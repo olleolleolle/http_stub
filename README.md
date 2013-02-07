@@ -6,15 +6,15 @@ A Http Server replaying configured stub responses.
 Guide
 -----
 
-# Configure responses via a POST to /stub with the following JSON payload:
+* Configure responses via a POST to /stub with the following JSON payload:
 
 > {
 >   "uri": "/some/path",
->   "method": "get",
+>   "method": "some method",
 >   "response": {
 >     "status": "200",
->     "body": "Hello World"
+>     "body": "Some body"
 >   }
 > }
 
-# Supported request types: GET, POST, PUT, DELETE, PATCH, OPTIONS
+* Supported request types: GET, POST, PUT, DELETE, PATCH, OPTIONS
