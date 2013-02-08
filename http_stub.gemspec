@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 $:.push File.expand_path("../lib", __FILE__)
-require "lib/http/stub/version"
+require "./lib/http/stub/version"
 
 Gem::Specification.new do |s|
   s.name = "http_stub"
