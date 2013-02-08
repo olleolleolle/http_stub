@@ -18,3 +18,9 @@ Guide
 > }
 
 * Supported request types: GET, POST, PUT, DELETE, PATCH, OPTIONS
+
+Requirements
+------------
+
+* Ruby 1.9.3
+* Rack server
