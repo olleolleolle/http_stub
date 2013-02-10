@@ -3,12 +3,13 @@ require 'rspec/core/rake_task'
 require File.expand_path('../lib/http/stub/rake_task', __FILE__)
 
 directory "coverage"
+directory "pkg"
 
 Bundler::GemHelper.install_tasks
 
 desc "Removed generated artefacts"
 task :clobber do
-  rm_rf "coverage"
+  %w{ coverage pkg }.each { |dir| rm_rf dir }
   rm Dir.glob("**/coverage.data"), force: true
   puts "Clobbered"
 end
