@@ -14,9 +14,11 @@ Gem::Specification.new do |s|
   s.rubyforge_project = "http_stub"
   s.license = "MIT"
 
-  s.required_ruby_version = '>= 1.9.3'
-
   s.files        = Dir.glob("./lib/**/*")
   s.test_files   = Dir.glob("./spec/**/*")
   s.require_path = "lib"
+
+  s.required_ruby_version = '>= 1.9.3'
+
+  s.add_dependency "sinatra", "~> 1.3.4"
 end

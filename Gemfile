@@ -1,12 +1,12 @@
 source 'http://rubygems.org'
 
-gem 'sinatra', '~> 1.3.4'
-gem 'rake', '~> 10.0.3'
+gemspec
 
 group :test do
   gem 'rspec', '~> 2.12'
   gem 'rack-test', '~> 0.6.2'
+  gem 'rake', '~> 10.0.3'
   gem 'cover_me', '~> 1.2.0'
   gem 'flog', '~> 3.2.2'
-  gem 'travis-lint'
+  gem 'travis-lint', '~> 1.6.0'
 end
