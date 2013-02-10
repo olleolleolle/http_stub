@@ -1,1 +1,1 @@
-curl -v -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '{"uri": "/test", "method": "get", "response": {"status":"200", "body":"Foo"}}' http://localhost:8000/register_stub
+curl -v -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '{"uri": "/test", "method": "get", "response": {"status":"200", "body":"Foo"}}' http://localhost:8001/stub

@@ -1,8 +1,3 @@
-require 'rubygems'
-require 'bundler/setup'
-Bundler.require(:default)
-require "json"
-
 module Http
   module Stub
 
@@ -50,8 +45,7 @@ module Http
         stub_data = @response_register[request.path_info]
         if stub_data && stub_data["method"].downcase == request.request_method.downcase
           response_data = stub_data["response"]
-          halt response_data["status"] unless response_data["status"] == "200"
-          response_data["body"]
+          halt response_data["status"].to_i, response_data["body"]
         else
           halt 404
         end

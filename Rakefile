@@ -1,4 +1,5 @@
 require 'rspec/core/rake_task'
+require File.expand_path('../lib/http/stub/rake_task', __FILE__)
 
 directory "coverage"
 
@@ -25,4 +26,16 @@ task :coverage => :spec do
   CoverMe.complete!
 end
 
+task :validate do
+  print " Travis CI Validation ".center(80, "*") + "\n"
+  result = `travis-lint #{File.expand_path('../travis.yml', __FILE__)}`
+  puts result
+  print "*" * 80+ "\n"
+  raise "Travis CI validation failed" unless result =~ /^Hooray/
+end
+
+Http::Stub::RakeTask.new(:sample, 8001)
+
 task :default => [:clobber, :metrics, :coverage]
+
+task :pre_commit => [:default, :validate]
