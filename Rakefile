@@ -1,7 +1,10 @@
+require 'bundler'
 require 'rspec/core/rake_task'
 require File.expand_path('../lib/http/stub/rake_task', __FILE__)
 
 directory "coverage"
+
+Bundler::GemHelper.install_tasks
 
 desc "Removed generated artefacts"
 task :clobber do
