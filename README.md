@@ -34,25 +34,17 @@ Guide
 
 * Clear all configured responses via a DELETE to /stubs.
 
-* Http::Stub::Client is a Ruby API on top of the HTTP requests:
+* Http::Stub::Client is a Ruby API on top of the HTTP requests, providing two methods: stub! and clear!
 
 ```ruby
-    class OAuthService
+    class AuthenticationService
         include Http::Stub::Client
 
-        server "my.stub.com"
-        port "8001
-
-        def grant_access
-            stub!("/", method: :get,
-                       response: { status: 200,
-                                   body: { refresh_token: "2.e8b7dbabc28f731035f771b8d15063f23.5184000",
-                                           access_token: "1.a6b7dbd428f731035f771b8d15063f61.86400" }.json
-                                 })
-        end
+        server "stub.authenticator.com"
+        port 8001
 
         def deny_access
-            stub!("/", method: :get, response: { status: 403 })
+            stub!("/", method: :get, response: { status: 403 }) # Registers a stub response
         end
 
     end
@@ -64,7 +56,7 @@ Guide
     end
 
     after(:each) do
-        @oath_service.clear # Removes all stubs
+        @oauth_service.clear! # Removes all stub responses
     end
 
     describe "when access is granted" do
