@@ -1,39 +1,58 @@
 describe Http::Stub::Server do
   include Rack::Test::Methods
 
-  let(:app) { Http::Stub::Server }
+  let(:app) { Http::Stub::Server.new }
+
+  let(:registry) { double(Http::Stub::Registry).as_null_object }
+  before(:each) { Http::Stub::Registry.stub!(:new).and_return(registry) }
+
   let(:response) { last_response }
   let(:response_body) { response.body.to_s }
 
-  shared_examples "a server that stubs a response" do |options|
+  describe "when a stub request is received" do
 
-    let(:request_type) { options[:request_type] }
-    let(:different_request_type) { options[:different_request_type] }
-    let(:test_url) { "/test_#{request_type}" }
+    it "should register a stub encapsulating the request" do
+      stub = double(Http::Stub::Stub)
+      Http::Stub::Stub.should_receive(:new).and_return(stub)
+      registry.should_receive(:add).with(stub, anything)
 
-    before(:each) do
-      post "/stub", '{"uri": "' + test_url + '", "method": "' + request_type.to_s + '", "response": {"status":"200", "body":"Foo"}}'
+      issue_stub_request
     end
 
-    describe "when a #{options[:request_type]} request is made" do
+  end
 
-      before(:each) { self.send(request_type, test_url) }
+  describe "when a playback request is received" do
 
-      it "should respond with the stubbed response code" do
-        response.status.should eql(200)
+    describe "and the request has been stubbed" do
+
+      before(:each) do
+        registry.stub!(:find_for).and_return(
+            double(Http::Stub::Stub, response: double("StubResponse", status: 500, body: "Some text")))
       end
 
-      it "should respond with the stubbed body" do
-        response_body.should eql("Foo")
+      it "should respond with the configured status" do
+        get "/a_path"
+
+        response.status.should eql(500)
+      end
+
+      it "should respond with the configured body" do
+        get "/a_path"
+
+        response_body.should eql("Some text")
       end
 
     end
 
-    describe "and a request of type '#{options[:different_request_type]}' is made" do
+    describe "and the request has not been stubbed" do
 
-      before(:each) { self.send(different_request_type, test_url) }
+      before(:each) do
+        registry.stub!(:find_for).and_return(nil)
+      end
 
-      it "should respond with a 404 response code" do
+      it "should respond with a 404" do
+        get "/a_path"
+
         response.status.should eql(404)
       end
 
@@ -41,25 +60,15 @@ describe Http::Stub::Server do
 
   end
 
-  all_request_types = [:get, :post, :put, :delete, :patch, :options]
-  all_request_types.each_with_index do |request_type, i|
-
-    describe "when a #{request_type} request is stubbed" do
-
-      it_should_behave_like "a server that stubs a response", request_type: request_type, different_request_type: all_request_types[i - 1]
-
-    end
-
-  end
-
-  describe "when a request is made that is not stubbed" do
-
-    before(:each) { get "/not_stubbed" }
-
-    it "should respond with 404 response code" do
-      response.status.should eql(404)
-    end
-
+  def issue_stub_request
+    post "/stub", {
+        "uri" => "/a_path",
+        "method" => "a method",
+        "response" => {
+            "status" => 200,
+            "body" => "Foo"
+        }
+    }.to_json
   end
 
 end

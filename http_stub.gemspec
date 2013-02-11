@@ -21,4 +21,5 @@ Gem::Specification.new do |s|
   s.required_ruby_version = '>= 1.9.3'
 
   s.add_dependency "sinatra", "~> 1.3.4"
+  s.add_dependency "immutable_struct", "~> 1.1.0"
 end

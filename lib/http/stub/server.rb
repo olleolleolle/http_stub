@@ -3,16 +3,16 @@ module Http
 
     class Server < ::Sinatra::Base
 
-      SUPPORTED_REQUEST_TYPES = [:get, :post, :put, :delete, :patch, :options].freeze
-
       enable :dump_errors, :logging
 
-      def initialize()
+      def initialize
         super()
-        @response_register = {}
+        @registry = Http::Stub::Registry.new
       end
 
       private
+
+      SUPPORTED_REQUEST_TYPES = [:get, :post, :put, :delete, :patch, :options].freeze
 
       def self.any_request_type(path, opts={}, &block)
         SUPPORTED_REQUEST_TYPES.each { |type| self.send(type, path, opts, &block) }
@@ -24,15 +24,17 @@ module Http
       # {
       #   "uri": "/some/path",
       #   "method": "get",
+      #   "parameters": {
+      #     "key": "value",
+      #     ...
+      #   },
       #   "response": {
       #     "status": "200",
       #     "body": "Hello World"
       #   }
       # }
       post "/stub" do
-        data = JSON.parse(request.body.read)
-        logger.info "Stub registered: #{data}"
-        @response_register[data["uri"]] = data
+        @registry.add(Http::Stub::Stub.new(request), request)
         halt 200
       end
 
@@ -41,14 +43,8 @@ module Http
       private
 
       def handle_stub_request
-        logger.info "Stub response requested: #{request}"
-        stub_data = @response_register[request.path_info]
-        if stub_data && stub_data["method"].downcase == request.request_method.downcase
-          response_data = stub_data["response"]
-          halt response_data["status"].to_i, response_data["body"]
-        else
-          halt 404
-        end
+        stub = @registry.find_for(request)
+        stub ? halt(stub.response.status, stub.response.body) : halt(404)
       end
 
     end

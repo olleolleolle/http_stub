@@ -12,9 +12,7 @@ describe Http::Stub::Client do
 
   describe "when a response for a request is stubbed" do
 
-    before(:each) do
-      client.stub_response!("/a_path", method: :get, status: 200, body: "Some body")
-    end
+    before(:each) { client.stub_response!("/a_path", method: :get, status: 200, body: "Some body") }
 
     describe "and that request is made" do
 
