@@ -36,6 +36,16 @@ describe Http::Stub::Registry do
           registry.find_for(request).should eql(stubs[1])
         end
 
+        describe "and the registry is subsequently cleared" do
+
+          before(:each) { registry.clear(request) }
+
+          it "should return nil" do
+            registry.find_for(request).should be_nil
+          end
+
+        end
+
       end
 
       describe "and multiple registered stubs match the request" do
@@ -72,6 +82,16 @@ describe Http::Stub::Registry do
       logger.should_receive(:info).with(/Request as String/)
 
       registry.find_for(request)
+    end
+
+  end
+
+  describe "#clear" do
+
+    it "should log that the stubs are being cleared" do
+      logger.should_receive(:info).with(/clearing stubs/i)
+
+      registry.clear(request)
     end
 
   end

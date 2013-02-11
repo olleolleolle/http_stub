@@ -17,6 +17,11 @@ module Http
         @stubs.find { |stub| stub.stubs?(request) }
       end
 
+      def clear(request)
+        request.logger.info "Clearing stubs"
+        @stubs.clear
+      end
+
     end
 
   end

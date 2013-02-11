@@ -23,19 +23,34 @@ module Http
 
       module InstanceMethods
 
-        def stub_response!(uri, response_options)
+        def stub!(uri, options)
+          response_options = options[:response]
           request = Net::HTTP::Post.new("/stub")
           request.content_type = "application/json"
           request.body = {
               "uri" => uri,
-              "method" => response_options[:method],
+              "method" => options[:method],
               "response" => {
                   "status" => response_options[:status] || "200",
                   "body" => response_options[:body]
               }
           }.to_json
-          response = Net::HTTP.new(self.class.host_value, self.class.port_value).start { |http| http.request(request) }
-          raise "Unable to stub request, stub responded with: #{response.message}" unless response.code == "200"
+          response = submit(request)
+          raise "Unable to stub request: #{response.message}" unless response.code == "200"
+        end
+
+        alias_method :stub_response!, :stub!
+
+        def clear!
+          request = Net::HTTP::Delete.new("/stubs")
+          response = submit(request)
+          raise "Unable to clear stubs: #{response.message}" unless response.code == "200"
+        end
+
+        private
+
+        def submit(request)
+          Net::HTTP.new(self.class.host_value, self.class.port_value).start { |http| http.request(request) }
         end
 
       end

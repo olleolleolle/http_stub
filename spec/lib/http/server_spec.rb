@@ -21,7 +21,7 @@ describe Http::Stub::Server do
 
   end
 
-  describe "when a playback request is received" do
+  describe "when a replay request is received" do
 
     describe "and the request has been stubbed" do
 
@@ -50,12 +50,28 @@ describe Http::Stub::Server do
         registry.stub!(:find_for).and_return(nil)
       end
 
-      it "should respond with a 404" do
+      it "should respond with a 404 status code" do
         get "/a_path"
 
         response.status.should eql(404)
       end
 
+    end
+
+  end
+
+  describe "when a request to clear the stub has been received" do
+
+    it "should clear the contents of the registry" do
+      registry.should_receive(:clear)
+
+      delete "/stubs"
+    end
+
+    it "should respond with a 200 status code" do
+      delete "/stubs"
+
+      response.status.should eql(200)
     end
 
   end

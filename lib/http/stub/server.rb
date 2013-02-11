@@ -38,6 +38,11 @@ module Http
         halt 200
       end
 
+      delete "/stubs" do
+        @registry.clear(request)
+        halt 200
+      end
+
       any_request_type(//) { handle_stub_request }
 
       private
