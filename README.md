@@ -24,17 +24,15 @@ Guide
     }
 ```
 
-** The uri and method attributes are mandatory.
-   Only subsequent requests matching these criteria will respond with the configured response.
-
-** The parameters attribute is optional.
-   When included, requests with matching parameters will return the stub response.
-
-** The most-recent configured stub request matching wins.
+    * The uri and method attributes are mandatory.
+      Only subsequent requests matching these criteria will respond with the configured response.
+    * The parameters attribute is optional.
+      When included, requests with matching parameters will return the stub response.
+    * The most-recent matching configured stub request wins.
 
 * Clear all configured responses via a DELETE to /stubs.
 
-* Http::Stub::Client is a Ruby API on top of the HTTP requests, providing two methods: stub! and clear!
+* Http::Stub::Client is a Ruby API on top of the HTTP requests, providing two methods: ```stub!``` and ```clear!```
 
 ```ruby
     class AuthenticationService
