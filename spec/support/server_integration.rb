@@ -1,4 +1,4 @@
-share_examples_for "server integration" do
+shared_context "server integration" do
 
   FIVE_SECONDS = 5
 
