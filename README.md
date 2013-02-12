@@ -29,6 +29,7 @@ Guide
     * The parameters attribute is optional.
       When included, requests with matching parameters will return the stub response.
     * The most-recent matching configured stub request wins.
+    * Stubs for GET, POST, PUT, DELETE, PATCH, OPTIONS request methods are supported.
 
 * Clear all configured responses via a DELETE to /stubs.
 
@@ -64,7 +65,12 @@ Guide
     end
 ```
 
-* Supported request types: GET, POST, PUT, DELETE, PATCH, OPTIONS
+* Includes a Rake Task generator, generating a task that starts a stub server:
+
+```ruby
+    require 'http/stub/start_server_rake_task'
+    Http::Stub::StartServerRakeTask.new(name: :some_server, port: 8080) # generates start_some_server task
+```
 
 Requirements
 ------------
