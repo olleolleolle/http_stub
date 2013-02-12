@@ -69,7 +69,7 @@ Guide
 
 ```ruby
     require 'http/stub/start_server_rake_task'
-    Http::Stub::StartServerRakeTask.new(name: :some_server, port: 8080) # generates start_some_server task
+    Http::Stub::StartServerRakeTask.new(name: :some_server, port: 8080) # Generates start_some_server task
 ```
 
 Requirements
