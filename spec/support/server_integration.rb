@@ -3,7 +3,7 @@ share_examples_for "server integration" do
   FIVE_SECONDS = 5
 
   before(:all) do
-    @pid = Process.spawn("rake start_sample_server --trace")
+    @pid = Process.spawn("rake start_test_server --trace")
     wait_until("http stub server started") { Net::HTTP.get_response("localhost", "/", 8001) }
   end
 

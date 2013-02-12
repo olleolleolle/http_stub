@@ -4,13 +4,13 @@ require 'rake/tasklib' unless defined?(::Rake::TaskLib)
 module Http
   module Stub
 
-    class RakeTask < ::Rake::TaskLib
+    class StartServerRakeTask < ::Rake::TaskLib
 
-      def initialize(server_name, server_port)
-        desc "Starts stub #{server_name} server"
-        task "start_#{server_name}_server" do
+      def initialize(options)
+        desc "Starts stub #{options[:name]}"
+        task "start_#{options[:name]}" do
           Http::Stub::Server.instance_eval do
-            set :port, server_port
+            set :port, options[:port]
             run!
           end
         end
