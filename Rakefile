@@ -2,7 +2,6 @@ require 'bundler'
 require 'rspec/core/rake_task'
 require File.expand_path('../lib/http/stub/start_server_rake_task', __FILE__)
 
-directory "coverage"
 directory "pkg"
 
 Bundler::GemHelper.install_tasks
@@ -25,9 +24,28 @@ desc "Exercises specifications"
 ::RSpec::Core::RakeTask.new(:spec)
 
 desc "Exercises specifications with coverage analysis"
-task :coverage => :spec do
-  require 'cover_me'
-  CoverMe.complete!
+task :coverage => "coverage:generate"
+
+namespace :coverage do
+
+  desc "Shows specification coverage results in browser"
+  task :show => :spec do
+    require 'cover_me'
+    CoverMe.complete!
+  end
+
+  desc "Generates specification coverage results"
+  task :generate => :spec do
+    require 'cover_me'
+    CoverMe.config.at_exit = Proc.new {
+      index = File.join(CoverMe.config.html_formatter.output_path, 'index.html')
+      print " Coverage Analysis ".center(80, "*") + "\n"
+      print "Report: #{index}\n"
+      print "*" * 80+ "\n"
+    }
+    CoverMe.complete!
+  end
+
 end
 
 task :validate do
@@ -42,4 +60,4 @@ Http::Stub::StartServerRakeTask.new(name: :test_server, port: 8001)
 
 task :default => [:clobber, :metrics, :coverage]
 
-task :pre_commit => [:default, :validate]
+task :pre_commit => [:clobber, :metrics, "coverage:show", :validate]
