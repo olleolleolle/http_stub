@@ -6,6 +6,8 @@ A Http Server replaying configured stub responses.
 Guide
 -----
 
+* gem install http_stub
+
 * Configure responses via a POST to /stub with the following JSON payload:
 
 ```javascript
