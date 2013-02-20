@@ -1,6 +1,6 @@
-describe Http::Stub::Registry do
+describe HttpStub::Registry do
 
-  let(:registry) { Http::Stub::Registry.new }
+  let(:registry) { HttpStub::Registry.new }
 
   let(:logger) { double("Logger").as_null_object }
   let(:request) { double("HttpRequest", logger: logger, to_s: "Request as String") }
@@ -8,7 +8,7 @@ describe Http::Stub::Registry do
   describe "#add" do
 
     it "should log that the stub has been registered" do
-      stub = double(Http::Stub::Stub, to_s: "Stub as String")
+      stub = double(HttpStub::Stub, to_s: "Stub as String")
       logger.should_receive(:info).with(/Stub as String/)
 
       registry.add(stub, request)
@@ -21,7 +21,7 @@ describe Http::Stub::Registry do
     describe "when multiple stubs have been registered" do
 
       let(:stubs) do
-        (1..3).map { |i| double("#{Http::Stub::Stub}#{i}", :stubs? => false) }
+        (1..3).map { |i| double("#{HttpStub::Stub}#{i}", :stubs? => false) }
       end
 
       before(:each) do

@@ -1,4 +1,4 @@
-describe Http::Stub::Stub do
+describe HttpStub::Stub do
 
   let(:stub_uri) { "/a_path" }
   let(:stub_method) { "get" }
@@ -15,7 +15,7 @@ describe Http::Stub::Stub do
     }.to_json
   end
   let(:stub_request) { double("HttpRequest", :body => double("HttpRequestBody", :read => stub_body)) }
-  let(:stub_instance) { Http::Stub::Stub.new(stub_request) }
+  let(:stub_instance) { HttpStub::Stub.new(stub_request) }
 
   describe "#stubs?" do
 

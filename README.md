@@ -1,45 +1,35 @@
 http_stub
 =========
 
-A Http Server replaying configured stub responses.
+A HTTP Server replaying configured stub responses.
 
-Guide
+Installation
+------------
+
+gem install http_stub
+
+Usage
 -----
 
-* gem install http_stub
+### Starting Server ###
 
-* Configure responses via a POST to /stub with the following JSON payload:
+Generate a rake task that starts a stub server:
 
-```javascript
-    {
-        "uri": "/some/path",
-        "method": "some method",
-        "parameters": {
-            "a_key": "a_value",
-            "another_key": "another_value"
-            ...
-        },
-        "response": {
-            "status": "200",
-            "body": "Some body"
-        }
-    }
+```ruby
+    require 'http_stub/start_server_rake_task'
+
+    HttpStub::StartServerRakeTask.new(name: :some_server, port: 8080) # Generates start_some_server task
 ```
 
-    * The uri and method attributes are mandatory.
-      Only subsequent requests matching these criteria will respond with the configured response.
-    * The parameters attribute is optional.
-      When included, requests with matching parameters will return the stub response.
-    * The most-recent matching configured stub request wins.
-    * Stubs for GET, POST, PUT, DELETE, PATCH, OPTIONS request methods are supported.
+### Stubbing Server Responses ###
 
-* Clear all configured responses via a DELETE to /stubs.
+#### Stub via Ruby API ####
 
-* Http::Stub::Client is a Ruby API on top of the HTTP requests, providing two methods: ```stub!``` and ```clear!```
+HttpStub::Client is a Ruby API that issues requests to the stub server via two methods: ```stub!``` and ```clear!```
 
 ```ruby
     class AuthenticationService
-        include Http::Stub::Client
+        include HttpStub::Client
 
         server "stub.authenticator.com"
         port 8001
@@ -67,12 +57,39 @@ Guide
     end
 ```
 
-* Includes a Rake Task generator, generating a task that starts a stub server:
+#### Stub via HTTP requests ####
 
-```ruby
-    require 'http/stub/start_server_rake_task'
-    Http::Stub::StartServerRakeTask.new(name: :some_server, port: 8080) # Generates start_some_server task
+POST to /stub with the following JSON payload:
+
+```javascript
+    {
+        "uri": "/some/path",
+        "method": "some method",
+        "parameters": {
+            "a_key": "a_value",
+            "another_key": "another_value"
+            ...
+        },
+        "response": {
+            "status": "200",
+            "body": "Some body"
+        }
+    }
 ```
+
+DELETE to /stubs in order to clear configured stubs.
+
+### Request configuration rules ###
+
+The **uri and method attributes are mandatory**.
+Only subsequent requests matching these criteria will respond with the configured response.
+
+The **parameters attribute is optional**.
+When included, requests with matching parameters will return the stub response.
+
+Stubs for **GET, POST, PUT, DELETE, PATCH, OPTIONS request methods are supported**.
+
+**The most-recent matching configured stub request wins**.
 
 Requirements
 ------------

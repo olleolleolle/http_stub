@@ -1,8 +1,8 @@
-describe Http::Stub::Client do
+describe HttpStub::Client do
   include_context "server integration"
 
   class TestClient
-    include Http::Stub::Client
+    include HttpStub::Client
 
     host "localhost"
     port 8001

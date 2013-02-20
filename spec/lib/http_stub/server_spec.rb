@@ -1,10 +1,10 @@
-describe Http::Stub::Server do
+describe HttpStub::Server do
   include Rack::Test::Methods
 
-  let(:app) { Http::Stub::Server.new }
+  let(:app) { HttpStub::Server.new }
 
-  let(:registry) { double(Http::Stub::Registry).as_null_object }
-  before(:each) { Http::Stub::Registry.stub!(:new).and_return(registry) }
+  let(:registry) { double(HttpStub::Registry).as_null_object }
+  before(:each) { HttpStub::Registry.stub!(:new).and_return(registry) }
 
   let(:response) { last_response }
   let(:response_body) { response.body.to_s }
@@ -12,8 +12,8 @@ describe Http::Stub::Server do
   describe "when a stub request is received" do
 
     it "should register a stub encapsulating the request" do
-      stub = double(Http::Stub::Stub)
-      Http::Stub::Stub.should_receive(:new).and_return(stub)
+      stub = double(HttpStub::Stub)
+      HttpStub::Stub.should_receive(:new).and_return(stub)
       registry.should_receive(:add).with(stub, anything)
 
       issue_stub_request
@@ -27,7 +27,7 @@ describe Http::Stub::Server do
 
       before(:each) do
         registry.stub!(:find_for).and_return(
-            double(Http::Stub::Stub, response: double("StubResponse", status: 500, body: "Some text")))
+            double(HttpStub::Stub, response: double("StubResponse", status: 500, body: "Some text")))
       end
 
       it "should respond with the configured status" do
