@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    http_stub (0.1.1)
+    http_stub (0.1.2)
       immutable_struct (~> 1.1.0)
       sinatra (~> 1.3.4)
 
