@@ -3,7 +3,7 @@ describe HttpStub::Registry do
   let(:registry) { HttpStub::Registry.new }
 
   let(:logger) { double("Logger").as_null_object }
-  let(:request) { double("HttpRequest", logger: logger, to_s: "Request as String") }
+  let(:request) { double("HttpRequest", logger: logger, inspect: "Request inspect result") }
 
   describe "#add" do
 
@@ -78,8 +78,8 @@ describe HttpStub::Registry do
 
     end
 
-    it "it should log that a stub is being found" do
-      logger.should_receive(:info).with(/Request as String/)
+    it "it should log stub discovery diagnostics that includes the complete details of the request" do
+      logger.should_receive(:info).with(/Request inspect result/)
 
       registry.find_for(request)
     end
