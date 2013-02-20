@@ -14,7 +14,7 @@ module HttpStub
     def stubs?(request)
       @data["uri"] == request.path_info &&
           @data["method"].downcase == request.request_method.downcase &&
-          parameters == request.params
+          (parameters.empty? || (parameters == request.params))
     end
 
     def to_s

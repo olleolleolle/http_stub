@@ -81,6 +81,22 @@ describe HttpStub::Stub do
 
         end
 
+        describe "and a parameter match is not configured" do
+
+          describe "and parameters are provided in the request" do
+
+            let(:request_parameters) do
+              { "param1" => "value1" }
+            end
+
+            it "should be true" do
+              stub_instance.stubs?(request).should be_true
+            end
+
+          end
+
+        end
+
       end
 
     end
