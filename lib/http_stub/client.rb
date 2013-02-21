@@ -30,6 +30,7 @@ module HttpStub
         request.body = {
             "uri" => uri,
             "method" => options[:method],
+            "parameters" => options[:parameters] || {},
             "response" => {
                 "status" => response_options[:status] || "200",
                 "body" => response_options[:body]
