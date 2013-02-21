@@ -85,7 +85,8 @@ The **uri and method attributes are mandatory**.
 Only subsequent requests matching these criteria will respond with the configured response.
 
 The **parameters attribute is optional**.
-When included, requests with matching parameters will return the stub response.
+When included, requests containing parameters matching these names and values will return the stub response.
+Requests that contain additional parameters will also match.
 
 Stubs for **GET, POST, PUT, DELETE, PATCH, OPTIONS request methods are supported**.
 

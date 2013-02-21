@@ -40,7 +40,7 @@ describe HttpStub::Stub do
             }
           end
 
-          describe "and the parameters match" do
+          describe "and the request parameters are identical" do
 
             it "should return true" do
               stub_instance.stubs?(request).should be_true
@@ -48,7 +48,17 @@ describe HttpStub::Stub do
 
           end
 
-          describe "and the parameter values do not match" do
+          describe "and the request parameters match the stub parameters and contain additional parameters" do
+
+            let(:request_parameters) { stub_parameters.merge("param4" => "value4") }
+
+            it "should return true" do
+              stub_instance.stubs?(request).should be_true
+            end
+
+          end
+
+          describe "and the requests parameter values do not match" do
 
             let(:request_parameters) do
               {
@@ -64,7 +74,7 @@ describe HttpStub::Stub do
 
           end
 
-          describe "and not all parameters are provided" do
+          describe "and the request parameters do not contain all stub parameters" do
 
             let(:request_parameters) do
               {
