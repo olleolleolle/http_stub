@@ -4,7 +4,7 @@ describe HttpStub::StartServerRakeTask do
   describe("when the generated task is invoked") do
 
     it "should start a stub server that responds to stub requests" do
-      request = Net::HTTP::Post.new("/stub")
+      request = Net::HTTP::Post.new("/stubs")
       request.body = { "response" => { "status" => 302, "body" => "Some Body" } }.to_json
 
       response = Net::HTTP.new("localhost", 8001).start { |http| http.request(request) }

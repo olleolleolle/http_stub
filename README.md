@@ -6,7 +6,11 @@ A HTTP Server replaying configured stub responses.
 Installation
 ------------
 
-gem install http_stub
+In your Gemfile include:
+
+```ruby
+    gem 'http_stub'
+```
 
 Usage
 -----
@@ -25,17 +29,19 @@ Generate a rake task that starts a stub server:
 
 #### Stub via Ruby API ####
 
-HttpStub::Client is a Ruby API that issues requests to the stub server via two methods: ```stub!``` and ```clear!```
+HttpStub::Configurer is a Ruby API that configures the stub server via the class method ```stub_alias``` and instance methods ```stub!``` and ```clear!```
 
 ```ruby
     class AuthenticationService
-        include HttpStub::Client
+        include HttpStub::Configurer
 
         server "stub.authenticator.com"
         port 8001
 
-        def deny_access
-            stub!("/", method: :get, response: { status: 403 }) # Registers a stub response
+        stub_alias "/unavailable", "/", method: :get, response: { status: 404 } # Register a stub for "/" when GET "/unavailable" request is made
+
+        def deny_access_for(username)
+            stub!("/", method: :get, parameters: { username: username }, response: { status: 403 }) # Registers a stub response
         end
 
     end
@@ -47,7 +53,7 @@ HttpStub::Client is a Ruby API that issues requests to the stub server via two m
     end
 
     after(:each) do
-        @oauth_service.clear! # Removes all stub responses
+        @oauth_service.clear! # Removes all stub responses, but retains aliases
     end
 
     describe "when access is granted" do
@@ -59,7 +65,7 @@ HttpStub::Client is a Ruby API that issues requests to the stub server via two m
 
 #### Stub via HTTP requests ####
 
-POST to /stub with the following JSON payload:
+To configure a stub, POST to /stubs with the following JSON payload:
 
 ```javascript
     {
@@ -74,6 +80,15 @@ POST to /stub with the following JSON payload:
             "status": "200",
             "body": "Some body"
         }
+    }
+```
+
+To configure an alias, POST to /stubs/aliases with the following JSON payload:
+
+```javascript
+    {
+        "alias_uri": "/some/alias/path",
+        # remainder same as stub request...
     }
 ```
 

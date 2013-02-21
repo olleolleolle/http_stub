@@ -6,7 +6,10 @@ module HttpStub
 
     def initialize
       super()
-      @registry = HttpStub::Registry.new
+      @stub_registry = HttpStub::Models::Registry.new("stub")
+      @alias_registry = HttpStub::Models::Registry.new("alias")
+      @stub_controller = HttpStub::Controllers::StubController.new(@stub_registry)
+      @alias_controller = HttpStub::Controllers::AliasController.new(@alias_registry, @stub_registry)
     end
 
     private
@@ -32,23 +35,35 @@ module HttpStub
     #     "body": "Hello World"
     #   }
     # }
-    post "/stub" do
-      @registry.add(HttpStub::Stub.new(request), request)
-      halt 200
+    post "/stubs" do
+      response = @stub_controller.register(request)
+      halt(response.status, response.body)
+    end
+
+    # Sample request body:
+    # {
+    #   "alias_uri": "/some/path",
+    #   ... see /stub ...
+    # }
+    post "/stubs/aliases" do
+      response = @alias_controller.register(request)
+      halt(response.status, response.body)
     end
 
     delete "/stubs" do
-      @registry.clear(request)
+      @stub_controller.clear(request)
       halt 200
     end
 
-    any_request_type(//) { handle_stub_request }
+    any_request_type(//) { handle_request }
 
     private
 
-    def handle_stub_request
-      stub = @registry.find_for(request)
-      stub ? halt(stub.response.status, stub.response.body) : halt(404)
+    def handle_request
+      response = @stub_controller.replay(request)
+      response = @alias_controller.activate(request) if response.empty?
+      response = HttpStub::Response::ERROR if response.empty?
+      halt(response.status, response.body)
     end
 
   end

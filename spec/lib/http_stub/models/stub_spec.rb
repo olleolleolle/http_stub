@@ -1,4 +1,4 @@
-describe HttpStub::Stub do
+describe HttpStub::Models::Stub do
 
   let(:stub_uri) { "/a_path" }
   let(:stub_method) { "get" }
@@ -14,10 +14,9 @@ describe HttpStub::Stub do
         }
     }.to_json
   end
-  let(:stub_request) { double("HttpRequest", :body => double("HttpRequestBody", :read => stub_body)) }
-  let(:stub_instance) { HttpStub::Stub.new(stub_request) }
+  let(:the_stub) { HttpStub::Models::Stub.new(stub_body) }
 
-  describe "#stubs?" do
+  describe "#satisfies?" do
 
     let(:request_uri) { stub_uri }
     let(:request_method) { stub_method }
@@ -43,7 +42,7 @@ describe HttpStub::Stub do
           describe "and the request parameters are identical" do
 
             it "should return true" do
-              stub_instance.stubs?(request).should be_true
+              the_stub.satisfies?(request).should be_true
             end
 
           end
@@ -53,7 +52,7 @@ describe HttpStub::Stub do
             let(:request_parameters) { stub_parameters.merge("param4" => "value4") }
 
             it "should return true" do
-              stub_instance.stubs?(request).should be_true
+              the_stub.satisfies?(request).should be_true
             end
 
           end
@@ -69,7 +68,7 @@ describe HttpStub::Stub do
             end
 
             it "should return false" do
-              stub_instance.stubs?(request).should be_false
+              the_stub.satisfies?(request).should be_false
             end
 
           end
@@ -84,7 +83,7 @@ describe HttpStub::Stub do
             end
 
             it "should be false" do
-              stub_instance.stubs?(request).should be_false
+              the_stub.satisfies?(request).should be_false
             end
 
           end
@@ -100,7 +99,7 @@ describe HttpStub::Stub do
             end
 
             it "should be true" do
-              stub_instance.stubs?(request).should be_true
+              the_stub.satisfies?(request).should be_true
             end
 
           end
@@ -116,7 +115,7 @@ describe HttpStub::Stub do
       let(:request_uri) { "/a_different_path" }
 
       it "should return false" do
-        stub_instance.stubs?(request).should be_false
+        the_stub.satisfies?(request).should be_false
       end
 
     end
@@ -126,7 +125,7 @@ describe HttpStub::Stub do
       let(:request_method) { "post" }
 
       it "should return false" do
-        stub_instance.stubs?(request).should be_false
+        the_stub.satisfies?(request).should be_false
       end
 
     end
@@ -136,11 +135,11 @@ describe HttpStub::Stub do
   describe "#response" do
 
     it "should expose the provided response status" do
-      stub_instance.response.status.should eql(201)
+      the_stub.response.status.should eql(201)
     end
 
     it "should expose the provided response body" do
-      stub_instance.response.body.should eql("Foo")
+      the_stub.response.body.should eql("Foo")
     end
 
   end
@@ -156,26 +155,26 @@ describe HttpStub::Stub do
     end
 
     it "should return a string containing the stubbed uri" do
-      stub_instance.to_s.should match(/\/a_path/)
+      the_stub.to_s.should match(/\/a_path/)
     end
 
     it "should return a string containing the stubbed request method" do
-      stub_instance.to_s.should match(/get/)
+      the_stub.to_s.should match(/get/)
     end
 
     it "should return a string containing the stubbed parameters" do
       stub_parameters.each_pair do |key, value|
-        stub_instance.to_s.should match(/#{Regexp.escape(key)}/)
-        stub_instance.to_s.should match(/#{Regexp.escape(value)}/)
+        the_stub.to_s.should match(/#{Regexp.escape(key)}/)
+        the_stub.to_s.should match(/#{Regexp.escape(value)}/)
       end
     end
 
     it "should return a string containing the intended response code" do
-      stub_instance.to_s.should match(/201/)
+      the_stub.to_s.should match(/201/)
     end
 
     it "should return a string containing the intended response body" do
-      stub_instance.to_s.should match(/Foo/)
+      the_stub.to_s.should match(/Foo/)
     end
 
   end
