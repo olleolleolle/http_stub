@@ -29,7 +29,7 @@ Generate a rake task that starts a stub server:
 
 #### Stub via Ruby API ####
 
-HttpStub::Configurer is a Ruby API that configures the stub server via the class method ```stub_alias``` and instance methods ```stub!``` and ```clear!```
+HttpStub::Configurer is a Ruby API that configures the stub server via the class method ```stub_alias``` and instance methods ```stub!```, ```activate!``` and ```clear!```
 
 ```ruby
     class AuthenticationService
@@ -40,11 +40,21 @@ HttpStub::Configurer is a Ruby API that configures the stub server via the class
 
         stub_alias "/unavailable", "/", method: :get, response: { status: 404 } # Register a stub for "/" when GET "/unavailable" request is made
 
-        def deny_access_for(username)
+        def unavailable!
+            activate!("/unavailable") # Activates the "/unavailable" alias
+        end
+
+        def deny_access_for!(username)
             stub!("/", method: :get, parameters: { username: username }, response: { status: 403 }) # Registers a stub response
         end
 
     end
+```
+
+**Important**: Once a server is running, initialize a Configurer via the ```initialize!``` class method.
+
+```ruby
+    AuthenticationService.initialize!
 ```
 
 ```ruby
@@ -92,7 +102,11 @@ To configure an alias, POST to /stubs/aliases with the following JSON payload:
     }
 ```
 
+To activate an alias, GET the alias_uri.
+
 DELETE to /stubs in order to clear configured stubs.
+
+DELETE to /stubs/aliases in order to clear configured aliases.
 
 ### Request configuration rules ###
 
@@ -110,5 +124,5 @@ Stubs for **GET, POST, PUT, DELETE, PATCH, OPTIONS request methods are supported
 Requirements
 ------------
 
-* Ruby 1.9.3
+* Ruby 1.9
 * Rack server

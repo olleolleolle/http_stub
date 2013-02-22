@@ -72,4 +72,14 @@ describe HttpStub::Controllers::AliasController do
 
   end
 
+  describe "#clear" do
+
+    it "should clear the alias registry" do
+      alias_registry.should_receive(:clear).with(request)
+
+      controller.clear(request)
+    end
+
+  end
+
 end

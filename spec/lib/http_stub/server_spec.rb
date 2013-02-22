@@ -78,7 +78,7 @@ describe HttpStub::Server do
 
   end
 
-  describe "when a request to clear the server has been received" do
+  describe "when a request to clear the stubs has been received" do
 
     it "should delegate clearing to the stub controller" do
       stub_controller.should_receive(:clear)
@@ -88,6 +88,22 @@ describe HttpStub::Server do
 
     it "should respond with a 200 status code" do
       delete "/stubs"
+
+      response.status.should eql(200)
+    end
+
+  end
+
+  describe "when a request to clear the stub aliases has been received" do
+
+    it "should delegate clearing to the stub controller" do
+      alias_controller.should_receive(:clear)
+
+      delete "/stubs/aliases"
+    end
+
+    it "should respond with a 200 status code" do
+      delete "/stubs/aliases"
 
       response.status.should eql(200)
     end

@@ -1,46 +1,58 @@
 describe HttpStub::Configurer do
   include_context "server integration"
 
-  before(:all) do
-    class TestConfigurer
-      include HttpStub::Configurer
+  let(:configurer) { HttpStub::Examples::ConfigurerWithAlias.new }
 
-      host "localhost"
-      port 8001
-
-      stub_alias "/an_alias", "/path1", method: :get, response: { status: 200, body: "Stub alias body" }
-    end
+  after(:each) do
+    configurer.clear!
+    configurer.class.clear_aliases!
   end
 
-  let(:configurer) { TestConfigurer.new }
+  describe "when initialized" do
 
-  after(:each) { configurer.clear! }
+    before(:each) { configurer.class.initialize! }
 
-  describe "when a stub alias is activated" do
+    describe "and a stub alias is activated" do
 
-    before(:each) { Net::HTTP.get_response("localhost", "/an_alias", 8001) }
+      before(:each) { configurer.activate!("/an_alias") }
 
-    describe "and the stub request is made" do
+      describe "and the stub request is made" do
 
-      let(:response) { Net::HTTP.get_response("localhost", "/path1", 8001) }
+        let(:response) { Net::HTTP.get_response("localhost", "/path1", 8001) }
 
-      it "should replay the stubbed response" do
-        response.code.should eql("200")
-        response.body.should eql("Stub alias body")
+        it "should replay the stubbed response" do
+          response.code.should eql("200")
+          response.body.should eql("Stub alias body")
+        end
+
+      end
+
+    end
+
+    describe "and a stub alias is not activated" do
+
+      describe "and the stub request is made" do
+
+        let(:response) { Net::HTTP.get_response("localhost", "/path1", 8001) }
+
+        it "should respond with a 404 status code" do
+          response.code.should eql("404")
+        end
+
       end
 
     end
 
   end
 
-  describe "when a stub alias is not activated" do
+  describe "when uninitialized" do
 
-    describe "and the stub request is made" do
+    describe "and an attempt is made to activate a stub alias" do
 
       let(:response) { Net::HTTP.get_response("localhost", "/path1", 8001) }
 
-      it "should respond with a 404 status code" do
-        response.code.should eql("404")
+      it "should respond raise an exception indicating the alias is not configured" do
+        lambda { configurer.activate!("/an_alias") }.should raise_error(/alias \/an_alias not configured/i)
       end
 
     end

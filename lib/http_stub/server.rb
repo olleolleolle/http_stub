@@ -40,6 +40,11 @@ module HttpStub
       halt(response.status, response.body)
     end
 
+    delete "/stubs" do
+      @stub_controller.clear(request)
+      halt 200
+    end
+
     # Sample request body:
     # {
     #   "alias_uri": "/some/path",
@@ -50,8 +55,8 @@ module HttpStub
       halt(response.status, response.body)
     end
 
-    delete "/stubs" do
-      @stub_controller.clear(request)
+    delete "/stubs/aliases" do
+      @alias_controller.clear(request)
       halt 200
     end
 

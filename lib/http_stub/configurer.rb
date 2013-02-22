@@ -31,12 +31,30 @@ module HttpStub
                 "body" => response_options[:body]
             }
         }.to_json
+        alias_requests << request
+      end
+
+      def initialize!
+        alias_requests.each do |request|
+          response = submit(request)
+          raise "Unable to initialize stub alias: #{response.message}" unless response.code == "200"
+        end
+      end
+
+      def clear_aliases!
+        request = Net::HTTP::Delete.new("/stubs/aliases")
         response = submit(request)
-        raise "Unable to establish stub alias: #{response.message}" unless response.code == "200"
+        raise "Unable to clear stub aliases: #{response.message}" unless response.code == "200"
       end
 
       def submit(request)
         Net::HTTP.new(@host, @port).start { |http| http.request(request) }
+      end
+
+      private
+
+      def alias_requests
+        @alias_requests ||= []
       end
 
     end
@@ -61,6 +79,14 @@ module HttpStub
       end
 
       alias_method :stub_response!, :stub!
+
+      def activate!(uri)
+        request = Net::HTTP::Get.new(uri)
+        response = self.class.submit(request)
+        raise "Alias #{uri} not configured: #{response.message}" unless response.code == "200"
+      end
+
+      alias_method :activate_stub!, :activate!
 
       def clear!
         request = Net::HTTP::Delete.new("/stubs")

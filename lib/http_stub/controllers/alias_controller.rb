@@ -23,6 +23,10 @@ module HttpStub
         end
       end
 
+      def clear(request)
+        @alias_registry.clear(request)
+      end
+
     end
 
   end
