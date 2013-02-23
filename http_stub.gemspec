@@ -26,7 +26,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rack-test", "~> 0.6.2"
   s.add_development_dependency "rake", "~> 10.0.3"
   s.add_development_dependency "rspec", "~> 2.12"
-  s.add_development_dependency "cover_me", "~> 1.2.0"
+  s.add_development_dependency "simplecov", "~> 0.7.1"
   s.add_development_dependency "flog", "~> 3.2.2"
   s.add_development_dependency "travis-lint", "~> 1.6.0"
 end

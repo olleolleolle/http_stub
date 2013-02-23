@@ -1,4 +1,10 @@
-require 'cover_me'
+require 'simplecov'
+SimpleCov.start do
+  add_filter "/spec/"
+  minimum_coverage 97.3
+  refuse_coverage_drop
+end if ENV['coverage']
+
 require 'rack/test'
 
 require File.expand_path('../../lib/http_stub/start_server_rake_task', __FILE__)

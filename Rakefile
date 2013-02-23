@@ -29,22 +29,19 @@ task :coverage => "coverage:generate"
 
 namespace :coverage do
 
-  desc "Shows specification coverage results in browser"
-  task :show => :spec do
-    require 'cover_me'
-    CoverMe.complete!
+  desc "Generates specification coverage results"
+  task :generate do
+    ENV["coverage"] = "enabled"
+    Rake::Task[:spec].invoke
   end
 
-  desc "Generates specification coverage results"
-  task :generate => :spec do
-    require 'cover_me'
-    CoverMe.config.at_exit = Proc.new {
-      index = File.join(CoverMe.config.html_formatter.output_path, 'index.html')
-      print " Coverage Analysis ".center(80, "*") + "\n"
-      print "Report: #{index}\n"
-      print "*" * 80+ "\n"
-    }
-    CoverMe.complete!
+  desc "Shows specification coverage results in browser"
+  task :show do
+    begin
+      Rake::Task["coverage:generate"].invoke
+    ensure
+      `open coverage/index.html`
+    end
   end
 
 end
