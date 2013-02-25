@@ -3,18 +3,18 @@ describe HttpStub::Models::Stub do
   let(:stub_uri) { "/a_path" }
   let(:stub_method) { "get" }
   let(:stub_parameters) { {} }
-  let(:stub_body) do
+  let(:stub_options) do
     {
-        "uri" => stub_uri,
-        "method" => stub_method,
-        "parameters" => stub_parameters,
-        "response" => {
-            "status" => 201,
-            "body" => "Foo"
-        }
-    }.to_json
+      "uri" => stub_uri,
+      "method" => stub_method,
+      "parameters" => stub_parameters,
+      "response" => {
+        "status" => 201,
+        "body" => "Foo"
+      }
+    }
   end
-  let(:the_stub) { HttpStub::Models::Stub.new(stub_body) }
+  let(:the_stub) { HttpStub::Models::Stub.new(stub_options) }
 
   describe "#satisfies?" do
 
@@ -128,6 +128,22 @@ describe HttpStub::Models::Stub do
         the_stub.satisfies?(request).should be_false
       end
 
+    end
+
+  end
+
+  describe "#uri" do
+
+    it "should return the value provided in the request body" do
+      the_stub.uri.should eql(stub_uri)
+    end
+
+  end
+
+  describe "#method" do
+
+    it "should return the value provided in the request body" do
+      the_stub.method.should eql(stub_method)
     end
 
   end

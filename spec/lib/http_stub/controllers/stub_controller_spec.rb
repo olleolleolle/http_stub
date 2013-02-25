@@ -1,11 +1,14 @@
 describe HttpStub::Controllers::StubController do
 
   let(:request_body) { "Some request body" }
+  let(:stub_options) { double("StubOptions") }
   let(:request) { double("HttpRequest", body: double("RequestBody", read: request_body)) }
   let(:response) { double(HttpStub::Response) }
   let(:the_stub) { double(HttpStub::Models::Stub, response: response) }
   let(:registry) { double(HttpStub::Models::Registry).as_null_object }
   let(:controller) { HttpStub::Controllers::StubController.new(registry) }
+
+  before(:each) { JSON.stub!(:parse).and_return(stub_options) }
 
   describe "#register" do
 
@@ -13,8 +16,14 @@ describe HttpStub::Controllers::StubController do
       HttpStub::Models::Stub.stub!(:new).and_return(the_stub)
     end
 
-    it "should create a stub from the request body" do
-      HttpStub::Models::Stub.should_receive(:new).with(request_body).and_return(the_stub)
+    it "should parse an options hash from the JSON request body" do
+      JSON.should_receive(:parse).with(request_body).and_return(stub_options)
+
+      controller.register(request)
+    end
+
+    it "should create a stub from the parsed options" do
+      HttpStub::Models::Stub.should_receive(:new).with(stub_options).and_return(the_stub)
 
       controller.register(request)
     end

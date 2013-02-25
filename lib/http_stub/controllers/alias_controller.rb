@@ -9,7 +9,7 @@ module HttpStub
       end
 
       def register(request)
-        @alias_registry.add(HttpStub::Models::Alias.new(request.body.read), request)
+        @alias_registry.add(HttpStub::Models::Alias.new(JSON.parse(request.body.read)), request)
         HttpStub::Response::SUCCESS
       end
 

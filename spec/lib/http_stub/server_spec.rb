@@ -28,7 +28,7 @@ describe HttpStub::Server do
     end
 
     it "should respond with the response provided by the controller" do
-      stub_controller.stub!(:register).and_return(HttpStub::Response.new(status: 202, body: ""))
+      stub_controller.stub!(:register).and_return(HttpStub::Response.new("status" => 202, "body" => ""))
 
       issue_stub_request
 
@@ -57,7 +57,7 @@ describe HttpStub::Server do
     end
 
     it "should respond with the response provided by the controller" do
-      alias_controller.stub!(:register).and_return(HttpStub::Response.new(status: 302, body: ""))
+      alias_controller.stub!(:register).and_return(HttpStub::Response.new("status" => 302, "body" => ""))
 
       issue_stub_alias_request
 
@@ -115,7 +115,7 @@ describe HttpStub::Server do
     describe "and the stub controller replays a response" do
 
       before(:each) do
-        stub_controller.stub!(:replay).and_return(HttpStub::Response.new(status: 222, body: "Some body"))
+        stub_controller.stub!(:replay).and_return(HttpStub::Response.new("status" => 222, "body" => "Some body"))
       end
 
       it "should respond with the replay status code" do
@@ -141,7 +141,7 @@ describe HttpStub::Server do
       describe "but the alias controller activates a stub" do
 
         before(:each) do
-          alias_controller.stub!(:activate).and_return(HttpStub::Response.new(status: 300, body: "A body"))
+          alias_controller.stub!(:activate).and_return(HttpStub::Response.new("status" => 300, "body" => "A body"))
         end
 
         it "should respond with the activation response status code" do

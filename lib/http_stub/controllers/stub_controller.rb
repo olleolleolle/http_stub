@@ -8,7 +8,7 @@ module HttpStub
       end
 
       def register(request)
-        @registry.add(HttpStub::Models::Stub.new(request.body.read), request)
+        @registry.add(HttpStub::Models::Stub.new(JSON.parse(request.body.read)), request)
         HttpStub::Response::SUCCESS
       end
 

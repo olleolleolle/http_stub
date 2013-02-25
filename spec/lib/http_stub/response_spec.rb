@@ -1,5 +1,7 @@
 describe HttpStub::Response do
 
+  let(:response) { HttpStub::Response.new("status" => 202, "body" => "A response body")}
+
   describe "::SUCCESS" do
 
     let(:response) { HttpStub::Response::SUCCESS }
@@ -38,6 +40,22 @@ describe HttpStub::Response do
 
     it "should have a nil body" do
       response.body.should be_nil
+    end
+
+  end
+
+  describe "#status" do
+
+    it "should return the value provided in the options" do
+      response.status.should eql(202)
+    end
+
+  end
+
+  describe "#body" do
+
+    it "should return the value provided in the options" do
+      response.body.should eql("A response body")
     end
 
   end

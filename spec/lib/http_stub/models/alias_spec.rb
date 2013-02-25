@@ -1,10 +1,10 @@
 describe HttpStub::Models::Alias do
 
   let(:alias_uri) { "/some/alias/uri" }
-  let(:alias_body) do
-    { "alias_uri" => alias_uri }.to_json
+  let(:alias_options) do
+    { "alias_uri" => alias_uri }
   end
-  let(:the_alias) { HttpStub::Models::Alias.new(alias_body) }
+  let(:the_alias) { HttpStub::Models::Alias.new(alias_options) }
 
   before(:each) { HttpStub::Models::Stub.stub!(:new).and_return(double(HttpStub::Models::Stub)) }
 
@@ -46,11 +46,19 @@ describe HttpStub::Models::Alias do
 
   describe "#the_stub" do
 
-    it "should return a HttpStub::Models::Stub constructed from the request body" do
+    it "should return a HttpStub::Models::Stub constructed from the alias options" do
       stub = double(HttpStub::Models::Stub)
-      HttpStub::Models::Stub.should_receive(:new).with(alias_body).and_return(stub)
+      HttpStub::Models::Stub.should_receive(:new).with(alias_options).and_return(stub)
 
       the_alias.the_stub.should eql(stub)
+    end
+
+  end
+
+  describe "#alias_uri" do
+
+    it "should return the value provided in the request body" do
+      the_alias.alias_uri.should eql(alias_uri)
     end
 
   end
