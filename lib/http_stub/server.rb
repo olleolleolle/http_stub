@@ -2,7 +2,9 @@ module HttpStub
 
   class Server < ::Sinatra::Base
 
-    enable :dump_errors, :logging
+    register Sinatra::Partial
+
+    enable :dump_errors, :logging, :partial_underscores
 
     def initialize
       super()
@@ -55,12 +57,28 @@ module HttpStub
       halt(response.status, response.body)
     end
 
+    get "/stubs/aliases" do
+      haml :aliases, {}, aliases: @alias_registry.all.sort_by(&:alias_uri)
+    end
+
     delete "/stubs/aliases" do
       @alias_controller.clear(request)
       halt 200
     end
 
+    get "/application.css" do
+      sass :application
+    end
+
     any_request_type(//) { handle_request }
+
+    helpers do
+
+      def h(text)
+        Rack::Utils.escape_html(text)
+      end
+
+    end
 
     private
 

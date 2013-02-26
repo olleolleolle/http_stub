@@ -1,4 +1,4 @@
-describe HttpStub::Configurer do
+describe HttpStub::Configurer, "when the server is running" do
   include_context "server integration"
 
   let(:configurer) { HttpStub::Examples::ConfigurerWithAlias.new }
@@ -8,7 +8,7 @@ describe HttpStub::Configurer do
     configurer.class.clear_aliases!
   end
 
-  describe "when initialized" do
+  describe "and the configurer is initialized" do
 
     before(:each) { configurer.class.initialize! }
 
@@ -45,7 +45,7 @@ describe HttpStub::Configurer do
 
   end
 
-  describe "when uninitialized" do
+  describe "and the configurer is uninitialized" do
 
     describe "and an attempt is made to activate a stub alias" do
 

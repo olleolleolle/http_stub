@@ -88,6 +88,34 @@ describe HttpStub::Models::Registry do
 
   end
 
+  describe "#all" do
+
+    describe "when multiple models have been registered" do
+
+      let(:models) do
+        (1..3).map { |i| double("HttpStub::Models::Model#{i}", :satisfies? => false) }
+      end
+
+      before(:each) do
+        models.each { |model| registry.add(model, request) }
+      end
+
+      it "should return the registered models in the order they were added" do
+        registry.all.should eql(models.reverse)
+      end
+
+    end
+
+    describe "when no model has been registered" do
+
+      it "should return an empty list" do
+        registry.all.should eql([])
+      end
+
+    end
+
+  end
+
   describe "#clear" do
 
     it "should log that the models are being cleared" do

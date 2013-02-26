@@ -18,6 +18,10 @@ module HttpStub
         @models.find { |model| model.satisfies?(request) }
       end
 
+      def all
+        Array.new(@models)
+      end
+
       def clear(request)
         request.logger.info "Clearing #{@model_name} registry"
         @models.clear

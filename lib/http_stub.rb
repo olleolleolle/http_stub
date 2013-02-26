@@ -3,7 +3,9 @@ require 'bundler/setup'
 Bundler.require(:default)
 
 require 'sinatra'
-require 'immutable_struct'
+require 'sinatra/partial'
+require 'haml'
+require 'sass'
 require 'net/http'
 require 'json'
 

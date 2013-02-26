@@ -1,0 +1,12 @@
+!!!
+%html
+  %head
+    %title http_stub server configuration
+    %link{ "rel" => "stylesheet", "href" => "/application.css", "type" => "text/css" }
+  %body
+    - aliases.each do |the_alias|
+      %div
+        %span Response Activation URI:
+        %a{ href: the_alias.alias_uri }= the_alias.alias_uri
+      = partial :stub, locals: { the_stub: the_alias.the_stub }
+      %br
