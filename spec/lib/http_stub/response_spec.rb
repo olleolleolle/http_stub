@@ -10,8 +10,8 @@ describe HttpStub::Response do
       response.status.should eql(200)
     end
 
-    it "should have an empty body" do
-      response.body.should eql("")
+    it "should have a body containing OK to visually indicate success to those interacting via a browser" do
+      response.body.should match(/OK/)
     end
 
   end
@@ -24,8 +24,8 @@ describe HttpStub::Response do
       response.status.should eql(404)
     end
 
-    it "should have an empty body" do
-      response.body.should eql("")
+    it "should have a body containing ERROR to visually indicate the error to those interacting via a browser" do
+      response.body.should match(/ERROR/)
     end
 
   end

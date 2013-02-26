@@ -6,8 +6,8 @@ module HttpStub
       @response_options = options || {}
     end
 
-    SUCCESS = HttpStub::Response.new("status" => 200, "body" => "")
-    ERROR = HttpStub::Response.new("status" => 404, "body" => "")
+    SUCCESS = HttpStub::Response.new("status" => 200, "body" => "OK")
+    ERROR = HttpStub::Response.new("status" => 404, "body" => "ERROR")
     EMPTY = HttpStub::Response.new()
 
     def status
