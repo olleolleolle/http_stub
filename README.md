@@ -121,6 +121,10 @@ Stubs for **GET, POST, PUT, DELETE, PATCH, OPTIONS request methods are supported
 
 **The most-recent matching configured stub request wins**.
 
+### Informational pages ###
+
+GET to /stubs/aliases returns HTML with information about each configured alias, including activation links.
+
 Requirements
 ------------
 
