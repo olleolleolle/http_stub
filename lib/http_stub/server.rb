@@ -42,6 +42,10 @@ module HttpStub
       halt(response.status, response.body)
     end
 
+    get "/stubs" do
+      haml :stubs, {}, stubs: @stub_registry.all
+    end
+
     delete "/stubs" do
       @stub_controller.clear(request)
       halt 200
