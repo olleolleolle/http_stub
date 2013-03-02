@@ -1,12 +1,12 @@
 http_stub
 =========
 
-```fakeweb``` for an external HTTP server, informing it to 'fake', or, in the test double vernacular - 'stub' - responses.
+```fakeweb``` for a HTTP server, informing it to 'fake', or, in the test double vernacular - 'stub' - responses.
 
 Motivation
 ----------
 
-Need to simulate an external HTTP server your application integrates with?  Enter http_stub.
+Need to simulate a HTTP service your application integrates with?  Enter http_stub.
 
 ```http_stub``` is similar in motivation to the ```fakeweb``` gem, although http_stub provides a separately running HTTP process whose responses can be faked / stubbed.
 
