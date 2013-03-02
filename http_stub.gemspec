@@ -7,8 +7,8 @@ Gem::Specification.new do |s|
   s.version = HttpStub::VERSION
   s.platform = Gem::Platform::RUBY
   s.authors = ["Matthew Ueckerman", "Russell Van Bert"]
-  s.summary = %q{A HTTP Server replaying configured stub responses}
-  s.description = %q{Configure server responses via requests to /stub.  Intended as an acceptance / integration testing tool.}
+  s.summary = %q{A HTTP Server replaying configured stub responses.}
+  s.description = %q{fakeweb for a HTTP server, informing it to stub / fake responses.}
   s.email = %q{matthew.ueckerman@myob.com}
   s.homepage = "http://github.com/MYOB-Technology/http_stub"
   s.rubyforge_project = "http_stub"
