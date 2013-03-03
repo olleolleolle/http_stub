@@ -1,20 +1,20 @@
 describe HttpStub::Configurer, "when the server is running" do
   include_context "server integration"
 
-  let(:configurer) { HttpStub::Examples::ConfigurerWithAlias.new }
+  let(:configurer) { HttpStub::Examples::ConfigurerWithActivator.new }
 
   after(:each) do
     configurer.clear!
-    configurer.class.clear_aliases!
+    configurer.class.clear_activators!
   end
 
   describe "and the configurer is initialized" do
 
     before(:each) { configurer.class.initialize! }
 
-    describe "and a stub alias is activated" do
+    describe "and a stub is activated" do
 
-      before(:each) { configurer.activate!("/an_alias") }
+      before(:each) { configurer.activate!("/an_activator") }
 
       describe "and the stub request is made" do
 
@@ -22,14 +22,14 @@ describe HttpStub::Configurer, "when the server is running" do
 
         it "should replay the stubbed response" do
           response.code.should eql("200")
-          response.body.should eql("Stub alias body")
+          response.body.should eql("Stub activator body")
         end
 
       end
 
     end
 
-    describe "and a stub alias is not activated" do
+    describe "and a stub is not activated" do
 
       describe "and the stub request is made" do
 
@@ -47,12 +47,12 @@ describe HttpStub::Configurer, "when the server is running" do
 
   describe "and the configurer is uninitialized" do
 
-    describe "and an attempt is made to activate a stub alias" do
+    describe "and an attempt is made to activate a stub" do
 
       let(:response) { Net::HTTP.get_response("localhost", "/path1", 8001) }
 
-      it "should respond raise an exception indicating the alias is not configured" do
-        lambda { configurer.activate!("/an_alias") }.should raise_error(/alias \/an_alias not configured/i)
+      it "should respond raise an exception indicating the activator is not configured" do
+        lambda { configurer.activate!("/an_activator") }.should raise_error(/activator \/an_activator not configured/i)
       end
 
     end

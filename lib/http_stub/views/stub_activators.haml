@@ -1,0 +1,6 @@
+- stub_activators.each do |stub_activator|
+  %div
+    %span Response Activation URI:
+    %a{ href: stub_activator.activation_uri }= stub_activator.activation_uri
+  = partial :stub, locals: { the_stub: stub_activator.the_stub }
+  %br

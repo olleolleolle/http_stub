@@ -6,9 +6,9 @@ http_stub
 Motivation
 ----------
 
-Need to simulate a HTTP service your application integrates with?  Enter http_stub.
+Need to simulate a HTTP service with which your application integrates?  Enter ```http_stub```.
 
-```http_stub``` is similar in motivation to the ```fakeweb``` gem, although http_stub provides a separately running HTTP process whose responses can be faked / stubbed.
+```http_stub``` is similar in motivation to the ```fakeweb``` gem, although ```http_stub``` provides a separately running HTTP process whose responses can be faked / stubbed.
 
 ```http_stub``` appears to be very similar in purpose to the ```HTTParrot``` gem, although that appears to be inactive.
 
@@ -36,9 +36,9 @@ Start a ```http_stub``` server via a rake task, generated via ```http_stub```:
 
 ### Stubbing Server Responses ###
 
-#### Stub via Ruby API ####
+#### Stub via API ####
 
-HttpStub::Configurer is a Ruby API that configures the stub server via the class method ```stub_alias``` and instance methods ```stub!```, ```activate!```:
+HttpStub::Configurer is an API that configures the stub server via the class method ```stub_activator``` and instance methods ```stub!```, ```activate!```:
 
 ```ruby
     class AuthenticationService
@@ -48,10 +48,10 @@ HttpStub::Configurer is a Ruby API that configures the stub server via the class
         port 8001 # The server post number
 
         # Register stub for POST "/" when GET "/unavailable" request is made
-        stub_alias "/unavailable", "/", method: :post, response: { status: 404 }
+        stub_activator "/unavailable", "/", method: :post, response: { status: 404 }
 
         def unavailable!
-            activate!("/unavailable") # Activates the "/unavailable" alias
+            activate!("/unavailable") # Activates the "/unavailable" stub
         end
 
         def deny_access_for!(username)
@@ -68,18 +68,18 @@ Once a server is running, initialize it via the Configurer's ```initialize!``` c
     AuthenticationService.initialize!
 ```
 
-The state of the ```http_stub``` server can be cleared via class method ```clear_aliases!``` and instance method ```clear!```, which clears stubs only.
+The state of the ```http_stub``` server can be cleared via class method ```clear_activators!``` and instance method ```clear!```, which clears stubs only.
 These are often used on completion of tests to return the server to it's original state:
 
 ```ruby
     let(:authentication_service) { AuthenticationService.new }
 
-    # Removes all stub responses, but retains aliases
-    after(:each) { @authentication_service.clear! }
+    # Removes all stub responses, but retains activators
+    after(:each) { authentication_service.clear! }
 
     describe "when the service is unavailable" do
 
-        before(:each) { @authentication_service.unavailable! }
+        before(:each) { authentication_service.unavailable! }
 
         #...
 ```
@@ -106,19 +106,19 @@ To configure a stub response, POST to /stubs with the following JSON payload:
     }
 ```
 
-To configure an alias, POST to /stubs/aliases with the following JSON payload:
+To configure a stub activator, POST to /stubs/activators with the following JSON payload:
 
 ```javascript
     {
-        "alias_uri": "/some/alias/path",
+        "activation_uri": "/some/activation/path",
         // remainder same as stub request...
     }
 ```
 
-To activate an alias, GET the alias_uri.
+To activate a stub activator, GET the activation_uri.
 
 DELETE to /stubs in order to clear configured stubs.
-DELETE to /stubs/aliases in order to clear configured aliases.
+DELETE to /stubs/activators in order to clear configured stub activators.
 
 ### Request configuration rules ###
 
@@ -135,7 +135,7 @@ Stubs for **GET, POST, PUT, DELETE, PATCH and OPTIONS request methods are suppor
 
 ### Informational pages ###
 
-GET to /stubs/aliases returns HTML with information about each configured alias, including activation links.
+GET to /stubs/activators returns HTML with information about each configured activator, including activation links.
 GET to /stubs returns HTML with information about each active stub, in top-down priority order.
 
 Requirements

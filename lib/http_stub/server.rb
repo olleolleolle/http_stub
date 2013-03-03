@@ -9,9 +9,10 @@ module HttpStub
     def initialize
       super()
       @stub_registry = HttpStub::Models::Registry.new("stub")
-      @alias_registry = HttpStub::Models::Registry.new("alias")
+      @stub_activator_registry = HttpStub::Models::Registry.new("stub_activator")
       @stub_controller = HttpStub::Controllers::StubController.new(@stub_registry)
-      @alias_controller = HttpStub::Controllers::AliasController.new(@alias_registry, @stub_registry)
+      @stub_activator_controller =
+          HttpStub::Controllers::StubActivatorController.new(@stub_activator_registry, @stub_registry)
     end
 
     private
@@ -53,20 +54,20 @@ module HttpStub
 
     # Sample request body:
     # {
-    #   "alias_uri": "/some/path",
+    #   "activation_uri": "/some/path",
     #   ... see /stub ...
     # }
-    post "/stubs/aliases" do
-      response = @alias_controller.register(request)
+    post "/stubs/activators" do
+      response = @stub_activator_controller.register(request)
       halt(response.status, response.body)
     end
 
-    get "/stubs/aliases" do
-      haml :aliases, {}, aliases: @alias_registry.all.sort_by(&:alias_uri)
+    get "/stubs/activators" do
+      haml :stub_activators, {}, stub_activators: @stub_activator_registry.all.sort_by(&:activation_uri)
     end
 
-    delete "/stubs/aliases" do
-      @alias_controller.clear(request)
+    delete "/stubs/activators" do
+      @stub_activator_controller.clear(request)
       halt 200
     end
 
@@ -88,7 +89,7 @@ module HttpStub
 
     def handle_request
       response = @stub_controller.replay(request)
-      response = @alias_controller.activate(request) if response.empty?
+      response = @stub_activator_controller.activate(request) if response.empty?
       response = HttpStub::Response::ERROR if response.empty?
       halt(response.status, response.body)
     end

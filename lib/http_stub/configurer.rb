@@ -17,12 +17,12 @@ module HttpStub
         @port = port
       end
 
-      def stub_alias(alias_uri, stub_uri, options)
+      def stub_activator(activation_uri, stub_uri, options)
         response_options = options[:response]
-        request = Net::HTTP::Post.new("/stubs/aliases")
+        request = Net::HTTP::Post.new("/stubs/activators")
         request.content_type = "application/json"
         request.body = {
-            "alias_uri" => alias_uri,
+            "activation_uri" => activation_uri,
             "uri" => stub_uri,
             "method" => options[:method],
             "parameters" => options[:parameters] || {},
@@ -31,20 +31,20 @@ module HttpStub
                 "body" => response_options[:body]
             }
         }.to_json
-        alias_requests << request
+        activator_requests << request
       end
 
       def initialize!
-        alias_requests.each do |request|
+        activator_requests.each do |request|
           response = submit(request)
-          raise "Unable to initialize stub alias: #{response.message}" unless response.code == "200"
+          raise "Unable to initialize stub activator: #{response.message}" unless response.code == "200"
         end
       end
 
-      def clear_aliases!
-        request = Net::HTTP::Delete.new("/stubs/aliases")
+      def clear_activators!
+        request = Net::HTTP::Delete.new("/stubs/activators")
         response = submit(request)
-        raise "Unable to clear stub aliases: #{response.message}" unless response.code == "200"
+        raise "Unable to clear stub activators: #{response.message}" unless response.code == "200"
       end
 
       def submit(request)
@@ -53,8 +53,8 @@ module HttpStub
 
       private
 
-      def alias_requests
-        @alias_requests ||= []
+      def activator_requests
+        @activator_requests ||= []
       end
 
     end
@@ -83,7 +83,7 @@ module HttpStub
       def activate!(uri)
         request = Net::HTTP::Get.new(uri)
         response = self.class.submit(request)
-        raise "Alias #{uri} not configured: #{response.message}" unless response.code == "200"
+        raise "Activator #{uri} not configured: #{response.message}" unless response.code == "200"
       end
 
       alias_method :activate_stub!, :activate!

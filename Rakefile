@@ -1,7 +1,7 @@
 require 'bundler'
 require 'rspec/core/rake_task'
 require File.expand_path('../lib/http_stub/start_server_rake_task', __FILE__)
-require File.expand_path('../examples/configurer_with_alias', __FILE__)
+require File.expand_path('../examples/configurer_with_activator', __FILE__)
 
 directory "pkg"
 
