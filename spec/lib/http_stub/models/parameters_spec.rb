@@ -1,16 +1,16 @@
 describe HttpStub::Models::Parameters do
 
-  let(:request_params) { double("RequestParameters") }
-  let(:request) { double("HttpRequest", params: request_params) }
+  let(:request_parameters) { double("RequestParameters") }
+  let(:request) { double("HttpRequest", params: request_parameters) }
 
-  let(:params) { { "key1" => "value1", "key2" => "value2", "key3" => "value3" } }
-  let(:model) { HttpStub::Models::Parameters.new(params) }
+  let(:model_parameters) { { "key1" => "value1", "key2" => "value2", "key3" => "value3" } }
+  let(:model) { HttpStub::Models::Parameters.new(model_parameters) }
 
   describe "#match?" do
 
-    describe "when the request parameters contain the model parameters" do
+    describe "when the request parameters contain the mandatory model parameters" do
 
-      before(:each) { request_params.stub!(:has_hash?).with(params).and_return(true) }
+      before(:each) { request_parameters.stub!(:has_hash?).with(model_parameters).and_return(true) }
 
       it "should return true" do
         model.match?(request).should be(true)
@@ -18,9 +18,9 @@ describe HttpStub::Models::Parameters do
 
     end
 
-    describe "when the request parameters do not contain the model parameters" do
+    describe "when the request parameters do not contain the mandatory model parameters" do
 
-      before(:each) { request_params.stub!(:has_hash?).with(params).and_return(false) }
+      before(:each) { request_parameters.stub!(:has_hash?).with(model_parameters).and_return(false) }
 
       it "should return false" do
         model.match?(request).should be(false)
@@ -34,12 +34,12 @@ describe HttpStub::Models::Parameters do
 
     describe "when multiple parameters are provided" do
 
-      let(:params) { { "key1" => "value1", "key2" => "value2", "key3" => "value3" } }
+      let(:model_parameters) { { "key1" => "value1", "key2" => "value2", "key3" => "value3" } }
 
       it "should return a string containing each parameter formatted as a conventional request parameter" do
         result = model.to_s
 
-        params.each { |key, value| result.should match(/#{key}=#{value}/) }
+        model_parameters.each { |key, value| result.should match(/#{key}=#{value}/) }
       end
 
       it "should separate each parameter with the conventional request parameter delimiter" do
@@ -50,7 +50,7 @@ describe HttpStub::Models::Parameters do
 
     describe "when empty parameters are provided" do
 
-      let(:params) { {} }
+      let(:model_parameters) { {} }
 
       it "should return an empty string" do
         model.to_s.should eql("")
@@ -60,7 +60,7 @@ describe HttpStub::Models::Parameters do
 
     describe "when nil parameters are provided" do
 
-      let(:params) { nil }
+      let(:model_parameters) { nil }
 
       it "should return an empty string" do
         model.to_s.should eql("")

@@ -12,15 +12,15 @@ describe HttpStub::Models::Headers do
   let(:env) { non_http_env_elements.merge(request_headers) }
   let(:request) { double("HttpRequest", env: env) }
 
-  let(:model) { HttpStub::Models::Headers.new(mandatory_headers) }
+  let(:model) { HttpStub::Models::Headers.new(model_headers) }
 
   describe "#match?" do
 
     describe "when multiple headers are mandatory" do
 
-      let(:mandatory_headers) { { "KEY1" => "value1", "KEY2" => "value2", "KEY3" => "value3" } }
+      let(:model_headers) { { "KEY1" => "value1", "KEY2" => "value2", "KEY3" => "value3" } }
 
-      describe "and the mandatory headers are provided" do
+      describe "and the mandatory model headers are provided" do
 
         let(:request_headers) { { "HTTP_KEY1" => "value1", "HTTP_KEY2" => "value2", "HTTP_KEY3" => "value3" } }
 
@@ -34,7 +34,7 @@ describe HttpStub::Models::Headers do
 
         describe "and the casing of the header names is different" do
 
-          let(:mandatory_headers) { { "key1" => "value1", "KEY2" => "value2", "key3" => "value3" } }
+          let(:model_headers) { { "key1" => "value1", "KEY2" => "value2", "key3" => "value3" } }
 
           it "should return true" do
             model.match?(request).should be_true
@@ -54,7 +54,7 @@ describe HttpStub::Models::Headers do
 
       end
 
-      describe "and some mandatory headers are omitted" do
+      describe "and some mandatory model headers are omitted" do
 
         let(:request_headers) { { "HTTP_KEY1" => "value1", "HTTP_KEY3" => "value3" } }
 
@@ -64,7 +64,7 @@ describe HttpStub::Models::Headers do
 
       end
 
-      describe "and all mandatory headers are omitted" do
+      describe "and all mandatory model headers are omitted" do
 
         let(:request_headers) { {} }
 
@@ -78,7 +78,7 @@ describe HttpStub::Models::Headers do
 
     describe "when no headers are mandatory" do
 
-      let(:mandatory_headers) { {} }
+      let(:model_headers) { {} }
 
       describe "and headers are provided" do
 
@@ -92,9 +92,9 @@ describe HttpStub::Models::Headers do
 
     end
 
-    describe "when the mandatory headers are nil" do
+    describe "when the mandatory model headers are nil" do
 
-      let(:mandatory_headers) { nil }
+      let(:model_headers) { nil }
 
       describe "and headers are provided" do
 
@@ -114,12 +114,12 @@ describe HttpStub::Models::Headers do
 
     describe "when multiple headers are provided" do
 
-      let(:mandatory_headers) { { "key1" => "value1", "key2" => "value2", "key3" => "value3" } }
+      let(:model_headers) { { "key1" => "value1", "key2" => "value2", "key3" => "value3" } }
 
       it "should return a string containing each header formatted as a conventional request header" do
         result = model.to_s
 
-        mandatory_headers.each { |key, value| result.should match(/#{key}:#{value}/) }
+        model_headers.each { |key, value| result.should match(/#{key}:#{value}/) }
       end
 
       it "should comma delimit the headers" do
@@ -130,7 +130,7 @@ describe HttpStub::Models::Headers do
 
     describe "when empty headers are provided" do
 
-      let(:mandatory_headers) { {} }
+      let(:model_headers) { {} }
 
       it "should return an empty string" do
         model.to_s.should eql("")
@@ -140,7 +140,7 @@ describe HttpStub::Models::Headers do
 
     describe "when nil headers are provided" do
 
-      let(:mandatory_headers) { nil }
+      let(:model_headers) { nil }
 
       it "should return an empty string" do
         model.to_s.should eql("")
