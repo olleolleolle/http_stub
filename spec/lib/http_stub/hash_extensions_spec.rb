@@ -1,6 +1,6 @@
 describe HttpStub::HashExtensions do
 
-  describe "#downcase_keys" do
+  describe "#downcase_and_underscore_keys" do
 
     describe "when the hash contains keys which are strings" do
 
@@ -9,7 +9,21 @@ describe HttpStub::HashExtensions do
       end
 
       it "should downcase the string keys" do
-        hash.downcase_keys.should eql({ "lower" => 1, "upper" => 2, "mixedcase" => 3 })
+        hash.downcase_and_underscore_keys.should eql({ "lower" => 1, "upper" => 2, "mixedcase" => 3 })
+      end
+
+      describe "and keys contain underscores and hyphens" do
+
+        let(:hash) do
+          { "has_underscore" => 1, "has-hypen" => 2, "has_underscore_and-hypen" => 3 }
+        end
+
+        it "should downcase the string keys" do
+          hash.downcase_and_underscore_keys.should eql({ "has_underscore" => 1,
+                                                         "has_hypen" => 2,
+                                                         "has_underscore_and_hypen" => 3 })
+        end
+
       end
 
     end
@@ -21,7 +35,7 @@ describe HttpStub::HashExtensions do
       end
 
       it "should not alter a hash" do
-        hash.downcase_keys.should eql({ 1 => 2, :symbol => 3, nil => 4 })
+        hash.downcase_and_underscore_keys.should eql({ 1 => 2, :symbol => 3, nil => 4 })
       end
 
     end

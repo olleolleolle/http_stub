@@ -20,7 +20,7 @@ describe HttpStub::Models::Headers do
 
       let(:model_headers) { { "KEY1" => "value1", "KEY2" => "value2", "KEY3" => "value3" } }
 
-      describe "and the mandatory model headers are provided" do
+      describe "and the mandatory headers are provided" do
 
         let(:request_headers) { { "HTTP_KEY1" => "value1", "HTTP_KEY2" => "value2", "HTTP_KEY3" => "value3" } }
 
@@ -42,6 +42,17 @@ describe HttpStub::Models::Headers do
 
         end
 
+        describe "and the mandatory and request header names have hyphens in place of underscores" do
+
+          let(:model_headers) { { "KEY_1" => "value1", "KEY-2" => "value2", "KEY_3" => "value3" } }
+          let(:request_headers) { { "HTTP_KEY-1" => "value1", "HTTP_KEY_2" => "value2", "HTTP_KEY-3" => "value3" } }
+
+          it "should return true" do
+            model.match?(request).should be_true
+          end
+
+        end
+
       end
 
       describe "and the request headers have different values" do
@@ -54,7 +65,7 @@ describe HttpStub::Models::Headers do
 
       end
 
-      describe "and some mandatory model headers are omitted" do
+      describe "and some mandatory headers are omitted" do
 
         let(:request_headers) { { "HTTP_KEY1" => "value1", "HTTP_KEY3" => "value3" } }
 
@@ -64,7 +75,7 @@ describe HttpStub::Models::Headers do
 
       end
 
-      describe "and all mandatory model headers are omitted" do
+      describe "and all mandatory headers are omitted" do
 
         let(:request_headers) { {} }
 
@@ -92,7 +103,7 @@ describe HttpStub::Models::Headers do
 
     end
 
-    describe "when the mandatory model headers are nil" do
+    describe "when the mandatory headers are nil" do
 
       let(:model_headers) { nil }
 

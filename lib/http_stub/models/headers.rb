@@ -8,7 +8,7 @@ module HttpStub
       end
 
       def match?(request)
-        headers_in(request).downcase_keys.has_hash?(@headers.downcase_keys)
+        headers_in(request).downcase_and_underscore_keys.has_hash?(@headers.downcase_and_underscore_keys)
       end
 
       def to_s

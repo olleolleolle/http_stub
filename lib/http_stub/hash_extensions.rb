@@ -2,9 +2,9 @@ module HttpStub
 
   module HashExtensions
 
-    def downcase_keys
+    def downcase_and_underscore_keys
       self.reduce({}) do |result, element|
-        result[element[0].is_a?(::String) ? element[0].downcase : element[0]] = element[1]
+        result[element[0].is_a?(::String) ? element[0].downcase.gsub(/-/, '_') : element[0]] = element[1]
         result
       end
     end
