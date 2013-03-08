@@ -3,13 +3,17 @@ describe HttpStub::Models::Stub do
   let(:stub_uri) { "/a_path" }
   let(:stub_method) { "get" }
   let(:stub_parameters) do
-    { "param" => "value" }
+    { "param" => "param_value" }
+  end
+  let(:stub_headers) do
+    { "header" => "header_value" }
   end
   let(:stub_options) do
     {
       "uri" => stub_uri,
       "method" => stub_method,
       "parameters" => stub_parameters,
+      "headers" => stub_headers,
       "response" => {
         "status" => 201,
         "body" => "Foo"
@@ -18,8 +22,12 @@ describe HttpStub::Models::Stub do
   end
   let(:the_stub) { HttpStub::Models::Stub.new(stub_options) }
   let(:parameters_model) { double(HttpStub::Models::Parameters, match?: true) }
-  
-  before(:each) { HttpStub::Models::Parameters.stub!(:new).and_return(parameters_model) }
+  let(:headers_model) { double(HttpStub::Models::Headers, match?: true) }
+
+  before(:each) do
+    HttpStub::Models::Parameters.stub!(:new).and_return(parameters_model)
+    HttpStub::Models::Headers.stub!(:new).and_return(headers_model)
+  end
 
   describe "#satisfies?" do
 
@@ -31,24 +39,34 @@ describe HttpStub::Models::Stub do
 
       describe "and the request method matches" do
 
-        describe "and a parameter match is configured" do
-          
+        describe "and a header match is configured" do
+
           describe "that matches" do
-            
-            before(:each) { parameters_model.stub!(:match?).with(request).and_return(true) }
 
-            it "should return true" do
-              the_stub.satisfies?(request).should be_true
-            end
-            
-          end
-          
-          describe "that does not match" do
+            before(:each) { headers_model.stub!(:match?).with(request).and_return(true) }
 
-            before(:each) { parameters_model.stub!(:match?).with(request).and_return(false) }
+            describe "and a parameter match is configured" do
 
-            it "should return false" do
-              the_stub.satisfies?(request).should be_false
+              describe "that matches" do
+
+                before(:each) { parameters_model.stub!(:match?).with(request).and_return(true) }
+
+                it "should return true" do
+                  the_stub.satisfies?(request).should be_true
+                end
+
+              end
+
+              describe "that does not match" do
+
+                before(:each) { parameters_model.stub!(:match?).with(request).and_return(false) }
+
+                it "should return false" do
+                  the_stub.satisfies?(request).should be_false
+                end
+
+              end
+
             end
 
           end
@@ -79,6 +97,16 @@ describe HttpStub::Models::Stub do
 
     end
 
+    describe "when the headers do not match" do
+
+      before(:each) { headers_model.stub!(:match?).with(request).and_return(false) }
+
+      it "should return false" do
+        the_stub.satisfies?(request).should be_false
+      end
+
+    end
+
   end
 
   describe "#uri" do
@@ -93,6 +121,14 @@ describe HttpStub::Models::Stub do
 
     it "should return the value provided in the request body" do
       the_stub.method.should eql(stub_method)
+    end
+
+  end
+
+  describe "#headers" do
+
+    it "should return the headers model encapsulating the headers provided in the request body" do
+      the_stub.headers.should eql(headers_model)
     end
 
   end
@@ -119,11 +155,19 @@ describe HttpStub::Models::Stub do
 
   describe "#to_s" do
 
+    let(:stub_headers) do
+      {
+          "header1" => "header_value1",
+          "header2" => "header_value2",
+          "header3" => "header_value3"
+      }
+    end
+
     let(:stub_parameters) do
       {
-          "param1" => "value1",
-          "param2" => "value2",
-          "param3" => "value3"
+          "param1" => "param_value1",
+          "param2" => "param_value2",
+          "param3" => "param_value3"
       }
     end
 
@@ -133,6 +177,13 @@ describe HttpStub::Models::Stub do
 
     it "should return a string containing the stubbed request method" do
       the_stub.to_s.should match(/get/)
+    end
+
+    it "should return a string containing the stubbed headers" do
+      stub_headers.each_pair do |key, value|
+        the_stub.to_s.should match(/#{Regexp.escape(key)}/)
+        the_stub.to_s.should match(/#{Regexp.escape(value)}/)
+      end
     end
 
     it "should return a string containing the stubbed parameters" do

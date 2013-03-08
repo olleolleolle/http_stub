@@ -27,8 +27,12 @@ describe HttpStub::Server, "when the server is running" do
         (1..3).each { |i| response.body.should match(/#{escape_html("/path#{i}")}/) }
       end
 
+      it "should return a response whose body contains the headers of each activators stub" do
+        (1..3).each { |i| response.body.should match(/header#{i}:header_value#{i}/) }
+      end
+
       it "should return a response whose body contains the parameters of each activators stub" do
-        (1..3).each { |i| response.body.should match(/param#{i}=value#{i}/) }
+        (1..3).each { |i| response.body.should match(/param#{i}=param_value#{i}/) }
       end
 
       it "should return a response whose body contains the response status of each activators stub" do
@@ -62,8 +66,12 @@ describe HttpStub::Server, "when the server is running" do
           (1..3).each { |i| response.body.should match(/#{escape_html("/path#{i}")}/) }
         end
 
+        it "should return a response whose body contains the headers of each stub" do
+          (1..3).each { |i| response.body.should match(/header#{i}:header_value#{i}/) }
+        end
+
         it "should return a response whose body contains the parameters of each stub" do
-          (1..3).each { |i| response.body.should match(/param#{i}=value#{i}/) }
+          (1..3).each { |i| response.body.should match(/param#{i}=param_value#{i}/) }
         end
 
         it "should return a response whose body contains the response status of each stub" do

@@ -25,6 +25,7 @@ module HttpStub
             "activation_uri" => activation_uri,
             "uri" => stub_uri,
             "method" => options[:method],
+            "headers" => options[:headers] || {},
             "parameters" => options[:parameters] || {},
             "response" => {
                 "status" => response_options[:status] || "200",
@@ -68,6 +69,7 @@ module HttpStub
         request.body = {
             "uri" => uri,
             "method" => options[:method],
+            "headers" => options[:headers] || {},
             "parameters" => options[:parameters] || {},
             "response" => {
                 "status" => response_options[:status] || "200",

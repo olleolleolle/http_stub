@@ -3,16 +3,20 @@ module HttpStub
 
     class Stub
 
-      attr_reader :response
+      attr_reader :headers, :parameters, :response
 
       def initialize(options)
         @stub_options = options
+        @headers = HttpStub::Models::Headers.new(options["headers"])
         @parameters = HttpStub::Models::Parameters.new(options["parameters"])
         @response = HttpStub::Response.new(options["response"])
       end
 
       def satisfies?(request)
-        uri == request.path_info && method.downcase == request.request_method.downcase && @parameters.match?(request)
+        uri == request.path_info &&
+            method.downcase == request.request_method.downcase &&
+            @headers.match?(request) &&
+            @parameters.match?(request)
       end
 
       def uri
@@ -21,10 +25,6 @@ module HttpStub
 
       def method
         @stub_options["method"]
-      end
-
-      def parameters
-        @parameters
       end
 
       def to_s

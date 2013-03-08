@@ -56,7 +56,10 @@ HttpStub::Configurer is an API that configures the stub server via the class met
 
         def deny_access_for!(username)
             # Immediately registers a stub response
-            stub!("/", method: :get, parameters: { username: username }, response: { status: 403 })
+            stub!("/", method: :get,
+                       headers: { api_key: "some_fixed_key" },
+                       parameters: { username: username },
+                       response: { status: 403 })
         end
 
     end
@@ -94,9 +97,13 @@ To configure a stub response, POST to /stubs with the following JSON payload:
     {
         "uri": "/some/path",
         "method": "some method",
+        "headers": {
+            "a_header": "a_value",
+            "another_header": "another_value"
+        },
         "parameters": {
-            "a_key": "a_value",
-            "another_key": "another_value"
+            "a_param": "a_value",
+            "another_param": "another_value"
             ...
         },
         "response": {
@@ -125,9 +132,14 @@ DELETE to /stubs/activators in order to clear configured stub activators.
 The **uri and method attributes are mandatory**.
 Only subsequent requests matching these criteria will respond with the configured response.
 
+The **headers attribute is optional**.
+When included, requests containing headers matching these names and values will return the stub response.
+Header name matches are case-insensitive and exclude the 'HTTP_' prefix.
+Requests containing additional headers will also match.
+
 The **parameters attribute is optional**.
 When included, requests containing parameters matching these names and values will return the stub response.
-Requests that contain additional parameters will also match.
+Requests containing additional parameters will also match.
 
 Stubs for **GET, POST, PUT, DELETE, PATCH and OPTIONS request methods are supported**.
 

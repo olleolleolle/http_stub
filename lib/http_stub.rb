@@ -9,7 +9,9 @@ require 'sass'
 require 'net/http'
 require 'json'
 
+require File.expand_path('../http_stub/hash_extensions', __FILE__)
 require File.expand_path('../http_stub/response', __FILE__)
+require File.expand_path('../http_stub/models/headers', __FILE__)
 require File.expand_path('../http_stub/models/parameters', __FILE__)
 require File.expand_path('../http_stub/models/stub', __FILE__)
 require File.expand_path('../http_stub/models/stub_activator', __FILE__)

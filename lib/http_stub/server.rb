@@ -29,6 +29,10 @@ module HttpStub
     # {
     #   "uri": "/some/path",
     #   "method": "get",
+    #   "headers": {
+    #     "key": "value",
+    #     ...
+    #   },
     #   "parameters": {
     #     "key": "value",
     #     ...

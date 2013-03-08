@@ -8,13 +8,11 @@ module HttpStub
       end
 
       def match?(request)
-        @parameters.nil? || @parameters.reduce(true) do |result, parameter|
-          result && (request.params[parameter[0]] == parameter[1])
-        end
+        request.params.has_hash?(@parameters)
       end
 
       def to_s
-        @parameters ? @parameters.map { |param| "#{param[0]}=#{param[1]}" }.join("&") : ""
+        @parameters ? @parameters.map { |key_and_value| key_and_value.join("=") }.join("&") : ""
       end
 
     end
