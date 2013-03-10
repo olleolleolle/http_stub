@@ -6,7 +6,7 @@ describe HttpStub::Models::StubHeaders do
 
   describe "#match?" do
 
-    before(:each) { HttpStub::RequestHeaderParser.stub!(:parse).with(request).and_return(request_headers) }
+    before(:each) { HttpStub::Models::RequestHeaderParser.stub!(:parse).with(request).and_return(request_headers) }
 
     describe "when multiple headers are mandatory" do
 

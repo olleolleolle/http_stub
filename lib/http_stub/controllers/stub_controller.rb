@@ -9,12 +9,12 @@ module HttpStub
 
       def register(request)
         @registry.add(HttpStub::Models::Stub.new(JSON.parse(request.body.read)), request)
-        HttpStub::Response::SUCCESS
+        HttpStub::Models::Response::SUCCESS
       end
 
       def replay(request)
         stub = @registry.find_for(request)
-        stub ? stub.response : HttpStub::Response::EMPTY
+        stub ? stub.response : HttpStub::Models::Response::EMPTY
       end
 
       def clear(request)

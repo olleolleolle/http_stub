@@ -9,7 +9,7 @@ module HttpStub
         @stub_options = options
         @headers = HttpStub::Models::StubHeaders.new(options["headers"])
         @parameters = HttpStub::Models::StubParameters.new(options["parameters"])
-        @response = HttpStub::Response.new(options["response"])
+        @response = HttpStub::Models::Response.new(options["response"])
       end
 
       def satisfies?(request)

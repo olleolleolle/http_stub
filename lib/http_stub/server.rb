@@ -94,7 +94,7 @@ module HttpStub
     def handle_request
       response = @stub_controller.replay(request)
       response = @stub_activator_controller.activate(request) if response.empty?
-      response = HttpStub::Response::ERROR if response.empty?
+      response = HttpStub::Models::Response::ERROR if response.empty?
       halt(response.status, response.body)
     end
 

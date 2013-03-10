@@ -3,7 +3,7 @@ describe HttpStub::Controllers::StubController do
   let(:request_body) { "Some request body" }
   let(:stub_options) { double("StubOptions") }
   let(:request) { double("HttpRequest", body: double("RequestBody", read: request_body)) }
-  let(:response) { double(HttpStub::Response) }
+  let(:response) { double(HttpStub::Models::Response) }
   let(:the_stub) { double(HttpStub::Models::Stub, response: response) }
   let(:registry) { double(HttpStub::Models::Registry).as_null_object }
   let(:controller) { HttpStub::Controllers::StubController.new(registry) }
@@ -35,7 +35,7 @@ describe HttpStub::Controllers::StubController do
     end
 
     it "should return a success response" do
-      controller.register(request).should eql(HttpStub::Response::SUCCESS)
+      controller.register(request).should eql(HttpStub::Models::Response::SUCCESS)
     end
 
   end
@@ -63,7 +63,7 @@ describe HttpStub::Controllers::StubController do
       end
 
       it "should return an empty response" do
-        controller.replay(request).should eql(HttpStub::Response::EMPTY)
+        controller.replay(request).should eql(HttpStub::Models::Response::EMPTY)
       end
 
     end

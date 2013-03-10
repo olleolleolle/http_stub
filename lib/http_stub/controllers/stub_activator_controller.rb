@@ -10,16 +10,16 @@ module HttpStub
 
       def register(request)
         @stub_activator_registry.add(HttpStub::Models::StubActivator.new(JSON.parse(request.body.read)), request)
-        HttpStub::Response::SUCCESS
+        HttpStub::Models::Response::SUCCESS
       end
 
       def activate(request)
         activator = @stub_activator_registry.find_for(request)
         if activator
           @stub_registry.add(activator.the_stub, request)
-          HttpStub::Response::SUCCESS
+          HttpStub::Models::Response::SUCCESS
         else
-          HttpStub::Response::EMPTY
+          HttpStub::Models::Response::EMPTY
         end
       end
 

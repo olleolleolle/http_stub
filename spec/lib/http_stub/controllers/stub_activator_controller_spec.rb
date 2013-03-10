@@ -36,7 +36,7 @@ describe HttpStub::Controllers::StubActivatorController do
     end
 
     it "should return a success response" do
-      controller.register(request).should eql(HttpStub::Response::SUCCESS)
+      controller.register(request).should eql(HttpStub::Models::Response::SUCCESS)
     end
 
   end
@@ -56,7 +56,7 @@ describe HttpStub::Controllers::StubActivatorController do
       end
 
       it "should return a success response" do
-        controller.activate(request).should eql(HttpStub::Response::SUCCESS)
+        controller.activate(request).should eql(HttpStub::Models::Response::SUCCESS)
       end
 
     end
@@ -74,7 +74,7 @@ describe HttpStub::Controllers::StubActivatorController do
       end
 
       it "should return an empty response" do
-        controller.activate(request).should eql(HttpStub::Response::EMPTY)
+        controller.activate(request).should eql(HttpStub::Models::Response::EMPTY)
       end
 
     end

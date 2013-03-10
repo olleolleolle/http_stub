@@ -18,7 +18,7 @@ module HttpStub
       private
 
       def headers_in(request)
-        HttpStub::RequestHeaderParser.parse(request)
+        HttpStub::Models::RequestHeaderParser.parse(request)
       end
 
     end

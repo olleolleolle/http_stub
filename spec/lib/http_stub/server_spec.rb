@@ -22,13 +22,13 @@ describe HttpStub::Server do
   describe "when a stub insertion is received" do
 
     it "should register the insertion via the stub controller" do
-      stub_controller.should_receive(:register).and_return(HttpStub::Response::SUCCESS)
+      stub_controller.should_receive(:register).and_return(HttpStub::Models::Response::SUCCESS)
 
       issue_stub_request
     end
 
     it "should respond with the response provided by the controller" do
-      stub_controller.stub!(:register).and_return(HttpStub::Response.new("status" => 202, "body" => ""))
+      stub_controller.stub!(:register).and_return(HttpStub::Models::Response.new("status" => 202, "body" => ""))
 
       issue_stub_request
 
@@ -51,13 +51,13 @@ describe HttpStub::Server do
   describe "when a stub activator insertion request is received" do
 
     it "should register the insertion via the stub activator controller" do
-      stub_activator_controller.should_receive(:register).and_return(HttpStub::Response::SUCCESS)
+      stub_activator_controller.should_receive(:register).and_return(HttpStub::Models::Response::SUCCESS)
 
       issue_stub_activator_request
     end
 
     it "should respond with the response provided by the controller" do
-      stub_activator_controller.stub!(:register).and_return(HttpStub::Response.new("status" => 302, "body" => ""))
+      stub_activator_controller.stub!(:register).and_return(HttpStub::Models::Response.new("status" => 302, "body" => ""))
 
       issue_stub_activator_request
 
@@ -115,7 +115,7 @@ describe HttpStub::Server do
     describe "and the stub controller replays a response" do
 
       before(:each) do
-        stub_controller.stub!(:replay).and_return(HttpStub::Response.new("status" => 222, "body" => "Some body"))
+        stub_controller.stub!(:replay).and_return(HttpStub::Models::Response.new("status" => 222, "body" => "Some body"))
       end
 
       it "should respond with the replay status code" do
@@ -135,13 +135,13 @@ describe HttpStub::Server do
     describe "and the stub controller does not replay a response" do
 
       before(:each) do
-        stub_controller.stub!(:replay).and_return(HttpStub::Response::EMPTY)
+        stub_controller.stub!(:replay).and_return(HttpStub::Models::Response::EMPTY)
       end
 
       describe "but the stub activator controller activates a stub" do
 
         before(:each) do
-          stub_activator_controller.stub!(:activate).and_return(HttpStub::Response.new("status" => 300, "body" => "A body"))
+          stub_activator_controller.stub!(:activate).and_return(HttpStub::Models::Response.new("status" => 300, "body" => "A body"))
         end
 
         it "should respond with the activation response status code" do
@@ -161,7 +161,7 @@ describe HttpStub::Server do
       describe "and the stub activator controller does not activate a stub" do
 
         before(:each) do
-          stub_activator_controller.stub!(:activate).and_return(HttpStub::Response::EMPTY)
+          stub_activator_controller.stub!(:activate).and_return(HttpStub::Models::Response::EMPTY)
         end
 
         it "should respond with a 404 status code" do
