@@ -7,8 +7,8 @@ module HttpStub
 
       def initialize(options)
         @stub_options = options
-        @headers = HttpStub::Models::Headers.new(options["headers"])
-        @parameters = HttpStub::Models::Parameters.new(options["parameters"])
+        @headers = HttpStub::Models::StubHeaders.new(options["headers"])
+        @parameters = HttpStub::Models::StubParameters.new(options["parameters"])
         @response = HttpStub::Response.new(options["response"])
       end
 

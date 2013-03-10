@@ -1,7 +1,7 @@
 module HttpStub
   module Models
 
-    class Headers
+    class StubHeaders
 
       def initialize(headers)
         @headers = headers || {}
@@ -18,11 +18,7 @@ module HttpStub
       private
 
       def headers_in(request)
-        request.env.reduce({}) do |result, element|
-          match = element[0].match(/^HTTP_(.*)/)
-          result[match[1]] = element[1] if match
-          result
-        end
+        HttpStub::RequestHeaderParser.parse(request)
       end
 
     end

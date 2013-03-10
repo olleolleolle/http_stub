@@ -1,7 +1,7 @@
 module HttpStub
   module Models
 
-    class Parameters
+    class StubParameters
 
       def initialize(parameters)
         @parameters = parameters
