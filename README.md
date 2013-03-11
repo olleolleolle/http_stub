@@ -134,11 +134,13 @@ Only subsequent requests matching these criteria will respond with the configure
 
 The **headers attribute is optional**.
 When included, requests containing headers matching these names and values will return the stub response.
-Header name matches are case-insensitive and exclude the 'HTTP_' prefix.
+Due to header name rewriting performed by Ruby Rack, header name matches are case-insensitive and consider underscores and hyphens to be synonymous.
+The 'HTTP_' prefix added to the header names by Rack is removed prior to any comparison.
 Requests containing additional headers will also match.
 
 The **parameters attribute is optional**.
 When included, requests containing parameters matching these names and values will return the stub response.
+The name match is case sensitive.
 Requests containing additional parameters will also match.
 
 Stubs for **GET, POST, PUT, DELETE, PATCH and OPTIONS request methods are supported**.
