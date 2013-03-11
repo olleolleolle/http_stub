@@ -9,17 +9,31 @@ describe HttpStub::Models::RequestHeaderParser do
         "SERVER_NAME" => "localhost",
     }
   end
-  let(:env) { non_http_env_elements.merge(request_headers) }
+  let(:env) { non_http_env_elements.merge(http_env_elements) }
   let(:request) { double("HttpRequest", env: env) }
 
   describe ".parse" do
+    
+    describe "when the request contains request environment entries prefixed with 'HTTP_'" do
 
-    let(:request_headers) { { "HTTP_KEY1" => "value1", "HTTP_KEY2" => "value2", "HTTP_KEY3" => "value3" } }
+      let(:http_env_elements) { { "HTTP_KEY1" => "value1", "HTTP_KEY2" => "value2", "HTTP_KEY3" => "value3" } }
 
-    it "should return a hash containing request environment entries prefixed with HTTP_" do
-      HttpStub::Models::RequestHeaderParser.parse(request).should eql({ "KEY1" => "value1",
-                                                                        "KEY2" => "value2",
-                                                                        "KEY3" => "value3" })
+      it "should return a hash containing only those entries with the prefix removed" do
+        HttpStub::Models::RequestHeaderParser.parse(request).should eql({ "KEY1" => "value1",
+                                                                          "KEY2" => "value2",
+                                                                          "KEY3" => "value3" })
+      end
+
+    end
+    
+    describe "when the request does not contain request environment entries prefixed with 'HTTP_'" do
+
+      let(:http_env_elements) { {} }
+      
+      it "should return an empty hash" do
+        HttpStub::Models::RequestHeaderParser.parse(request).should eql({})
+      end
+      
     end
 
   end
