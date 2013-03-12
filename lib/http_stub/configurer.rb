@@ -40,6 +40,8 @@ module HttpStub
           response = submit(request)
           raise "Unable to initialize stub activator: #{response.message}" unless response.code == "200"
         end
+        instance = self.new
+        instance.after_initialize if instance.respond_to?(:after_initialize)
       end
 
       def clear_activators!
@@ -95,6 +97,8 @@ module HttpStub
         response = self.class.submit(request)
         raise "Unable to clear stubs: #{response.message}" unless response.code == "200"
       end
+
+      alias_method :clear_stubs!, :clear!
 
     end
 

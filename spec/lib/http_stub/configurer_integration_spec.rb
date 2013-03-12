@@ -4,7 +4,7 @@ describe HttpStub::Configurer, "when the server is running" do
   let(:configurer) { HttpStub::Examples::ConfigurerWithActivator.new }
 
   after(:each) do
-    configurer.clear!
+    configurer.clear_stubs!
     configurer.class.clear_activators!
   end
 
@@ -39,6 +39,19 @@ describe HttpStub::Configurer, "when the server is running" do
           response.code.should eql("404")
         end
 
+      end
+
+    end
+
+    describe "and an after_initialize callback is defined" do
+
+      let(:configurer) { HttpStub::Examples::ConfigurerWithInitializationObserver.new }
+
+      it "the callback should be invoked" do
+        response = Net::HTTP.get_response("localhost", "/an_initialization_stub", 8001)
+
+        response.code.should eql("201")
+        response.body.should eql("Initialization stub body")
       end
 
     end
