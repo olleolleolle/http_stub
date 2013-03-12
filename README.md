@@ -38,7 +38,8 @@ Start a ```http_stub``` server via a rake task, generated via ```http_stub```:
 
 #### Stub via API ####
 
-HttpStub::Configurer is an API that configures the stub server via the class method ```stub_activator``` and instance methods ```stub!```, ```activate!```:
+HttpStub::Configurer is an API that configures the stub server via the class and instance methods ```stub_activator```, ```stub!``` and ```activate!```.
+These methods issue HTTP requests to a ```http_stub``` server to configure it's responses.  An example follows:
 
 ```ruby
     class AuthenticationService
@@ -47,6 +48,8 @@ HttpStub::Configurer is an API that configures the stub server via the class met
         server "my.stub.server.com" # Often localhost for automated test purposes
         port 8001 # The server post number
 
+        # Register stub for POST "/"
+        stub! "/", method: :post, response: { status: 200 }
         # Register stub for POST "/" when GET "/unavailable" request is made
         stub_activator "/unavailable", "/", method: :post, response: { status: 404 }
 
@@ -55,7 +58,7 @@ HttpStub::Configurer is an API that configures the stub server via the class met
         end
 
         def deny_access_for!(username)
-            # Immediately registers a stub response
+            # Registers another stub for POST "/" matching on headers and parameters
             stub!("/", method: :get,
                        headers: { api_key: "some_fixed_key" },
                        parameters: { username: username },
@@ -65,11 +68,13 @@ HttpStub::Configurer is an API that configures the stub server via the class met
     end
 ```
 
-Once a server is running, initialize it via the Configurer's ```initialize!``` class method:
+Once a server is running, you must initialize it via the Configurer's ```initialize!``` class method:
 
 ```ruby
     AuthenticationService.initialize!
 ```
+
+This informs the Configurer that the ```http_stub``` server is able to accept HTTP requests.
 
 The state of the ```http_stub``` server can be cleared via class method ```clear_activators!``` and instance method ```clear!```, which clears stubs only.
 These are often used on completion of tests to return the server to it's original state:

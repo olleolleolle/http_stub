@@ -1,7 +1,7 @@
 describe HttpStub::Configurer, "when the server is running" do
   include_context "server integration"
 
-  let(:configurer) { HttpStub::Examples::ConfigurerWithActivator.new }
+  let(:configurer) { HttpStub::Examples::ConfigurerWithClassActivator.new }
 
   after(:each) do
     configurer.clear_stubs!
@@ -43,15 +43,15 @@ describe HttpStub::Configurer, "when the server is running" do
 
     end
 
-    describe "and an after_initialize callback is defined" do
+    describe "and an class stub is defined" do
 
-      let(:configurer) { HttpStub::Examples::ConfigurerWithInitializationObserver.new }
+      let(:configurer) { HttpStub::Examples::ConfigurerWithClassStub.new }
 
-      it "the callback should be invoked" do
-        response = Net::HTTP.get_response("localhost", "/an_initialization_stub", 8001)
+      it "the stub should be registered" do
+        response = Net::HTTP.get_response("localhost", "/a_class_stub", 8001)
 
         response.code.should eql("201")
-        response.body.should eql("Initialization stub body")
+        response.body.should eql("Class stub body")
       end
 
     end
@@ -64,8 +64,10 @@ describe HttpStub::Configurer, "when the server is running" do
 
       let(:response) { Net::HTTP.get_response("localhost", "/path1", 8001) }
 
-      it "should respond raise an exception indicating the activator is not configured" do
-        lambda { configurer.activate!("/an_activator") }.should raise_error(/activator \/an_activator not configured/i)
+      it "should raise an exception indicating an error occurred during activation" do
+        activation_lambda = lambda { configurer.activate!("/an_activator") }
+
+        activation_lambda.should raise_error(/error occurred activating '\/an_activator'/i)
       end
 
     end

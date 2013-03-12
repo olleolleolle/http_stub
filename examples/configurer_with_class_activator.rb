@@ -1,7 +1,7 @@
 module HttpStub
   module Examples
 
-    class ConfigurerWithActivator
+    class ConfigurerWithClassActivator
       include HttpStub::Configurer
 
       host "localhost"

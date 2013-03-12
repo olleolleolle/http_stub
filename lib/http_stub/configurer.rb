@@ -32,37 +32,8 @@ module HttpStub
                 "body" => response_options[:body]
             }
         }.to_json
-        activator_requests << request
+        handle(request, "registering activator '#{activation_uri}'")
       end
-
-      def initialize!
-        activator_requests.each do |request|
-          response = submit(request)
-          raise "Unable to initialize stub activator: #{response.message}" unless response.code == "200"
-        end
-        instance = self.new
-        instance.after_initialize if instance.respond_to?(:after_initialize)
-      end
-
-      def clear_activators!
-        request = Net::HTTP::Delete.new("/stubs/activators")
-        response = submit(request)
-        raise "Unable to clear stub activators: #{response.message}" unless response.code == "200"
-      end
-
-      def submit(request)
-        Net::HTTP.new(@host, @port).start { |http| http.request(request) }
-      end
-
-      private
-
-      def activator_requests
-        @activator_requests ||= []
-      end
-
-    end
-
-    module InstanceMethods
 
       def stub!(uri, options)
         response_options = options[:response]
@@ -78,27 +49,62 @@ module HttpStub
                 "body" => response_options[:body]
             }
         }.to_json
-        response = self.class.submit(request)
-        raise "Unable to establish stub: #{response.message}" unless response.code == "200"
+        handle(request, "stubbing '#{uri}'")
       end
 
       alias_method :stub_response!, :stub!
 
       def activate!(uri)
-        request = Net::HTTP::Get.new(uri)
-        response = self.class.submit(request)
-        raise "Activator #{uri} not configured: #{response.message}" unless response.code == "200"
+        handle(Net::HTTP::Get.new(uri), "activating '#{uri}'")
       end
 
       alias_method :activate_stub!, :activate!
 
+      def initialize!
+        pending_requests.each { |request| request.submit() }
+        @initialized = true
+      end
+
+      def clear_activators!
+        handle(Net::HTTP::Delete.new("/stubs/activators"), "clearing activators")
+      end
+
       def clear!
-        request = Net::HTTP::Delete.new("/stubs")
-        response = self.class.submit(request)
-        raise "Unable to clear stubs: #{response.message}" unless response.code == "200"
+        handle(Net::HTTP::Delete.new("/stubs"), "clearing stubs")
       end
 
       alias_method :clear_stubs!, :clear!
+
+      private
+
+      def handle(http_request, description)
+        request = HttpStub::ConfigurerRequest.new(@host, @port, http_request, description)
+        initialized? ? request.submit() : pending_requests << request
+      end
+
+      def pending_requests
+        @activator_requests ||= []
+      end
+
+      def initialized?
+        @initialized ||= false
+      end
+
+    end
+
+    module InstanceMethods
+
+      DELEGATE_METHODS = %w{ stub_activator stub! stub_response! activate! activate_stub! clear_activators! clear! clear_stubs! }
+
+      def self.included(mod)
+        DELEGATE_METHODS.each do |method_name|
+          mod.class_eval <<-METHOD_DEF
+            def #{method_name}(*args)
+              self.class.#{method_name}(*args)
+            end
+          METHOD_DEF
+        end
+      end
 
     end
 
