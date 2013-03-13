@@ -36,8 +36,8 @@ module HttpStub
       alias_method :activate_stub!, :activate!
 
       def initialize!
-        pending_commands.each { |command| command.execute() }
-        @initialized = true
+        processor.flush
+        @processor = HttpStub::Configurer::ImmediateCommandProcessor.new
       end
 
       def clear_activators!
@@ -53,16 +53,11 @@ module HttpStub
       private
 
       def handle(request, description)
-        command = HttpStub::Configurer::Command.new(@host, @port, request, description)
-        initialized? ? command.execute() : pending_commands << command
+        processor.process(HttpStub::Configurer::Command.new(@host, @port, request, description))
       end
 
-      def pending_commands
-        @pending_commands ||= []
-      end
-
-      def initialized?
-        @initialized ||= false
+      def processor
+        @processor ||= HttpStub::Configurer::BufferedCommandProcessor.new
       end
 
     end
