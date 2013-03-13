@@ -1,7 +1,7 @@
 module HttpStub
   module Configurer
 
-    class Request
+    class Command
 
       def initialize(host, port, request, description)
         @host = host
@@ -10,7 +10,7 @@ module HttpStub
         @description = description
       end
 
-      def submit
+      def execute
         response = Net::HTTP.new(@host, @port).start { |http| http.request(@request) }
         raise "Error occurred #{@description}: #{response.message}" unless response.code == "200"
       end

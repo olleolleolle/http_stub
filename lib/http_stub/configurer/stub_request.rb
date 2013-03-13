@@ -1,12 +1,12 @@
 module HttpStub
   module Configurer
 
-    class StubHttpRequestFactory
+    class StubRequest < Net::HTTP::Post
 
-      def self.create(uri, options)
-        request = Net::HTTP::Post.new("/stubs")
-        request.content_type = "application/json"
-        request.body = {
+      def initialize(uri, options)
+        super("/stubs")
+        self.content_type = "application/json"
+        self.body = {
             "uri" => uri,
             "method" => options[:method],
             "headers" => options[:headers] || {},
@@ -16,7 +16,6 @@ module HttpStub
                 "body" => options[:response][:body]
             }
         }.to_json
-        request
       end
 
     end

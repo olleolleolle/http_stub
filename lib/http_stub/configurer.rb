@@ -18,12 +18,12 @@ module HttpStub
       end
 
       def stub_activator(activation_uri, stub_uri, options)
-        request = HttpStub::Configurer::StubActivatorHttpRequestFactory.create(activation_uri, stub_uri, options)
+        request = HttpStub::Configurer::StubActivatorRequest.new(activation_uri, stub_uri, options)
         handle(request, "registering activator '#{activation_uri}'")
       end
 
       def stub!(uri, options)
-        request = HttpStub::Configurer::StubHttpRequestFactory.create(uri, options)
+        request = HttpStub::Configurer::StubRequest.new(uri, options)
         handle(request, "stubbing '#{uri}'")
       end
 
@@ -36,7 +36,7 @@ module HttpStub
       alias_method :activate_stub!, :activate!
 
       def initialize!
-        pending_requests.each { |request| request.submit() }
+        pending_commands.each { |command| command.execute() }
         @initialized = true
       end
 
@@ -52,13 +52,13 @@ module HttpStub
 
       private
 
-      def handle(http_request, description)
-        request = HttpStub::Configurer::Request.new(@host, @port, http_request, description)
-        initialized? ? request.submit() : pending_requests << request
+      def handle(request, description)
+        command = HttpStub::Configurer::Command.new(@host, @port, request, description)
+        initialized? ? command.execute() : pending_commands << command
       end
 
-      def pending_requests
-        @activator_requests ||= []
+      def pending_commands
+        @pending_commands ||= []
       end
 
       def initialized?

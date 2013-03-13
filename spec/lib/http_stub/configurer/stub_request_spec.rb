@@ -1,8 +1,6 @@
-describe HttpStub::Configurer::StubHttpRequestFactory do
+describe HttpStub::Configurer::StubRequest do
 
-  let(:factory) { HttpStub::Configurer::StubHttpRequestFactory }
-
-  describe ".create" do
+  describe "#initialize" do
 
     describe "when provided a uri and stub options" do
 
@@ -25,44 +23,35 @@ describe HttpStub::Configurer::StubHttpRequestFactory do
         }
       end
 
-      it "should create a HTTP POST request" do
-        request = factory.create(uri, stub_options)
+      let(:request) { HttpStub::Configurer::StubRequest.new(uri, stub_options) }
+      let(:request_body) { JSON.parse(request.body) }
 
-        request.class::METHOD.should eql("POST")
+      it "should create a HTTP POST request" do
+        request.method.should eql("POST")
       end
 
       it "should submit the request to '/stubs'" do
-        request = factory.create(uri, stub_options)
-
         request.path.should eql("/stubs")
       end
 
       it "should set the content type to json" do
-        request = factory.create(uri, stub_options)
-
         request.content_type.should eql("application/json")
       end
 
       describe "generates a JSON body which" do
 
         it "should have an entry for the provided URI" do
-          request = factory.create(uri, stub_options)
-
-          JSON.parse(request.body).should include({ "uri" => uri })
+          request_body.should include({ "uri" => uri })
         end
 
         it "should have an entry for the method option" do
-          request = factory.create(uri, stub_options)
-
-          JSON.parse(request.body).should include({ "method" => stub_method })
+          request_body.should include({ "method" => stub_method })
         end
 
         describe "when a header option is provided" do
 
           it "should have an entry for the option" do
-            request = factory.create(uri, stub_options)
-
-            JSON.parse(request.body).should include({ "headers" => headers })
+            request_body.should include({ "headers" => headers })
           end
 
         end
@@ -72,9 +61,7 @@ describe HttpStub::Configurer::StubHttpRequestFactory do
           let(:headers) { nil }
 
           it "should have an empty header entry" do
-            request = factory.create(uri, stub_options)
-
-            JSON.parse(request.body).should include({ "headers" => {} })
+            request_body.should include({ "headers" => {} })
           end
 
         end
@@ -82,9 +69,7 @@ describe HttpStub::Configurer::StubHttpRequestFactory do
         describe "when a parameter option is provided" do
 
           it "should have an entry for the option" do
-            request = factory.create(uri, stub_options)
-
-            JSON.parse(request.body).should include({ "parameters" => parameters })
+            request_body.should include({ "parameters" => parameters })
           end
 
         end
@@ -94,9 +79,7 @@ describe HttpStub::Configurer::StubHttpRequestFactory do
           let(:parameters) { nil }
 
           it "should have an empty header entry" do
-            request = factory.create(uri, stub_options)
-
-            JSON.parse(request.body).should include({ "parameters" => {} })
+            request_body.should include({ "parameters" => {} })
           end
 
         end
@@ -104,9 +87,6 @@ describe HttpStub::Configurer::StubHttpRequestFactory do
         describe "when a status response option is provided" do
 
           it "should have a response entry for the option" do
-            request = factory.create(uri, stub_options)
-
-            request_body = JSON.parse(request.body)
             request_body["response"].should include({ "status" => response_status })
           end
 
@@ -117,18 +97,12 @@ describe HttpStub::Configurer::StubHttpRequestFactory do
           let(:response_status) { nil }
 
           it "should have a response entry with status code '200'" do
-            request = factory.create(uri, stub_options)
-
-            request_body = JSON.parse(request.body)
             request_body["response"].should include({ "status" => "200" })
           end
 
         end
 
         it "should have an entry for the response body option" do
-          request = factory.create(uri, stub_options)
-
-          request_body = JSON.parse(request.body)
           request_body["response"].should include({ "body" => response_body })
         end
 
