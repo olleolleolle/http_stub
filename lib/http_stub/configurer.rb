@@ -78,7 +78,7 @@ module HttpStub
       private
 
       def handle(http_request, description)
-        request = HttpStub::ConfigurerRequest.new(@host, @port, http_request, description)
+        request = HttpStub::Configurer::Request.new(@host, @port, http_request, description)
         initialized? ? request.submit() : pending_requests << request
       end
 
