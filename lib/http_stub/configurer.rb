@@ -18,37 +18,12 @@ module HttpStub
       end
 
       def stub_activator(activation_uri, stub_uri, options)
-        response_options = options[:response]
-        request = Net::HTTP::Post.new("/stubs/activators")
-        request.content_type = "application/json"
-        request.body = {
-            "activation_uri" => activation_uri,
-            "uri" => stub_uri,
-            "method" => options[:method],
-            "headers" => options[:headers] || {},
-            "parameters" => options[:parameters] || {},
-            "response" => {
-                "status" => response_options[:status] || "200",
-                "body" => response_options[:body]
-            }
-        }.to_json
+        request = HttpStub::Configurer::StubActivatorHttpRequestFactory.create(activation_uri, stub_uri, options)
         handle(request, "registering activator '#{activation_uri}'")
       end
 
       def stub!(uri, options)
-        response_options = options[:response]
-        request = Net::HTTP::Post.new("/stubs")
-        request.content_type = "application/json"
-        request.body = {
-            "uri" => uri,
-            "method" => options[:method],
-            "headers" => options[:headers] || {},
-            "parameters" => options[:parameters] || {},
-            "response" => {
-                "status" => response_options[:status] || "200",
-                "body" => response_options[:body]
-            }
-        }.to_json
+        request = HttpStub::Configurer::StubHttpRequestFactory.create(uri, options)
         handle(request, "stubbing '#{uri}'")
       end
 
