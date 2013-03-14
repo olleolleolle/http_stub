@@ -7,7 +7,7 @@ module HttpStub
       host "localhost"
       port 8001
 
-      stub_activator "/an_activator", "/path1", method: :get, response: { status: 200, body: "Stub activator body" }
+      stub_activator "/an_activator", "/stub_path", method: :get, response: { status: 200, body: "Stub activator body" }
     end
 
   end

@@ -18,7 +18,7 @@ describe HttpStub::Configurer, "when the server is running" do
 
       describe "and the stub request is made" do
 
-        let(:response) { Net::HTTP.get_response("localhost", "/path1", 8001) }
+        let(:response) { Net::HTTP.get_response("localhost", "/stub_path", 8001) }
 
         it "should replay the stubbed response" do
           response.code.should eql("200")
@@ -33,7 +33,7 @@ describe HttpStub::Configurer, "when the server is running" do
 
       describe "and the stub request is made" do
 
-        let(:response) { Net::HTTP.get_response("localhost", "/path1", 8001) }
+        let(:response) { Net::HTTP.get_response("localhost", "/stub_path", 8001) }
 
         it "should respond with a 404 status code" do
           response.code.should eql("404")
@@ -56,50 +56,119 @@ describe HttpStub::Configurer, "when the server is running" do
 
     end
 
-  end
+    describe "and a response for a request is stubbed" do
 
-  describe "and the configurer is uninitialized" do
+      describe "that contains no headers or parameters" do
 
-    describe "and an attempt is made to activate a stub" do
+        describe "and contains a response status" do
 
-      let(:response) { Net::HTTP.get_response("localhost", "/path1", 8001) }
+          before(:each) do
+            configurer.stub_response!("/stub_with_status", method: :get, response: { status: 201, body: "Stub body" })
+          end
 
-      it "should raise an exception indicating an error occurred during activation" do
-        activation_lambda = lambda { configurer.activate!("/an_activator") }
+          describe "and that request is made" do
 
-        activation_lambda.should raise_error(/error occurred activating '\/an_activator'/i)
-      end
+            let(:response) { Net::HTTP.get_response("localhost", "/stub_with_status", 8001) }
 
-    end
+            it "should respond with the stubbed status" do
+              response.code.should eql("201")
+            end
 
-  end
+            it "should replay the stubbed body" do
+              response.body.should eql("Stub body")
+            end
 
-  describe "when a response for a request is stubbed" do
+          end
 
-    describe "that contains no headers or parameters" do
+          describe "and the stub is cleared" do
 
-      before(:each) do
-        configurer.stub_response!("/path2", method: :get, response: { status: 201, body: "Stub body" })
-      end
+            before(:each) { configurer.clear! }
 
-      describe "and that request is made" do
+            describe "and the original request is made" do
 
-        let(:response) { Net::HTTP.get_response("localhost", "/path2", 8001) }
+              let(:response) { Net::HTTP.get_response("localhost", "/stub_with_status", 8001) }
 
-        it "should replay the stubbed response" do
-          response.code.should eql("201")
-          response.body.should eql("Stub body")
+              it "should respond with a 404 status code" do
+                response.code.should eql("404")
+              end
+
+            end
+
+          end
+
+        end
+
+        describe "and does not contain a response status" do
+
+          before(:each) do
+            configurer.stub_response!("/stub_without_status", method: :get, response: { body: "Stub body" })
+          end
+
+          describe "and that request is made" do
+
+            let(:response) { Net::HTTP.get_response("localhost", "/stub_without_status", 8001) }
+
+            it "should respond with the stubbed body" do
+              response.body.should eql("Stub body")
+            end
+
+          end
+
         end
 
       end
 
-      describe "and the stub is cleared" do
+      describe "that contains headers" do
 
-        before(:each) { configurer.clear! }
+        before(:each) do
+          configurer.stub_response!("/stub_with_headers", method: :get, headers: { key: "value" },
+                                    response: { status: 202, body: "Another stub body" })
+        end
 
-        describe "and the original request is made" do
+        describe "and that request is made" do
 
-          let(:response) { Net::HTTP.get_response("localhost", "/path2", 8001) }
+          let(:response) { HTTParty.get("http://localhost:8001/stub_with_headers", headers: { "key" => "value" }) }
+
+          it "should replay the stubbed response" do
+            response.code.should eql(202)
+            response.body.should eql("Another stub body")
+          end
+
+        end
+
+        describe "and a request with different headers is made" do
+
+          let(:response) { HTTParty.get("http://localhost:8001/stub_with_headers", headers: { "key" => "other_value" }) }
+
+          it "should respond with a 404 status code" do
+            response.code.should eql(404)
+          end
+
+        end
+
+      end
+
+      describe "that contains parameters" do
+
+        before(:each) do
+          configurer.stub_response!("/stub_with_parameters", method: :get, parameters: { key: "value" },
+                                    response: { status: 202, body: "Another stub body" })
+        end
+
+        describe "and that request is made" do
+
+          let(:response) { Net::HTTP.get_response("localhost", "/stub_with_parameters?key=value", 8001) }
+
+          it "should replay the stubbed response" do
+            response.code.should eql("202")
+            response.body.should eql("Another stub body")
+          end
+
+        end
+
+        describe "and a request with different parameters is made" do
+
+          let(:response) { Net::HTTP.get_response("localhost", "/stub_with_parameters?key=another_value", 8001) }
 
           it "should respond with a 404 status code" do
             response.code.should eql("404")
@@ -111,62 +180,18 @@ describe HttpStub::Configurer, "when the server is running" do
 
     end
 
-    describe "that contains headers" do
+  end
 
-      before(:each) do
-        configurer.stub_response!("/path3", method: :get, headers: { key: "value" },
-                                                          response: { status: 202, body: "Another stub body" })
-      end
+  describe "and the configurer is uninitialized" do
 
-      describe "and that request is made" do
+    describe "and an attempt is made to activate a stub" do
 
-        let(:response) { HTTParty.get("http://localhost:8001/path3", headers: { "key" => "value" }) }
+      let(:response) { Net::HTTP.get_response("localhost", "/stub_path", 8001) }
 
-        it "should replay the stubbed response" do
-          response.code.should eql(202)
-          response.body.should eql("Another stub body")
-        end
+      it "should raise an exception indicating an error occurred during activation" do
+        activation_lambda = lambda { configurer.activate!("/an_activator") }
 
-      end
-
-      describe "and a request with different headers is made" do
-
-        let(:response) { HTTParty.get("http://localhost:8001/path3", headers: { "key" => "another_value" }) }
-
-        it "should respond with a 404 status code" do
-          response.code.should eql(404)
-        end
-
-      end
-
-    end
-
-    describe "that contains parameters" do
-
-      before(:each) do
-        configurer.stub_response!("/path4", method: :get, parameters: { key: "value" },
-                                                          response: { status: 202, body: "Another stub body" })
-      end
-
-      describe "and that request is made" do
-
-        let(:response) { Net::HTTP.get_response("localhost", "/path4?key=value", 8001) }
-
-        it "should replay the stubbed response" do
-          response.code.should eql("202")
-          response.body.should eql("Another stub body")
-        end
-
-      end
-
-      describe "and a request with different parameters is made" do
-
-        let(:response) { Net::HTTP.get_response("localhost", "/path4?key=another_value", 8001) }
-
-        it "should respond with a 404 status code" do
-          response.code.should eql("404")
-        end
-
+        activation_lambda.should raise_error(/error occurred activating '\/an_activator'/i)
       end
 
     end

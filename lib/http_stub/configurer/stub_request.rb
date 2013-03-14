@@ -12,7 +12,7 @@ module HttpStub
             "headers" => options[:headers] || {},
             "parameters" => options[:parameters] || {},
             "response" => {
-                "status" => options[:response][:status] || "200",
+                "status" => options[:response][:status] || 200,
                 "body" => options[:response][:body]
             }
         }.to_json

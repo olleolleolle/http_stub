@@ -96,8 +96,8 @@ describe HttpStub::Configurer::StubRequest do
 
           let(:response_status) { nil }
 
-          it "should have a response entry with status code '200'" do
-            request_body["response"].should include({ "status" => "200" })
+          it "should have a response entry with status code of 200" do
+            request_body["response"].should include({ "status" => 200 })
           end
 
         end
