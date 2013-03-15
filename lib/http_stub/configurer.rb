@@ -36,8 +36,8 @@ module HttpStub
       alias_method :activate_stub!, :activate!
 
       def initialize!
-        processor.flush
-        @processor = HttpStub::Configurer::ImmediateCommandProcessor.new
+        processor.replay()
+        @processor = HttpStub::Configurer::PostInitializeCommandProcessor.new(processor)
       end
 
       def clear_activators!
@@ -57,7 +57,7 @@ module HttpStub
       end
 
       def processor
-        @processor ||= HttpStub::Configurer::BufferedCommandProcessor.new
+        @processor ||= HttpStub::Configurer::PreInitializeCommandProcessor.new
       end
 
     end

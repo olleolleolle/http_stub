@@ -43,7 +43,7 @@ describe HttpStub::Configurer, "when the server is running" do
 
     end
 
-    describe "and an class stub is defined" do
+    describe "and a class stub is defined" do
 
       let(:configurer) { HttpStub::Examples::ConfigurerWithClassStub.new }
 
@@ -52,6 +52,27 @@ describe HttpStub::Configurer, "when the server is running" do
 
         response.code.should eql("201")
         response.body.should eql("Class stub body")
+      end
+
+      describe "and the stub is overridden" do
+
+        before(:each) do
+          configurer.stub_response!("/a_class_stub", method: :get, response: { body: "Other class stub body" })
+        end
+
+        describe "and the configurer is re-initialized" do
+
+          before(:each) { configurer.class.initialize! }
+
+          it "should re-establish the class stub as having priority" do
+            response = Net::HTTP.get_response("localhost", "/a_class_stub", 8001)
+
+            response.code.should eql("201")
+            response.body.should eql("Class stub body")
+          end
+
+        end
+
       end
 
     end
