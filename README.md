@@ -29,9 +29,9 @@ Usage
 Start a ```http_stub``` server via a rake task, generated via ```http_stub```:
 
 ```ruby
-    require 'http_stub/start_server_rake_task'
+    require 'http_stub/rake/task_generators'
 
-    HttpStub::StartServerRakeTask.new(name: :some_server, port: 8001) # Generates 'start_some_server' task
+    HttpStub::Rake::StartServerTask.new(name: :some_server, port: 8001) # Generates 'start_some_server' task
 ```
 
 ### Stubbing Server Responses ###

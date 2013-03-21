@@ -1,6 +1,6 @@
 require 'bundler'
 require 'rspec/core/rake_task'
-require File.expand_path('../lib/http_stub/start_server_rake_task', __FILE__)
+require File.expand_path('../lib/http_stub/rake/task_generators', __FILE__)
 require File.expand_path('../examples/configurer_with_class_activator', __FILE__)
 
 directory "pkg"
@@ -54,7 +54,7 @@ task :validate do
   raise "Travis CI validation failed" unless result =~ /^Hooray/
 end
 
-HttpStub::StartServerRakeTask.new(name: :example_server, port: 8001)
+HttpStub::Rake::StartServerTask.new(name: :example_server, port: 8001)
 
 task :default => [:clobber, :metrics, :coverage]
 

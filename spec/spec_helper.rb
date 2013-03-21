@@ -9,7 +9,7 @@ require 'rack/test'
 require 'httparty'
 require 'nokogiri'
 
-require File.expand_path('../../lib/http_stub/start_server_rake_task', __FILE__)
+require File.expand_path('../../lib/http_stub/rake/task_generators', __FILE__)
 require File.expand_path('../../lib/http_stub', __FILE__)
 require File.expand_path('../../examples/configurer_with_class_activator', __FILE__)
 require File.expand_path('../../examples/configurer_with_class_stub', __FILE__)

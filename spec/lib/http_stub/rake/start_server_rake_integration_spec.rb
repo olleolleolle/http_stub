@@ -1,4 +1,4 @@
-describe HttpStub::StartServerRakeTask do
+describe HttpStub::Rake::StartServerTask do
   include_context "server integration"
 
   describe("when the generated task is invoked") do
