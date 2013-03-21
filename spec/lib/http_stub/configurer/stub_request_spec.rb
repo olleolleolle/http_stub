@@ -4,7 +4,7 @@ describe HttpStub::Configurer::StubRequest do
 
     describe "when provided a uri and stub options" do
 
-      let(:uri) { "Some URI" }
+      let(:uri) { "/some/uri" }
       let(:stub_method) { "Some Method" }
       let(:headers) { { "header_name" => "value" } }
       let(:parameters) { { "parameter_name" => "value" } }
@@ -40,8 +40,22 @@ describe HttpStub::Configurer::StubRequest do
 
       describe "generates a JSON body which" do
 
-        it "should have an entry for the provided URI" do
-          request_body.should include({ "uri" => uri })
+        describe "when the uri is a string" do
+
+          it "should have an entry containing the provided URI unaltered" do
+            request_body.should include({ "uri" => uri })
+          end
+
+        end
+
+        describe "when the uri is a regular expression" do
+
+          let(:uri) { /\/some\/uri/ }
+
+          it "should have an entry containing the provided URI converted to a string and prefixed with 'regexp:'" do
+            request_body.should include({ "uri" => "regexp:/some/uri" })
+          end
+
         end
 
         it "should have an entry for the method option" do

@@ -7,7 +7,7 @@ module HttpStub
         super("/stubs")
         self.content_type = "application/json"
         self.body = {
-            "uri" => uri,
+            "uri" => uri.is_a?(Regexp) ? "regexp:#{uri.source.gsub(/\\/, "")}" : uri,
             "method" => options[:method],
             "headers" => options[:headers] || {},
             "parameters" => options[:parameters] || {},

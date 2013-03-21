@@ -1,13 +1,14 @@
 require 'simplecov'
 SimpleCov.start do
   add_filter "/spec/"
-  minimum_coverage 97.1
+  minimum_coverage 97.2
   refuse_coverage_drop
 end if ENV["coverage"]
 
-require 'rack/test'
 require 'httparty'
 require 'nokogiri'
+require 'rack/test'
+require 'wait_until'
 
 require File.expand_path('../../lib/http_stub/rake/task_generators', __FILE__)
 require File.expand_path('../../lib/http_stub', __FILE__)

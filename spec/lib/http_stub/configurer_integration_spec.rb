@@ -135,6 +135,35 @@ describe HttpStub::Configurer, "when the server is running" do
 
           end
 
+          describe "and the stub uri is regular expression" do
+
+            before(:each) do
+              configurer.stub_response!(/\/stub\/regexp\/.*/, method: :get, response: { body: "Stub body" })
+            end
+
+            describe "and a request is made whose uri matches the regular expression" do
+
+              let(:response) { Net::HTTP.get_response("localhost", "/stub/regexp/match", 8001) }
+
+              it "should respond with the stubbed body" do
+                response.body.should eql("Stub body")
+              end
+
+            end
+
+            describe "and a request is made whose uri does not match the regular expression" do
+
+              let(:response) { Net::HTTP.get_response("localhost", "/stub/no_match/regexp", 8001) }
+
+              it "should respond with a 404 status code" do
+                response.code.should eql("404")
+              end
+
+            end
+
+
+          end
+
         end
 
       end

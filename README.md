@@ -68,6 +68,14 @@ These methods issue HTTP requests to a ```http_stub``` server to configure it's 
     end
 ```
 
+Note that the stub uri accepted in the ```stub!``` and ```stub_activator``` methods can be a regular expression:
+
+```ruby
+    stub! /prefix\/[^\/]*\/postfix/, method: :post, response: { status: 200 }
+
+    stub_activator! "/activate_this", /prefix\/[^\/]+\/postfix/, method: :post, response: { status: 200 }
+```
+
 Once a server is running, you must initialize it via the Configurer's ```initialize!``` class method:
 
 ```ruby
@@ -115,6 +123,15 @@ To configure a stub response, POST to /stubs with the following JSON payload:
             "status": "200",
             "body": "Some body"
         }
+    }
+```
+
+The stub uri can be a regular expression by prefixing the uri with ```regexp:```
+
+```javascript
+    {
+        "uri": "regexp:/prefix/.+",
+        // remainder as above
     }
 ```
 
