@@ -174,6 +174,11 @@ Stubs for **GET, POST, PUT, DELETE, PATCH and OPTIONS request methods are suppor
 GET to /stubs/activators returns HTML with information about each configured activator, including activation links.
 GET to /stubs returns HTML with information about each active stub, in top-down priority order.
 
+Build Status
+------------
+
+[![Build Status](https://travis-ci.org/MYOB-Technology/http_stub.png)](https://travis-ci.org/MYOB-Technology/http_stub)
+
 Requirements
 ------------
 
