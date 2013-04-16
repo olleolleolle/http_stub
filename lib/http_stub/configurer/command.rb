@@ -3,16 +3,21 @@ module HttpStub
 
     class Command
 
-      def initialize(host, port, request, description)
-        @host = host
-        @port = port
-        @request = request
-        @description = description
+      def initialize(options)
+        @host = options[:host]
+        @port = options[:port]
+        @request = options[:request]
+        @description = options[:description]
+        @resetable_flag = !!options[:resetable]
       end
 
       def execute
-        response = Net::HTTP.new(@host, @port).start { |http| http.request(@request) }
+        response = Net::HTTP.start(@host, @port) { |http| http.request(@request) }
         raise "Error occurred #{@description}: #{response.message}" unless response.code == "200"
+      end
+
+      def resetable?
+        @resetable_flag
       end
 
     end

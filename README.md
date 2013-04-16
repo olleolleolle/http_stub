@@ -10,7 +10,7 @@ Need to simulate a HTTP service with which your application integrates?  Enter `
 
 ```http_stub``` is similar in motivation to the ```fakeweb``` gem, although ```http_stub``` provides a separately running HTTP process whose responses can be faked / stubbed.
 
-```http_stub``` appears to be very similar in purpose to the ```HTTParrot``` gem, although that appears to be inactive.
+```http_stub``` appears to be very similar in purpose to the ```HTTParrot``` and ```rack-stubs``` gems, although these appear to be inactive.
 
 Installation
 ------------
@@ -38,8 +38,8 @@ Start a ```http_stub``` server via a rake task, generated via ```http_stub```:
 
 #### Stub via API ####
 
-HttpStub::Configurer is an API that configures the stub server via the class and instance methods ```stub_activator```, ```stub!``` and ```activate!```.
-These methods issue HTTP requests to a ```http_stub``` server to configure it's responses.  An example follows:
+```HttpStub::Configurer``` offers an API to configure a stub server via the class and instance methods ```stub_activator```, ```stub!``` and ```activate!```.
+These methods issue HTTP requests to the server, configuring it's responses.  An example follows:
 
 ```ruby
     class AuthenticationService
@@ -68,30 +68,24 @@ These methods issue HTTP requests to a ```http_stub``` server to configure it's 
     end
 ```
 
-Note that the stub uri accepted in the ```stub!``` and ```stub_activator``` methods can be a regular expression:
+Note that the stub uri accepted in the ```stub_activator``` and ```stub!``` methods can be a regular expression:
 
 ```ruby
+    stub_activator "/activate_this", /prefix\/[^\/]+\/postfix/, method: :post, response: { status: 200 }
+
     stub! /prefix\/[^\/]*\/postfix/, method: :post, response: { status: 200 }
-
-    stub_activator! "/activate_this", /prefix\/[^\/]+\/postfix/, method: :post, response: { status: 200 }
 ```
 
-Once a server is running, you must initialize it via the Configurer's ```initialize!``` class method:
+The stubs known by the server can also be cleared via class methods ```clear_activators!``` and ```clear!```,
+which clears stubs only.
 
-```ruby
-    AuthenticationService.initialize!
-```
-
-This informs the Configurer that the ```http_stub``` server is able to accept HTTP requests.
-
-The state of the ```http_stub``` server can be cleared via class method ```clear_activators!``` and instance method ```clear!```, which clears stubs only.
-These are often used on completion of tests to return the server to it's original state:
+These methods are often used on completion of tests to return the server to a known state:
 
 ```ruby
     let(:authentication_service) { AuthenticationService.new }
 
-    # Removes all stub responses, but retains activators
-    after(:each) { authentication_service.clear! }
+    # Returns server to post-initialize state
+    after(:each) { authentication_service.reset! }
 
     describe "when the service is unavailable" do
 
@@ -99,6 +93,38 @@ These are often used on completion of tests to return the server to it's origina
 
         #...
 ```
+
+##### Configurer Initialization ######
+
+You must inform a Configurer once a server is running, otherwise operations will buffer and never be issued to the
+server.
+
+This can be done in one of two ways, via the ```server_is_started!``` or ```initialize!``` class methods.
+
+The ```initialize!``` method has the benefit of:
+* Flushing all pending requests
+* Enabling the ```reset!``` class method, which efficiently returns the server to it's post-initialization state
+
+A common use case is to start the server and ```initialize!``` in one process, for example before running acceptance
+tests, and ```reset!``` the before each test which is run in another process:
+
+```ruby
+    task :acceptance => [:start_some_service, :cucumber]
+
+    task :start_some_service => :start_some_server do
+        SomeConfigurer.initialize! # Initialize the server prior to running any tests
+    end
+```
+
+```ruby
+    Before do                             # Before each acceptance test scenario
+        SomeConfigurer.server_is_started! # Ensure operations are issued immediately
+        SomeConfigurer.reset!             # Return to post-initialization state
+    end
+```
+
+Take a look at the [http_server_manager gem]|(http://rubygems.org/gems/http_server_manager) should you be looking for a
+simple way to start / stop / restart a ```http_stub``` server running as a separate process.
 
 #### Stub via HTTP requests ####
 

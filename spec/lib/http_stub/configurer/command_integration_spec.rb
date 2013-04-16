@@ -1,7 +1,10 @@
 describe HttpStub::Configurer::Command, "when the server is running" do
   include_context "server integration"
 
-  let(:command) { HttpStub::Configurer::Command.new("localhost", 8001, request, "performing an operation") }
+  let(:command) do
+    HttpStub::Configurer::Command.new(host: "localhost", port: 8001,
+                                      request: request, description: "performing an operation")
+  end
 
   describe "#execute" do
 

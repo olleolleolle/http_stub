@@ -19,52 +19,67 @@ module HttpStub
 
       def stub_activator(activation_uri, stub_uri, options)
         request = HttpStub::Configurer::StubActivatorRequest.new(activation_uri, stub_uri, options)
-        handle(request, "registering activator '#{activation_uri}'")
+        handle(request: request, description: "registering activator '#{activation_uri}'")
       end
 
       def stub!(uri, options)
         request = HttpStub::Configurer::StubRequest.new(uri, options)
-        handle(request, "stubbing '#{uri}'")
+        handle(request: request, description: "stubbing '#{uri}'", resetable: true)
       end
 
       alias_method :stub_response!, :stub!
 
       def activate!(uri)
-        handle(Net::HTTP::Get.new(uri), "activating '#{uri}'")
+        handle(request: Net::HTTP::Get.new(uri), description: "activating '#{uri}'", resetable: true)
       end
 
       alias_method :activate_stub!, :activate!
 
+      def server_has_started!
+        @effective_command_chain = HttpStub::Configurer::ImpatientCommandChain.new()
+      end
+
       def initialize!
-        processor.replay()
-        @processor = HttpStub::Configurer::PostInitializeCommandProcessor.new(processor)
+        server_has_started!
+        initialize_command_chain.execute()
+      end
+
+      def reset!
+        clear!
+        initialize_command_chain.filter(&:resetable?).execute()
       end
 
       def clear_activators!
-        handle(Net::HTTP::Delete.new("/stubs/activators"), "clearing activators")
+        handle(request: Net::HTTP::Delete.new("/stubs/activators"), description: "clearing activators")
       end
 
       def clear!
-        handle(Net::HTTP::Delete.new("/stubs"), "clearing stubs")
+        handle(request: Net::HTTP::Delete.new("/stubs"), description: "clearing stubs")
       end
 
       alias_method :clear_stubs!, :clear!
 
       private
 
-      def handle(request, description)
-        processor.process(HttpStub::Configurer::Command.new(@host, @port, request, description))
+      def handle(command_options)
+        effective_command_chain <<
+            HttpStub::Configurer::Command.new({ host: @host, port: @port }.merge(command_options))
       end
 
-      def processor
-        @processor ||= HttpStub::Configurer::PreInitializeCommandProcessor.new
+      def effective_command_chain
+        @effective_command_chain ||= initialize_command_chain
+      end
+
+      def initialize_command_chain
+        @initialize_command_chain ||= HttpStub::Configurer::PatientCommandChain.new()
       end
 
     end
 
     module InstanceMethods
 
-      DELEGATE_METHODS = %w{ stub_activator stub! stub_response! activate! activate_stub! clear_activators! clear! clear_stubs! }
+      DELEGATE_METHODS = %w{ stub_activator stub! stub_response! activate! activate_stub!
+                             server_has_started! reset! clear_activators! clear! clear_stubs! }
 
       def self.included(mod)
         DELEGATE_METHODS.each do |method_name|

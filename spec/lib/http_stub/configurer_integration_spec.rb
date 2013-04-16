@@ -47,7 +47,7 @@ describe HttpStub::Configurer, "when the server is running" do
 
       let(:configurer) { HttpStub::Examples::ConfigurerWithClassStub.new }
 
-      it "the stub should be registered" do
+      it "should register the stub" do
         response = Net::HTTP.get_response("localhost", "/a_class_stub", 8001)
 
         response.code.should eql("201")
@@ -69,6 +69,60 @@ describe HttpStub::Configurer, "when the server is running" do
 
             response.code.should eql("201")
             response.body.should eql("Class stub body")
+          end
+
+        end
+
+      end
+
+    end
+
+    describe "and the initializer contains stub activators that are activated and conventional stubs" do
+
+      let(:configurer) { HttpStub::Examples::ConfigurerWithComplexInitializer.new }
+
+      it "should register the activated activator" do
+        response = Net::HTTP.get_response("localhost", "/activated_during_initialization_stub_path", 8001)
+
+        response.code.should eql("200")
+        response.body.should eql("Activated during initialization body")
+      end
+
+      it "should register the stub" do
+        response = Net::HTTP.get_response("localhost", "/stubbed_during_initialization_path", 8001)
+
+        response.code.should eql("200")
+        response.body.should eql("Stubbed during initialization body")
+      end
+
+      describe "and another stub is registered" do
+
+        before(:each) do
+          configurer.stub_response!("/another_stub", method: :get, response: { body: "Another stub body" })
+        end
+
+        describe "and the configurer is reset" do
+
+          before(:each) { configurer.reset! }
+
+          it "should remove the stub registered post-initialization" do
+            response = Net::HTTP.get_response("localhost", "/another_stub", 8001)
+
+            response.code.should eql("404")
+          end
+
+          it "should retain the activated activator during initialization" do
+            response = Net::HTTP.get_response("localhost", "/activated_during_initialization_stub_path", 8001)
+
+            response.code.should eql("200")
+            response.body.should eql("Activated during initialization body")
+          end
+
+          it "should retain the stub registered during initialization" do
+            response = Net::HTTP.get_response("localhost", "/stubbed_during_initialization_path", 8001)
+
+            response.code.should eql("200")
+            response.body.should eql("Stubbed during initialization body")
           end
 
         end
@@ -234,14 +288,43 @@ describe HttpStub::Configurer, "when the server is running" do
 
   describe "and the configurer is uninitialized" do
 
-    describe "and an attempt is made to activate a stub" do
+    describe "and the configurer is informed that the server has started" do
 
-      let(:response) { Net::HTTP.get_response("localhost", "/stub_path", 8001) }
+      before(:each) { configurer.server_has_started! }
 
-      it "should raise an exception indicating an error occurred during activation" do
+      it "should not initialize the configurer" do
         activation_lambda = lambda { configurer.activate!("/an_activator") }
 
         activation_lambda.should raise_error(/error occurred activating '\/an_activator'/i)
+      end
+
+      describe "and an attempt is made to register a stub" do
+
+        before(:each) do
+          configurer.stub_response!("/some_stub_path", method: :get, response: { body: "Some stub body" })
+        end
+
+        it "should register the stub" do
+          response = Net::HTTP.get_response("localhost", "/some_stub_path", 8001)
+
+          response.code.should eql("200")
+          response.body.should eql("Some stub body")
+        end
+
+      end
+
+    end
+
+    describe "and the configurer has not been informed that the server has started" do
+
+      describe "and an attempt is made to activate a stub" do
+
+        it "should raise an exception indicating an error occurred during activation" do
+          activation_lambda = lambda { configurer.activate!("/an_activator") }
+
+          activation_lambda.should raise_error(/error occurred activating '\/an_activator'/i)
+        end
+
       end
 
     end
