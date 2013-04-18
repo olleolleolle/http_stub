@@ -26,11 +26,7 @@ describe HttpStub::Configurer::Request::Stub do
       let(:request) { HttpStub::Configurer::Request::Stub.new(uri, stub_options) }
       let(:request_body) { JSON.parse(request.body) }
 
-      before(:each) do
-        HttpStub::Configurer::Request::HashWithRegexpableValues.stub!(:new).and_return(
-            double(HttpStub::Configurer::Request::HashWithRegexpableValues).as_null_object
-        )
-      end
+      before(:each) { HttpStub::Configurer::Request::Regexpable.stub!(:format) }
 
       it "should create a HTTP POST request" do
         request.method.should eql("POST")
@@ -44,16 +40,10 @@ describe HttpStub::Configurer::Request::Stub do
         request.content_type.should eql("application/json")
       end
 
-      it "should create a regexpable representation of the uri" do
-        HttpStub::Configurer::Request::RegexpableValue.should_receive(:new).with(uri)
-
-        request
-      end
-
       describe "when a header option is provided" do
 
-        it "should create a regexpable representation of the headers" do
-          HttpStub::Configurer::Request::HashWithRegexpableValues.should_receive(:new).with(headers)
+        it "should format the headers with regexp support" do
+          HttpStub::Configurer::Request::Regexpable.should_receive(:format).with(headers)
 
           request
         end
@@ -64,8 +54,8 @@ describe HttpStub::Configurer::Request::Stub do
 
         let(:headers) { nil }
 
-        it "should create a regexpable representation of an empty header hash" do
-          HttpStub::Configurer::Request::HashWithRegexpableValues.should_receive(:new).with({})
+        it "should format an empty header hash" do
+          HttpStub::Configurer::Request::Regexpable.should_receive(:format).with({})
 
           request
         end
@@ -74,8 +64,8 @@ describe HttpStub::Configurer::Request::Stub do
 
       describe "when a parameter option is provided" do
 
-        it "should create a regexpable representation of the parameters" do
-          HttpStub::Configurer::Request::HashWithRegexpableValues.should_receive(:new).with(parameters)
+        it "should format the parameters with regexp support" do
+          HttpStub::Configurer::Request::Regexpable.should_receive(:format).with(parameters)
 
           request
         end
@@ -86,8 +76,8 @@ describe HttpStub::Configurer::Request::Stub do
 
         let(:parameters) { nil }
 
-        it "should create a regexpable representation of an empty parameter hash" do
-          HttpStub::Configurer::Request::HashWithRegexpableValues.should_receive(:new).with({})
+        it "should format an empty parameter hash" do
+          HttpStub::Configurer::Request::Regexpable.should_receive(:format).with({})
 
           request
         end
@@ -96,9 +86,8 @@ describe HttpStub::Configurer::Request::Stub do
 
       describe "generates a JSON body which" do
 
-        it "should have an entry containing the string representation of the uri" do
-          uri_value = double(HttpStub::Configurer::Request::RegexpableValue, to_s: "uri as a string")
-          HttpStub::Configurer::Request::RegexpableValue.stub!(:new).and_return(uri_value)
+        it "should have an entry containing the regexpable representation of the uri" do
+          HttpStub::Configurer::Request::Regexpable.should_receive(:format).with(uri).and_return("uri as a string")
 
           request_body.should include({ "uri" => "uri as a string" })
         end
@@ -108,15 +97,15 @@ describe HttpStub::Configurer::Request::Stub do
         end
 
         it "should have an entry containing the string representation of the headers" do
-          hash_value = double(HttpStub::Configurer::Request::HashWithRegexpableValues, to_s: "headers as string")
-          HttpStub::Configurer::Request::HashWithRegexpableValues.stub!(:new).with(headers).and_return(hash_value)
+          HttpStub::Configurer::Request::Regexpable.should_receive(:format)
+            .with(headers).and_return("headers as string")
 
           request_body.should include({ "headers" => "headers as string" })
         end
 
         it "should have an entry containing the string representation of the parameters" do
-          hash_value = double(HttpStub::Configurer::Request::HashWithRegexpableValues, to_s: "parameters as string")
-          HttpStub::Configurer::Request::HashWithRegexpableValues.stub!(:new).with(parameters).and_return(hash_value)
+          HttpStub::Configurer::Request::Regexpable.should_receive(:format)
+            .with(parameters).and_return("parameters as string")
 
           request_body.should include({ "parameters" => "parameters as string" })
         end
