@@ -6,7 +6,7 @@ module HttpStub
       attr_reader :uri, :headers, :parameters, :response
 
       def initialize(options)
-        @stub_options = options
+        @options = options
         @uri = HttpStub::Models::StubUri.new(options["uri"])
         @headers = HttpStub::Models::StubHeaders.new(options["headers"])
         @parameters = HttpStub::Models::StubParameters.new(options["parameters"])
@@ -21,11 +21,11 @@ module HttpStub
       end
 
       def method
-        @stub_options["method"]
+        @options["method"]
       end
 
       def to_s
-        @stub_options.to_s
+        @options.to_s
       end
 
     end

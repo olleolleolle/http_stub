@@ -167,36 +167,11 @@ describe HttpStub::Models::Stub do
 
   describe "#to_s" do
 
-    it "should return a string containing the stubbed uri" do
-      the_stub.to_s.should match(/\/a_path/)
-    end
+    it "should return a string representation of the stub options" do
+      stub_options.should_receive(:to_s).and_return("stub options string")
 
-    it "should return a string containing the stubbed request method" do
-      the_stub.to_s.should match(/get/)
+      the_stub.to_s.should eql("stub options string")
     end
-
-    it "should return a string containing the stubbed headers" do
-      raw_stub_headers.each_pair do |key, value|
-        the_stub.to_s.should match(/#{Regexp.escape(key)}/)
-        the_stub.to_s.should match(/#{Regexp.escape(value)}/)
-      end
-    end
-
-    it "should return a string containing the stubbed parameters" do
-      raw_stub_parameters.each_pair do |key, value|
-        the_stub.to_s.should match(/#{Regexp.escape(key)}/)
-        the_stub.to_s.should match(/#{Regexp.escape(value)}/)
-      end
-    end
-
-    it "should return a string containing the intended response code" do
-      the_stub.to_s.should match(/201/)
-    end
-
-    it "should return a string containing the intended response body" do
-      the_stub.to_s.should match(/Foo/)
-    end
-
   end
 
 end

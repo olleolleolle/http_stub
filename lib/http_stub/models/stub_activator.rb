@@ -20,6 +20,10 @@ module HttpStub
         @options["activation_uri"]
       end
 
+      def to_s
+        @options.to_s
+      end
+
     end
 
   end

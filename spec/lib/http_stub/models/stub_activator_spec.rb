@@ -63,4 +63,14 @@ describe HttpStub::Models::StubActivator do
 
   end
 
+  describe "#to_s" do
+
+    it "should return the string representation of the activation options" do
+      options.should_receive(:to_s).and_return("activation options string")
+
+      stub_activator.to_s.should eql("activation options string")
+    end
+
+  end
+
 end

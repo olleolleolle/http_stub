@@ -4,7 +4,7 @@ module HttpStub
     class HashWithRegexpableValues < Hash
 
       def initialize(hash)
-        hash.each { |entry| self[entry[0]] = HttpStub::Models::RegexpableValue.new(entry[1]) }
+        hash.each_pair { |key, value| self[key] = HttpStub::Models::RegexpableValue.new(value) }
       end
 
       def match?(other_hash)
