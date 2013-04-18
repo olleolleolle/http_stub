@@ -68,10 +68,15 @@ These methods issue HTTP requests to the server, configuring it's responses.  An
     end
 ```
 
-Note that the stub uri accepted in the ```stub_activator``` and ```stub!``` methods can be a regular expression:
+Note that the stub uri, parameter values and header values accepted in the ```stub_activator``` and ```stub!``` methods
+can be regular expressions:
 
 ```ruby
-    stub_activator "/activate_this", /prefix\/[^\/]+\/postfix/, method: :post, response: { status: 200 }
+    stub_activator "/activate_this", /prefix\/[^\/]+\/postfix/,
+                   method: :post,
+                   headers: { api_key: /^some_.+_key$/ },
+                   parameters: { username: /^user_.+/ },
+                   response: { status: 200 }
 
     stub! /prefix\/[^\/]*\/postfix/, method: :post, response: { status: 200 }
 ```
@@ -139,6 +144,7 @@ To configure a stub response, POST to /stubs with the following JSON payload:
         "headers": {
             "a_header": "a_value",
             "another_header": "another_value"
+            ...
         },
         "parameters": {
             "a_param": "a_value",
@@ -152,12 +158,17 @@ To configure a stub response, POST to /stubs with the following JSON payload:
     }
 ```
 
-The stub uri can be a regular expression by prefixing the uri with ```regexp:```
+The stub uri, header values and parameter values can be regular expressions by prefixing them with ```regexp:```
 
 ```javascript
     {
         "uri": "regexp:/prefix/.+",
-        // remainder as above
+        "headers": {
+            "a_header": "regexp:^some.+value$",
+        },
+        "parameters": {
+            "a_param": "regexp:^some.+a_value$",
+        }
     }
 ```
 
