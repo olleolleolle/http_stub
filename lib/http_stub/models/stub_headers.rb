@@ -4,15 +4,15 @@ module HttpStub
     class StubHeaders
 
       def initialize(headers)
-        @headers = headers || {}
+        @headers = HttpStub::Models::HashWithRegexpableValues.new((headers || {}).downcase_and_underscore_keys)
       end
 
       def match?(request)
-        headers_in(request).downcase_and_underscore_keys.has_hash?(@headers.downcase_and_underscore_keys)
+        @headers.match?(headers_in(request).downcase_and_underscore_keys)
       end
 
       def to_s
-        @headers ? @headers.map { |key_and_value| key_and_value.join(":") }.join(", ") : ""
+        @headers ? @headers.map { |key_and_value| key_and_value.map(&:to_s).join(":") }.join(", ") : ""
       end
 
       private

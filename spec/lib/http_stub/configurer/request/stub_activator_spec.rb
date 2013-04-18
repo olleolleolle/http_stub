@@ -1,4 +1,4 @@
-describe HttpStub::Configurer::StubActivatorRequest do
+describe HttpStub::Configurer::Request::StubActivator do
 
   describe "#initialize" do
 
@@ -6,7 +6,7 @@ describe HttpStub::Configurer::StubActivatorRequest do
     let(:stub_request_content_type) { "Some content type" }
     let(:stub_request) { double("StubRequest", :content_type => stub_request_content_type, :body => stub_request_body) }
 
-    before(:each) { HttpStub::Configurer::StubRequest.stub!(:new).and_return(stub_request) }
+    before(:each) { HttpStub::Configurer::Request::Stub.stub!(:new).and_return(stub_request) }
 
     describe "when provided an activation uri, stub uri and stub options" do
 
@@ -14,7 +14,7 @@ describe HttpStub::Configurer::StubActivatorRequest do
       let(:stub_uri) { "Some stub URI" }
       let(:stub_options) { "Some options" }
 
-      let(:request) { HttpStub::Configurer::StubActivatorRequest.new(activation_uri, stub_uri, stub_options) }
+      let(:request) { HttpStub::Configurer::Request::StubActivator.new(activation_uri, stub_uri, stub_options) }
       let(:request_body) { JSON.parse(request.body) }
 
       it "should create a HTTP POST request" do
@@ -32,7 +32,7 @@ describe HttpStub::Configurer::StubActivatorRequest do
       describe "generates a JSON body which" do
 
         it "should contain entries for a stub request" do
-          HttpStub::Configurer::StubRequest.should_receive(:new).with(stub_uri, stub_options).and_return(stub_request)
+          HttpStub::Configurer::Request::Stub.should_receive(:new).with(stub_uri, stub_options).and_return(stub_request)
 
           request_body.should include(JSON.parse(stub_request_body))
         end

@@ -4,15 +4,15 @@ module HttpStub
     class StubParameters
 
       def initialize(parameters)
-        @parameters = parameters
+        @parameters = HttpStub::Models::HashWithRegexpableValues.new(parameters || {})
       end
 
       def match?(request)
-        request.params.has_hash?(@parameters)
+        @parameters.match?(request.params)
       end
 
       def to_s
-        @parameters ? @parameters.map { |key_and_value| key_and_value.join("=") }.join("&") : ""
+        @parameters ? @parameters.map { |key_and_value| key_and_value.map(&:to_s).join("=") }.join("&") : ""
       end
 
     end

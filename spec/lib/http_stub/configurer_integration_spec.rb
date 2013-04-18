@@ -224,28 +224,68 @@ describe HttpStub::Configurer, "when the server is running" do
 
       describe "that contains headers" do
 
-        before(:each) do
-          configurer.stub_response!("/stub_with_headers", method: :get, headers: { key: "value" },
-                                    response: { status: 202, body: "Another stub body" })
-        end
+        describe "whose values are strings" do
 
-        describe "and that request is made" do
+          before(:each) do
+            configurer.stub_response!("/stub_with_headers", method: :get, headers: { key: "value" },
+                                      response: { status: 202, body: "Another stub body" })
+          end
 
-          let(:response) { HTTParty.get("http://localhost:8001/stub_with_headers", headers: { "key" => "value" }) }
+          describe "and that request is made" do
 
-          it "should replay the stubbed response" do
-            response.code.should eql(202)
-            response.body.should eql("Another stub body")
+            let(:response) { HTTParty.get("http://localhost:8001/stub_with_headers", headers: { "key" => "value" }) }
+
+            it "should replay the stubbed response" do
+              response.code.should eql(202)
+              response.body.should eql("Another stub body")
+            end
+
+          end
+
+          describe "and a request with different headers is made" do
+
+            let(:response) do
+              HTTParty.get("http://localhost:8001/stub_with_headers", headers: { "key" => "other_value" })
+            end
+
+            it "should respond with a 404 status code" do
+              response.code.should eql(404)
+            end
+
           end
 
         end
 
-        describe "and a request with different headers is made" do
+        describe "whose values are regular expressions" do
 
-          let(:response) { HTTParty.get("http://localhost:8001/stub_with_headers", headers: { "key" => "other_value" }) }
+          before(:each) do
+            configurer.stub_response!("/stub_with_headers", method: :get, headers: { key: /^match.*/ },
+                                      response: { status: 202, body: "Another stub body" })
+          end
 
-          it "should respond with a 404 status code" do
-            response.code.should eql(404)
+          describe "and a request that matches is made" do
+
+            let(:response) do
+              HTTParty.get("http://localhost:8001/stub_with_headers", headers: { "key" => "matching_value" })
+            end
+
+            it "should replay the stubbed response" do
+              response.code.should eql(202)
+              response.body.should eql("Another stub body")
+            end
+
+          end
+
+          describe "and a request that does not match is made" do
+
+            let(:response) do
+              HTTParty.get("http://localhost:8001/stub_with_headers", headers: { "key" => "does_not_match_value" })
+            end
+
+            it "should respond with a 404 status code" do
+              response.code.should eql(404)
+            end
+
           end
 
         end
@@ -254,28 +294,64 @@ describe HttpStub::Configurer, "when the server is running" do
 
       describe "that contains parameters" do
 
-        before(:each) do
-          configurer.stub_response!("/stub_with_parameters", method: :get, parameters: { key: "value" },
-                                    response: { status: 202, body: "Another stub body" })
-        end
+        describe "whose values are strings" do
 
-        describe "and that request is made" do
+          before(:each) do
+            configurer.stub_response!("/stub_with_parameters", method: :get, parameters: { key: "value" },
+                                      response: { status: 202, body: "Another stub body" })
+          end
 
-          let(:response) { Net::HTTP.get_response("localhost", "/stub_with_parameters?key=value", 8001) }
+          describe "and that request is made" do
 
-          it "should replay the stubbed response" do
-            response.code.should eql("202")
-            response.body.should eql("Another stub body")
+            let(:response) { Net::HTTP.get_response("localhost", "/stub_with_parameters?key=value", 8001) }
+
+            it "should replay the stubbed response" do
+              response.code.should eql("202")
+              response.body.should eql("Another stub body")
+            end
+
+          end
+
+          describe "and a request with different parameters is made" do
+
+            let(:response) { Net::HTTP.get_response("localhost", "/stub_with_parameters?key=another_value", 8001) }
+
+            it "should respond with a 404 status code" do
+              response.code.should eql("404")
+            end
+
           end
 
         end
 
-        describe "and a request with different parameters is made" do
+        describe "whose values are regular expressions" do
 
-          let(:response) { Net::HTTP.get_response("localhost", "/stub_with_parameters?key=another_value", 8001) }
+          before(:each) do
+            configurer.stub_response!("/stub_with_parameters", method: :get, parameters: { key: /^match.*/ },
+                                      response: { status: 202, body: "Another stub body" })
+          end
 
-          it "should respond with a 404 status code" do
-            response.code.should eql("404")
+          describe "and a request that matches is made" do
+
+            let(:response) { Net::HTTP.get_response("localhost", "/stub_with_parameters?key=matching_value", 8001) }
+
+            it "should replay the stubbed response" do
+              response.code.should eql("202")
+              response.body.should eql("Another stub body")
+            end
+
+          end
+
+          describe "and a request that does not match is made" do
+
+            let(:response) do
+              Net::HTTP.get_response("localhost", "/stub_with_parameters?key=does_not_match_value", 8001)
+            end
+
+            it "should respond with a 404 status code" do
+              response.code.should eql("404")
+            end
+
           end
 
         end

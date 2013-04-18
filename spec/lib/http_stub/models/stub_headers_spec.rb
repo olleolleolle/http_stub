@@ -1,114 +1,62 @@
 describe HttpStub::Models::StubHeaders do
 
   let(:request) { double("HttpRequest") }
+  let(:stubbed_headers) { { "stub_key" => "value" } }
 
   let(:stub_headers) { HttpStub::Models::StubHeaders.new(stubbed_headers) }
 
+  describe "when stubbed headers are provided" do
+
+    it "should create a regexpable representation of the stubbed headers whose keys are downcased and underscored" do
+      downcased_and_underscored_hash = { "another_stub_key" => "value" }
+      stubbed_headers.should_receive(:downcase_and_underscore_keys).and_return(downcased_and_underscored_hash)
+      HttpStub::Models::HashWithRegexpableValues.should_receive(:new).with(downcased_and_underscored_hash)
+
+      stub_headers
+    end
+
+  end
+
+  describe "when the stubbed headers are nil" do
+
+    let(:stubbed_headers) { nil }
+
+    it "should create a regexpable representation of an empty hash" do
+      HttpStub::Models::HashWithRegexpableValues.should_receive(:new).with({})
+
+      stub_headers
+    end
+
+  end
+
   describe "#match?" do
 
-    before(:each) { HttpStub::Models::RequestHeaderParser.stub!(:parse).with(request).and_return(request_headers) }
+    let(:request_headers) { { "request_key" => "value" } }
+    let(:regexpable_stubbed_headers) { double(HttpStub::Models::HashWithRegexpableValues).as_null_object }
 
-    describe "when multiple headers are mandatory" do
-
-      let(:stubbed_headers) { { "KEY1" => "value1", "KEY2" => "value2", "KEY3" => "value3" } }
-
-      describe "and the mandatory headers are provided" do
-
-        let(:request_headers) { stubbed_headers }
-
-        describe "and the casing of the header names is identical" do
-
-          it "should return true" do
-            stub_headers.match?(request).should be_true
-          end
-
-        end
-
-        describe "and the casing of the header names is different" do
-
-          let(:stubbed_headers) { { "key1" => "value1", "KEY2" => "value2", "key3" => "value3" } }
-
-          it "should return true" do
-            stub_headers.match?(request).should be_true
-          end
-
-        end
-
-        describe "and the mandatory request header names have hyphens in place of underscores" do
-
-          let(:stubbed_headers) { { "KEY_1" => "value1", "KEY-2" => "value2", "KEY_3" => "value3" } }
-          let(:request_headers) { { "KEY-1" => "value1", "KEY_2" => "value2", "KEY-3" => "value3" } }
-
-          it "should return true" do
-            stub_headers.match?(request).should be_true
-          end
-
-        end
-
-      end
-
-      describe "and the request headers have different values" do
-
-        let(:request_headers) { { "KEY1" => "value1", "KEY2" => "doesNotMatch", "KEY3" => "value3" } }
-
-        it "should return false" do
-          stub_headers.match?(request).should be_false
-        end
-
-      end
-
-      describe "and some mandatory headers are omitted" do
-
-        let(:request_headers) { { "KEY1" => "value1", "KEY3" => "value3" } }
-
-        it "should return false" do
-          stub_headers.match?(request).should be_false
-        end
-
-      end
-
-      describe "and all mandatory headers are omitted" do
-
-        let(:request_headers) { {} }
-
-        it "should return false" do
-          stub_headers.match?(request).should be_false
-        end
-
-      end
-
+    before(:each) do
+      HttpStub::Models::HashWithRegexpableValues.stub!(:new).and_return(regexpable_stubbed_headers)
+      HttpStub::Models::RequestHeaderParser.stub!(:parse).with(request).and_return(request_headers)
     end
 
-    describe "when no headers are mandatory" do
+    it "should parse the requests headers into a hash" do
+      HttpStub::Models::RequestHeaderParser.should_receive(:parse).with(request).and_return(request_headers)
 
-      let(:stubbed_headers) { {} }
-
-      describe "and headers are provided" do
-
-        let(:request_headers) { { "KEY" => "value" } }
-
-        it "should return true" do
-          stub_headers.match?(request).should be_true
-        end
-
-      end
-
+      stub_headers.match?(request)
     end
 
-    describe "when the mandatory headers are nil" do
+    it "should downcase and underscore the keys in the request header hash" do
+      request_headers.should_receive(:downcase_and_underscore_keys)
 
-      let(:stubbed_headers) { nil }
+      stub_headers.match?(request)
+    end
 
-      describe "and headers are provided" do
+    it "should delegate to the regexpable representation of the stubbed headers to determine a match" do
+      downcased_and_underscored_hash = { "another_request_key" => "value" }
+      request_headers.stub!(:downcase_and_underscore_keys).and_return(downcased_and_underscored_hash)
+      regexpable_stubbed_headers.should_receive(:match?).with(downcased_and_underscored_hash).and_return(true)
 
-        let(:request_headers) { { "KEY" => "value" } }
-
-        it "should return true" do
-          stub_headers.match?(request).should be_true
-        end
-
-      end
-
+      stub_headers.match?(request).should be_true
     end
 
   end

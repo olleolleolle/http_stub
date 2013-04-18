@@ -18,12 +18,12 @@ module HttpStub
       end
 
       def stub_activator(activation_uri, stub_uri, options)
-        request = HttpStub::Configurer::StubActivatorRequest.new(activation_uri, stub_uri, options)
+        request = HttpStub::Configurer::Request::StubActivator.new(activation_uri, stub_uri, options)
         handle(request: request, description: "registering activator '#{activation_uri}'")
       end
 
       def stub!(uri, options)
-        request = HttpStub::Configurer::StubRequest.new(uri, options)
+        request = HttpStub::Configurer::Request::Stub.new(uri, options)
         handle(request: request, description: "stubbing '#{uri}'", resetable: true)
       end
 

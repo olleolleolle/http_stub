@@ -4,16 +4,15 @@ module HttpStub
     class StubUri
 
       def initialize(uri)
-        @uri = uri
+        @uri = HttpStub::Models::RegexpableValue.new(uri)
       end
 
       def match?(request)
-        match_data = @uri.match(/^regexp:(.*)/)
-        match_data ? !!Regexp.new(match_data[1]).match(request.path_info) : request.path_info == @uri
+        @uri.match?(request.path_info)
       end
 
       def to_s
-        @uri
+        @uri.to_s
       end
 
     end
