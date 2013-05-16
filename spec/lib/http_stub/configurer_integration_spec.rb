@@ -189,15 +189,15 @@ describe HttpStub::Configurer, "when the server is running" do
 
           end
 
-          describe "and the stub uri is regular expression" do
+          describe "and the stub uri is regular expression containing meta characters" do
 
             before(:each) do
-              configurer.stub_response!(/\/stub\/regexp\/.*/, method: :get, response: { body: "Stub body" })
+              configurer.stub_response!(/\/stub\/regexp\/\$key=value/, method: :get, response: { body: "Stub body" })
             end
 
             describe "and a request is made whose uri matches the regular expression" do
 
-              let(:response) { Net::HTTP.get_response("localhost", "/stub/regexp/match", 8001) }
+              let(:response) { Net::HTTP.get_response("localhost", "/match/stub/regexp/$key=value", 8001) }
 
               it "should respond with the stubbed body" do
                 response.body.should eql("Stub body")

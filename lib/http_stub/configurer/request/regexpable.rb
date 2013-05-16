@@ -25,7 +25,7 @@ module HttpStub
           end
 
           def format_regexp(regexp)
-            "regexp:#{regexp.source.gsub(/\\/, "")}"
+            "regexp:#{regexp.source.gsub(/\\\//, "/")}"
           end
 
           def format_hash(hash)

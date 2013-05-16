@@ -8,11 +8,11 @@ describe HttpStub::Models::RegexpableValue do
 
     describe "when the value is a string prefixed with 'regexp:'" do
 
-      let(:value) { "regexp:^a[0-9]*z$" }
+      let(:value) { "regexp:^a[0-9]*\\$z$" }
 
       describe "and the provided value matches the regular expression" do
 
-        let(:other_value) { "a789z" }
+        let(:other_value) { "a789$z" }
 
         it "should return true" do
           regexpable_value.match?(other_value).should be_true

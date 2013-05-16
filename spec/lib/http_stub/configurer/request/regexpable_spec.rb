@@ -24,6 +24,16 @@ describe HttpStub::Configurer::Request::Regexpable do
         HttpStub::Configurer::Request::Regexpable.format(value).should end_with(".+?[a-z]")
       end
 
+      describe "and the regular expression contain escaped meta characters" do
+
+        let(:value) { /\^\+\[/ }
+
+        it "should return a string that retains the escape characters" do
+          HttpStub::Configurer::Request::Regexpable.format(value).should include("\\^\\+\\[")
+        end
+
+      end
+
       describe "and the regular expression contain path separators" do
 
         let(:value) { /\/some\/path/ }
