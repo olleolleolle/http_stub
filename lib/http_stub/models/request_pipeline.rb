@@ -3,7 +3,7 @@ module HttpStub
     class RequestPipeline
 
       def before_halt(options = {})
-        sleep options[:duration] if options[:duration] && options[:duration] > 0
+        sleep options[:delay_in_seconds] if options[:delay_in_seconds] && options[:delay_in_seconds] > 0
       end
     end
   end

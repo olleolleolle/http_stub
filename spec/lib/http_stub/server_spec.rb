@@ -10,7 +10,7 @@ describe HttpStub::Server do
   let(:stub_controller) { double(HttpStub::Controllers::StubController).as_null_object }
   let(:stub_activator_controller) { double(HttpStub::Controllers::StubActivatorController).as_null_object }
 
-  let(:app) { HttpStub::Server.new }
+  let(:app) { HttpStub::Server.new! }
 
   before(:each) do
     HttpStub::Models::Registry.stub(:new).with("stub").and_return(stub_registry)
@@ -174,6 +174,16 @@ describe HttpStub::Server do
 
     end
 
+  end
+
+  describe "#handle_request" do
+
+    it "should delegate to the request pipeline" do
+      app.stub!(:halt)
+      app.instance_variable_set(:@request_pipeline, mock(HttpStub::Models::RequestPipeline))
+      app.instance_variable_get(:@request_pipeline).should_receive(:before_halt).with({:delay_in_seconds => 0})
+      app.send(:handle_request)
+    end
   end
 
 end

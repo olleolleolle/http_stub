@@ -2,7 +2,7 @@ describe HttpStub::Models::RequestPipeline do
 
   describe '#before_halt' do
 
-    let(:options) {{:duration => 5}}
+    let(:options) {{:delay_in_seconds => 5}}
     let(:request_pipeline) { HttpStub::Models::RequestPipeline.new }
 
     before(:each) do
@@ -10,7 +10,7 @@ describe HttpStub::Models::RequestPipeline do
     end
 
     it 'should sleep for specified duration' do
-      request_pipeline.should_receive(:sleep).with(options[:duration])
+      request_pipeline.should_receive(:sleep).with(options[:delay_in_seconds])
       request_pipeline.before_halt options
     end
 
@@ -21,7 +21,7 @@ describe HttpStub::Models::RequestPipeline do
 
     it 'should skip sleep if duration is negative' do
       request_pipeline.should_not_receive(:sleep)
-      request_pipeline.before_halt({:duration => -1})
+      request_pipeline.before_halt({:delay_in_seconds => -1})
     end
   end
 end
