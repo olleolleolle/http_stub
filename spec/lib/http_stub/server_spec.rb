@@ -19,7 +19,7 @@ describe HttpStub::Server do
     HttpStub::Controllers::StubActivatorController.stub(:new).and_return(stub_activator_controller)
   end
 
-  describe "when a stub insertion is received" do
+  context "when a stub insertion is received" do
 
     it "should register the insertion via the stub controller" do
       stub_controller.should_receive(:register).and_return(HttpStub::Models::Response::SUCCESS)
@@ -48,7 +48,7 @@ describe HttpStub::Server do
 
   end
 
-  describe "when a stub activator insertion request is received" do
+  context "when a stub activator insertion request is received" do
 
     it "should register the insertion via the stub activator controller" do
       stub_activator_controller.should_receive(:register).and_return(HttpStub::Models::Response::SUCCESS)
@@ -78,7 +78,7 @@ describe HttpStub::Server do
 
   end
 
-  describe "when a request to clear the stubs has been received" do
+  context "when a request to clear the stubs has been received" do
 
     it "should delegate clearing to the stub controller" do
       stub_controller.should_receive(:clear)
@@ -94,7 +94,7 @@ describe HttpStub::Server do
 
   end
 
-  describe "when a request to clear the stub activators has been received" do
+  context "when a request to clear the stub activators has been received" do
 
     it "should delegate clearing to the stub activator controller" do
       stub_activator_controller.should_receive(:clear)
@@ -110,9 +110,9 @@ describe HttpStub::Server do
 
   end
 
-  describe "when another type of request is received" do
+  context "when another type of request is received" do
 
-    describe "and the stub controller replays a response" do
+    context "and the stub controller replays a response" do
 
       before(:each) do
         stub_controller.stub(:replay).and_return(HttpStub::Models::Response.new("status" => 222, "body" => "Some body"))
@@ -132,13 +132,13 @@ describe HttpStub::Server do
 
     end
 
-    describe "and the stub controller does not replay a response" do
+    context "and the stub controller does not replay a response" do
 
       before(:each) do
         stub_controller.stub(:replay).and_return(HttpStub::Models::Response::EMPTY)
       end
 
-      describe "but the stub activator controller activates a stub" do
+      context "but the stub activator controller activates a stub" do
 
         before(:each) do
           stub_activator_controller.stub(:activate).and_return(HttpStub::Models::Response.new("status" => 300, "body" => "A body"))
@@ -158,7 +158,7 @@ describe HttpStub::Server do
 
       end
 
-      describe "and the stub activator controller does not activate a stub" do
+      context "and the stub activator controller does not activate a stub" do
 
         before(:each) do
           stub_activator_controller.stub(:activate).and_return(HttpStub::Models::Response::EMPTY)
@@ -176,14 +176,14 @@ describe HttpStub::Server do
 
   end
 
-  describe "#handle_request" do
+  context "when a request to replay a stub is received" do
 
-    it "should delegate to the request pipeline" do
-      app.stub!(:halt)
-      app.instance_variable_set(:@request_pipeline, mock(HttpStub::Models::RequestPipeline))
-      app.instance_variable_get(:@request_pipeline).should_receive(:before_halt)
-      app.send(:handle_request)
+    it "should handle processing of the response via the request pipeline" do
+      HttpStub::Models::RequestPipeline.should_receive(:before_halt).with(duck_type(:status, :body))
+
+      get "/some/stubbed/uri"
     end
+
   end
 
 end

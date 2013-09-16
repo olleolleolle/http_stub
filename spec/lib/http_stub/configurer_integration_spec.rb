@@ -392,7 +392,7 @@ describe HttpStub::Configurer, "when the server is running" do
       describe "and an attempt is made to register a stub with a timeout" do
 
         before(:each) do
-          configurer.stub_response!("/some_stub_path", method: :get, response: { body: "Some stub body", :delay_in_seconds => 5})
+          configurer.stub_response!("/some_stub_path", method: :get, response: {:delay_in_seconds => 2})
         end
 
         it "should delegate to request pipeline" do
@@ -403,7 +403,7 @@ describe HttpStub::Configurer, "when the server is running" do
 
           after = Time.now
 
-          (after - before).round().should be_between(5, 7)
+          (after - before).round().should be >= 2
         end
 
       end

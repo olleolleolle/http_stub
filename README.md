@@ -79,7 +79,7 @@ These methods issue HTTP requests to the server, configuring it's responses.  An
 The ```stub!``` and ```stub_activator``` methods share the same signatures, expect a ```stub_activator``` accepts an
 activation url as the first argument.
 
-A stubs uri and parameter and header values accepted in the ```stub_activator``` and ```stub!``` methods can be
+A stubs uri and parameter and header values accepted in the ```stub!``` and ```stub_activator``` methods can be
 regular expressions:
 
 ```ruby
@@ -90,6 +90,12 @@ regular expressions:
                    headers: { api_key: /^some_.+_key$/ },
                    parameters: { username: /^user_.+/ },
                    response: { status: 200 }
+```
+
+They may also impose response delays, for example:
+
+```ruby
+    stub! /prefix\/[^\/]*\/postfix/, method: :post, response: { status: 200, delay_in_seconds: 8 }
 ```
 
 The stubs known by the server can also be cleared via class methods ```clear_activators!``` and ```clear!```,
@@ -172,7 +178,8 @@ To configure a stub response, POST to /stubs with the following JSON payload:
         },
         "response": {
             "status": "200",
-            "body": "Some body"
+            "body": "Some body",
+            "delay_in_seconds": 8
         }
     }
 ```
