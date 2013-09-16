@@ -403,7 +403,7 @@ describe HttpStub::Configurer, "when the server is running" do
 
           after = Time.now
 
-          (after - before).round().should be_between(4, 5)
+          (after - before).round().should be_between(5, 7)
         end
 
       end
