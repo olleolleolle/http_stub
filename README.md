@@ -31,7 +31,7 @@ Start a ```http_stub``` server via a rake task, generated via ```http_stub```:
 ```ruby
     require 'http_stub/rake/task_generators'
 
-    HttpStub::Rake::StartServerTask.new(name: :some_server, port: 8001) # Generates 'start_some_server' task
+    HttpStub::Rake::ServerTasks.new(name: :some_server, port: 8001) # Generates 'start_some_server' task
 ```
 
 ### Stubbing Server Responses ###
@@ -112,17 +112,17 @@ These methods are often used on completion of tests to return the server to a kn
 
 ##### Configurer Initialization ######
 
-You must inform a Configurer once a server is running, otherwise operations will buffer and never be issued to the
+You must tell a Configurer when a server is running, otherwise operations will buffer and never be issued to the
 server.
 
-This can be done in one of two ways, via the ```server_is_started!``` or ```initialize!``` class methods.
+This can be done in one of two ways, via the ```initialize!``` or ```server_is_started!``` class methods.
 
 The ```initialize!``` method has the benefit of:
 * Flushing all pending requests
 * Enabling the ```reset!``` class method, which efficiently returns the server to it's post-initialization state
 
 A common use case is to start the server and ```initialize!``` in one process, for example before running acceptance
-tests, and ```reset!``` the before each test which is run in another process:
+tests, and then ```reset!``` before each test runs:
 
 ```ruby
     task :acceptance => [:start_some_service, :cucumber]
@@ -141,6 +141,14 @@ tests, and ```reset!``` the before each test which is run in another process:
 
 Take a look at the [http_server_manager gem]|(http://rubygems.org/gems/http_server_manager) should you be looking for a
 simple way to start / stop / restart a ```http_stub``` server running as a separate process.
+
+The ```HttpStub::Rake::ServerTasks``` also generates a task that initializes a server should a configurer be provided:
+
+```ruby
+    require 'http_stub/rake/task_generators'
+
+    HttpStub::Rake::ServerTasks.new(name: :some_server, port: 8001, configurer: MyConfigurer) # Generates 'configure_some_server' task
+```
 
 #### Stub via HTTP requests ####
 
