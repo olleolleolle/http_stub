@@ -8,12 +8,12 @@ describe HttpStub::Controllers::StubController do
   let(:registry) { double(HttpStub::Models::Registry).as_null_object }
   let(:controller) { HttpStub::Controllers::StubController.new(registry) }
 
-  before(:each) { JSON.stub!(:parse).and_return(stub_options) }
+  before(:each) { JSON.stub(:parse).and_return(stub_options) }
 
   describe "#register" do
 
     before(:each) do
-      HttpStub::Models::Stub.stub!(:new).and_return(the_stub)
+      HttpStub::Models::Stub.stub(:new).and_return(the_stub)
     end
 
     it "should parse an options hash from the JSON request body" do
@@ -45,7 +45,7 @@ describe HttpStub::Controllers::StubController do
     describe "when a stub has been registered that should be replayed for the request" do
 
       before(:each) do
-        registry.stub!(:find_for).with(request).and_return(the_stub)
+        registry.stub(:find_for).with(request).and_return(the_stub)
       end
 
       it "should return the stubs response" do
@@ -59,7 +59,7 @@ describe HttpStub::Controllers::StubController do
     describe "when no stub should be replayed for the request" do
 
       before(:each) do
-        registry.stub!(:find_for).with(request).and_return(nil)
+        registry.stub(:find_for).with(request).and_return(nil)
       end
 
       it "should return an empty response" do

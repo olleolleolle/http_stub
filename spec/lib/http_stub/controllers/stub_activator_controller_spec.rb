@@ -9,12 +9,12 @@ describe HttpStub::Controllers::StubActivatorController do
   let(:stub_registry) { double("HttpStub::Models::StubRegistry").as_null_object }
   let(:controller) { HttpStub::Controllers::StubActivatorController.new(stub_activator_registry, stub_registry) }
 
-  before(:each) { JSON.stub!(:parse).and_return(stub_activator_options) }
+  before(:each) { JSON.stub(:parse).and_return(stub_activator_options) }
 
   describe "#register" do
 
     before(:each) do
-      HttpStub::Models::StubActivator.stub!(:new).and_return(stub_activator)
+      HttpStub::Models::StubActivator.stub(:new).and_return(stub_activator)
     end
 
     it "should parse an options hash from the JSON request body" do
@@ -46,7 +46,7 @@ describe HttpStub::Controllers::StubActivatorController do
     describe "when a stub activator has been registered that is activated by the request" do
 
       before(:each) do
-        stub_activator_registry.stub!(:find_for).with(request).and_return(stub_activator)
+        stub_activator_registry.stub(:find_for).with(request).and_return(stub_activator)
       end
 
       it "should add the activators stub to the stub registry" do
@@ -64,7 +64,7 @@ describe HttpStub::Controllers::StubActivatorController do
     describe "when no stub activator is activated by the request" do
 
       before(:each) do
-        stub_activator_registry.stub!(:find_for).with(request).and_return(nil)
+        stub_activator_registry.stub(:find_for).with(request).and_return(nil)
       end
 
       it "should not add a stub to the registry" do

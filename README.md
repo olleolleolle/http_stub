@@ -36,6 +36,14 @@ Start a ```http_stub``` server via a rake task, generated via ```http_stub```:
 
 ### Stubbing Server Responses ###
 
+### What is a stub? ###
+
+A unit of configuration that matches an incoming request to the server to a response.
+
+### What is a stub activator? ###
+
+A unit of configuration that activates, or enables, a stub when a url is hit on the server.
+
 #### Stub via API ####
 
 ```HttpStub::Configurer``` offers an API to configure a stub server via the class and instance methods ```stub_activator```, ```stub!``` and ```activate!```.
@@ -68,17 +76,20 @@ These methods issue HTTP requests to the server, configuring it's responses.  An
     end
 ```
 
-Note that the stub uri, parameter values and header values accepted in the ```stub_activator``` and ```stub!``` methods
-can be regular expressions:
+The ```stub!``` and ```stub_activator``` methods share the same signatures, expect a ```stub_activator``` accepts an
+activation url as the first argument.
+
+A stubs uri and parameter and header values accepted in the ```stub_activator``` and ```stub!``` methods can be
+regular expressions:
 
 ```ruby
+    stub! /prefix\/[^\/]*\/postfix/, method: :post, response: { status: 200 }
+
     stub_activator "/activate_this", /prefix\/[^\/]+\/postfix/,
                    method: :post,
                    headers: { api_key: /^some_.+_key$/ },
                    parameters: { username: /^user_.+/ },
                    response: { status: 200 }
-
-    stub! /prefix\/[^\/]*\/postfix/, method: :post, response: { status: 200 }
 ```
 
 The stubs known by the server can also be cleared via class methods ```clear_activators!``` and ```clear!```,

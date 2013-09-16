@@ -6,7 +6,7 @@ describe HttpStub::Server, "when the server is running" do
 
   describe "and a configurer with multiple stub activators is initialized" do
 
-    before(:all) { configurer.class.initialize! }
+    before(:all) { HttpStub::Examples::ConfigurerWithManyActivators.initialize! }
 
     describe "GET #stubs/activators" do
 

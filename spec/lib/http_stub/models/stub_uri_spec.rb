@@ -5,7 +5,7 @@ describe HttpStub::Models::StubUri do
   let(:regexpable_value) { double(HttpStub::Models::RegexpableValue).as_null_object }
   let(:stub_uri) { HttpStub::Models::StubUri.new(stubbed_uri) }
 
-  before(:each) { HttpStub::Models::RegexpableValue.stub!(:new).and_return(regexpable_value) }
+  before(:each) { HttpStub::Models::RegexpableValue.stub(:new).and_return(regexpable_value) }
 
   describe "constructor" do
 

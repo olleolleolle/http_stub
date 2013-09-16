@@ -6,7 +6,7 @@ describe HttpStub::Configurer::Request::StubActivator do
     let(:stub_request_content_type) { "Some content type" }
     let(:stub_request) { double("StubRequest", :content_type => stub_request_content_type, :body => stub_request_body) }
 
-    before(:each) { HttpStub::Configurer::Request::Stub.stub!(:new).and_return(stub_request) }
+    before(:each) { HttpStub::Configurer::Request::Stub.stub(:new).and_return(stub_request) }
 
     describe "when provided an activation uri, stub uri and stub options" do
 

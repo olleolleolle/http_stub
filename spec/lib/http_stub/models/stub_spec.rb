@@ -34,9 +34,9 @@ describe HttpStub::Models::Stub do
   let(:the_stub) { HttpStub::Models::Stub.new(stub_options) }
 
   before(:each) do
-    HttpStub::Models::StubUri.stub!(:new).and_return(stub_uri)
-    HttpStub::Models::StubParameters.stub!(:new).and_return(stub_parameters)
-    HttpStub::Models::StubHeaders.stub!(:new).and_return(stub_headers)
+    HttpStub::Models::StubUri.stub(:new).and_return(stub_uri)
+    HttpStub::Models::StubParameters.stub(:new).and_return(stub_parameters)
+    HttpStub::Models::StubHeaders.stub(:new).and_return(stub_headers)
   end
 
   describe "#satisfies?" do
@@ -47,7 +47,7 @@ describe HttpStub::Models::Stub do
 
     describe "when the request uri matches" do
 
-      before(:each) { stub_uri.stub!(:match?).with(request).and_return(true) }
+      before(:each) { stub_uri.stub(:match?).with(request).and_return(true) }
 
       describe "and the request method matches" do
 
@@ -55,13 +55,13 @@ describe HttpStub::Models::Stub do
 
           describe "that matches" do
 
-            before(:each) { stub_headers.stub!(:match?).with(request).and_return(true) }
+            before(:each) { stub_headers.stub(:match?).with(request).and_return(true) }
 
             describe "and a parameter match is configured" do
 
               describe "that matches" do
 
-                before(:each) { stub_parameters.stub!(:match?).with(request).and_return(true) }
+                before(:each) { stub_parameters.stub(:match?).with(request).and_return(true) }
 
                 it "should return true" do
                   the_stub.satisfies?(request).should be_true
@@ -81,7 +81,7 @@ describe HttpStub::Models::Stub do
 
     describe "when the request uri does not match" do
 
-      before(:each) { stub_uri.stub!(:match?).with(request).and_return(false) }
+      before(:each) { stub_uri.stub(:match?).with(request).and_return(false) }
 
       it "should return false" do
         the_stub.satisfies?(request).should be_false
@@ -101,7 +101,7 @@ describe HttpStub::Models::Stub do
 
     describe "when the headers do not match" do
 
-      before(:each) { stub_headers.stub!(:match?).with(request).and_return(false) }
+      before(:each) { stub_headers.stub(:match?).with(request).and_return(false) }
 
       it "should return false" do
         the_stub.satisfies?(request).should be_false
@@ -111,7 +111,7 @@ describe HttpStub::Models::Stub do
 
     describe "when the parameters do not match" do
 
-      before(:each) { stub_parameters.stub!(:match?).with(request).and_return(false) }
+      before(:each) { stub_parameters.stub(:match?).with(request).and_return(false) }
 
       it "should return false" do
         the_stub.satisfies?(request).should be_false

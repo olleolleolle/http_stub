@@ -14,7 +14,7 @@ describe HttpStub::Models::HashWithRegexpableValues do
   let(:regexpable_hash) { HttpStub::Models::HashWithRegexpableValues.new(stubbed_hash) }
 
   before(:each) do
-    regexpable_values.each { |value| HttpStub::Models::RegexpableValue.stub!(:new).with(value.to_s).and_return(value) }
+    regexpable_values.each { |value| HttpStub::Models::RegexpableValue.stub(:new).with(value.to_s).and_return(value) }
   end
 
   it "should be hash" do
@@ -51,7 +51,7 @@ describe HttpStub::Models::HashWithRegexpableValues do
           describe "and the values match" do
 
             before(:each) do
-              regexpable_values.each { |value| value.stub!(:match?).with("another #{value}").and_return(true) }
+              regexpable_values.each { |value| value.stub(:match?).with("another #{value}").and_return(true) }
             end
             
             it "should return true" do
@@ -63,10 +63,10 @@ describe HttpStub::Models::HashWithRegexpableValues do
           describe "and a value does not match" do
 
             before(:each) do
-              regexpable_values.each { |value| value.stub!(:match?).with("another #{value}").and_return(true) }
+              regexpable_values.each { |value| value.stub(:match?).with("another #{value}").and_return(true) }
 
               non_matching_value = regexpable_values[1]
-              non_matching_value.stub!(:match?).with("another #{non_matching_value}").and_return(false)
+              non_matching_value.stub(:match?).with("another #{non_matching_value}").and_return(false)
             end
 
             it "should return false" do
@@ -82,7 +82,7 @@ describe HttpStub::Models::HashWithRegexpableValues do
           let(:provided_hash) { { "key1" => "value1", "differentkey2" => "another value2", "key3" => "value3" } }
 
           before(:each) do
-            regexpable_values.each { |value| value.stub!(:match?).with(value.to_s).and_return(true) }
+            regexpable_values.each { |value| value.stub(:match?).with(value.to_s).and_return(true) }
           end
 
           it "should return false" do
@@ -105,7 +105,7 @@ describe HttpStub::Models::HashWithRegexpableValues do
         describe "and it has matching keys and values" do
 
           before(:each) do
-            regexpable_values.each { |value| value.stub!(:match?).with("another #{value}").and_return(true) }
+            regexpable_values.each { |value| value.stub(:match?).with("another #{value}").and_return(true) }
           end
 
           it "should return true" do

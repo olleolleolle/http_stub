@@ -26,7 +26,7 @@ describe HttpStub::Configurer::Request::Stub do
       let(:request) { HttpStub::Configurer::Request::Stub.new(uri, stub_options) }
       let(:request_body) { JSON.parse(request.body) }
 
-      before(:each) { HttpStub::Configurer::Request::Regexpable.stub!(:format) }
+      before(:each) { HttpStub::Configurer::Request::Regexpable.stub(:format) }
 
       it "should create a HTTP POST request" do
         request.method.should eql("POST")

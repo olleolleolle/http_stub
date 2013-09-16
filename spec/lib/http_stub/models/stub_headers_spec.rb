@@ -35,8 +35,8 @@ describe HttpStub::Models::StubHeaders do
     let(:regexpable_stubbed_headers) { double(HttpStub::Models::HashWithRegexpableValues).as_null_object }
 
     before(:each) do
-      HttpStub::Models::HashWithRegexpableValues.stub!(:new).and_return(regexpable_stubbed_headers)
-      HttpStub::Models::RequestHeaderParser.stub!(:parse).with(request).and_return(request_headers)
+      HttpStub::Models::HashWithRegexpableValues.stub(:new).and_return(regexpable_stubbed_headers)
+      HttpStub::Models::RequestHeaderParser.stub(:parse).with(request).and_return(request_headers)
     end
 
     it "should parse the requests headers into a hash" do
@@ -53,7 +53,7 @@ describe HttpStub::Models::StubHeaders do
 
     it "should delegate to the regexpable representation of the stubbed headers to determine a match" do
       downcased_and_underscored_hash = { "another_request_key" => "value" }
-      request_headers.stub!(:downcase_and_underscore_keys).and_return(downcased_and_underscored_hash)
+      request_headers.stub(:downcase_and_underscore_keys).and_return(downcased_and_underscored_hash)
       regexpable_stubbed_headers.should_receive(:match?).with(downcased_and_underscored_hash).and_return(true)
 
       stub_headers.match?(request).should be_true

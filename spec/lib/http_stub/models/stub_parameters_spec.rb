@@ -33,7 +33,7 @@ describe HttpStub::Models::StubParameters do
   describe "#match?" do
 
     it "should delegate to the regexpable representation of the stubbed parameters to determine a match" do
-      HttpStub::Models::HashWithRegexpableValues.stub!(:new).and_return(regexpable_stubbed_paremeters)
+      HttpStub::Models::HashWithRegexpableValues.stub(:new).and_return(regexpable_stubbed_paremeters)
       regexpable_stubbed_paremeters.should_receive(:match?).with(request_parameters).and_return(true)
 
       stub_parameters.match?(request).should be(true)

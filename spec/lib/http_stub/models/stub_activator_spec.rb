@@ -6,7 +6,7 @@ describe HttpStub::Models::StubActivator do
   end
   let(:stub_activator) { HttpStub::Models::StubActivator.new(options) }
 
-  before(:each) { HttpStub::Models::Stub.stub!(:new).and_return(double(HttpStub::Models::Stub)) }
+  before(:each) { HttpStub::Models::Stub.stub(:new).and_return(double(HttpStub::Models::Stub)) }
 
   describe "#satisfies?" do
 

@@ -32,7 +32,7 @@ describe HttpStub::Models::Registry do
 
         let(:matching_model) { models[1] }
 
-        before(:each) { matching_model.stub!(:satisfies?).and_return(true) }
+        before(:each) { matching_model.stub(:satisfies?).and_return(true) }
 
         it "should return the model" do
           registry.find_for(request).should eql(matching_model)
@@ -53,7 +53,7 @@ describe HttpStub::Models::Registry do
       describe "and multiple registered models satisfy the request" do
 
         before(:each) do
-          [0, 2].each { |i| models[i].stub!(:satisfies?).and_return(true) }
+          [0, 2].each { |i| models[i].stub(:satisfies?).and_return(true) }
         end
 
         it "should support model overrides by returning the last model registered" do
