@@ -377,7 +377,7 @@ describe HttpStub::Configurer, "when the server is running" do
       describe "and an attempt is made to register a stub" do
 
         before(:each) do
-          configurer.stub_response!("/some_stub_path", method: :get, response: { body: "Some stub body" })
+          configurer.stub_response!("/some_stub_path", method: :get, response: { body: "Some stub body"})
         end
 
         it "should register the stub" do
@@ -385,6 +385,25 @@ describe HttpStub::Configurer, "when the server is running" do
 
           response.code.should eql("200")
           response.body.should eql("Some stub body")
+        end
+
+      end
+
+      describe "and an attempt is made to register a stub with a timeout" do
+
+        before(:each) do
+          configurer.stub_response!("/some_stub_path", method: :get, response: { body: "Some stub body", :delay_in_seconds => 5})
+        end
+
+        it "should delegate to request pipeline" do
+          before = Time.new
+
+          response = Net::HTTP.get_response("localhost", "/some_stub_path", 8001)
+          response.code.should eql("200")
+
+          after = Time.now
+
+          (after - before).round().should be_between(4, 5)
         end
 
       end

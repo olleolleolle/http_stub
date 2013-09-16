@@ -2,8 +2,9 @@ module HttpStub
   module Models
     class RequestPipeline
 
-      def before_halt(options = {})
-        sleep options[:delay_in_seconds] if options[:delay_in_seconds] && options[:delay_in_seconds] > 0
+      def before_halt(response)
+        delay_in_seconds = response.delay_in_seconds
+        sleep delay_in_seconds if delay_in_seconds && delay_in_seconds > 0
       end
     end
   end

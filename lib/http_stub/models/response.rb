@@ -19,10 +19,13 @@ module HttpStub
         @response_options["body"]
       end
 
+      def delay_in_seconds
+        @response_options["delay_in_seconds"]
+      end
+
       def empty?
         @response_options.empty?
       end
-
     end
 
   end

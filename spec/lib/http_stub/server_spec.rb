@@ -181,7 +181,7 @@ describe HttpStub::Server do
     it "should delegate to the request pipeline" do
       app.stub!(:halt)
       app.instance_variable_set(:@request_pipeline, mock(HttpStub::Models::RequestPipeline))
-      app.instance_variable_get(:@request_pipeline).should_receive(:before_halt).with({:delay_in_seconds => 0})
+      app.instance_variable_get(:@request_pipeline).should_receive(:before_halt)
       app.send(:handle_request)
     end
   end

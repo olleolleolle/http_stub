@@ -96,8 +96,7 @@ module HttpStub
       response = @stub_controller.replay(request)
       response = @stub_activator_controller.activate(request) if response.empty?
       response = HttpStub::Models::Response::ERROR if response.empty?
-      # TODO - grab from config.
-      @request_pipeline.before_halt({:delay_in_seconds => 0})
+      @request_pipeline.before_halt(response)
       halt(response.status, response.body)
     end
 
