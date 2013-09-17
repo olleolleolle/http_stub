@@ -408,6 +408,19 @@ describe HttpStub::Configurer, "when the server is running" do
 
       end
 
+      describe "and an attempt is made to register a response with a given content type" do
+
+        before(:each) do
+          configurer.stub_response!("/some_stub_path", method: :get, response: { body: "Some stub body", content_type: "application/xhtml" })
+        end
+
+        it "should register the stub" do
+          response = Net::HTTP.get_response("localhost", "/some_stub_path", 8001)
+          response.content_type.should eql("application/xhtml")
+        end
+
+      end
+
     end
 
     describe "and the configurer has not been informed that the server has started" do

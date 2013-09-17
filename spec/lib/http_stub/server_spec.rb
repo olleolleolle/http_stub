@@ -184,6 +184,12 @@ describe HttpStub::Server do
       get "/some/stubbed/uri"
     end
 
+    it "should respond with the response's content type" do
+      stub_controller.stub(:replay).and_return(HttpStub::Models::Response.new("status" => 200, "body" => "A body", "content_type" => "application/xhtml"))
+      get "/some/stubbed/uri"
+      response.content_type.should eql("application/xhtml")
+    end
+
   end
 
 end

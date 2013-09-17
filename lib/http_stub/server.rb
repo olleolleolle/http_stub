@@ -96,7 +96,7 @@ module HttpStub
       response = @stub_activator_controller.activate(request) if response.empty?
       response = HttpStub::Models::Response::ERROR if response.empty?
       HttpStub::Models::RequestPipeline.before_halt(response)
-      halt(response.status, response.body)
+      halt(response.status, {'Content-Type' => response.content_type}, response.body)
     end
 
   end

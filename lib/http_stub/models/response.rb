@@ -35,6 +35,10 @@ module HttpStub
         @response_options["delay_in_seconds"]
       end
 
+      def content_type
+        @response_options["content_type"]
+      end
+
       def empty?
         @original_options.empty?
       end
