@@ -1,6 +1,12 @@
 describe HttpStub::Models::Response do
 
-  let(:response) { HttpStub::Models::Response.new("status" => 202, "body" => "A response body")}
+  let(:status) { 202 }
+  let(:body) { "A response body" }
+  let(:delay_in_seconds) { 18 }
+
+  let(:response) do
+    HttpStub::Models::Response.new("status" => status, "body" => body, "delay_in_seconds" => delay_in_seconds)
+  end
 
   describe "::SUCCESS" do
 
@@ -30,24 +36,38 @@ describe HttpStub::Models::Response do
 
   end
 
-  describe "::EMPTY" do
-
-    let(:response) { HttpStub::Models::Response::EMPTY }
-
-    it "should have a nil status" do
-      response.status.should be_nil
-    end
-
-    it "should have a nil body" do
-      response.body.should be_nil
-    end
-
-  end
-
   describe "#status" do
 
-    it "should return the value provided in the options" do
-      response.status.should eql(202)
+    context "when a value is provided in the options" do
+
+      context "that is an integer" do
+
+        it "should return the value provided" do
+          response.status.should eql(status)
+        end
+
+      end
+
+      context "that is an empty string" do
+
+        let(:status) { "" }
+
+        it "should return 200" do
+          response.status.should eql(200)
+        end
+
+      end
+
+    end
+
+    context "when the status is not provided in the options" do
+
+      let(:response) { HttpStub::Models::Response.new("body" => body, "delay_in_seconds" => delay_in_seconds) }
+
+      it "should return 200" do
+        response.status.should eql(200)
+      end
+
     end
 
   end
@@ -56,6 +76,42 @@ describe HttpStub::Models::Response do
 
     it "should return the value provided in the options" do
       response.body.should eql("A response body")
+    end
+
+  end
+
+  describe "#delay_in_seconds" do
+
+    context "when a value is provided in the options" do
+
+      context "that is an integer" do
+
+        it "should return the value" do
+          response.delay_in_seconds.should eql(delay_in_seconds)
+        end
+
+      end
+
+      context "that is an empty string" do
+
+        let(:delay_in_seconds) { "" }
+
+        it "should return 0" do
+          response.delay_in_seconds.should eql(0)
+        end
+
+      end
+
+    end
+
+    context "when a value is not provided in the options" do
+
+      let(:response) { HttpStub::Models::Response.new("status" => status, "body" => body) }
+
+      it "should return 0" do
+        response.delay_in_seconds.should eql(0)
+      end
+
     end
 
   end

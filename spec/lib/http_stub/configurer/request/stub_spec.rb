@@ -2,7 +2,7 @@ describe HttpStub::Configurer::Request::Stub do
 
   describe "#initialize" do
 
-    describe "when provided a uri and stub options" do
+    context "when provided a uri and stub options" do
 
       let(:uri) { "/some/uri" }
       let(:stub_method) { "Some Method" }
@@ -10,6 +10,7 @@ describe HttpStub::Configurer::Request::Stub do
       let(:parameters) { { "parameter_name" => "value" } }
       let(:response_status) { 500 }
       let(:response_body) { "Some body" }
+      let(:response_delay_in_seconds) { 7 }
 
       let(:stub_options) do
         {
@@ -18,7 +19,8 @@ describe HttpStub::Configurer::Request::Stub do
             parameters: parameters,
             response: {
                 status: response_status,
-                body: response_body
+                body: response_body,
+                delay_in_seconds: response_delay_in_seconds
             }
         }
       end
@@ -40,7 +42,7 @@ describe HttpStub::Configurer::Request::Stub do
         request.content_type.should eql("application/json")
       end
 
-      describe "when a header option is provided" do
+      context "when a header option is provided" do
 
         it "should format the headers with regexp support" do
           HttpStub::Configurer::Request::Regexpable.should_receive(:format).with(headers)
@@ -50,7 +52,7 @@ describe HttpStub::Configurer::Request::Stub do
 
       end
 
-      describe "when no header is provided" do
+      context "when no header is provided" do
 
         let(:headers) { nil }
 
@@ -62,7 +64,7 @@ describe HttpStub::Configurer::Request::Stub do
 
       end
 
-      describe "when a parameter option is provided" do
+      context "when a parameter option is provided" do
 
         it "should format the parameters with regexp support" do
           HttpStub::Configurer::Request::Regexpable.should_receive(:format).with(parameters)
@@ -72,7 +74,7 @@ describe HttpStub::Configurer::Request::Stub do
 
       end
 
-      describe "when no parameter option is provided" do
+      context "when no parameter option is provided" do
 
         let(:parameters) { nil }
 
@@ -84,52 +86,70 @@ describe HttpStub::Configurer::Request::Stub do
 
       end
 
-      describe "generates a JSON body which" do
+      context "generates a JSON body which" do
 
         it "should have an entry containing the regexpable representation of the uri" do
           HttpStub::Configurer::Request::Regexpable.should_receive(:format).with(uri).and_return("uri as a string")
 
-          request_body.should include({ "uri" => "uri as a string" })
+          request_body.should include("uri" => "uri as a string")
         end
 
         it "should have an entry for the method option" do
-          request_body.should include({ "method" => stub_method })
+          request_body.should include("method" => stub_method)
         end
 
         it "should have an entry containing the string representation of the headers" do
           HttpStub::Configurer::Request::Regexpable.should_receive(:format)
             .with(headers).and_return("headers as string")
 
-          request_body.should include({ "headers" => "headers as string" })
+          request_body.should include("headers" => "headers as string")
         end
 
         it "should have an entry containing the string representation of the parameters" do
           HttpStub::Configurer::Request::Regexpable.should_receive(:format)
             .with(parameters).and_return("parameters as string")
 
-          request_body.should include({ "parameters" => "parameters as string" })
+          request_body.should include("parameters" => "parameters as string")
         end
 
-        describe "when a status response option is provided" do
+        context "when a status response option is provided" do
 
           it "should have a response entry for the option" do
-            request_body["response"].should include({ "status" => response_status })
+            request_body["response"].should include("status" => response_status)
           end
 
         end
 
-        describe "when no status response option is provided" do
+        context "when no status response option is provided" do
 
           let(:response_status) { nil }
 
-          it "should have a response entry with status code of 200" do
-            request_body["response"].should include({ "status" => 200 })
+          it "should have a response entry with an empty status code" do
+            request_body["response"].should include("status" => "")
           end
 
         end
 
         it "should have an entry for the response body option" do
-          request_body["response"].should include({ "body" => response_body })
+          request_body["response"].should include("body" => response_body)
+        end
+
+        context "when a delay option is provided" do
+
+          it "should have a response entry for the option" do
+            request_body["response"].should include("delay_in_seconds" => response_delay_in_seconds)
+          end
+
+        end
+
+        context "when a delay option is not provided" do
+
+          let(:response_delay_in_seconds) { nil }
+
+          it "should have a response entry with an empty delay" do
+            request_body["response"].should include("delay_in_seconds" => "")
+          end
+
         end
 
       end

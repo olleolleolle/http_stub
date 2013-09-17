@@ -13,9 +13,9 @@ module HttpStub
               "headers" => HttpStub::Configurer::Request::Regexpable.format(options[:headers] || {}),
               "parameters" => HttpStub::Configurer::Request::Regexpable.format(options[:parameters] || {}),
               "response" => {
-                  "status" => options[:response][:status] || 200,
+                  "status" => options[:response][:status] || "",
                   "body" => options[:response][:body],
-                  "delay_in_seconds" => options[:response][:delay_in_seconds]
+                  "delay_in_seconds" => options[:response][:delay_in_seconds] || ""
               }
           }.to_json
         end

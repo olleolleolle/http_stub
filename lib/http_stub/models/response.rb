@@ -3,8 +3,20 @@ module HttpStub
 
     class Response
 
+      private
+
+      DEFAULT_OPTIONS = { "status" => 200, "delay_in_seconds" => 0 }
+
+      def establish_defaults_in(options)
+        DEFAULT_OPTIONS.each { |key, value| options[key] = value if !options[key] || options[key] == "" }
+      end
+
+      public
+
       def initialize(options = {})
-        @response_options = options || {}
+        @original_options = options
+        @response_options = options.clone
+        establish_defaults_in(@response_options)
       end
 
       SUCCESS = HttpStub::Models::Response.new("status" => 200, "body" => "OK")
@@ -24,8 +36,9 @@ module HttpStub
       end
 
       def empty?
-        @response_options.empty?
+        @original_options.empty?
       end
+
     end
 
   end
