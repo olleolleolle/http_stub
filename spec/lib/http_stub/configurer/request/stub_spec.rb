@@ -11,6 +11,7 @@ describe HttpStub::Configurer::Request::Stub do
       let(:response_status) { 500 }
       let(:response_body) { "Some body" }
       let(:response_delay_in_seconds) { 7 }
+      let(:response_content_type) { "application/xhtml" }
 
       let(:stub_options) do
         {
@@ -19,6 +20,7 @@ describe HttpStub::Configurer::Request::Stub do
             parameters: parameters,
             response: {
                 status: response_status,
+                content_type: response_content_type,
                 body: response_body,
                 delay_in_seconds: response_delay_in_seconds
             }
@@ -150,6 +152,22 @@ describe HttpStub::Configurer::Request::Stub do
             request_body["response"].should include("delay_in_seconds" => "")
           end
 
+        end
+
+        context "when a content type is provided" do
+
+          it "should have a response entry for the option" do
+            request_body["response"].should include("content_type" => response_content_type)
+          end
+        end
+
+        context "when a content type is not provided" do
+
+          let (:response_content_type) { nil }
+
+          it "should have a response entry with the default content type" do
+            request_body["response"].should include("content_type" => "application/json")
+          end
         end
 
       end
