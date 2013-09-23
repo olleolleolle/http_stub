@@ -9,8 +9,16 @@ module HttpStub
 
     module ClassMethods
 
+      def get_host
+        @host
+      end
+
       def host(host)
         @host = host
+      end
+
+      def get_port
+        @port
       end
 
       def port(port)
@@ -63,7 +71,7 @@ module HttpStub
 
       def handle(command_options)
         effective_command_chain <<
-            HttpStub::Configurer::Command.new({ host: @host, port: @port }.merge(command_options))
+          HttpStub::Configurer::Command.new({ processor: command_processor }.merge(command_options))
       end
 
       def effective_command_chain
@@ -72,6 +80,10 @@ module HttpStub
 
       def initialize_command_chain
         @initialize_command_chain ||= HttpStub::Configurer::PatientCommandChain.new()
+      end
+
+      def command_processor
+        @command_processor ||= HttpStub::Configurer::CommandProcessor.new(self)
       end
 
     end

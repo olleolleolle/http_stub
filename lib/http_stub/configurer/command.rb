@@ -3,17 +3,17 @@ module HttpStub
 
     class Command
 
+      attr_reader :request, :description
+
       def initialize(options)
-        @host = options[:host]
-        @port = options[:port]
+        @processor = options[:processor]
         @request = options[:request]
         @description = options[:description]
         @resetable_flag = !!options[:resetable]
       end
 
       def execute
-        response = Net::HTTP.start(@host, @port) { |http| http.request(@request) }
-        raise "Error occurred #{@description}: #{response.message}" unless response.code == "200"
+        @processor.process(self)
       end
 
       def resetable?

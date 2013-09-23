@@ -6,11 +6,15 @@ describe HttpStub::Server, "when the server is running" do
 
   describe "and a configurer with multiple stub activators is initialized" do
 
-    before(:all) { HttpStub::Examples::ConfigurerWithManyActivators.initialize! }
+    before(:all) do
+      HttpStub::Examples::ConfigurerWithManyActivators.host server_host
+      HttpStub::Examples::ConfigurerWithManyActivators.port server_port
+      HttpStub::Examples::ConfigurerWithManyActivators.initialize!
+    end
 
     describe "GET #stubs/activators" do
 
-      let(:response) { Net::HTTP.get_response("localhost", "/stubs/activators", 8001) }
+      let(:response) { Net::HTTP.get_response(server_host, "/stubs/activators", server_port) }
       let(:response_document) { Nokogiri::HTML(response.body) }
 
       it "should return a 200 response code" do
@@ -52,10 +56,10 @@ describe HttpStub::Server, "when the server is running" do
       describe "when multiple stubs are configured" do
 
         before(:all) do
-          (1..3).each { |i| Net::HTTP.get_response("localhost", "/activator#{i}", 8001) }
+          (1..3).each { |i| Net::HTTP.get_response(server_host, "/activator#{i}", server_port) }
         end
 
-        let(:response) { Net::HTTP.get_response("localhost", "/stubs", 8001) }
+        let(:response) { Net::HTTP.get_response(server_host, "/stubs", server_port) }
         let(:response_document) { Nokogiri::HTML(response.body) }
 
         it "should return a 200 response code" do

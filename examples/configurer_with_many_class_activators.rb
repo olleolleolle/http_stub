@@ -4,9 +4,6 @@ module HttpStub
     class ConfigurerWithManyActivators
       include HttpStub::Configurer
 
-      host "localhost"
-      port 8001
-
       stub_activator "/activator1", "/path1", method: :get,
                                               headers: { header1: "header_value1" },
                                               parameters: { param1: "param_value1" },
