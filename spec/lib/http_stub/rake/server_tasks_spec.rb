@@ -2,13 +2,14 @@ describe HttpStub::Rake::ServerTasks do
 
   describe "the configure task" do
 
+    let(:default_options) { { port: 8001 } }
+
+    before(:each) { HttpStub::Rake::ServerTasks.new(default_options.merge(options)) }
+
     context "when a configurer is provided" do
 
       let(:configurer) { double(HttpStub::Configurer) }
-
-      before(:each) do
-        HttpStub::Rake::ServerTasks.new(name: :tasks_configurer_provided_test, port: 8001, configurer: configurer)
-      end
+      let(:options) { { name: :tasks_configurer_provided_test, configurer: configurer } }
 
       context "and the task is executed" do
 
@@ -24,7 +25,7 @@ describe HttpStub::Rake::ServerTasks do
 
     context "when a configurer is not provided" do
 
-      before(:each) { HttpStub::Rake::ServerTasks.new(name: :tasks_configurer_not_provided_test, port: 8001) }
+      let(:options) { { name: :tasks_configurer_not_provided_test } }
 
       it "should not generate a task" do
         lambda { Rake::Task[:configure_tasks_configurer_not_provided_test] }.should

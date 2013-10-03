@@ -15,6 +15,7 @@ module HttpStub
         desc "Starts stub #{options[:name]}"
         task "start_#{options[:name]}" do
           HttpStub::Server.instance_eval do
+            set :environment, :test
             set :port, options[:port]
             run!
           end

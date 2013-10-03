@@ -2,7 +2,7 @@ require 'simplecov'
 SimpleCov.start do
   add_filter "/spec/"
   add_filter "/vendor/"
-  minimum_coverage 98.31
+  minimum_coverage 98.1
   refuse_coverage_drop
 end if ENV["coverage"]
 
