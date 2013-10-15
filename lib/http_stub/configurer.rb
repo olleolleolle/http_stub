@@ -52,8 +52,10 @@ module HttpStub
       end
 
       def initialize!
-        server_has_started!
+        on_initialize if self.respond_to?(:on_initialize) && !@initialized
         initialize_command_chain.execute()
+        @initialized = true
+        server_has_started!
       end
 
       def reset!

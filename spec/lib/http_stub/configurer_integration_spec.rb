@@ -366,6 +366,19 @@ describe HttpStub::Configurer, "when the server is running" do
 
     end
 
+    context "and the configurer contains an on initialize callback" do
+
+      let(:configurer) { HttpStub::Examples::ConfigurerWithInitializeCallback.new }
+
+      it "should execute the callback" do
+        response = Net::HTTP.get_response(server_host, "/stubbed_on_initialize_path", server_port)
+
+        response.code.should eql("200")
+        response.body.should eql("Stubbed on initialize body")
+      end
+
+    end
+
   end
 
   context "and the configurer is uninitialized" do
@@ -439,6 +452,18 @@ describe HttpStub::Configurer, "when the server is running" do
           activation_lambda.should raise_error(/error occurred activating '\/an_activator'/i)
         end
 
+      end
+
+    end
+
+    context "and the configurer contains an on initialize callback" do
+
+      let(:configurer) { HttpStub::Examples::ConfigurerWithInitializeCallback.new }
+
+      it "should not execute the callback" do
+        response = Net::HTTP.get_response(server_host, "/stubbed_on_initialize_path", server_port)
+
+        response.code.should eql("404")
       end
 
     end

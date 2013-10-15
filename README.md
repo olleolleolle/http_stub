@@ -121,14 +121,35 @@ These methods are often used on completion of tests to return the server to a kn
 You must tell a Configurer when a server is running, otherwise operations will buffer and never be issued to the
 server.
 
-This can be done in one of two ways, via the ```initialize!``` or ```server_is_started!``` class methods.
+This can be done in one of two ways, via the ```initialize!``` or ```server_has_started!``` class methods.
 
 The ```initialize!``` method has the benefit of:
 * Flushing all pending requests
 * Enabling the ```reset!``` class method, which efficiently returns the server to it's post-initialization state
 
+It is recommended that ```initialize!``` is called once, post server start-up.
+Use ```reset!``` should you need to re-initialize a server.
+
+An initialization callback is also available, should you wish to have a configurer state change reflected in an
+```initialize!``` and ```reset!``` response:
+
+```ruby
+    class FooService
+        include HttpStub::Configurer
+
+        def self.on_initialize
+          stub! "/registered_on_initialize", method: :get, response: { body: some_state }
+        end
+    end
+```
+
+```ruby
+    FooService.some_state = "bar"
+    FooService.initialize!
+```
+
 A common use case is to start the server and ```initialize!``` in one process, for example before running acceptance
-tests, and then ```reset!``` before each test runs:
+tests, and then ```reset!``` before each test is run:
 
 ```ruby
     task :acceptance => [:start_some_service, :cucumber]
@@ -139,9 +160,9 @@ tests, and then ```reset!``` before each test runs:
 ```
 
 ```ruby
-    Before do                             # Before each acceptance test scenario
-        SomeConfigurer.server_is_started! # Ensure operations are issued immediately
-        SomeConfigurer.reset!             # Return to post-initialization state
+    Before do                              # Before each acceptance test scenario
+        SomeConfigurer.server_has_started! # Ensure operations are issued immediately
+        SomeConfigurer.reset!              # Return to post-initialization state
     end
 ```
 
