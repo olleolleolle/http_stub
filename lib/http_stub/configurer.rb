@@ -25,6 +25,10 @@ module HttpStub
         @port = port
       end
 
+      def get_base_uri
+        "http://#{@host}:#{@port}"
+      end
+
       def stub_activator(activation_uri, stub_uri, options)
         request = HttpStub::Configurer::Request::StubActivator.new(activation_uri, stub_uri, options)
         handle(request: request, description: "registering activator '#{activation_uri}'")
