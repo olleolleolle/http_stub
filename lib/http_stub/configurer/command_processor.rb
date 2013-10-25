@@ -8,8 +8,26 @@ module HttpStub
       end
 
       def process(command)
-        response = Net::HTTP.start(@configurer.get_host, @configurer.get_port) { |http| http.request(command.request) }
-        raise "Error occurred #{command.description}: #{response.message}" unless response.code == "200"
+        begin
+          response = Net::HTTP.start(host, port) { |http| http.request(command.request) }
+          raise "#{error_message_prefix(command)}: #{response.code} #{response.message}" unless response.code == "200"
+        rescue Exception => exc
+          raise "#{error_message_prefix(command)}: #{exc}"
+        end
+      end
+
+      private
+
+      def host
+        @configurer.get_host
+      end
+
+      def port
+        @configurer.get_port
+      end
+
+      def error_message_prefix(command)
+        "Error occurred #{command.description} whilst configuring #{@configurer.get_base_uri}: "
       end
 
     end
