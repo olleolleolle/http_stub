@@ -53,6 +53,6 @@ end
 
 HttpStub::Rake::ServerTasks.new(name: :example_server, port: 8001)
 
-task :default => [:clobber, :metrics, :coverage]
+task :default => %w{ clobber metrics coverage }
 
-task :pre_commit => [:clobber, :metrics, "coverage:show", :validate]
+task :pre_commit => %w{ clobber metrics coverage:show validate }
