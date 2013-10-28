@@ -3,6 +3,12 @@ http_stub
 
 ```fakeweb``` for a HTTP server, informing it to 'fake', or, in the test double vernacular - 'stub' - responses.
 
+Status
+------------
+
+[![Build Status](https://travis-ci.org/MYOB-Technology/http_stub.png)](https://travis-ci.org/MYOB-Technology/http_stub)
+[![Gem Version](https://badge.fury.io/rb/http_stub.png)](http://badge.fury.io/rb/http_stub)
+
 Motivation
 ----------
 
@@ -263,8 +269,3 @@ Requirements
 
 * Ruby 1.9
 * Rack server
-
-Build Status
-------------
-
-[![Build Status](https://travis-ci.org/MYOB-Technology/http_stub.png)](https://travis-ci.org/MYOB-Technology/http_stub)
