@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 $:.push File.expand_path("../lib", __FILE__)
-require "./lib/http_stub/version"
+require "http_stub/version"
 
 Gem::Specification.new do |s|
   s.name = "http_stub"
@@ -16,6 +16,7 @@ Gem::Specification.new do |s|
 
   s.files        = Dir.glob("./lib/**/*")
   s.test_files   = Dir.glob("./spec/**/*")
+
   s.require_path = "lib"
 
   s.required_ruby_version = ">= 1.9.3"
@@ -24,10 +25,11 @@ Gem::Specification.new do |s|
   s.add_dependency "sinatra-partial", "~> 0.4"
   s.add_dependency "haml", "~> 4.0"
   s.add_dependency "sass", "~> 3.2"
+  s.add_dependency "rake", "~> 10.1"
 
+  s.add_development_dependency "metric_fu", "~> 4.4"
   s.add_development_dependency "rspec", "~> 2.14"
   s.add_development_dependency "simplecov", "~> 0.7"
-  s.add_development_dependency "flog", "~> 4.2"
   s.add_development_dependency "travis-lint", "~> 1.7"
   s.add_development_dependency "rake", "~> 10.1"
   s.add_development_dependency "rack-test", "~> 0.6"

@@ -16,9 +16,7 @@ end
 
 desc "Complexity analysis"
 task :metrics do
-  print " Complexity Metrics ".center(80, "*") + "\n"
-  print `find lib -name \\*.rb | xargs flog --continue`
-  print "*" * 80+ "\n"
+  print `metric_fu --no-open`
 end
 
 desc "Exercises specifications"
