@@ -1,11 +1,10 @@
 require 'bundler'
+require 'bundler/gem_tasks'
 require 'rspec/core/rake_task'
 require File.expand_path('../lib/http_stub/rake/task_generators', __FILE__)
 require File.expand_path('../examples/configurer_with_class_activator', __FILE__)
 
 directory "pkg"
-
-Bundler::GemHelper.install_tasks
 
 desc "Removed generated artefacts"
 task :clobber do
