@@ -231,8 +231,10 @@ describe HttpStub::Configurer, "when the server is running" do
         context "whose values are strings" do
 
           before(:each) do
-            configurer.stub_response!("/stub_with_headers", method: :get, headers: { key: "value" },
-                                      response: { status: 202, body: "Another stub body" })
+            configurer.stub_response!(
+              "/stub_with_headers", method: :get, headers: { key: "value" },
+              response: { status: 202, body: "Another stub body" }
+            )
           end
 
           context "and that request is made" do
@@ -261,8 +263,10 @@ describe HttpStub::Configurer, "when the server is running" do
         context "whose values are regular expressions" do
 
           before(:each) do
-            configurer.stub_response!("/stub_with_headers", method: :get, headers: { key: /^match.*/ },
-                                      response: { status: 202, body: "Another stub body" })
+            configurer.stub_response!(
+              "/stub_with_headers", method: :get, headers: { key: /^match.*/ },
+              response: { status: 202, body: "Another stub body" }
+            )
           end
 
           context "and a request that matches is made" do
@@ -331,8 +335,10 @@ describe HttpStub::Configurer, "when the server is running" do
         context "whose values are regular expressions" do
 
           before(:each) do
-            configurer.stub_response!("/stub_with_parameters", method: :get, parameters: { key: /^match.*/ },
-                                      response: { status: 202, body: "Another stub body" })
+            configurer.stub_response!(
+              "/stub_with_parameters", method: :get, parameters: { key: /^match.*/ },
+              response: { status: 202, body: "Another stub body" }
+            )
           end
 
           context "and a request that matches is made" do
@@ -430,7 +436,9 @@ describe HttpStub::Configurer, "when the server is running" do
       describe "and an attempt is made to register a response with a given content type" do
 
         before(:each) do
-          configurer.stub_response!("/some_stub_path", method: :get, response: { body: "Some stub body", content_type: "application/xhtml" })
+          configurer.stub_response!(
+            "/some_stub_path", method: :get, response: { body: "Some stub body", content_type: "application/xhtml" }
+          )
         end
 
         it "should register the stub" do

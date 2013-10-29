@@ -57,7 +57,9 @@ describe HttpStub::Server do
     end
 
     it "should respond with the response provided by the controller" do
-      stub_activator_controller.stub(:register).and_return(HttpStub::Models::Response.new("status" => 302, "body" => ""))
+      stub_activator_controller.stub(:register).and_return(
+        HttpStub::Models::Response.new("status" => 302, "body" => "")
+      )
 
       issue_stub_activator_request
 
@@ -141,7 +143,9 @@ describe HttpStub::Server do
       context "but the stub activator controller activates a stub" do
 
         before(:each) do
-          stub_activator_controller.stub(:activate).and_return(HttpStub::Models::Response.new("status" => 300, "body" => "A body"))
+          stub_activator_controller.stub(:activate).and_return(
+            HttpStub::Models::Response.new("status" => 300, "body" => "A body")
+          )
         end
 
         it "should respond with the activation response status code" do
@@ -185,7 +189,9 @@ describe HttpStub::Server do
     end
 
     it "should respond with the response's content type" do
-      stub_controller.stub(:replay).and_return(HttpStub::Models::Response.new("status" => 200, "body" => "A body", "content_type" => "application/xhtml"))
+      stub_controller.stub(:replay).and_return(
+        HttpStub::Models::Response.new("status" => 200, "body" => "A body", "content_type" => "application/xhtml")
+      )
       get "/some/stubbed/uri"
       response.content_type.should eql("application/xhtml")
     end

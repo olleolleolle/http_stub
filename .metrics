@@ -1,0 +1,22 @@
+MetricFu::Configuration.run do |config|
+
+  config.configure_metric(:cane) do |cane|
+    cane.enabled = true
+    cane.abc_max = 10
+    cane.line_length = 120
+    cane.no_doc = 'y'
+    cane.no_readme = 'y'
+  end
+
+  config.configure_metric(:roodi) do |roodi|
+    roodi.enabled = true
+    roodi.roodi_config = 'config/roodi.yml'
+  end
+
+  config.configure_metric(:reek) do |reek|
+    reek.enabled = true
+    reek.config_file_pattern = 'config/reek.yml'
+  end
+
+  config.configure_formatter(:html)
+end
