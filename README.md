@@ -205,7 +205,7 @@ To configure a stub response, POST to /stubs with the following JSON payload:
             ...
         },
         "response": {
-            "status": "200",
+            "status": 200,
             "body": "Some body",
             "delay_in_seconds": 8
         }

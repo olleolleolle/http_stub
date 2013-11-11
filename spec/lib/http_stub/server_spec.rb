@@ -37,12 +37,9 @@ describe HttpStub::Server do
 
     def issue_stub_request
       post "/stubs", {
-          "uri" => "/a_path",
-          "method" => "a method",
-          "response" => {
-              "status" => 200,
-              "body" => "Foo"
-          }
+          uri: "/a_path",
+          method: "a method",
+          response: { status: 200, body: "Foo" }
       }.to_json
     end
 
