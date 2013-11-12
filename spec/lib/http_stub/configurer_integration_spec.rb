@@ -11,8 +11,8 @@ describe HttpStub::Configurer, "when the server is running" do
   context "and the configurer is initialized" do
 
     before(:each) do
-      configurer.class.host server_host
-      configurer.class.port server_port
+      configurer.class.host(server_host)
+      configurer.class.port(server_port)
       configurer.class.initialize!
     end
 
@@ -358,6 +358,40 @@ describe HttpStub::Configurer, "when the server is running" do
 
             let(:response) do
               Net::HTTP.get_response(server_host, "/stub_with_parameters?key=does_not_match_value", server_port)
+            end
+
+            it "should respond with a 404 status code" do
+              response.code.should eql("404")
+            end
+
+          end
+
+        end
+
+        context "whose values indicate the parameters must be omitted" do
+
+          before(:each) do
+            configurer.stub_response!(
+              "/stub_with_omitted_parameters", method: :get, parameters: { key: :omitted },
+              response: { status: 202, body: "Omitted parameter stub body" }
+            )
+          end
+
+          context "and a request that matches is made" do
+
+            let(:response) { Net::HTTP.get_response(server_host, "/stub_with_omitted_parameters", server_port) }
+
+            it "should replay the stubbed response" do
+              response.code.should eql("202")
+              response.body.should eql("Omitted parameter stub body")
+            end
+
+          end
+
+          context "and a request that does not match is made" do
+
+            let(:response) do
+              Net::HTTP.get_response(server_host, "/stub_with_omitted_parameters?key=must_be_omitted", server_port)
             end
 
             it "should respond with a 404 status code" do

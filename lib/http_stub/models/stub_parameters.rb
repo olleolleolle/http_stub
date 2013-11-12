@@ -4,7 +4,7 @@ module HttpStub
     class StubParameters
 
       def initialize(parameters)
-        @parameters = HttpStub::Models::HashWithRegexpableValues.new(parameters || {})
+        @parameters = HttpStub::Models::HashWithValueMatchers.new(parameters || {})
       end
 
       def match?(request)

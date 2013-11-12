@@ -8,10 +8,10 @@ module HttpStub
           super("/stubs")
           self.content_type = "application/json"
           self.body = {
-              "uri" => HttpStub::Configurer::Request::Regexpable.format(uri),
+              "uri" => HttpStub::Configurer::Request::ControllableValue.format(uri),
               "method" => options[:method],
-              "headers" => HttpStub::Configurer::Request::Regexpable.format(options[:headers] || {}),
-              "parameters" => HttpStub::Configurer::Request::Regexpable.format(options[:parameters] || {}),
+              "headers" => HttpStub::Configurer::Request::ControllableValue.format(options[:headers] || {}),
+              "parameters" => HttpStub::Configurer::Request::ControllableValue.format(options[:parameters] || {}),
               "response" => {
                   "status" => options[:response][:status] || "",
                   "content_type" => options[:response][:content_type] || "application/json",

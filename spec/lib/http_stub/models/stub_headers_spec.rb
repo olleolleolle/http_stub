@@ -10,7 +10,7 @@ describe HttpStub::Models::StubHeaders do
     it "should create a regexpable representation of the stubbed headers whose keys are downcased and underscored" do
       downcased_and_underscored_hash = { "another_stub_key" => "value" }
       stubbed_headers.should_receive(:downcase_and_underscore_keys).and_return(downcased_and_underscored_hash)
-      HttpStub::Models::HashWithRegexpableValues.should_receive(:new).with(downcased_and_underscored_hash)
+      HttpStub::Models::HashWithValueMatchers.should_receive(:new).with(downcased_and_underscored_hash)
 
       stub_headers
     end
@@ -22,7 +22,7 @@ describe HttpStub::Models::StubHeaders do
     let(:stubbed_headers) { nil }
 
     it "should create a regexpable representation of an empty hash" do
-      HttpStub::Models::HashWithRegexpableValues.should_receive(:new).with({})
+      HttpStub::Models::HashWithValueMatchers.should_receive(:new).with({})
 
       stub_headers
     end
@@ -32,10 +32,10 @@ describe HttpStub::Models::StubHeaders do
   describe "#match?" do
 
     let(:request_headers) { { "request_key" => "value" } }
-    let(:regexpable_stubbed_headers) { double(HttpStub::Models::HashWithRegexpableValues).as_null_object }
+    let(:regexpable_stubbed_headers) { double(HttpStub::Models::HashWithValueMatchers).as_null_object }
 
     before(:each) do
-      HttpStub::Models::HashWithRegexpableValues.stub(:new).and_return(regexpable_stubbed_headers)
+      HttpStub::Models::HashWithValueMatchers.stub(:new).and_return(regexpable_stubbed_headers)
       HttpStub::Models::RequestHeaderParser.stub(:parse).with(request).and_return(request_headers)
     end
 

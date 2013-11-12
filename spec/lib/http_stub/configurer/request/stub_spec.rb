@@ -30,7 +30,7 @@ describe HttpStub::Configurer::Request::Stub do
       let(:request) { HttpStub::Configurer::Request::Stub.new(uri, stub_options) }
       let(:request_body) { JSON.parse(request.body) }
 
-      before(:each) { HttpStub::Configurer::Request::Regexpable.stub(:format) }
+      before(:each) { HttpStub::Configurer::Request::ControllableValue.stub(:format) }
 
       it "should create a HTTP POST request" do
         request.method.should eql("POST")
@@ -46,8 +46,8 @@ describe HttpStub::Configurer::Request::Stub do
 
       context "when a header option is provided" do
 
-        it "should format the headers with regexp support" do
-          HttpStub::Configurer::Request::Regexpable.should_receive(:format).with(headers)
+        it "should format the headers into control values" do
+          HttpStub::Configurer::Request::ControllableValue.should_receive(:format).with(headers)
 
           request
         end
@@ -59,7 +59,7 @@ describe HttpStub::Configurer::Request::Stub do
         let(:headers) { nil }
 
         it "should format an empty header hash" do
-          HttpStub::Configurer::Request::Regexpable.should_receive(:format).with({})
+          HttpStub::Configurer::Request::ControllableValue.should_receive(:format).with({})
 
           request
         end
@@ -68,8 +68,8 @@ describe HttpStub::Configurer::Request::Stub do
 
       context "when a parameter option is provided" do
 
-        it "should format the parameters with regexp support" do
-          HttpStub::Configurer::Request::Regexpable.should_receive(:format).with(parameters)
+        it "should format the parameters into control values" do
+          HttpStub::Configurer::Request::ControllableValue.should_receive(:format).with(parameters)
 
           request
         end
@@ -81,7 +81,7 @@ describe HttpStub::Configurer::Request::Stub do
         let(:parameters) { nil }
 
         it "should format an empty parameter hash" do
-          HttpStub::Configurer::Request::Regexpable.should_receive(:format).with({})
+          HttpStub::Configurer::Request::ControllableValue.should_receive(:format).with({})
 
           request
         end
@@ -90,8 +90,8 @@ describe HttpStub::Configurer::Request::Stub do
 
       context "generates a JSON body which" do
 
-        it "should have an entry containing the regexpable representation of the uri" do
-          HttpStub::Configurer::Request::Regexpable.should_receive(:format).with(uri).and_return("uri as a string")
+        it "should have an entry containing the control value representation of the uri" do
+          HttpStub::Configurer::Request::ControllableValue.should_receive(:format).with(uri).and_return("uri as a string")
 
           request_body.should include("uri" => "uri as a string")
         end
@@ -101,14 +101,14 @@ describe HttpStub::Configurer::Request::Stub do
         end
 
         it "should have an entry containing the string representation of the headers" do
-          HttpStub::Configurer::Request::Regexpable.should_receive(:format)
+          HttpStub::Configurer::Request::ControllableValue.should_receive(:format)
             .with(headers).and_return("headers as string")
 
           request_body.should include("headers" => "headers as string")
         end
 
         it "should have an entry containing the string representation of the parameters" do
-          HttpStub::Configurer::Request::Regexpable.should_receive(:format)
+          HttpStub::Configurer::Request::ControllableValue.should_receive(:format)
             .with(parameters).and_return("parameters as string")
 
           request_body.should include("parameters" => "parameters as string")

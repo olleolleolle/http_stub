@@ -86,7 +86,7 @@ These methods issue HTTP requests to the server, configuring it's responses.  An
 The ```stub!``` and ```stub_activator``` methods share the same signatures, expect a ```stub_activator``` accepts an
 activation url as the first argument.
 
-A stubs uri and parameter and header values accepted in the ```stub!``` and ```stub_activator``` methods can be
+A stubs uri, parameter and header values accepted in the ```stub!``` and ```stub_activator``` methods can be
 regular expressions:
 
 ```ruby
@@ -99,7 +99,17 @@ regular expressions:
                    response: { status: 200 }
 ```
 
-They may also impose response delays, for example:
+Parameter and header values can also be mandatory omissions, for example:
+
+```ruby
+    stub! "/some/path",
+          method: :post,
+          headers: { header_name: :omitted },
+          parameters: { parameter_name: :omitted },
+          response: { status: 200 }
+```
+
+The methods may also impose response delays, for example:
 
 ```ruby
     stub! /prefix\/[^\/]*\/postfix/, method: :post, response: { status: 200, delay_in_seconds: 8 }
@@ -222,6 +232,19 @@ The stub uri, header values and parameter values can be regular expressions by p
         },
         "parameters": {
             "a_param": "regexp:^some.+a_value$",
+        }
+    }
+```
+
+Headers and parameters can also be mandatory omissions by providing the control value: ```control:omitted```:
+
+```javascript
+    {
+        "headers": {
+            "a_header": "control:omitted",
+        },
+        "parameters": {
+            "a_param": "control:omitted",
         }
     }
 ```

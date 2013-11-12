@@ -2,15 +2,15 @@ describe HttpStub::Models::StubUri do
 
   let(:stubbed_uri) { "/some/uri" }
   let(:request) { double("HttpRequest", path_info: request_uri) }
-  let(:regexpable_value) { double(HttpStub::Models::RegexpableValue).as_null_object }
+  let(:value_matcher) { double(HttpStub::Models::ValueMatcher).as_null_object }
   let(:stub_uri) { HttpStub::Models::StubUri.new(stubbed_uri) }
 
-  before(:each) { HttpStub::Models::RegexpableValue.stub(:new).and_return(regexpable_value) }
+  before(:each) { HttpStub::Models::ValueMatcher.stub(:new).and_return(value_matcher) }
 
   describe "constructor" do
 
-    it "should create a regexpable representation of the provided uri" do
-      HttpStub::Models::RegexpableValue.should_receive(:new).with(stubbed_uri)
+    it "should create a value matcher for the provided uri" do
+      HttpStub::Models::ValueMatcher.should_receive(:new).with(stubbed_uri)
 
       stub_uri
     end
@@ -21,8 +21,8 @@ describe HttpStub::Models::StubUri do
 
     let(:request_uri) { "/some/uri" }
 
-    it "should delegate to the regexpable representation of the provided uri" do
-      regexpable_value.should_receive(:match?).with(request_uri).and_return(true)
+    it "should delegate to the value matcher representation of the provided uri" do
+      value_matcher.should_receive(:match?).with(request_uri).and_return(true)
 
       stub_uri.match?(request).should be_true
     end
@@ -31,10 +31,10 @@ describe HttpStub::Models::StubUri do
 
   describe "#to_s" do
 
-    it "should delegate to the regexpable representation of the provided uri" do
-      regexpable_value.should_receive(:to_s).and_return("some regexpable value string")
+    it "should delegate to the value matcher representation of the provided uri" do
+      value_matcher.should_receive(:to_s).and_return("some value matcher string")
 
-      stub_uri.to_s.should eql("some regexpable value string")
+      stub_uri.to_s.should eql("some value matcher string")
     end
 
   end

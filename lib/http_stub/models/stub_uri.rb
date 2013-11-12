@@ -4,7 +4,7 @@ module HttpStub
     class StubUri
 
       def initialize(uri)
-        @uri = HttpStub::Models::RegexpableValue.new(uri)
+        @uri = HttpStub::Models::ValueMatcher.new(uri)
       end
 
       def match?(request)

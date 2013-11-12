@@ -8,21 +8,16 @@ module HttpStub
 
           private
 
-          FORMATTERS = { String => :format_string, Regexp => :format_regexp, Hash => :format_hash }
+          FORMATTERS = { Regexp => :format_regexp, Hash => :format_hash }.freeze
 
           public
 
           def format(value)
             formatter = FORMATTERS.find { |formatter_entry| value.is_a?(formatter_entry[0]) }
-            raise "No Regexp formatter found for #{value}" unless formatter
-            self.send(formatter[1], value)
+            formatter ? self.send(formatter[1], value) : value
           end
 
           private
-
-          def format_string(string)
-            string
-          end
 
           def format_regexp(regexp)
             "regexp:#{regexp.source.gsub(/\\\//, "/")}"

@@ -10,10 +10,8 @@ describe HttpStub::Server, "when the server is running" do
 
       before(:each) do
         @response = HTTParty.post(
-          "http://#{server_host}:#{server_port}/stubs",
-          body: { "uri" => "/some/path", "method" => "get",
-                  "response" => { "status" => 200, "body" => "Some body" }
-          }.to_json
+          "#{server_uri}/stubs",
+          body: { uri: "/some/path", method: "get", response: { status: 200, body: "Some body" } }.to_json
         )
       end
 
@@ -22,7 +20,7 @@ describe HttpStub::Server, "when the server is running" do
       end
 
       it "should register a stub returning the provided response for a matching request" do
-        stubbed_response = HTTParty.get("http://#{server_host}:#{server_port}/some/path")
+        stubbed_response = HTTParty.get("#{server_uri}/some/path")
 
         stubbed_response.code.should eql(200)
         stubbed_response.body.should eql("Some body")
@@ -42,7 +40,7 @@ describe HttpStub::Server, "when the server is running" do
 
     describe "GET #stubs/activators" do
 
-      let(:response) { HTTParty.get("http://#{server_host}:#{server_port}/stubs/activators") }
+      let(:response) { HTTParty.get("#{server_uri}/stubs/activators") }
       let(:response_document) { Nokogiri::HTML(response.body) }
 
       it "should return a 200 response code" do
@@ -84,10 +82,10 @@ describe HttpStub::Server, "when the server is running" do
       describe "when multiple stubs are configured" do
 
         before(:all) do
-          (1..3).each { |i| HTTParty.get("http://#{server_host}:#{server_port}/activator#{i}") }
+          (1..3).each { |i| HTTParty.get("#{server_uri}/activator#{i}") }
         end
 
-        let(:response) { HTTParty.get("http://#{server_host}:#{server_port}/stubs") }
+        let(:response) { HTTParty.get("#{server_uri}/stubs") }
         let(:response_document) { Nokogiri::HTML(response.body) }
 
         it "should return a 200 response code" do
