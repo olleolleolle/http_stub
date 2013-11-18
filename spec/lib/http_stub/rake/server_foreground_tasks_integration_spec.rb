@@ -1,4 +1,4 @@
-describe HttpStub::Rake::ServerTasks do
+describe HttpStub::Rake::ServerForegroundTasks do
   include_context "server integration"
 
   describe "the start task" do

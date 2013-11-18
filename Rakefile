@@ -51,7 +51,7 @@ task :validate do
   raise "Travis CI validation failed" unless result =~ /^Hooray/
 end
 
-HttpStub::Rake::ServerTasks.new(name: :example_server, port: 8001)
+HttpStub::Rake::ServerForegroundTasks.new(name: :example_server, port: 8001)
 
 task :default => %w{ clobber metrics coverage }
 

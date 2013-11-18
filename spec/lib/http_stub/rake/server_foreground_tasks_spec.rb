@@ -1,10 +1,10 @@
-describe HttpStub::Rake::ServerTasks do
+describe HttpStub::Rake::ServerForegroundTasks do
 
   describe "the configure task" do
 
     let(:default_options) { { port: 8001 } }
 
-    before(:each) { HttpStub::Rake::ServerTasks.new(default_options.merge(options)) }
+    before(:each) { HttpStub::Rake::ServerForegroundTasks.new(default_options.merge(options)) }
 
     context "when a configurer is provided" do
 
@@ -16,7 +16,7 @@ describe HttpStub::Rake::ServerTasks do
         it "should initialize the provided configurer" do
           configurer.should_receive(:initialize!)
 
-          Rake::Task[:configure_tasks_configurer_provided_test].execute
+          Rake::Task["tasks_configurer_provided_test:configure"].execute
         end
 
       end
@@ -28,7 +28,7 @@ describe HttpStub::Rake::ServerTasks do
       let(:options) { { name: :tasks_configurer_not_provided_test } }
 
       it "should not generate a task" do
-        lambda { Rake::Task[:configure_tasks_configurer_not_provided_test] }.should
+        lambda { Rake::Task["tasks_configurer_not_provided_test:configure"] }.should
           raise_error(/Don't know how to build task/)
       end
 

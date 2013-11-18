@@ -38,7 +38,7 @@ Start a ```http_stub``` server via a rake task, generated via ```http_stub```:
 ```ruby
     require 'http_stub/rake/task_generators'
 
-    HttpStub::Rake::ServerTasks.new(name: :some_server, port: 8001) # Generates 'start_some_server' task
+    HttpStub::Rake::ServerForegroundTasks.new(name: :some_server, port: 8001) # Generates 'some_server:start:foreground' task
 ```
 
 ### Stubbing Server Responses ###
@@ -191,7 +191,7 @@ The ```HttpStub::Rake::ServerTasks``` also generates a task that initializes a s
 ```ruby
     require 'http_stub/rake/task_generators'
 
-    HttpStub::Rake::ServerTasks.new(name: :some_server, port: 8001, configurer: MyConfigurer) # Generates 'configure_some_server' task
+    HttpStub::Rake::ServerForegroundTasks.new(name: :some_server, port: 8001, configurer: MyConfigurer) # Generates 'some_server:configure' task
 ```
 
 #### Stub via HTTP requests ####
