@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    http_stub (0.11.1)
+    http_stub (0.11.2)
       haml (~> 4.0)
       http_server_manager (~> 0.4)
       rake (~> 10.1)
@@ -50,7 +50,7 @@ GEM
       tilt
     hashr (0.0.22)
     hirb (0.7.1)
-    http_server_manager (0.4.3)
+    http_server_manager (0.4.4)
       rake (~> 10.1)
       sys-proctree (~> 0.0.4)
       wait_until (~> 0.1)
