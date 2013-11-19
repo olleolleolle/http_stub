@@ -26,6 +26,7 @@ Gem::Specification.new do |s|
   s.add_dependency "haml", "~> 4.0"
   s.add_dependency "sass", "~> 3.2"
   s.add_dependency "rake", "~> 10.1"
+  s.add_dependency "http_server_manager", "~> 0.4"
 
   s.add_development_dependency "travis-lint", "~> 1.7"
   s.add_development_dependency "metric_fu", "~> 4.5"

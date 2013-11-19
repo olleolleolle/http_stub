@@ -8,6 +8,7 @@ require 'haml'
 require 'sass'
 require 'net/http'
 require 'json'
+require 'http_server_manager'
 
 require File.expand_path('../http_stub/hash_extensions', __FILE__)
 require File.expand_path('../http_stub/models/response', __FILE__)
@@ -27,6 +28,7 @@ require File.expand_path('../http_stub/models/request_pipeline', __FILE__)
 require File.expand_path('../http_stub/controllers/stub_controller', __FILE__)
 require File.expand_path('../http_stub/controllers/stub_activator_controller', __FILE__)
 require File.expand_path('../http_stub/server', __FILE__)
+require File.expand_path('../http_stub/daemon', __FILE__)
 require File.expand_path('../http_stub/configurer/request/omittable', __FILE__)
 require File.expand_path('../http_stub/configurer/request/regexpable', __FILE__)
 require File.expand_path('../http_stub/configurer/request/controllable_value', __FILE__)

@@ -1,10 +1,10 @@
-describe HttpStub::Rake::ServerForegroundTasks do
+describe HttpStub::Rake::ServerTasks do
 
   describe "the configure task" do
 
     let(:default_options) { { port: 8001 } }
 
-    before(:each) { HttpStub::Rake::ServerForegroundTasks.new(default_options.merge(options)) }
+    before(:each) { HttpStub::Rake::ServerTasks.new(default_options.merge(options)) }
 
     context "when a configurer is provided" do
 

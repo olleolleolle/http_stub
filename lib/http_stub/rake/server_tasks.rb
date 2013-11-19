@@ -1,8 +1,7 @@
 module HttpStub
-
   module Rake
 
-    class ServerForegroundTasks < ::Rake::TaskLib
+    class ServerTasks < ::Rake::TaskLib
 
       def initialize(options)
         namespace options[:name] do
@@ -34,5 +33,4 @@ module HttpStub
     end
 
   end
-
 end

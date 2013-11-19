@@ -51,7 +51,11 @@ task :validate do
   raise "Travis CI validation failed" unless result =~ /^Hooray/
 end
 
-HttpStub::Rake::ServerForegroundTasks.new(name: :example_server, port: 8001)
+HttpStub::Daemon.log_dir = File.expand_path('../tmp/log', __FILE__)
+HttpStub::Daemon.pid_dir = File.expand_path('../tmp/pids', __FILE__)
+
+HttpStub::Rake::ServerTasks.new(name: :example_server, port: 8001)
+HttpStub::Rake::DaemonTasks.new(name: :example_daemon, port: 8002)
 
 task :default => %w{ clobber metrics coverage }
 
