@@ -1,25 +1,22 @@
-require 'simplecov'
+require 'bundler'
+Bundler.require(:default, :development)
+
 SimpleCov.start do
   add_filter "/spec/"
   add_filter "/vendor/"
-  minimum_coverage 99.2
+  minimum_coverage 100
   refuse_coverage_drop
 end if ENV["coverage"]
 
-require 'httparty'
-require 'nokogiri'
-require 'rack/test'
-require 'wait_until'
-
 require 'http_server_manager/test_support'
 
-require File.expand_path('../../lib/http_stub/rake/task_generators', __FILE__)
-require File.expand_path('../../lib/http_stub', __FILE__)
-require File.expand_path('../../examples/configurer_with_class_activator', __FILE__)
-require File.expand_path('../../examples/configurer_with_class_stub', __FILE__)
-require File.expand_path('../../examples/configurer_with_initialize_callback', __FILE__)
-require File.expand_path('../../examples/configurer_with_complex_initializer', __FILE__)
-require File.expand_path('../../examples/configurer_with_many_class_activators', __FILE__)
+require_relative '../lib/http_stub/rake/task_generators'
+require_relative '../lib/http_stub'
+require_relative '../examples/configurer_with_class_activator'
+require_relative '../examples/configurer_with_class_stub'
+require_relative '../examples/configurer_with_initialize_callback'
+require_relative '../examples/configurer_with_complex_initializer'
+require_relative '../examples/configurer_with_many_class_activators'
 
 HttpStub::Daemon.log_dir = File.expand_path('../../tmp/log', __FILE__)
 HttpStub::Daemon.pid_dir = File.expand_path('../../tmp/pids', __FILE__)

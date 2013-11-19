@@ -1,8 +1,9 @@
 require 'bundler'
 require 'bundler/gem_tasks'
+Bundler.require(:default, :development)
 require 'rspec/core/rake_task'
-require File.expand_path('../lib/http_stub/rake/task_generators', __FILE__)
-require File.expand_path('../examples/configurer_with_class_activator', __FILE__)
+require_relative 'lib/http_stub/rake/task_generators'
+require_relative 'examples/configurer_with_class_activator'
 
 directory "pkg"
 
