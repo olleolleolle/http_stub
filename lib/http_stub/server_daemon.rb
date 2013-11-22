@@ -1,6 +1,6 @@
 module HttpStub
 
-  class Daemon < HttpServerManager::Server
+  class ServerDaemon < HttpServerManager::Server
 
     class << self
 

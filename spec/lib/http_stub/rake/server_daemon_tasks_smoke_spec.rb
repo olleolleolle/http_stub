@@ -1,15 +1,15 @@
-describe HttpStub::Rake::DaemonTasks do
+describe HttpStub::Rake::ServerDaemonTasks do
   include Rake::DSL
 
-  before(:all) { HttpStub::Rake::DaemonTasks.new(name: :example_daemon, port: 8002) }
+  before(:all) { HttpStub::Rake::ServerDaemonTasks.new(name: :example_server_daemon, port: 8002) }
 
   describe "start task" do
 
     context "when invoked" do
 
-      before(:all) { @exit_flag = Rake::Task["example_daemon:start"].invoke("--trace") }
+      before(:all) { @exit_flag = Rake::Task["example_server_daemon:start"].invoke("--trace") }
 
-      after(:all) { Rake::Task["example_daemon:stop"].invoke("--trace") }
+      after(:all) { Rake::Task["example_server_daemon:stop"].invoke("--trace") }
 
       it "should exit with a status code of 0" do
         @exit_flag.should be_true

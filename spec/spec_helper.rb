@@ -18,8 +18,8 @@ require_relative '../examples/configurer_with_initialize_callback'
 require_relative '../examples/configurer_with_complex_initializer'
 require_relative '../examples/configurer_with_many_class_activators'
 
-HttpStub::Daemon.log_dir = File.expand_path('../../tmp/log', __FILE__)
-HttpStub::Daemon.pid_dir = File.expand_path('../../tmp/pids', __FILE__)
+HttpStub::ServerDaemon.log_dir = File.expand_path('../../tmp/log', __FILE__)
+HttpStub::ServerDaemon.pid_dir = File.expand_path('../../tmp/pids', __FILE__)
 
 HttpServerManager.logger = HttpServerManager::Test::SilentLogger
 
