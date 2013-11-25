@@ -1,0 +1,8 @@
+source 'http://rubygems.org'
+
+platforms :rbx do
+  gem 'racc', '~> 1.4'
+  gem 'rubysl', '~> 2.0'
+end
+
+eval_gemfile File.expand_path('../Gemfile', __FILE__)
