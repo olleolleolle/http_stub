@@ -1,6 +1,14 @@
 language: ruby
+script: rake
+notifications:
+  email:
+    on_success: change
+    on_failure: always
 gemfile:
   - Gemfile.travis
 rvm:
-  - "1.9.3"
-  - rbx-2.0.0
+  - 1.9.3
+matrix:
+  include:
+    - rvm: rbx
+      env: RBX_RUBY_COMPAT=1.9.3
