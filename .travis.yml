@@ -11,4 +11,4 @@ rvm:
 matrix:
   include:
     - rvm: rbx
-      env: RBX_RUBY_COMPAT=1.9.3
+      env: RBXOPT=-X19
