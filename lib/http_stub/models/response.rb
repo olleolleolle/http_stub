@@ -5,10 +5,13 @@ module HttpStub
 
       private
 
-      DEFAULT_OPTIONS = { "status" => 200, "delay_in_seconds" => 0 }
+      DEFAULT_OPTIONS = { "status" => 200, "delay_in_seconds" => 0 }.freeze
+      DEFAULT_HEADERS = { "content-type" => "application/json" }.freeze
 
       def establish_defaults_in(options)
+        headers = options["headers"] ||= {}
         DEFAULT_OPTIONS.each { |key, value| options[key] = value if !options[key] || options[key] == "" }
+        DEFAULT_HEADERS.each { |key, value| headers[key] = value if !headers[key] || headers[key] == "" }
       end
 
       public
@@ -36,7 +39,7 @@ module HttpStub
       end
 
       def headers
-        {"content-type" => @response_options["content_type"]}
+        @response_options["headers"]
       end
 
       def empty?

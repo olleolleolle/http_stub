@@ -1,11 +1,14 @@
 describe HttpStub::Models::Response do
 
   let(:status) { 202 }
+  let(:headers) { nil }
   let(:body) { "A response body" }
   let(:delay_in_seconds) { 18 }
 
   let(:response) do
-    HttpStub::Models::Response.new("status" => status, "body" => body, "delay_in_seconds" => delay_in_seconds)
+    HttpStub::Models::Response.new(
+      "status" => status, "headers" => headers, "body" => body, "delay_in_seconds" => delay_in_seconds
+    )
   end
 
   describe "::SUCCESS" do
@@ -116,9 +119,59 @@ describe HttpStub::Models::Response do
 
   end
 
+  describe "#headers" do
+
+    context "when headers are provided" do
+
+      context "that include a content type" do
+
+        let(:headers) do
+          { "content-type" => "some/content/type", "some_header" => "some value", "another_header" => "another value" }
+        end
+
+        it "should return a hash including the provided headers" do
+          response.headers.should eql(headers)
+        end
+
+      end
+
+      context "that do not include a content type" do
+
+        let(:headers) do
+          {
+            "some_header" => "some value",
+            "another_header" => "another value",
+            "yet_another_header" => "yet another value"
+          }
+        end
+
+        it "should return a hash including the provided headers" do
+          response.headers.should include(headers)
+        end
+
+        it "should return a hash including json as the default response content type" do
+          response.headers.should include("content-type" => "application/json")
+        end
+
+      end
+
+    end
+
+    context "when no headers are provided" do
+
+      let(:headers) { nil }
+
+      it "should return a hash containing json as the default response content type" do
+        response.headers.should eql("content-type" => "application/json")
+      end
+
+    end
+
+  end
+
   describe "#empty?" do
 
-    describe "when the response is EMPTY" do
+    context "when the response is EMPTY" do
 
       it "should return true" do
         HttpStub::Models::Response::EMPTY.should be_empty
@@ -126,7 +179,7 @@ describe HttpStub::Models::Response do
 
     end
 
-    describe "when the response is not EMPTY but contains no values" do
+    context "when the response is not EMPTY but contains no values" do
 
       it "should return true" do
         HttpStub::Models::Response.new.should be_empty
@@ -134,7 +187,7 @@ describe HttpStub::Models::Response do
 
     end
 
-    describe "when the response is not EMPTY" do
+    context "when the response is not EMPTY" do
 
       it "should return false" do
         HttpStub::Models::Response::SUCCESS.should_not be_empty

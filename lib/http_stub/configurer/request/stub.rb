@@ -14,7 +14,7 @@ module HttpStub
               "parameters" => HttpStub::Configurer::Request::ControllableValue.format(options[:parameters] || {}),
               "response" => {
                   "status" => options[:response][:status] || "",
-                  "content_type" => options[:response][:content_type] || "application/json",
+                  "headers" => options[:response][:headers] || {},
                   "body" => options[:response][:body],
                   "delay_in_seconds" => options[:response][:delay_in_seconds] || ""
               }

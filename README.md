@@ -66,7 +66,7 @@ These methods issue HTTP requests to the server, configuring it's responses.  An
         port 8001 # The server post number
 
         # Register stub for POST "/"
-        stub! "/", method: :post, response: { status: 200 }
+        stub! "/", method: :post, response: { status: 201 }
         # Register stub for POST "/" when GET "/unavailable" request is made
         stub_activator "/unavailable", "/", method: :post, response: { status: 404 }
 
@@ -98,7 +98,7 @@ regular expressions:
                    method: :post,
                    headers: { api_key: /^some_.+_key$/ },
                    parameters: { username: /^user_.+/ },
-                   response: { status: 200 }
+                   response: { status: 201 }
 ```
 
 Parameter and header values can also be mandatory omissions, for example:
@@ -108,7 +108,16 @@ Parameter and header values can also be mandatory omissions, for example:
           method: :post,
           headers: { header_name: :omitted },
           parameters: { parameter_name: :omitted },
-          response: { status: 200 }
+          response: { status: 201 }
+```
+
+Responses may contain headers, for example:
+
+```ruby
+    stub! /prefix\/[^\/]*\/postfix/,
+          method: :post,
+          response: { status: 201,
+                      headers: { "content-type" => "application/xhtml+xml", "location" => "http://some/resource/path" } }
 ```
 
 Responses may also impose delays, for example:

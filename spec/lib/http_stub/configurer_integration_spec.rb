@@ -467,17 +467,43 @@ describe HttpStub::Configurer, "when the server is running" do
 
       end
 
-      describe "and an attempt is made to register a response with a given content type" do
+      describe "and an attempt is made to register a response with a content type header" do
 
         before(:each) do
           configurer.stub_response!(
-            "/some_stub_path", method: :get, response: { body: "Some stub body", content_type: "application/xhtml" }
+            "/some_stub_path", method: :get, response: { body: "Some stub body",
+                                                         headers: { "content-type" => "application/xhtml" } }
           )
         end
 
         it "should register the stub" do
           response = Net::HTTP.get_response("localhost", "/some_stub_path", 8001)
+
           response.content_type.should eql("application/xhtml")
+        end
+
+      end
+
+      describe "and an attempt is made to register a response with a other headers" do
+
+        let(:response_headers) do
+          {
+            "some_header" => "some value",
+            "another_header" => "another value",
+            "yet_another_header" => "yet another value"
+          }
+        end
+
+        before(:each) do
+          configurer.stub_response!(
+            "/some_stub_path", method: :get, response: { body: "Some stub body", headers: response_headers }
+          )
+        end
+
+        it "should register the stub" do
+          response = Net::HTTP.get_response("localhost", "/some_stub_path", 8001)
+
+          response_headers.each { |key, value| response[key].should eql(value) }
         end
 
       end

@@ -6,21 +6,21 @@ describe HttpStub::Configurer::Request::Stub do
 
       let(:uri) { "/some/uri" }
       let(:stub_method) { "Some Method" }
-      let(:headers) { { "header_name" => "value" } }
-      let(:parameters) { { "parameter_name" => "value" } }
+      let(:request_headers) { { "request_header_name" => "value" } }
+      let(:request_parameters) { { "parameter_name" => "value" } }
       let(:response_status) { 500 }
+      let(:response_headers) { { "response_header_name" => "value" } }
       let(:response_body) { "Some body" }
       let(:response_delay_in_seconds) { 7 }
-      let(:response_content_type) { "application/xhtml" }
 
       let(:stub_options) do
         {
             method: stub_method,
-            headers: headers,
-            parameters: parameters,
+            headers: request_headers,
+            parameters: request_parameters,
             response: {
                 status: response_status,
-                content_type: response_content_type,
+                headers: response_headers,
                 body: response_body,
                 delay_in_seconds: response_delay_in_seconds
             }
@@ -44,19 +44,19 @@ describe HttpStub::Configurer::Request::Stub do
         request.content_type.should eql("application/json")
       end
 
-      context "when a header option is provided" do
+      context "when a request header option is provided" do
 
         it "should format the headers into control values" do
-          HttpStub::Configurer::Request::ControllableValue.should_receive(:format).with(headers)
+          HttpStub::Configurer::Request::ControllableValue.should_receive(:format).with(request_headers)
 
           request
         end
 
       end
 
-      context "when no header is provided" do
+      context "when no request header is provided" do
 
-        let(:headers) { nil }
+        let(:request_headers) { nil }
 
         it "should format an empty header hash" do
           HttpStub::Configurer::Request::ControllableValue.should_receive(:format).with({})
@@ -66,19 +66,19 @@ describe HttpStub::Configurer::Request::Stub do
 
       end
 
-      context "when a parameter option is provided" do
+      context "when a request parameter option is provided" do
 
-        it "should format the parameters into control values" do
-          HttpStub::Configurer::Request::ControllableValue.should_receive(:format).with(parameters)
+        it "should format the request parameters into control values" do
+          HttpStub::Configurer::Request::ControllableValue.should_receive(:format).with(request_parameters)
 
           request
         end
 
       end
 
-      context "when no parameter option is provided" do
+      context "when no request parameter option is provided" do
 
-        let(:parameters) { nil }
+        let(:request_parameters) { nil }
 
         it "should format an empty parameter hash" do
           HttpStub::Configurer::Request::ControllableValue.should_receive(:format).with({})
@@ -100,18 +100,18 @@ describe HttpStub::Configurer::Request::Stub do
           request_body.should include("method" => stub_method)
         end
 
-        it "should have an entry containing the string representation of the headers" do
+        it "should have an entry containing the string representation of the request headers" do
           HttpStub::Configurer::Request::ControllableValue.should_receive(:format)
-            .with(headers).and_return("headers as string")
+            .with(request_headers).and_return("request headers as string")
 
-          request_body.should include("headers" => "headers as string")
+          request_body.should include("headers" => "request headers as string")
         end
 
-        it "should have an entry containing the string representation of the parameters" do
+        it "should have an entry containing the string representation of the request parameters" do
           HttpStub::Configurer::Request::ControllableValue.should_receive(:format)
-            .with(parameters).and_return("parameters as string")
+            .with(request_parameters).and_return("request parameters as string")
 
-          request_body.should include("parameters" => "parameters as string")
+          request_body.should include("parameters" => "request parameters as string")
         end
 
         context "when a status response option is provided" do
@@ -154,19 +154,22 @@ describe HttpStub::Configurer::Request::Stub do
 
         end
 
-        context "when a content type is provided" do
+        context "when response headers are provided" do
 
-          it "should have a response entry for the option" do
-            request_body["response"].should include("content_type" => response_content_type)
+          let(:response_headers) { { "response_header_name" => "value" } }
+
+          it "should have a headers response entry containing the the provided headers" do
+            request_body["response"]["headers"].should eql(response_headers)
           end
+
         end
 
-        context "when a content type is not provided" do
+        context "when response headers are not provided" do
 
-          let (:response_content_type) { nil }
+          let (:response_headers) { nil }
 
-          it "should have a response entry with the default content type" do
-            request_body["response"].should include("content_type" => "application/json")
+          it "should have a headers response entry containing an empty hash" do
+            request_body["response"]["headers"].should eql({})
           end
         end
 
