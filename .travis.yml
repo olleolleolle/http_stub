@@ -3,4 +3,4 @@ gemfile:
   - Gemfile.travis
 rvm:
   - "1.9.3"
-  - rbx
+  - rbx-2.0.0
