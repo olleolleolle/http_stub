@@ -15,5 +15,11 @@
     %td Response Status:
     %td=the_stub.response.status
   %tr
+    %td Response Headers:
+    %td=h(the_stub.response.headers)
+  %tr
     %td Response Body:
     %td=h(the_stub.response.body)
+  %tr
+    %td Response Delay:
+    %td=h(the_stub.response.delay_in_seconds)

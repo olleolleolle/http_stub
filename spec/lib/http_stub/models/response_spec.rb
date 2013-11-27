@@ -121,6 +121,12 @@ describe HttpStub::Models::Response do
 
   describe "#headers" do
 
+    let(:response_header_hash) { response.headers.to_hash }
+
+    it "should be Headers" do
+      response.headers.should be_a(HttpStub::Models::Headers)
+    end
+
     context "when headers are provided" do
 
       context "that include a content type" do
@@ -129,8 +135,8 @@ describe HttpStub::Models::Response do
           { "content-type" => "some/content/type", "some_header" => "some value", "another_header" => "another value" }
         end
 
-        it "should return a hash including the provided headers" do
-          response.headers.should eql(headers)
+        it "should return headers including the provided headers" do
+          response_header_hash.should eql(headers)
         end
 
       end
@@ -145,12 +151,12 @@ describe HttpStub::Models::Response do
           }
         end
 
-        it "should return a hash including the provided headers" do
-          response.headers.should include(headers)
+        it "should return headers including the provided headers" do
+          response_header_hash.should include(headers)
         end
 
-        it "should return a hash including json as the default response content type" do
-          response.headers.should include("content-type" => "application/json")
+        it "should return headers including json as the default response content type" do
+          response_header_hash.should include("content-type" => "application/json")
         end
 
       end
@@ -161,8 +167,8 @@ describe HttpStub::Models::Response do
 
       let(:headers) { nil }
 
-      it "should return a hash containing json as the default response content type" do
-        response.headers.should eql("content-type" => "application/json")
+      it "should return headers containing json as the default response content type" do
+        response_header_hash.should eql("content-type" => "application/json")
       end
 
     end

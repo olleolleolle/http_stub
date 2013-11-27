@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    http_stub (0.13.0)
+    http_stub (0.13.1)
       haml (~> 4.0)
       http_server_manager (~> 0.4)
       rake (~> 10.1)

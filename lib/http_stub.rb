@@ -7,6 +7,7 @@ require 'json'
 require 'http_server_manager'
 
 require_relative 'http_stub/hash_extensions'
+require_relative 'http_stub/models/headers'
 require_relative 'http_stub/models/response'
 require_relative 'http_stub/models/omitted_value_matcher'
 require_relative 'http_stub/models/regexp_value_matcher'

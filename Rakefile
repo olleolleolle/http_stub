@@ -3,7 +3,7 @@ require 'bundler/gem_tasks'
 Bundler.require(:default, :development)
 require 'rspec/core/rake_task'
 require_relative 'lib/http_stub/rake/task_generators'
-require_relative 'examples/configurer_with_class_activator'
+require_relative 'examples/configurer_with_complex_initializer'
 
 directory "pkg"
 
@@ -56,7 +56,11 @@ HttpStub::ServerDaemon.log_dir = File.expand_path('../tmp/log', __FILE__)
 HttpStub::ServerDaemon.pid_dir = File.expand_path('../tmp/pids', __FILE__)
 
 HttpStub::Rake::ServerTasks.new(name: :example_server, port: 8001)
-HttpStub::Rake::ServerDaemonTasks.new(name: :example_server_daemon, port: 8002)
+
+HttpStub::Examples::ConfigurerWithComplexInitializer.host("localhost")
+HttpStub::Examples::ConfigurerWithComplexInitializer.port(8002)
+HttpStub::Rake::ServerDaemonTasks.new(name: :example_server_daemon, port: 8002,
+                                      configurer: HttpStub::Examples::ConfigurerWithComplexInitializer)
 
 task :default => %w{ clobber metrics coverage }
 

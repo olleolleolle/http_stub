@@ -5,6 +5,10 @@ describe HttpStub::Models::StubHeaders do
 
   let(:stub_headers) { HttpStub::Models::StubHeaders.new(stubbed_headers) }
 
+  it "should be Headers" do
+    stub_headers.should be_a(HttpStub::Models::Headers)
+  end
+
   describe "when stubbed headers are provided" do
 
     it "should create a regexpable representation of the stubbed headers whose keys are downcased and underscored" do
@@ -57,46 +61,6 @@ describe HttpStub::Models::StubHeaders do
       regexpable_stubbed_headers.should_receive(:match?).with(downcased_and_underscored_hash).and_return(true)
 
       stub_headers.match?(request).should be_true
-    end
-
-  end
-
-  describe "#to_s" do
-
-    describe "when multiple headers are provided" do
-
-      let(:stubbed_headers) { { "key1" => "value1", "key2" => "value2", "key3" => "value3" } }
-
-      it "should return a string containing each header formatted as a conventional request header" do
-        result = stub_headers.to_s
-
-        stubbed_headers.each { |key, value| result.should match(/#{key}:#{value}/) }
-      end
-
-      it "should comma delimit the headers" do
-        stub_headers.to_s.should match(/key\d.value\d\, key\d.value\d\, key\d.value\d/)
-      end
-
-    end
-
-    describe "when empty headers are provided" do
-
-      let(:stubbed_headers) { {} }
-
-      it "should return an empty string" do
-        stub_headers.to_s.should eql("")
-      end
-
-    end
-
-    describe "when nil headers are provided" do
-
-      let(:stubbed_headers) { nil }
-
-      it "should return an empty string" do
-        stub_headers.to_s.should eql("")
-      end
-
     end
 
   end
