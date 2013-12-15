@@ -75,9 +75,9 @@ module HttpStub
 
       private
 
-      def handle(command_options)
+      def handle(command_args)
         effective_command_chain <<
-          HttpStub::Configurer::Command.new({ processor: command_processor }.merge(command_options))
+          HttpStub::Configurer::Command.new({ processor: command_processor }.merge(command_args))
       end
 
       def effective_command_chain

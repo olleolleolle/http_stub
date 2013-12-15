@@ -5,11 +5,11 @@ module HttpStub
 
       attr_reader :request, :description
 
-      def initialize(options)
-        @processor = options[:processor]
-        @request = options[:request]
-        @description = options[:description]
-        @resetable_flag = !!options[:resetable]
+      def initialize(args)
+        @processor = args[:processor]
+        @request = args[:request]
+        @description = args[:description]
+        @resetable_flag = !!args[:resetable]
       end
 
       def execute

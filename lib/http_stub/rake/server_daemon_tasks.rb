@@ -3,9 +3,9 @@ module HttpStub
 
     class ServerDaemonTasks < ::Rake::TaskLib
 
-      def initialize(options)
-        HttpStub::Rake::ServerTasks.new(options)
-        namespace(options[:name]) { HttpServerManager::Rake::ServerTasks.new(HttpStub::ServerDaemon.new(options)) }
+      def initialize(args)
+        HttpStub::Rake::ServerTasks.new(args)
+        namespace(args[:name]) { HttpServerManager::Rake::ServerTasks.new(HttpStub::ServerDaemon.new(args)) }
       end
 
     end

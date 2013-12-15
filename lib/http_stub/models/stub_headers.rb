@@ -5,7 +5,7 @@ module HttpStub
 
       def initialize(headers)
         super(headers)
-        @headers = HttpStub::Models::HashWithValueMatchers.new((headers || {}).downcase_and_underscore_keys)
+        @headers = HttpStub::Models::HashWithStringValueMatchers.new((headers || {}).downcase_and_underscore_keys)
       end
 
       def match?(request)

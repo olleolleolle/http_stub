@@ -5,12 +5,12 @@ module HttpStub
 
       attr_reader :uri, :headers, :parameters, :response
 
-      def initialize(options)
-        @options = options
-        @uri = HttpStub::Models::StubUri.new(options["uri"])
-        @headers = HttpStub::Models::StubHeaders.new(options["headers"])
-        @parameters = HttpStub::Models::StubParameters.new(options["parameters"])
-        @response = HttpStub::Models::Response.new(options["response"])
+      def initialize(args)
+        @args = args
+        @uri = HttpStub::Models::StubUri.new(args["uri"])
+        @headers = HttpStub::Models::StubHeaders.new(args["headers"])
+        @parameters = HttpStub::Models::StubParameters.new(args["parameters"])
+        @response = HttpStub::Models::Response.new(args["response"])
       end
 
       def satisfies?(request)
@@ -21,11 +21,11 @@ module HttpStub
       end
 
       def method
-        @options["method"]
+        @args["method"]
       end
 
       def to_s
-        @options.to_s
+        @args.to_s
       end
 
     end

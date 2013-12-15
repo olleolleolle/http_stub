@@ -2,15 +2,15 @@ describe HttpStub::Models::StubUri do
 
   let(:stubbed_uri) { "/some/uri" }
   let(:request) { double("HttpRequest", path_info: request_uri) }
-  let(:value_matcher) { double(HttpStub::Models::ValueMatcher).as_null_object }
+  let(:value_matcher) { double(HttpStub::Models::StringValueMatcher).as_null_object }
   let(:stub_uri) { HttpStub::Models::StubUri.new(stubbed_uri) }
 
-  before(:each) { HttpStub::Models::ValueMatcher.stub(:new).and_return(value_matcher) }
+  before(:each) { HttpStub::Models::StringValueMatcher.stub(:new).and_return(value_matcher) }
 
   describe "constructor" do
 
     it "should create a value matcher for the provided uri" do
-      HttpStub::Models::ValueMatcher.should_receive(:new).with(stubbed_uri)
+      HttpStub::Models::StringValueMatcher.should_receive(:new).with(stubbed_uri)
 
       stub_uri
     end

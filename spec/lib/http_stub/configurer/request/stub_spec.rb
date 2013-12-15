@@ -2,7 +2,7 @@ describe HttpStub::Configurer::Request::Stub do
 
   describe "#initialize" do
 
-    context "when provided a uri and stub options" do
+    context "when provided a uri and stub arguments" do
 
       let(:uri) { "/some/uri" }
       let(:stub_method) { "Some Method" }
@@ -13,7 +13,7 @@ describe HttpStub::Configurer::Request::Stub do
       let(:response_body) { "Some body" }
       let(:response_delay_in_seconds) { 7 }
 
-      let(:stub_options) do
+      let(:stub_args) do
         {
             method: stub_method,
             headers: request_headers,
@@ -27,7 +27,7 @@ describe HttpStub::Configurer::Request::Stub do
         }
       end
 
-      let(:request) { HttpStub::Configurer::Request::Stub.new(uri, stub_options) }
+      let(:request) { HttpStub::Configurer::Request::Stub.new(uri, stub_args) }
       let(:request_body) { JSON.parse(request.body) }
 
       before(:each) { HttpStub::Configurer::Request::ControllableValue.stub(:format) }
@@ -44,7 +44,7 @@ describe HttpStub::Configurer::Request::Stub do
         request.content_type.should eql("application/json")
       end
 
-      context "when a request header option is provided" do
+      context "when a request header argument is provided" do
 
         it "should format the headers into control values" do
           HttpStub::Configurer::Request::ControllableValue.should_receive(:format).with(request_headers)
@@ -66,7 +66,7 @@ describe HttpStub::Configurer::Request::Stub do
 
       end
 
-      context "when a request parameter option is provided" do
+      context "when a request parameter argument is provided" do
 
         it "should format the request parameters into control values" do
           HttpStub::Configurer::Request::ControllableValue.should_receive(:format).with(request_parameters)
@@ -76,7 +76,7 @@ describe HttpStub::Configurer::Request::Stub do
 
       end
 
-      context "when no request parameter option is provided" do
+      context "when no request parameter argument is provided" do
 
         let(:request_parameters) { nil }
 
@@ -96,7 +96,7 @@ describe HttpStub::Configurer::Request::Stub do
           request_body.should include("uri" => "uri as a string")
         end
 
-        it "should have an entry for the method option" do
+        it "should have an entry for the method argument" do
           request_body.should include("method" => stub_method)
         end
 
@@ -114,15 +114,15 @@ describe HttpStub::Configurer::Request::Stub do
           request_body.should include("parameters" => "request parameters as string")
         end
 
-        context "when a status response option is provided" do
+        context "when a status response argument is provided" do
 
-          it "should have a response entry for the option" do
+          it "should have a response entry for the argument" do
             request_body["response"].should include("status" => response_status)
           end
 
         end
 
-        context "when no status response option is provided" do
+        context "when no status response argument is provided" do
 
           let(:response_status) { nil }
 
@@ -132,19 +132,19 @@ describe HttpStub::Configurer::Request::Stub do
 
         end
 
-        it "should have an entry for the response body option" do
+        it "should have an entry for the response body argument" do
           request_body["response"].should include("body" => response_body)
         end
 
-        context "when a delay option is provided" do
+        context "when a delay argument is provided" do
 
-          it "should have a response entry for the option" do
+          it "should have a response entry for the argument" do
             request_body["response"].should include("delay_in_seconds" => response_delay_in_seconds)
           end
 
         end
 
-        context "when a delay option is not provided" do
+        context "when a delay argument is not provided" do
 
           let(:response_delay_in_seconds) { nil }
 

@@ -1,10 +1,10 @@
 describe HttpStub::Models::StubActivator do
 
   let(:activation_uri) { "/some/activation/uri" }
-  let(:options) do
+  let(:args) do
     { "activation_uri" => activation_uri }
   end
-  let(:stub_activator) { HttpStub::Models::StubActivator.new(options) }
+  let(:stub_activator) { HttpStub::Models::StubActivator.new(args) }
 
   before(:each) { HttpStub::Models::Stub.stub(:new).and_return(double(HttpStub::Models::Stub)) }
 
@@ -46,9 +46,9 @@ describe HttpStub::Models::StubActivator do
 
   describe "#the_stub" do
 
-    it "should return a HttpStub::Models::Stub constructed from the activator's options" do
+    it "should return a HttpStub::Models::Stub constructed from the activator's arguments" do
       stub = double(HttpStub::Models::Stub)
-      HttpStub::Models::Stub.should_receive(:new).with(options).and_return(stub)
+      HttpStub::Models::Stub.should_receive(:new).with(args).and_return(stub)
 
       stub_activator.the_stub.should eql(stub)
     end
@@ -65,10 +65,10 @@ describe HttpStub::Models::StubActivator do
 
   describe "#to_s" do
 
-    it "should return the string representation of the activation options" do
-      options.should_receive(:to_s).and_return("activation options string")
+    it "should return the string representation of the activation arguments" do
+      args.should_receive(:to_s).and_return("activation args string")
 
-      stub_activator.to_s.should eql("activation options string")
+      stub_activator.to_s.should eql("activation args string")
     end
 
   end

@@ -402,6 +402,96 @@ describe HttpStub::Configurer, "when the server is running" do
 
         end
 
+        context "whose values are numbers" do
+
+          before(:each) do
+            configurer.stub_response!("/stub_with_parameters", method: :get, parameters: { key: 88 },
+                                      response: { status: 203, body: "Body for parameter number" })
+          end
+
+          context "and that request is made" do
+
+            let(:response) { Net::HTTP.get_response(server_host, "/stub_with_parameters?key=88", server_port) }
+
+            it "should replay the stubbed response" do
+              response.code.should eql("203")
+              response.body.should eql("Body for parameter number")
+            end
+
+          end
+
+        end
+
+        context "whose values are regular expressions" do
+
+          before(:each) do
+            configurer.stub_response!(
+              "/stub_with_parameters", method: :get, parameters: { key: /^match.*/ },
+              response: { status: 202, body: "Another stub body" }
+            )
+          end
+
+          context "and a request that matches is made" do
+
+            let(:response) do
+              Net::HTTP.get_response(server_host, "/stub_with_parameters?key=matching_value", server_port)
+            end
+
+            it "should replay the stubbed response" do
+              response.code.should eql("202")
+              response.body.should eql("Another stub body")
+            end
+
+          end
+
+          context "and a request that does not match is made" do
+
+            let(:response) do
+              Net::HTTP.get_response(server_host, "/stub_with_parameters?key=does_not_match_value", server_port)
+            end
+
+            it "should respond with a 404 status code" do
+              response.code.should eql("404")
+            end
+
+          end
+
+        end
+
+        context "whose values indicate the parameters must be omitted" do
+
+          before(:each) do
+            configurer.stub_response!(
+              "/stub_with_omitted_parameters", method: :get, parameters: { key: :omitted },
+              response: { status: 202, body: "Omitted parameter stub body" }
+            )
+          end
+
+          context "and a request that matches is made" do
+
+            let(:response) { Net::HTTP.get_response(server_host, "/stub_with_omitted_parameters", server_port) }
+
+            it "should replay the stubbed response" do
+              response.code.should eql("202")
+              response.body.should eql("Omitted parameter stub body")
+            end
+
+          end
+
+          context "and a request that does not match is made" do
+
+            let(:response) do
+              Net::HTTP.get_response(server_host, "/stub_with_omitted_parameters?key=must_be_omitted", server_port)
+            end
+
+            it "should respond with a 404 status code" do
+              response.code.should eql("404")
+            end
+
+          end
+
+        end
+
       end
 
     end

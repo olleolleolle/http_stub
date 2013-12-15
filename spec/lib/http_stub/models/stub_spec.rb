@@ -15,7 +15,7 @@ describe HttpStub::Models::Stub do
     }
   end
   let(:stub_method) { "get" }
-  let(:stub_options) do
+  let(:stub_args) do
     {
       "uri" => "/a_path",
       "method" => stub_method,
@@ -31,7 +31,7 @@ describe HttpStub::Models::Stub do
   let(:stub_parameters) { double(HttpStub::Models::StubParameters, match?: true) }
   let(:stub_headers) { double(HttpStub::Models::StubHeaders, match?: true) }
 
-  let(:the_stub) { HttpStub::Models::Stub.new(stub_options) }
+  let(:the_stub) { HttpStub::Models::Stub.new(stub_args) }
 
   before(:each) do
     HttpStub::Models::StubUri.stub(:new).and_return(stub_uri)
@@ -167,10 +167,10 @@ describe HttpStub::Models::Stub do
 
   describe "#to_s" do
 
-    it "should return a string representation of the stub options" do
-      stub_options.should_receive(:to_s).and_return("stub options string")
+    it "should return a string representation of the stub arguments" do
+      stub_args.should_receive(:to_s).and_return("stub arguments string")
 
-      the_stub.to_s.should eql("stub options string")
+      the_stub.to_s.should eql("stub arguments string")
     end
   end
 

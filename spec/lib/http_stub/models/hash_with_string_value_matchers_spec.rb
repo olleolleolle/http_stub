@@ -1,4 +1,4 @@
-describe HttpStub::Models::HashWithValueMatchers do
+describe HttpStub::Models::HashWithStringValueMatchers do
 
   let(:stubbed_hash) do
     (1..3).reduce({}) do |result, i|
@@ -8,13 +8,13 @@ describe HttpStub::Models::HashWithValueMatchers do
   end
 
   let(:value_matchers) do
-    stubbed_hash.values.map { |value| double(HttpStub::Models::ValueMatcher, to_s: value).as_null_object }
+    stubbed_hash.values.map { |value| double(HttpStub::Models::StringValueMatcher, to_s: value).as_null_object }
   end
 
-  let(:value_matcher_hash) { HttpStub::Models::HashWithValueMatchers.new(stubbed_hash) }
+  let(:value_matcher_hash) { HttpStub::Models::HashWithStringValueMatchers.new(stubbed_hash) }
 
   before(:each) do
-    value_matchers.each { |value| HttpStub::Models::ValueMatcher.stub(:new).with(value.to_s).and_return(value) }
+    value_matchers.each { |value| HttpStub::Models::StringValueMatcher.stub(:new).with(value.to_s).and_return(value) }
   end
 
   it "should be hash" do
@@ -25,7 +25,7 @@ describe HttpStub::Models::HashWithValueMatchers do
 
     it "should create a value matcher representation of each value in the hash" do
       value_matchers.each do |value|
-        HttpStub::Models::ValueMatcher.should_receive(:new).with(value.to_s).and_return(value)
+        HttpStub::Models::StringValueMatcher.should_receive(:new).with(value.to_s).and_return(value)
       end
 
       value_matcher_hash.values.should eql(value_matchers)

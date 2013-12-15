@@ -3,31 +3,31 @@ module HttpStub
 
     class ServerTasks < ::Rake::TaskLib
 
-      def initialize(options)
-        namespace options[:name] do
-          define_start_task(options)
-          define_initialize_task(options) if options[:configurer]
+      def initialize(args)
+        namespace args[:name] do
+          define_start_task(args)
+          define_initialize_task(args) if args[:configurer]
         end
       end
 
       private
 
-      def define_start_task(options)
+      def define_start_task(args)
         namespace :start do
-          desc "Starts stub #{options[:name]} in the foreground"
+          desc "Starts stub #{args[:name]} in the foreground"
           task(:foreground) do
             HttpStub::Server.instance_eval do
               set :environment, :test
-              set :port, options[:port]
+              set :port, args[:port]
               run!
             end
           end
         end
       end
 
-      def define_initialize_task(options)
-        desc "Configures stub #{options[:name]}"
-        task(:configure) { options[:configurer].initialize! }
+      def define_initialize_task(args)
+        desc "Configures stub #{args[:name]}"
+        task(:configure) { args[:configurer].initialize! }
       end
 
     end

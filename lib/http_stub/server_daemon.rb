@@ -14,9 +14,9 @@ module HttpStub
 
     end
 
-    def initialize(options)
-      super({ host: "localhost" }.merge(options))
-      @configurer = options[:configurer]
+    def initialize(args)
+      super({ host: "localhost" }.merge(args))
+      @configurer = args[:configurer]
     end
 
     def start!

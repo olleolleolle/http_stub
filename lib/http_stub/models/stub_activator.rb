@@ -3,9 +3,9 @@ module HttpStub
 
     class StubActivator
 
-      def initialize(options)
-        @options = options
-        @stub = HttpStub::Models::Stub.new(options)
+      def initialize(args)
+        @args = args
+        @stub = HttpStub::Models::Stub.new(args)
       end
 
       def satisfies?(request)
@@ -17,11 +17,11 @@ module HttpStub
       end
 
       def activation_uri
-        @options["activation_uri"]
+        @args["activation_uri"]
       end
 
       def to_s
-        @options.to_s
+        @args.to_s
       end
 
     end

@@ -41,7 +41,7 @@ describe HttpStub::Models::Response do
 
   describe "#status" do
 
-    context "when a value is provided in the options" do
+    context "when a value is provided in the arguments" do
 
       context "that is an integer" do
 
@@ -63,7 +63,7 @@ describe HttpStub::Models::Response do
 
     end
 
-    context "when the status is not provided in the options" do
+    context "when the status is not provided in the arguments" do
 
       let(:response) { HttpStub::Models::Response.new("body" => body, "delay_in_seconds" => delay_in_seconds) }
 
@@ -77,7 +77,7 @@ describe HttpStub::Models::Response do
 
   describe "#body" do
 
-    it "should return the value provided in the options" do
+    it "should return the value provided in the arguments" do
       response.body.should eql("A response body")
     end
 
@@ -85,7 +85,7 @@ describe HttpStub::Models::Response do
 
   describe "#delay_in_seconds" do
 
-    context "when a value is provided in the options" do
+    context "when a value is provided in the arguments" do
 
       context "that is an integer" do
 
@@ -107,7 +107,7 @@ describe HttpStub::Models::Response do
 
     end
 
-    context "when a value is not provided in the options" do
+    context "when a value is not provided in the arguments" do
 
       let(:response) { HttpStub::Models::Response.new("status" => status, "body" => body) }
 

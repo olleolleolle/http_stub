@@ -1,9 +1,9 @@
 describe HttpStub::Configurer::Command do
 
   let(:processor) { double(HttpStub::Configurer::CommandProcessor) }
-  let(:options) { { processor: processor, request: double("HttpRequest"), description: "Some Description" } }
+  let(:args) { { processor: processor, request: double("HttpRequest"), description: "Some Description" } }
 
-  let(:command) { HttpStub::Configurer::Command.new(options) }
+  let(:command) { HttpStub::Configurer::Command.new(args) }
 
   describe "#execute" do
 
@@ -19,7 +19,7 @@ describe HttpStub::Configurer::Command do
 
     describe "when created with a resetable flag that is true" do
 
-      before(:each) { options.merge!(resetable: true) }
+      before(:each) { args.merge!(resetable: true) }
 
       it "should return true" do
         command.resetable?.should be_true
