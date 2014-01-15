@@ -21,18 +21,18 @@ Gem::Specification.new do |s|
 
   s.required_ruby_version = ">= 1.9.3"
 
+  s.add_runtime_dependency 'rake', '~> 10.1', '~> 10.1'
+
   s.add_dependency "sinatra", "~> 1.4"
   s.add_dependency "sinatra-partial", "~> 0.4"
   s.add_dependency "haml", "~> 4.0"
   s.add_dependency "sass", "~> 3.2"
-  s.add_dependency "rake", "~> 10.1"
   s.add_dependency "http_server_manager", "~> 0.4"
 
   s.add_development_dependency "travis-lint", "~> 1.7"
-  s.add_development_dependency "metric_fu", "~> 4.5"
+  s.add_development_dependency "metric_fu", "~> 4.7"
   s.add_development_dependency "rspec", "~> 2.14"
   s.add_development_dependency "simplecov", "~> 0.8"
-  s.add_development_dependency "rake", "~> 10.1"
   s.add_development_dependency "rack-test", "~> 0.6"
   s.add_development_dependency "nokogiri", "~> 1.6"
   s.add_development_dependency "httparty", "~> 0.12"

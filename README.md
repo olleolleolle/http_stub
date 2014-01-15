@@ -300,5 +300,5 @@ DELETE to /stubs/activators in order to clear configured stub activators.
 Requirements
 ------------
 
-* Ruby 1.9
+* Ruby 1.9.3, 2.0 or 2.1
 * Rack server

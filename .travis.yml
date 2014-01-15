@@ -3,8 +3,7 @@ notifications:
   email:
     on_success: change
     on_failure: always
-gemfile:
-  - Gemfile.travis
 rvm:
   - 1.9.3
-  - rbx-19mode
+  - 2.0.0
+  - 2.1.0
