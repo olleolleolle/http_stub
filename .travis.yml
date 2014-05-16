@@ -3,7 +3,10 @@ notifications:
   email:
     on_success: change
     on_failure: always
+  hipchat:
+    rooms:
+      secure: HgDg3i2gg4wup8mm7bahDL581vItSssPJUme/1K6NxwtuS1zdrTIrPoarG/PMWzNqLKUgPNnZpwFQ+N5ZCRFTuYlUU0DV47biBduToxncJzcL8+GaC+nOU05b4N3rF8KL+jidrPU9eAGUPLkTNxxXyhZEcBVl8pV3DfSv1JhsUM=
 rvm:
-  - 1.9.3
-  - 2.0.0
-  - 2.1.0
+- 1.9.3
+- 2.0.0
+- 2.1.0
