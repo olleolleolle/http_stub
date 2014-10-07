@@ -1,22 +1,22 @@
 describe HttpStub::Rake::ServerTasks do
 
+  let(:default_args) { { port: 8001 } }
+  let(:configurer)   { double(HttpStub::Configurer) }
+
+  before(:each) { HttpStub::Rake::ServerTasks.new(default_args.merge(args)) }
+
   describe "the configure task" do
-
-    let(:default_args) { { port: 8001 } }
-
-    before(:each) { HttpStub::Rake::ServerTasks.new(default_args.merge(args)) }
 
     context "when a configurer is provided" do
 
-      let(:configurer) { double(HttpStub::Configurer) }
-      let(:args) { { name: :tasks_configurer_provided_test, configurer: configurer } }
+      let(:args) { { name: :configure_task_configurer_provided_test, configurer: configurer } }
 
       context "and the task is executed" do
 
-        it "should initialize the provided configurer" do
+        it "initializes the provided configurer" do
           configurer.should_receive(:initialize!)
 
-          Rake::Task["tasks_configurer_provided_test:configure"].execute
+          Rake::Task["configure_task_configurer_provided_test:configure"].execute
         end
 
       end
@@ -25,10 +25,41 @@ describe HttpStub::Rake::ServerTasks do
 
     context "when a configurer is not provided" do
 
-      let(:args) { { name: :tasks_configurer_not_provided_test } }
+      let(:args) { { name: :configure_task_configurer_not_provided_test } }
 
-      it "should not generate a task" do
-        lambda { Rake::Task["tasks_configurer_not_provided_test:configure"] }.should
+      it "does not generate a task" do
+        lambda { Rake::Task["configure_task_configurer_not_provided_test:configure"] }.should
+          raise_error(/Don't know how to build task/)
+      end
+
+    end
+
+  end
+
+  describe "the reset task" do
+
+    context "when a configurer is provided" do
+
+      let(:args) { { name: :reset_task_configurer_provided_test, configurer: configurer } }
+
+      context "and the task is executed" do
+
+        it "resets the provided configurer" do
+          configurer.should_receive(:reset!)
+
+          Rake::Task["reset_task_configurer_provided_test:reset"].execute
+        end
+
+      end
+
+    end
+
+    context "when a configurer is not provided" do
+
+      let(:args) { { name: :reset_task_configurer_not_provided_test } }
+
+      it "does not generate a task" do
+        lambda { Rake::Task["reset_task_configurer_not_provided_test:reset"] }.should
           raise_error(/Don't know how to build task/)
       end
 

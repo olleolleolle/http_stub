@@ -6,7 +6,10 @@ module HttpStub
       def initialize(args)
         namespace args[:name] do
           define_start_task(args)
-          define_initialize_task(args) if args[:configurer]
+          if args[:configurer]
+            define_initialize_task(args)
+            define_reset_task(args)
+          end
         end
       end
 
@@ -28,6 +31,11 @@ module HttpStub
       def define_initialize_task(args)
         desc "Configures stub #{args[:name]}"
         task(:configure) { args[:configurer].initialize! }
+      end
+
+      def define_reset_task(args)
+        desc "Resets stub #{args[:name]} to its configured state"
+        task(:reset) { args[:configurer].reset! }
       end
 
     end

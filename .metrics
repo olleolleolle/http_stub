@@ -19,4 +19,5 @@ MetricFu::Configuration.run do |config|
   end
 
   config.configure_formatter(:html)
+
 end
