@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    http_stub (0.13.4)
+    http_stub (0.13.5)
       haml (~> 4.0)
       http_server_manager (~> 0.4)
       rake (~> 10.1)
@@ -128,7 +128,7 @@ GEM
       sexp_processor (~> 4.0)
     ruby_parser (3.3.0)
       sexp_processor (~> 4.1)
-    sass (3.3.14)
+    sass (3.4.5)
     sexp_processor (4.4.1)
     simplecov (0.8.2)
       docile (~> 1.1.0)
