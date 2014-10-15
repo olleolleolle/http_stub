@@ -6,8 +6,8 @@ describe HttpStub::Models::RequestPipeline do
 
     let(:response) { double(HttpStub::Models::Response, delay_in_seconds: 5) }
 
-    it "should sleep for specified duration" do
-      request_pipeline.should_receive(:sleep).with(5)
+    it "sleeps for specified duration" do
+      expect(request_pipeline).to receive(:sleep).with(5)
 
       request_pipeline.before_halt(response)
     end

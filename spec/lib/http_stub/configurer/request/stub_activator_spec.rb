@@ -6,7 +6,7 @@ describe HttpStub::Configurer::Request::StubActivator do
     let(:stub_request_content_type) { "Some content type" }
     let(:stub_request) { double("StubRequest", :content_type => stub_request_content_type, :body => stub_request_body) }
 
-    before(:each) { HttpStub::Configurer::Request::Stub.stub(:new).and_return(stub_request) }
+    before(:example) { allow(HttpStub::Configurer::Request::Stub).to receive(:new).and_return(stub_request) }
 
     describe "when provided an activation uri, stub uri and stub options" do
 
@@ -17,28 +17,28 @@ describe HttpStub::Configurer::Request::StubActivator do
       let(:request) { HttpStub::Configurer::Request::StubActivator.new(activation_uri, stub_uri, stub_options) }
       let(:request_body) { JSON.parse(request.body) }
 
-      it "should create a HTTP POST request" do
-        request.method.should eql("POST")
+      it "creates a HTTP POST request" do
+        expect(request.method).to eql("POST")
       end
 
-      it "should submit the request to '/stubs/activators'" do
-        request.path.should eql("/stubs/activators")
+      it "submits the request to '/stubs/activators'" do
+        expect(request.path).to eql("/stubs/activators")
       end
 
-      it "should set the content type to the same as a stub request" do
-        request.content_type.should eql(stub_request_content_type)
+      it "sets the content type to the same as a stub request" do
+        expect(request.content_type).to eql(stub_request_content_type)
       end
 
       describe "generates a JSON body which" do
 
-        it "should contain entries for a stub request" do
-          HttpStub::Configurer::Request::Stub.should_receive(:new).with(stub_uri, stub_options).and_return(stub_request)
+        it "contains entries for a stub request" do
+          expect(HttpStub::Configurer::Request::Stub).to receive(:new).with(stub_uri, stub_options).and_return(stub_request)
 
-          request_body.should include(JSON.parse(stub_request_body))
+          expect(request_body).to include(JSON.parse(stub_request_body))
         end
 
-        it "should have an entry for the provided activation URI" do
-          request_body.should include({ "activation_uri" => activation_uri })
+        it "has an entry for the provided activation URI" do
+          expect(request_body).to include({ "activation_uri" => activation_uri })
         end
 
       end

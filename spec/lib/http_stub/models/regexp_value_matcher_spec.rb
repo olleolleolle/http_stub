@@ -10,8 +10,8 @@ describe HttpStub::Models::RegexpValueMatcher do
 
         let(:actual_value) { "a789$z" }
 
-        it "should return true" do
-          perform_match.should be_true
+        it "returns true" do
+          expect(perform_match).to be_truthy
         end
 
       end
@@ -20,8 +20,8 @@ describe HttpStub::Models::RegexpValueMatcher do
 
         let(:actual_value) { "a789" }
 
-        it "should return false" do
-          perform_match.should be_false
+        it "returns false" do
+          expect(perform_match).to be_falsey
         end
 
       end
@@ -33,8 +33,8 @@ describe HttpStub::Models::RegexpValueMatcher do
       let(:stub_value) { "does not start with regexp:" }
       let(:actual_value) { "some actual value" }
 
-      it "should return false" do
-        perform_match.should be_false
+      it "returns false" do
+        expect(perform_match).to be_falsey
       end
 
     end

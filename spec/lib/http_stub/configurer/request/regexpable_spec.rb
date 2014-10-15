@@ -6,8 +6,8 @@ describe HttpStub::Configurer::Request::Regexpable do
 
       let(:value) { "some string value" }
 
-      it "should return the value unaltered" do
-        HttpStub::Configurer::Request::Regexpable.format(value).should eql(value)
+      it "returns the value unaltered" do
+        expect(HttpStub::Configurer::Request::Regexpable.format(value)).to eql(value)
       end
 
     end
@@ -16,20 +16,20 @@ describe HttpStub::Configurer::Request::Regexpable do
 
       let(:value) { /.+?[a-z]/ }
 
-      it "should return a string prefixed by 'regexp:'" do
-        HttpStub::Configurer::Request::Regexpable.format(value).should start_with("regexp:")
+      it "returns a string prefixed by 'regexp:'" do
+        expect(HttpStub::Configurer::Request::Regexpable.format(value)).to start_with("regexp:")
       end
 
-      it "should contain the regular expression converted to a string" do
-        HttpStub::Configurer::Request::Regexpable.format(value).should end_with(".+?[a-z]")
+      it "contains the regular expression converted to a string" do
+        expect(HttpStub::Configurer::Request::Regexpable.format(value)).to end_with(".+?[a-z]")
       end
 
       describe "and the regular expression contain escaped meta characters" do
 
         let(:value) { /\^\+\[/ }
 
-        it "should return a string that retains the escape characters" do
-          HttpStub::Configurer::Request::Regexpable.format(value).should include("\\^\\+\\[")
+        it "returns a string that retains the escape characters" do
+          expect(HttpStub::Configurer::Request::Regexpable.format(value)).to include("\\^\\+\\[")
         end
 
       end
@@ -38,8 +38,8 @@ describe HttpStub::Configurer::Request::Regexpable do
 
         let(:value) { /\/some\/path/ }
 
-        it "should represent the path separators as a single forward-slash" do
-          HttpStub::Configurer::Request::Regexpable.format(value).should end_with("/some/path")
+        it "represents the path separators as a single forward-slash" do
+          expect(HttpStub::Configurer::Request::Regexpable.format(value)).to end_with("/some/path")
         end
 
       end
@@ -52,10 +52,10 @@ describe HttpStub::Configurer::Request::Regexpable do
 
         let(:value) { { key1: "value1", key2: /^.*value2$/, key3: "value3" } }
 
-        it "should return a json representation of the hash whose values are their regexpable form" do
+        it "returns a json representation of the hash whose values are their regexpable form" do
           expected_formatted_hash = {key1: "value1", key2: "regexp:^.*value2$", key3: "value3"}
 
-          HttpStub::Configurer::Request::Regexpable.format(value).should eql(expected_formatted_hash)
+          expect(HttpStub::Configurer::Request::Regexpable.format(value)).to eql(expected_formatted_hash)
         end
 
       end
@@ -64,8 +64,8 @@ describe HttpStub::Configurer::Request::Regexpable do
 
         let(:value) { {} }
 
-        it "should return an empty hash" do
-          HttpStub::Configurer::Request::Regexpable.format(value).should eql({})
+        it "returns an empty hash" do
+          expect(HttpStub::Configurer::Request::Regexpable.format(value)).to eql({})
         end
 
       end

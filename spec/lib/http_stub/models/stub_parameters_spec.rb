@@ -10,8 +10,8 @@ describe HttpStub::Models::StubParameters do
 
   describe "when stubbed parameters are provided" do
 
-    it "should create a regexpable representation of the stubbed parameters" do
-      HttpStub::Models::HashWithStringValueMatchers.should_receive(:new).with(stubbed_parameters)
+    it "creates a regexpable representation of the stubbed parameters" do
+      expect(HttpStub::Models::HashWithStringValueMatchers).to receive(:new).with(stubbed_parameters)
 
       stub_parameters
     end
@@ -22,8 +22,8 @@ describe HttpStub::Models::StubParameters do
 
     let(:stubbed_parameters) { nil }
 
-    it "should create a regexpable representation of an empty hash" do
-      HttpStub::Models::HashWithStringValueMatchers.should_receive(:new).with({})
+    it "creates a regexpable representation of an empty hash" do
+      expect(HttpStub::Models::HashWithStringValueMatchers).to receive(:new).with({})
 
       stub_parameters
     end
@@ -32,11 +32,11 @@ describe HttpStub::Models::StubParameters do
 
   describe "#match?" do
 
-    it "should delegate to the regexpable representation of the stubbed parameters to determine a match" do
-      HttpStub::Models::HashWithStringValueMatchers.stub(:new).and_return(regexpable_stubbed_paremeters)
-      regexpable_stubbed_paremeters.should_receive(:match?).with(request_parameters).and_return(true)
+    it "delegates to the regexpable representation of the stubbed parameters to determine a match" do
+      allow(HttpStub::Models::HashWithStringValueMatchers).to receive(:new).and_return(regexpable_stubbed_paremeters)
+      expect(regexpable_stubbed_paremeters).to receive(:match?).with(request_parameters).and_return(true)
 
-      stub_parameters.match?(request).should be(true)
+      expect(stub_parameters.match?(request)).to be(true)
     end
 
   end
@@ -47,14 +47,14 @@ describe HttpStub::Models::StubParameters do
 
       let(:stubbed_parameters) { { "key1" => "value1", "key2" => "value2", "key3" => "value3" } }
 
-      it "should return a string containing each parameter formatted as a conventional request parameter" do
+      it "returns a string containing each parameter formatted as a conventional request parameter" do
         result = stub_parameters.to_s
 
-        stubbed_parameters.each { |key, value| result.should match(/#{key}=#{value}/) }
+        stubbed_parameters.each { |key, value| expect(result).to match(/#{key}=#{value}/) }
       end
 
-      it "should separate each parameter with the conventional request parameter delimiter" do
-        stub_parameters.to_s.should match(/key\d.value\d\&key\d.value\d\&key\d.value\d/)
+      it "separates each parameter with the conventional request parameter delimiter" do
+        expect(stub_parameters.to_s).to match(/key\d.value\d\&key\d.value\d\&key\d.value\d/)
       end
 
     end
@@ -63,8 +63,8 @@ describe HttpStub::Models::StubParameters do
 
       let(:stubbed_parameters) { {} }
 
-      it "should return an empty string" do
-        stub_parameters.to_s.should eql("")
+      it "returns an empty string" do
+        expect(stub_parameters.to_s).to eql("")
       end
 
     end
@@ -73,8 +73,8 @@ describe HttpStub::Models::StubParameters do
 
       let(:stubbed_parameters) { nil }
 
-      it "should return an empty string" do
-        stub_parameters.to_s.should eql("")
+      it "returns an empty string" do
+        expect(stub_parameters.to_s).to eql("")
       end
 
     end

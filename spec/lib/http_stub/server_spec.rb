@@ -12,27 +12,27 @@ describe HttpStub::Server do
 
   let(:app) { HttpStub::Server.new! }
 
-  before(:each) do
-    HttpStub::Models::Registry.stub(:new).with("stub").and_return(stub_registry)
-    HttpStub::Models::Registry.stub(:new).with("stub_activator").and_return(stub_activator_registry)
-    HttpStub::Controllers::StubController.stub(:new).and_return(stub_controller)
-    HttpStub::Controllers::StubActivatorController.stub(:new).and_return(stub_activator_controller)
+  before(:example) do
+    allow(HttpStub::Models::Registry).to receive(:new).with("stub").and_return(stub_registry)
+    allow(HttpStub::Models::Registry).to receive(:new).with("stub_activator").and_return(stub_activator_registry)
+    allow(HttpStub::Controllers::StubController).to receive(:new).and_return(stub_controller)
+    allow(HttpStub::Controllers::StubActivatorController).to receive(:new).and_return(stub_activator_controller)
   end
 
   context "when a stub insertion is received" do
 
-    it "should register the insertion via the stub controller" do
-      stub_controller.should_receive(:register).and_return(HttpStub::Models::Response::SUCCESS)
+    it "registers the insertion via the stub controller" do
+      expect(stub_controller).to receive(:register).and_return(HttpStub::Models::Response::SUCCESS)
 
       issue_stub_request
     end
 
-    it "should respond with the response provided by the controller" do
-      stub_controller.stub(:register).and_return(HttpStub::Models::Response.new("status" => 202, "body" => ""))
+    it "responds with the response provided by the controller" do
+      allow(stub_controller).to receive(:register).and_return(HttpStub::Models::Response.new("status" => 202, "body" => ""))
 
       issue_stub_request
 
-      response.status.should eql(202)
+      expect(response.status).to eql(202)
     end
 
     def issue_stub_request
@@ -46,20 +46,20 @@ describe HttpStub::Server do
 
   context "when a stub activator insertion request is received" do
 
-    it "should register the insertion via the stub activator controller" do
-      stub_activator_controller.should_receive(:register).and_return(HttpStub::Models::Response::SUCCESS)
+    it "registers the insertion via the stub activator controller" do
+      expect(stub_activator_controller).to receive(:register).and_return(HttpStub::Models::Response::SUCCESS)
 
       issue_stub_activator_request
     end
 
-    it "should respond with the response provided by the controller" do
-      stub_activator_controller.stub(:register).and_return(
+    it "responds with the response provided by the controller" do
+      allow(stub_activator_controller).to receive(:register).and_return(
         HttpStub::Models::Response.new("status" => 302, "body" => "")
       )
 
       issue_stub_activator_request
 
-      response.status.should eql(302)
+      expect(response.status).to eql(302)
     end
 
     def issue_stub_activator_request
@@ -73,32 +73,32 @@ describe HttpStub::Server do
 
   context "when a request to clear the stubs has been received" do
 
-    it "should delegate clearing to the stub controller" do
-      stub_controller.should_receive(:clear)
+    it "delegates clearing to the stub controller" do
+      expect(stub_controller).to receive(:clear)
 
       delete "/stubs"
     end
 
-    it "should respond with a 200 status code" do
+    it "responds with a 200 status code" do
       delete "/stubs"
 
-      response.status.should eql(200)
+      expect(response.status).to eql(200)
     end
 
   end
 
   context "when a request to clear the stub activators has been received" do
 
-    it "should delegate clearing to the stub activator controller" do
-      stub_activator_controller.should_receive(:clear)
+    it "delegates clearing to the stub activator controller" do
+      expect(stub_activator_controller).to receive(:clear)
 
       delete "/stubs/activators"
     end
 
-    it "should respond with a 200 status code" do
+    it "responds with a 200 status code" do
       delete "/stubs/activators"
 
-      response.status.should eql(200)
+      expect(response.status).to eql(200)
     end
 
   end
@@ -107,62 +107,62 @@ describe HttpStub::Server do
 
     context "and the stub controller replays a response" do
 
-      before(:each) do
-        stub_controller.stub(:replay).and_return(HttpStub::Models::Response.new("status" => 222, "body" => "Some body"))
+      before(:example) do
+        allow(stub_controller).to receive(:replay).and_return(HttpStub::Models::Response.new("status" => 222, "body" => "Some body"))
       end
 
-      it "should respond with the replay status code" do
+      it "responds with the replay status code" do
         get "/a_path"
 
-        response.status.should eql(222)
+        expect(response.status).to eql(222)
       end
 
-      it "should respond with the replay body" do
+      it "responds with the replay body" do
         get "/a_path"
 
-        response_body.should eql("Some body")
+        expect(response_body).to eql("Some body")
       end
 
     end
 
     context "and the stub controller does not replay a response" do
 
-      before(:each) do
-        stub_controller.stub(:replay).and_return(HttpStub::Models::Response::EMPTY)
+      before(:example) do
+        allow(stub_controller).to receive(:replay).and_return(HttpStub::Models::Response::EMPTY)
       end
 
       context "but the stub activator controller activates a stub" do
 
-        before(:each) do
-          stub_activator_controller.stub(:activate).and_return(
+        before(:example) do
+          allow(stub_activator_controller).to receive(:activate).and_return(
             HttpStub::Models::Response.new("status" => 300, "body" => "A body")
           )
         end
 
-        it "should respond with the activation response status code" do
+        it "responds with the activation response status code" do
           get "/a_path"
 
-          response.status.should eql(300)
+          expect(response.status).to eql(300)
         end
 
-        it "should respond with the activation response body" do
+        it "responds with the activation response body" do
           get "/a_path"
 
-          response_body.should eql("A body")
+          expect(response_body).to eql("A body")
         end
 
       end
 
       context "and the stub activator controller does not activate a stub" do
 
-        before(:each) do
-          stub_activator_controller.stub(:activate).and_return(HttpStub::Models::Response::EMPTY)
+        before(:example) do
+          allow(stub_activator_controller).to receive(:activate).and_return(HttpStub::Models::Response::EMPTY)
         end
 
-        it "should respond with a 404 status code" do
+        it "responds with a 404 status code" do
           get "/a_path"
 
-          response.status.should eql(404)
+          expect(response.status).to eql(404)
         end
 
       end
@@ -173,14 +173,14 @@ describe HttpStub::Server do
 
   context "when a request to replay a stub is received" do
 
-    it "should handle processing of the response via the request pipeline" do
-      HttpStub::Models::RequestPipeline.should_receive(:before_halt).with(duck_type(:status, :body))
+    it "handles processing of the response via the request pipeline" do
+      expect(HttpStub::Models::RequestPipeline).to receive(:before_halt).with(duck_type(:status, :body))
 
       get "/some/stubbed/uri"
     end
 
-    it "should respond with the response's content type" do
-      stub_controller.stub(:replay).and_return(
+    it "responds with the response's content type" do
+      allow(stub_controller).to receive(:replay).and_return(
         HttpStub::Models::Response.new(
           "status" => 200, "headers" => { "content-type" => "application/xhtml" }, "body" => "A body"
         )
@@ -188,7 +188,7 @@ describe HttpStub::Server do
 
       get "/some/stubbed/uri"
 
-      response.content_type.should eql("application/xhtml")
+      expect(response.content_type).to eql("application/xhtml")
     end
 
   end

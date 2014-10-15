@@ -1,28 +1,39 @@
 describe HttpStub::Rake::ServerTasks do
 
-  let(:default_args) { { port: 8001 } }
+  class HttpStub::Rake::ServerTasksTestCounter
+
+    def self.next
+      @counter ||= 0
+      @counter += 1
+    end
+
+  end
+
+  let(:server_name)  { "server_tasks_test_#{HttpStub::Rake::ServerTasksTestCounter.next}".to_sym }
+  let(:default_args) { { port: 8001, name: server_name } }
+  let(:args)         { {} }
   let(:configurer)   { double(HttpStub::Configurer).as_null_object }
 
-  before(:each) { HttpStub::Rake::ServerTasks.new(default_args.merge(args)) }
+  before(:example) { HttpStub::Rake::ServerTasks.new(default_args.merge(args)) }
 
   describe "the configure task" do
 
     context "when a configurer is provided" do
 
-      let(:args) { { name: :configure_task_configurer_provided_test, configurer: configurer } }
+      let(:args) { { configurer: configurer } }
 
       context "and the task is executed" do
 
         it "initializes the provided configurer" do
-          configurer.should_receive(:initialize!)
+          expect(configurer).to receive(:initialize!)
 
-          Rake::Task["configure_task_configurer_provided_test:configure"].execute
+          Rake::Task["#{server_name}:configure"].execute
         end
 
         it "resets the provided configurer to ensure stubs are in their initial state" do
-          configurer.should_receive(:reset!)
+          expect(configurer).to receive(:reset!)
 
-          Rake::Task["configure_task_configurer_provided_test:configure"].execute
+          Rake::Task["#{server_name}:configure"].execute
         end
 
       end
@@ -31,11 +42,8 @@ describe HttpStub::Rake::ServerTasks do
 
     context "when a configurer is not provided" do
 
-      let(:args) { { name: :configure_task_configurer_not_provided_test } }
-
       it "does not generate a task" do
-        lambda { Rake::Task["configure_task_configurer_not_provided_test:configure"] }.should
-          raise_error(/Don't know how to build task/)
+        expect { Rake::Task["#{server_name}:configure"] }.to raise_error(/Don't know how to build task/)
       end
 
     end

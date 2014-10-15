@@ -30,24 +30,24 @@ describe HttpStub::Configurer::Request::Stub do
       let(:request) { HttpStub::Configurer::Request::Stub.new(uri, stub_args) }
       let(:request_body) { JSON.parse(request.body) }
 
-      before(:each) { HttpStub::Configurer::Request::ControllableValue.stub(:format) }
+      before(:example) { allow(HttpStub::Configurer::Request::ControllableValue).to receive(:format) }
 
-      it "should create a HTTP POST request" do
-        request.method.should eql("POST")
+      it "creates a HTTP POST request" do
+        expect(request.method).to eql("POST")
       end
 
-      it "should submit the request to '/stubs'" do
-        request.path.should eql("/stubs")
+      it "submits the request to '/stubs'" do
+        expect(request.path).to eql("/stubs")
       end
 
-      it "should set the content type to json" do
-        request.content_type.should eql("application/json")
+      it "sets the content type to json" do
+        expect(request.content_type).to eql("application/json")
       end
 
       context "when a request header argument is provided" do
 
-        it "should format the headers into control values" do
-          HttpStub::Configurer::Request::ControllableValue.should_receive(:format).with(request_headers)
+        it "formats the headers into control values" do
+          expect(HttpStub::Configurer::Request::ControllableValue).to receive(:format).with(request_headers)
 
           request
         end
@@ -58,8 +58,8 @@ describe HttpStub::Configurer::Request::Stub do
 
         let(:request_headers) { nil }
 
-        it "should format an empty header hash" do
-          HttpStub::Configurer::Request::ControllableValue.should_receive(:format).with({})
+        it "formats an empty header hash" do
+          expect(HttpStub::Configurer::Request::ControllableValue).to receive(:format).with({})
 
           request
         end
@@ -68,8 +68,8 @@ describe HttpStub::Configurer::Request::Stub do
 
       context "when a request parameter argument is provided" do
 
-        it "should format the request parameters into control values" do
-          HttpStub::Configurer::Request::ControllableValue.should_receive(:format).with(request_parameters)
+        it "formats the request parameters into control values" do
+          expect(HttpStub::Configurer::Request::ControllableValue).to receive(:format).with(request_parameters)
 
           request
         end
@@ -80,8 +80,8 @@ describe HttpStub::Configurer::Request::Stub do
 
         let(:request_parameters) { nil }
 
-        it "should format an empty parameter hash" do
-          HttpStub::Configurer::Request::ControllableValue.should_receive(:format).with({})
+        it "formats an empty parameter hash" do
+          expect(HttpStub::Configurer::Request::ControllableValue).to receive(:format).with({})
 
           request
         end
@@ -90,34 +90,34 @@ describe HttpStub::Configurer::Request::Stub do
 
       context "generates a JSON body which" do
 
-        it "should have an entry containing the control value representation of the uri" do
-          HttpStub::Configurer::Request::ControllableValue.should_receive(:format).with(uri).and_return("uri as a string")
+        it "has an entry containing the control value representation of the uri" do
+          expect(HttpStub::Configurer::Request::ControllableValue).to receive(:format).with(uri).and_return("uri as a string")
 
-          request_body.should include("uri" => "uri as a string")
+          expect(request_body).to include("uri" => "uri as a string")
         end
 
-        it "should have an entry for the method argument" do
-          request_body.should include("method" => stub_method)
+        it "has an entry for the method argument" do
+          expect(request_body).to include("method" => stub_method)
         end
 
-        it "should have an entry containing the string representation of the request headers" do
-          HttpStub::Configurer::Request::ControllableValue.should_receive(:format)
+        it "has an entry containing the string representation of the request headers" do
+          expect(HttpStub::Configurer::Request::ControllableValue).to receive(:format)
             .with(request_headers).and_return("request headers as string")
 
-          request_body.should include("headers" => "request headers as string")
+          expect(request_body).to include("headers" => "request headers as string")
         end
 
-        it "should have an entry containing the string representation of the request parameters" do
-          HttpStub::Configurer::Request::ControllableValue.should_receive(:format)
+        it "has an entry containing the string representation of the request parameters" do
+          expect(HttpStub::Configurer::Request::ControllableValue).to receive(:format)
             .with(request_parameters).and_return("request parameters as string")
 
-          request_body.should include("parameters" => "request parameters as string")
+          expect(request_body).to include("parameters" => "request parameters as string")
         end
 
         context "when a status response argument is provided" do
 
-          it "should have a response entry for the argument" do
-            request_body["response"].should include("status" => response_status)
+          it "has a response entry for the argument" do
+            expect(request_body["response"]).to include("status" => response_status)
           end
 
         end
@@ -126,20 +126,20 @@ describe HttpStub::Configurer::Request::Stub do
 
           let(:response_status) { nil }
 
-          it "should have a response entry with an empty status code" do
-            request_body["response"].should include("status" => "")
+          it "has a response entry with an empty status code" do
+            expect(request_body["response"]).to include("status" => "")
           end
 
         end
 
-        it "should have an entry for the response body argument" do
-          request_body["response"].should include("body" => response_body)
+        it "has an entry for the response body argument" do
+          expect(request_body["response"]).to include("body" => response_body)
         end
 
         context "when a delay argument is provided" do
 
-          it "should have a response entry for the argument" do
-            request_body["response"].should include("delay_in_seconds" => response_delay_in_seconds)
+          it "has a response entry for the argument" do
+            expect(request_body["response"]).to include("delay_in_seconds" => response_delay_in_seconds)
           end
 
         end
@@ -148,8 +148,8 @@ describe HttpStub::Configurer::Request::Stub do
 
           let(:response_delay_in_seconds) { nil }
 
-          it "should have a response entry with an empty delay" do
-            request_body["response"].should include("delay_in_seconds" => "")
+          it "has a response entry with an empty delay" do
+            expect(request_body["response"]).to include("delay_in_seconds" => "")
           end
 
         end
@@ -158,8 +158,8 @@ describe HttpStub::Configurer::Request::Stub do
 
           let(:response_headers) { { "response_header_name" => "value" } }
 
-          it "should have a headers response entry containing the the provided headers" do
-            request_body["response"]["headers"].should eql(response_headers)
+          it "has a headers response entry containing the the provided headers" do
+            expect(request_body["response"]["headers"]).to eql(response_headers)
           end
 
         end
@@ -168,8 +168,8 @@ describe HttpStub::Configurer::Request::Stub do
 
           let (:response_headers) { nil }
 
-          it "should have a headers response entry containing an empty hash" do
-            request_body["response"]["headers"].should eql({})
+          it "has a headers response entry containing an empty hash" do
+            expect(request_body["response"]["headers"]).to eql({})
           end
         end
 

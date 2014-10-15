@@ -9,34 +9,34 @@ describe HttpStub::Controllers::StubActivatorController do
   let(:stub_registry) { double("HttpStub::Models::StubRegistry").as_null_object }
   let(:controller) { HttpStub::Controllers::StubActivatorController.new(stub_activator_registry, stub_registry) }
 
-  before(:each) { JSON.stub(:parse).and_return(stub_activator_options) }
+  before(:example) { allow(JSON).to receive(:parse).and_return(stub_activator_options) }
 
   describe "#register" do
 
-    before(:each) do
-      HttpStub::Models::StubActivator.stub(:new).and_return(stub_activator)
+    before(:example) do
+      allow(HttpStub::Models::StubActivator).to receive(:new).and_return(stub_activator)
     end
 
-    it "should parse an options hash from the JSON request body" do
-      JSON.should_receive(:parse).with(request_body).and_return(stub_activator_options)
+    it "parses an options hash from the JSON request body" do
+      expect(JSON).to receive(:parse).with(request_body).and_return(stub_activator_options)
 
       controller.register(request)
     end
 
-    it "should create a stub activator from the parsed options" do
-      HttpStub::Models::StubActivator.should_receive(:new).with(stub_activator_options).and_return(stub_activator)
+    it "creates a stub activator from the parsed options" do
+      expect(HttpStub::Models::StubActivator).to receive(:new).with(stub_activator_options).and_return(stub_activator)
 
       controller.register(request)
     end
 
-    it "should add the created activator to the activator registry" do
-      stub_activator_registry.should_receive(:add).with(stub_activator, request)
+    it "adds the created activator to the activator registry" do
+      expect(stub_activator_registry).to receive(:add).with(stub_activator, request)
 
       controller.register(request)
     end
 
-    it "should return a success response" do
-      controller.register(request).should eql(HttpStub::Models::Response::SUCCESS)
+    it "returns a success response" do
+      expect(controller.register(request)).to eql(HttpStub::Models::Response::SUCCESS)
     end
 
   end
@@ -45,36 +45,36 @@ describe HttpStub::Controllers::StubActivatorController do
 
     describe "when a stub activator has been registered that is activated by the request" do
 
-      before(:each) do
-        stub_activator_registry.stub(:find_for).with(request).and_return(stub_activator)
+      before(:example) do
+        allow(stub_activator_registry).to receive(:find_for).with(request).and_return(stub_activator)
       end
 
-      it "should add the activators stub to the stub registry" do
-        stub_registry.should_receive(:add).with(the_stub, request)
+      it "adds the activators stub to the stub registry" do
+        expect(stub_registry).to receive(:add).with(the_stub, request)
 
         controller.activate(request)
       end
 
-      it "should return a success response" do
-        controller.activate(request).should eql(HttpStub::Models::Response::SUCCESS)
+      it "returns a success response" do
+        expect(controller.activate(request)).to eql(HttpStub::Models::Response::SUCCESS)
       end
 
     end
 
     describe "when no stub activator is activated by the request" do
 
-      before(:each) do
-        stub_activator_registry.stub(:find_for).with(request).and_return(nil)
+      before(:example) do
+        allow(stub_activator_registry).to receive(:find_for).with(request).and_return(nil)
       end
 
-      it "should not add a stub to the registry" do
-        stub_registry.should_not_receive(:add)
+      it "does not add a stub to the registry" do
+        expect(stub_registry).not_to receive(:add)
 
         controller.activate(request)
       end
 
-      it "should return an empty response" do
-        controller.activate(request).should eql(HttpStub::Models::Response::EMPTY)
+      it "returns an empty response" do
+        expect(controller.activate(request)).to eql(HttpStub::Models::Response::EMPTY)
       end
 
     end
@@ -83,8 +83,8 @@ describe HttpStub::Controllers::StubActivatorController do
 
   describe "#clear" do
 
-    it "should clear the activator registry" do
-      stub_activator_registry.should_receive(:clear).with(request)
+    it "clears the activator registry" do
+      expect(stub_activator_registry).to receive(:clear).with(request)
 
       controller.clear(request)
     end

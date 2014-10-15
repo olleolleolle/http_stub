@@ -8,34 +8,34 @@ describe HttpStub::Controllers::StubController do
   let(:registry) { double(HttpStub::Models::Registry).as_null_object }
   let(:controller) { HttpStub::Controllers::StubController.new(registry) }
 
-  before(:each) { JSON.stub(:parse).and_return(stub_options) }
+  before(:example) { allow(JSON).to receive(:parse).and_return(stub_options) }
 
   describe "#register" do
 
-    before(:each) do
-      HttpStub::Models::Stub.stub(:new).and_return(the_stub)
+    before(:example) do
+      allow(HttpStub::Models::Stub).to receive(:new).and_return(the_stub)
     end
 
-    it "should parse an options hash from the JSON request body" do
-      JSON.should_receive(:parse).with(request_body).and_return(stub_options)
+    it "parses an options hash from the JSON request body" do
+      expect(JSON).to receive(:parse).with(request_body).and_return(stub_options)
 
       controller.register(request)
     end
 
-    it "should create a stub from the parsed options" do
-      HttpStub::Models::Stub.should_receive(:new).with(stub_options).and_return(the_stub)
+    it "creates a stub from the parsed options" do
+      expect(HttpStub::Models::Stub).to receive(:new).with(stub_options).and_return(the_stub)
 
       controller.register(request)
     end
 
-    it "should add the stub to the stub registry" do
-      registry.should_receive(:add).with(the_stub, request)
+    it "adds the stub to the stub registry" do
+      expect(registry).to receive(:add).with(the_stub, request)
 
       controller.register(request)
     end
 
-    it "should return a success response" do
-      controller.register(request).should eql(HttpStub::Models::Response::SUCCESS)
+    it "returns a success response" do
+      expect(controller.register(request)).to eql(HttpStub::Models::Response::SUCCESS)
     end
 
   end
@@ -44,26 +44,26 @@ describe HttpStub::Controllers::StubController do
 
     describe "when a stub has been registered that should be replayed for the request" do
 
-      before(:each) do
-        registry.stub(:find_for).with(request).and_return(the_stub)
+      before(:example) do
+        allow(registry).to receive(:find_for).with(request).and_return(the_stub)
       end
 
-      it "should return the stubs response" do
-        the_stub.should_receive(:response).and_return(response)
+      it "returns the stubs response" do
+        expect(the_stub).to receive(:response).and_return(response)
 
-        controller.replay(request).should eql(response)
+        expect(controller.replay(request)).to eql(response)
       end
 
     end
 
     describe "when no stub should be replayed for the request" do
 
-      before(:each) do
-        registry.stub(:find_for).with(request).and_return(nil)
+      before(:example) do
+        allow(registry).to receive(:find_for).with(request).and_return(nil)
       end
 
-      it "should return an empty response" do
-        controller.replay(request).should eql(HttpStub::Models::Response::EMPTY)
+      it "returns an empty response" do
+        expect(controller.replay(request)).to eql(HttpStub::Models::Response::EMPTY)
       end
 
     end
@@ -72,8 +72,8 @@ describe HttpStub::Controllers::StubController do
 
   describe "#clear" do
 
-    it "should clear the stub registry" do
-      registry.should_receive(:clear).with(request)
+    it "clears the stub registry" do
+      expect(registry).to receive(:clear).with(request)
 
       controller.clear(request)
     end

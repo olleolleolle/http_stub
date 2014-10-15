@@ -8,8 +8,8 @@ describe HttpStub::Models::ExactValueMatcher do
 
       let(:actual_value) { stub_value }
 
-      it "should return true" do
-        perform_match.should be_true
+      it "returns true" do
+        expect(perform_match).to be_truthy
       end
 
     end
@@ -18,8 +18,8 @@ describe HttpStub::Models::ExactValueMatcher do
 
       let(:actual_value) { "not equal to stub value" }
 
-      it "should return false" do
-        perform_match.should be_false
+      it "returns false" do
+        expect(perform_match).to be_falsey
       end
 
     end

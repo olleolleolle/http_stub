@@ -13,13 +13,13 @@ describe HttpStub::Configurer::Request::Omittable do
           end
         end
 
-        it "should return a hash containing the omitted values converted to 'control:omitted'" do
+        it "returns a hash containing the omitted values converted to 'control:omitted'" do
           expected_hash = (1..5).reduce({}) do |result, i|
             result["key#{i}"] = (i % 2 == 0) ? "value#{i}" : "control:omitted"
             result
           end
 
-          perform_format.should eql(expected_hash)
+          expect(perform_format).to eql(expected_hash)
         end
 
       end
@@ -33,8 +33,8 @@ describe HttpStub::Configurer::Request::Omittable do
           end
         end
 
-        it "should return the hash unchanged" do
-          perform_format.should eql(value)
+        it "returns the hash unchanged" do
+          expect(perform_format).to eql(value)
         end
 
       end
@@ -43,8 +43,8 @@ describe HttpStub::Configurer::Request::Omittable do
 
         let(:value) { {} }
 
-        it "should return the hash unchanged" do
-          perform_format.should eql({})
+        it "returns the hash unchanged" do
+          expect(perform_format).to eql({})
         end
 
       end
@@ -55,8 +55,8 @@ describe HttpStub::Configurer::Request::Omittable do
 
       let(:value) { "not a hash" }
 
-      it "should return the value unchanged" do
-        perform_format.should eql(value)
+      it "returns the value unchanged" do
+        expect(perform_format).to eql(value)
       end
 
     end

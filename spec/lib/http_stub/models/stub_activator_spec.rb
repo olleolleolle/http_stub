@@ -6,7 +6,7 @@ describe HttpStub::Models::StubActivator do
   end
   let(:stub_activator) { HttpStub::Models::StubActivator.new(args) }
 
-  before(:each) { HttpStub::Models::Stub.stub(:new).and_return(double(HttpStub::Models::Stub)) }
+  before(:example) { allow(HttpStub::Models::Stub).to receive(:new).and_return(double(HttpStub::Models::Stub)) }
 
   describe "#satisfies?" do
 
@@ -16,8 +16,8 @@ describe HttpStub::Models::StubActivator do
 
       let(:request_path_info) { activation_uri }
 
-      it "should return true" do
-        stub_activator.satisfies?(request).should be_true
+      it "returns true" do
+        expect(stub_activator.satisfies?(request)).to be_truthy
       end
 
     end
@@ -26,8 +26,8 @@ describe HttpStub::Models::StubActivator do
 
       let(:request_path_info) { "#{activation_uri}/with/additional/paths" }
 
-      it "should return false" do
-        stub_activator.satisfies?(request).should be_false
+      it "returns false" do
+        expect(stub_activator.satisfies?(request)).to be_falsey
       end
 
     end
@@ -36,8 +36,8 @@ describe HttpStub::Models::StubActivator do
 
       let(:request_path_info) { "/completely/different/path" }
 
-      it "should return false" do
-        stub_activator.satisfies?(request).should be_false
+      it "returns false" do
+        expect(stub_activator.satisfies?(request)).to be_falsey
       end
 
     end
@@ -46,29 +46,29 @@ describe HttpStub::Models::StubActivator do
 
   describe "#the_stub" do
 
-    it "should return a HttpStub::Models::Stub constructed from the activator's arguments" do
+    it "returns a HttpStub::Models::Stub constructed from the activator's arguments" do
       stub = double(HttpStub::Models::Stub)
-      HttpStub::Models::Stub.should_receive(:new).with(args).and_return(stub)
+      expect(HttpStub::Models::Stub).to receive(:new).with(args).and_return(stub)
 
-      stub_activator.the_stub.should eql(stub)
+      expect(stub_activator.the_stub).to eql(stub)
     end
 
   end
 
   describe "#activation_uri" do
 
-    it "should return the value provided in the request body" do
-      stub_activator.activation_uri.should eql(activation_uri)
+    it "returns the value provided in the request body" do
+      expect(stub_activator.activation_uri).to eql(activation_uri)
     end
 
   end
 
   describe "#to_s" do
 
-    it "should return the string representation of the activation arguments" do
-      args.should_receive(:to_s).and_return("activation args string")
+    it "returns the string representation of the activation arguments" do
+      expect(args).to receive(:to_s).and_return("activation args string")
 
-      stub_activator.to_s.should eql("activation args string")
+      expect(stub_activator.to_s).to eql("activation args string")
     end
 
   end

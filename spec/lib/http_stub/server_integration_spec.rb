@@ -8,22 +8,22 @@ describe HttpStub::Server, "when the server is running" do
 
     context "when provided with the minimum data required" do
 
-      before(:each) do
+      before(:example) do
         @response = HTTParty.post(
           "#{server_uri}/stubs",
           body: { uri: "/some/path", method: "get", response: { status: 200, body: "Some body" } }.to_json
         )
       end
 
-      it "should return a 200 response code" do
-        @response.code.should eql(200)
+      it "returns a 200 response code" do
+        expect(@response.code).to eql(200)
       end
 
-      it "should register a stub returning the provided response for a matching request" do
+      it "registers a stub returning the provided response for a matching request" do
         stubbed_response = HTTParty.get("#{server_uri}/some/path")
 
-        stubbed_response.code.should eql(200)
-        stubbed_response.body.should eql("Some body")
+        expect(stubbed_response.code).to eql(200)
+        expect(stubbed_response.body).to eql("Some body")
       end
 
     end
@@ -32,7 +32,7 @@ describe HttpStub::Server, "when the server is running" do
 
   describe "and a configurer with multiple stub activators is initialized" do
 
-    before(:all) do
+    before(:context) do
       HttpStub::Examples::ConfigurerWithManyActivators.host(server_host)
       HttpStub::Examples::ConfigurerWithManyActivators.port(server_port)
       HttpStub::Examples::ConfigurerWithManyActivators.initialize!
@@ -43,44 +43,44 @@ describe HttpStub::Server, "when the server is running" do
       let(:response) { HTTParty.get("#{server_uri}/stubs/activators") }
       let(:response_document) { Nokogiri::HTML(response.body) }
 
-      it "should return a 200 response code" do
-        response.code.should eql(200)
+      it "returns a 200 response code" do
+        expect(response.code).to eql(200)
       end
 
-      it "should return response whose body contains a link to each activator in alphabetical order" do
+      it "returns response whose body contains a link to each activator in alphabetical order" do
         response_document.css("a").each_with_index do |link, i|
-          link['href'].should eql("/activator_#{i + 1}")
+          expect(link['href']).to eql("/activator_#{i + 1}")
         end
       end
 
-      it "should return a response whose body contains the uri of each activators stub" do
-        (1..3).each { |i| response.body.should match(/#{escape_html("/path_#{i}")}/) }
+      it "returns a response whose body contains the uri of each activators stub" do
+        (1..3).each { |i| expect(response.body).to match(/#{escape_html("/path_#{i}")}/) }
       end
 
-      it "should return a response whose body contains the request headers of each activators stub" do
-        (1..3).each { |i| response.body.should match(/request_header_#{i}:request_header_value_#{i}/) }
+      it "returns a response whose body contains the request headers of each activators stub" do
+        (1..3).each { |i| expect(response.body).to match(/request_header_#{i}:request_header_value_#{i}/) }
       end
 
-      it "should return a response whose body contains the parameters of each activators stub" do
-        (1..3).each { |i| response.body.should match(/parameter_#{i}=parameter_value_#{i}/) }
+      it "returns a response whose body contains the parameters of each activators stub" do
+        (1..3).each { |i| expect(response.body).to match(/parameter_#{i}=parameter_value_#{i}/) }
       end
 
-      it "should return a response whose body contains the response status of each activators stub" do
-        (1..3).each { |i| response.body.should match(/20#{i}/) }
+      it "returns a response whose body contains the response status of each activators stub" do
+        (1..3).each { |i| expect(response.body).to match(/20#{i}/) }
       end
 
-      it "should return a response whose body contains the response headers of each activators stub" do
-        (1..3).each { |i| response.body.should match(/response_header_#{i}:response_header_value_#{i}/) }
+      it "returns a response whose body contains the response headers of each activators stub" do
+        (1..3).each { |i| expect(response.body).to match(/response_header_#{i}:response_header_value_#{i}/) }
       end
 
-      it "should return a response whose body contains the response body of each activators stub" do
-        response.body.should match(/Plain text body/)
-        response.body.should match(/#{escape_html({ "key" => "JSON body" }.to_json)}/)
-        response.body.should match(/#{escape_html("<html><body>HTML body</body></html>")}/)
+      it "returns a response whose body contains the response body of each activators stub" do
+        expect(response.body).to match(/Plain text body/)
+        expect(response.body).to match(/#{escape_html({ "key" => "JSON body" }.to_json)}/)
+        expect(response.body).to match(/#{escape_html("<html><body>HTML body</body></html>")}/)
       end
 
-      it "should return a response whose body contains the response delay of each activators stub" do
-        (1..3).each { |i| response.body.should include("#{i * 8}") }
+      it "returns a response whose body contains the response delay of each activators stub" do
+        (1..3).each { |i| expect(response.body).to include("#{i * 8}") }
       end
 
     end
@@ -89,45 +89,45 @@ describe HttpStub::Server, "when the server is running" do
 
       describe "when multiple stubs are configured" do
 
-        before(:all) do
+        before(:context) do
           (1..3).each { |i| HTTParty.get("#{server_uri}/activator_#{i}") }
         end
 
         let(:response) { HTTParty.get("#{server_uri}/stubs") }
         let(:response_document) { Nokogiri::HTML(response.body) }
 
-        it "should return a 200 response code" do
-          response.code.should eql(200)
+        it "returns a 200 response code" do
+          expect(response.code).to eql(200)
         end
 
-        it "should return a response whose body contains the uri of each stub" do
-          (1..3).each { |i| response.body.should match(/#{escape_html("/path_#{i}")}/) }
+        it "returns a response whose body contains the uri of each stub" do
+          (1..3).each { |i| expect(response.body).to match(/#{escape_html("/path_#{i}")}/) }
         end
 
-        it "should return a response whose body contains the headers of each stub" do
-          (1..3).each { |i| response.body.should match(/request_header_#{i}:request_header_value_#{i}/) }
+        it "returns a response whose body contains the headers of each stub" do
+          (1..3).each { |i| expect(response.body).to match(/request_header_#{i}:request_header_value_#{i}/) }
         end
 
-        it "should return a response whose body contains the parameters of each stub" do
-          (1..3).each { |i| response.body.should match(/parameter_#{i}=parameter_value_#{i}/) }
+        it "returns a response whose body contains the parameters of each stub" do
+          (1..3).each { |i| expect(response.body).to match(/parameter_#{i}=parameter_value_#{i}/) }
         end
 
-        it "should return a response whose body contains the response status of each stub" do
-          (1..3).each { |i| response.body.should match(/20#{i}/) }
+        it "returns a response whose body contains the response status of each stub" do
+          (1..3).each { |i| expect(response.body).to match(/20#{i}/) }
         end
 
-        it "should return a response whose body contains the response headers of each stub" do
-          (1..3).each { |i| response.body.should match(/response_header_#{i}:response_header_value_#{i}/) }
+        it "returns a response whose body contains the response headers of each stub" do
+          (1..3).each { |i| expect(response.body).to match(/response_header_#{i}:response_header_value_#{i}/) }
         end
 
-        it "should return a response whose body contains the response body of each stub" do
-          response.body.should match(/Plain text body/)
-          response.body.should match(/#{escape_html({ "key" => "JSON body" }.to_json)}/)
-          response.body.should match(/#{escape_html("<html><body>HTML body</body></html>")}/)
+        it "returns a response whose body contains the response body of each stub" do
+          expect(response.body).to match(/Plain text body/)
+          expect(response.body).to match(/#{escape_html({ "key" => "JSON body" }.to_json)}/)
+          expect(response.body).to match(/#{escape_html("<html><body>HTML body</body></html>")}/)
         end
 
-        it "should return a response whose body contains the response delay of each stub" do
-          (1..3).each { |i| response.body.should include("#{i * 8}") }
+        it "returns a response whose body contains the response delay of each stub" do
+          (1..3).each { |i| expect(response.body).to include("#{i * 8}") }
         end
 
       end

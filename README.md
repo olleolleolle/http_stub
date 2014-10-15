@@ -177,11 +177,11 @@ An initialization callback is available, useful should you wish to control stub 
     let(:authentication_service) { AuthenticationService.new }
 
     # Returns server to post-initialize state
-    after(:each) { authentication_service.reset! }
+    after(:example) { authentication_service.reset! }
 
     describe "when the service is unavailable" do
 
-        before(:each) { authentication_service.unavailable! }
+        before(:example) { authentication_service.unavailable! }
 
         #...
 ```

@@ -33,10 +33,10 @@ describe HttpStub::Models::Stub do
 
   let(:the_stub) { HttpStub::Models::Stub.new(stub_args) }
 
-  before(:each) do
-    HttpStub::Models::StubUri.stub(:new).and_return(stub_uri)
-    HttpStub::Models::StubParameters.stub(:new).and_return(stub_parameters)
-    HttpStub::Models::StubHeaders.stub(:new).and_return(stub_headers)
+  before(:example) do
+    allow(HttpStub::Models::StubUri).to receive(:new).and_return(stub_uri)
+    allow(HttpStub::Models::StubParameters).to receive(:new).and_return(stub_parameters)
+    allow(HttpStub::Models::StubHeaders).to receive(:new).and_return(stub_headers)
   end
 
   describe "#satisfies?" do
@@ -47,7 +47,7 @@ describe HttpStub::Models::Stub do
 
     describe "when the request uri matches" do
 
-      before(:each) { stub_uri.stub(:match?).with(request).and_return(true) }
+      before(:example) { allow(stub_uri).to receive(:match?).with(request).and_return(true) }
 
       describe "and the request method matches" do
 
@@ -55,16 +55,16 @@ describe HttpStub::Models::Stub do
 
           describe "that matches" do
 
-            before(:each) { stub_headers.stub(:match?).with(request).and_return(true) }
+            before(:example) { allow(stub_headers).to receive(:match?).with(request).and_return(true) }
 
             describe "and a parameter match is configured" do
 
               describe "that matches" do
 
-                before(:each) { stub_parameters.stub(:match?).with(request).and_return(true) }
+                before(:example) { allow(stub_parameters).to receive(:match?).with(request).and_return(true) }
 
-                it "should return true" do
-                  the_stub.satisfies?(request).should be_true
+                it "returns true" do
+                  expect(the_stub.satisfies?(request)).to be_truthy
                 end
 
               end
@@ -81,10 +81,10 @@ describe HttpStub::Models::Stub do
 
     describe "when the request uri does not match" do
 
-      before(:each) { stub_uri.stub(:match?).with(request).and_return(false) }
+      before(:example) { allow(stub_uri).to receive(:match?).with(request).and_return(false) }
 
-      it "should return false" do
-        the_stub.satisfies?(request).should be_false
+      it "returns false" do
+        expect(the_stub.satisfies?(request)).to be_falsey
       end
 
     end
@@ -93,28 +93,28 @@ describe HttpStub::Models::Stub do
 
       let(:request_method) { "post" }
 
-      it "should return false" do
-        the_stub.satisfies?(request).should be_false
+      it "returns false" do
+        expect(the_stub.satisfies?(request)).to be_falsey
       end
 
     end
 
     describe "when the headers do not match" do
 
-      before(:each) { stub_headers.stub(:match?).with(request).and_return(false) }
+      before(:example) { allow(stub_headers).to receive(:match?).with(request).and_return(false) }
 
-      it "should return false" do
-        the_stub.satisfies?(request).should be_false
+      it "returns false" do
+        expect(the_stub.satisfies?(request)).to be_falsey
       end
 
     end
 
     describe "when the parameters do not match" do
 
-      before(:each) { stub_parameters.stub(:match?).with(request).and_return(false) }
+      before(:example) { allow(stub_parameters).to receive(:match?).with(request).and_return(false) }
 
-      it "should return false" do
-        the_stub.satisfies?(request).should be_false
+      it "returns false" do
+        expect(the_stub.satisfies?(request)).to be_falsey
       end
 
     end
@@ -123,55 +123,56 @@ describe HttpStub::Models::Stub do
 
   describe "#uri" do
 
-    it "should return the parameters model encapsulating the uri provided in the request body" do
-      the_stub.uri.should eql(stub_uri)
+    it "returns the parameters model encapsulating the uri provided in the request body" do
+      expect(the_stub.uri).to eql(stub_uri)
     end
 
   end
 
   describe "#method" do
 
-    it "should return the value provided in the request body" do
-      the_stub.method.should eql(stub_method)
+    it "returns the value provided in the request body" do
+      expect(the_stub.method).to eql(stub_method)
     end
 
   end
 
   describe "#headers" do
 
-    it "should return the headers model encapsulating the headers provided in the request body" do
-      the_stub.headers.should eql(stub_headers)
+    it "returns the headers model encapsulating the headers provided in the request body" do
+      expect(the_stub.headers).to eql(stub_headers)
     end
 
   end
 
   describe "#parameters" do
 
-    it "should return the parameters model encapsulating the parameters provided in the request body" do
-      the_stub.parameters.should eql(stub_parameters)
+    it "returns the parameters model encapsulating the parameters provided in the request body" do
+      expect(the_stub.parameters).to eql(stub_parameters)
     end
 
   end
 
   describe "#response" do
 
-    it "should expose the provided response status" do
-      the_stub.response.status.should eql(201)
+    it "exposes the provided response status" do
+      expect(the_stub.response.status).to eql(201)
     end
 
-    it "should expose the provided response body" do
-      the_stub.response.body.should eql("Foo")
+    it "exposes the provided response body" do
+      expect(the_stub.response.body).to eql("Foo")
     end
 
   end
 
   describe "#to_s" do
 
-    it "should return a string representation of the stub arguments" do
-      stub_args.should_receive(:to_s).and_return("stub arguments string")
+    it "returns a string representation of the stub arguments" do
+      expect(stub_args).to receive(:to_s).and_return("stub arguments string")
 
-      the_stub.to_s.should eql("stub arguments string")
+      expect(the_stub.to_s).to eql("stub arguments string")
     end
+
   end
 
 end

@@ -6,8 +6,8 @@ describe HttpStub::Configurer::ImpatientCommandChain do
 
   describe "#<<" do
 
-    it "should immediately execute the provided command" do
-      command.should_receive(:execute)
+    it "immediately execute the provided command" do
+      expect(command).to receive(:execute)
 
       command_chain << command
     end

@@ -15,12 +15,12 @@ describe HttpStub::Models::Response do
 
     let(:response) { HttpStub::Models::Response::SUCCESS }
 
-    it "should have a status of 200" do
-      response.status.should eql(200)
+    it "has a status of 200" do
+      expect(response.status).to eql(200)
     end
 
-    it "should have a body containing OK to visually indicate success to those interacting via a browser" do
-      response.body.should match(/OK/)
+    it "has a body containing OK to visually indicate success to those interacting via a browser" do
+      expect(response.body).to match(/OK/)
     end
 
   end
@@ -29,12 +29,12 @@ describe HttpStub::Models::Response do
 
     let(:response) { HttpStub::Models::Response::ERROR }
 
-    it "should have a status of 404" do
-      response.status.should eql(404)
+    it "has a status of 404" do
+      expect(response.status).to eql(404)
     end
 
-    it "should have a body containing ERROR to visually indicate the error to those interacting via a browser" do
-      response.body.should match(/ERROR/)
+    it "has a body containing ERROR to visually indicate the error to those interacting via a browser" do
+      expect(response.body).to match(/ERROR/)
     end
 
   end
@@ -45,8 +45,8 @@ describe HttpStub::Models::Response do
 
       context "that is an integer" do
 
-        it "should return the value provided" do
-          response.status.should eql(status)
+        it "returns the value provided" do
+          expect(response.status).to eql(status)
         end
 
       end
@@ -55,8 +55,8 @@ describe HttpStub::Models::Response do
 
         let(:status) { "" }
 
-        it "should return 200" do
-          response.status.should eql(200)
+        it "returns 200" do
+          expect(response.status).to eql(200)
         end
 
       end
@@ -67,8 +67,8 @@ describe HttpStub::Models::Response do
 
       let(:response) { HttpStub::Models::Response.new("body" => body, "delay_in_seconds" => delay_in_seconds) }
 
-      it "should return 200" do
-        response.status.should eql(200)
+      it "returns 200" do
+        expect(response.status).to eql(200)
       end
 
     end
@@ -77,8 +77,8 @@ describe HttpStub::Models::Response do
 
   describe "#body" do
 
-    it "should return the value provided in the arguments" do
-      response.body.should eql("A response body")
+    it "returns the value provided in the arguments" do
+      expect(response.body).to eql("A response body")
     end
 
   end
@@ -89,8 +89,8 @@ describe HttpStub::Models::Response do
 
       context "that is an integer" do
 
-        it "should return the value" do
-          response.delay_in_seconds.should eql(delay_in_seconds)
+        it "returns the value" do
+          expect(response.delay_in_seconds).to eql(delay_in_seconds)
         end
 
       end
@@ -99,8 +99,8 @@ describe HttpStub::Models::Response do
 
         let(:delay_in_seconds) { "" }
 
-        it "should return 0" do
-          response.delay_in_seconds.should eql(0)
+        it "returns 0" do
+          expect(response.delay_in_seconds).to eql(0)
         end
 
       end
@@ -111,8 +111,8 @@ describe HttpStub::Models::Response do
 
       let(:response) { HttpStub::Models::Response.new("status" => status, "body" => body) }
 
-      it "should return 0" do
-        response.delay_in_seconds.should eql(0)
+      it "returns 0" do
+        expect(response.delay_in_seconds).to eql(0)
       end
 
     end
@@ -123,8 +123,8 @@ describe HttpStub::Models::Response do
 
     let(:response_header_hash) { response.headers.to_hash }
 
-    it "should be Headers" do
-      response.headers.should be_a(HttpStub::Models::Headers)
+    it "is Headers" do
+      expect(response.headers).to be_a(HttpStub::Models::Headers)
     end
 
     context "when headers are provided" do
@@ -135,8 +135,8 @@ describe HttpStub::Models::Response do
           { "content-type" => "some/content/type", "some_header" => "some value", "another_header" => "another value" }
         end
 
-        it "should return headers including the provided headers" do
-          response_header_hash.should eql(headers)
+        it "returns headers including the provided headers" do
+          expect(response_header_hash).to eql(headers)
         end
 
       end
@@ -151,12 +151,12 @@ describe HttpStub::Models::Response do
           }
         end
 
-        it "should return headers including the provided headers" do
-          response_header_hash.should include(headers)
+        it "returns headers including the provided headers" do
+          expect(response_header_hash).to include(headers)
         end
 
-        it "should return headers including json as the default response content type" do
-          response_header_hash.should include("content-type" => "application/json")
+        it "returns headers including json as the default response content type" do
+          expect(response_header_hash).to include("content-type" => "application/json")
         end
 
       end
@@ -167,8 +167,8 @@ describe HttpStub::Models::Response do
 
       let(:headers) { nil }
 
-      it "should return headers containing json as the default response content type" do
-        response_header_hash.should eql("content-type" => "application/json")
+      it "returns headers containing json as the default response content type" do
+        expect(response_header_hash).to eql("content-type" => "application/json")
       end
 
     end
@@ -179,24 +179,24 @@ describe HttpStub::Models::Response do
 
     context "when the response is EMPTY" do
 
-      it "should return true" do
-        HttpStub::Models::Response::EMPTY.should be_empty
+      it "returns true" do
+        expect(HttpStub::Models::Response::EMPTY).to be_empty
       end
 
     end
 
     context "when the response is not EMPTY but contains no values" do
 
-      it "should return true" do
-        HttpStub::Models::Response.new.should be_empty
+      it "returns true" do
+        expect(HttpStub::Models::Response.new).to be_empty
       end
 
     end
 
     context "when the response is not EMPTY" do
 
-      it "should return false" do
-        HttpStub::Models::Response::SUCCESS.should_not be_empty
+      it "returns false" do
+        expect(HttpStub::Models::Response::SUCCESS).not_to be_empty
       end
 
     end

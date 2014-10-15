@@ -10,38 +10,38 @@ describe HttpStub::Models::StringValueMatcher do
 
     shared_examples_for "a StringValueMatcher that matches an expected stub value" do
 
-      it "should determine if actual value should be omitted" do
-        HttpStub::Models::OmittedValueMatcher.should_receive(:match?).with(expected_stub_match_value, actual_value)
+      it "determines if actual value should be omitted" do
+        expect(HttpStub::Models::OmittedValueMatcher).to receive(:match?).with(expected_stub_match_value, actual_value)
 
         perform_match
       end
 
-      it "should determine if the actual value matches a regular expression" do
-        HttpStub::Models::RegexpValueMatcher.should_receive(:match?).with(expected_stub_match_value, actual_value)
+      it "determines if the actual value matches a regular expression" do
+        expect(HttpStub::Models::RegexpValueMatcher).to receive(:match?).with(expected_stub_match_value, actual_value)
 
         perform_match
       end
 
-      it "should determine if the actual value exactly matches the stub value" do
-        HttpStub::Models::ExactValueMatcher.should_receive(:match?).with(expected_stub_match_value, actual_value)
+      it "determines if the actual value exactly matches the stub value" do
+        expect(HttpStub::Models::ExactValueMatcher).to receive(:match?).with(expected_stub_match_value, actual_value)
 
         perform_match
       end
 
-      it "should determine if actual value should be omitted" do
-        HttpStub::Models::OmittedValueMatcher.should_receive(:match?).with(expected_stub_match_value, actual_value)
+      it "determines if actual value should be omitted" do
+        expect(HttpStub::Models::OmittedValueMatcher).to receive(:match?).with(expected_stub_match_value, actual_value)
 
         perform_match
       end
 
-      it "should determine if the actual value matches a regular expression" do
-        HttpStub::Models::RegexpValueMatcher.should_receive(:match?).with(expected_stub_match_value, actual_value)
+      it "determines if the actual value matches a regular expression" do
+        expect(HttpStub::Models::RegexpValueMatcher).to receive(:match?).with(expected_stub_match_value, actual_value)
 
         perform_match
       end
 
-      it "should determine if the actual value exactly matches the stub value" do
-        HttpStub::Models::ExactValueMatcher.should_receive(:match?).with(expected_stub_match_value, actual_value)
+      it "determines if the actual value exactly matches the stub value" do
+        expect(HttpStub::Models::ExactValueMatcher).to receive(:match?).with(expected_stub_match_value, actual_value)
 
         perform_match
       end
@@ -68,38 +68,38 @@ describe HttpStub::Models::StringValueMatcher do
 
     context "when an omitted match occurs" do
 
-      before(:each) { HttpStub::Models::OmittedValueMatcher.should_receive(:match?).and_return(true) }
+      before(:example) { expect(HttpStub::Models::OmittedValueMatcher).to receive(:match?).and_return(true) }
 
-      it "should return true" do
-        perform_match.should be_true
+      it "returns true" do
+        expect(perform_match).to be_truthy
       end
 
     end
 
     context "when a regular expression match occurs" do
 
-      before(:each) { HttpStub::Models::RegexpValueMatcher.should_receive(:match?).and_return(true) }
+      before(:example) { expect(HttpStub::Models::RegexpValueMatcher).to receive(:match?).and_return(true) }
 
-      it "should return true" do
-        perform_match.should be_true
+      it "returns true" do
+        expect(perform_match).to be_truthy
       end
 
     end
 
     context "when an exact match occurs" do
 
-      before(:each) { HttpStub::Models::ExactValueMatcher.should_receive(:match?).and_return(true) }
+      before(:example) { expect(HttpStub::Models::ExactValueMatcher).to receive(:match?).and_return(true) }
 
-      it "should return true" do
-        perform_match.should be_true
+      it "returns true" do
+        expect(perform_match).to be_truthy
       end
 
     end
 
     context "when no match occurs" do
 
-      it "should return false" do
-        perform_match.should be_false
+      it "returns false" do
+        expect(perform_match).to be_falsey
       end
 
     end
@@ -112,8 +112,8 @@ describe HttpStub::Models::StringValueMatcher do
 
   describe "#to_s" do
 
-    it "should return the stub value provided" do
-      string_value_matcher.to_s.should eql(stub_value)
+    it "returns the stub value provided" do
+      expect(string_value_matcher.to_s).to eql(stub_value)
     end
 
   end

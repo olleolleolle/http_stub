@@ -4,25 +4,25 @@ describe HttpStub::Configurer::Request::ControllableValue do
 
     let(:value) { "some value" }
 
-    it "should format the potential control value via the Regexpable formatter" do
-      HttpStub::Configurer::Request::Regexpable.should_receive(:format).with(value)
+    it "formats the potential control value via the Regexpable formatter" do
+      expect(HttpStub::Configurer::Request::Regexpable).to receive(:format).with(value)
 
       perform_format
     end
 
-    it "should chain formatting by formatting the Regexpable formatter result via the Omittable formatter" do
+    it "chains formatting by formatting the Regexpable formatter result via the Omittable formatter" do
       regexp_formatted_value = "some regexp formatted value"
-      HttpStub::Configurer::Request::Regexpable.stub(:format).and_return(regexp_formatted_value)
-      HttpStub::Configurer::Request::Omittable.should_receive(:format).with(regexp_formatted_value)
+      allow(HttpStub::Configurer::Request::Regexpable).to receive(:format).and_return(regexp_formatted_value)
+      expect(HttpStub::Configurer::Request::Omittable).to receive(:format).with(regexp_formatted_value)
 
       perform_format
     end
 
-    it "should return the Omittable formatter result" do
+    it "returns the Omittable formatter result" do
       omit_formatted_value = "some omit formatted value"
-      HttpStub::Configurer::Request::Omittable.stub(:format).and_return(omit_formatted_value)
+      allow(HttpStub::Configurer::Request::Omittable).to receive(:format).and_return(omit_formatted_value)
 
-      perform_format.should eql(omit_formatted_value)
+      expect(perform_format).to eql(omit_formatted_value)
     end
 
     def perform_format

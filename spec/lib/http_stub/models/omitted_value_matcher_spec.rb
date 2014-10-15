@@ -10,8 +10,8 @@ describe HttpStub::Models::OmittedValueMatcher  do
 
         let(:actual_value) { nil }
 
-        it "should return true" do
-          perform_match.should be_true
+        it "returns true" do
+          expect(perform_match).to be_truthy
         end
 
       end
@@ -20,8 +20,8 @@ describe HttpStub::Models::OmittedValueMatcher  do
 
         let(:actual_value) { "some non-empty string" }
 
-        it "should return false" do
-          perform_match.should be_false
+        it "returns false" do
+          expect(perform_match).to be_falsey
         end
 
       end
@@ -30,8 +30,8 @@ describe HttpStub::Models::OmittedValueMatcher  do
 
         let(:actual_value) { "" }
 
-        it "should return false" do
-          perform_match.should be_false
+        it "returns false" do
+          expect(perform_match).to be_falsey
         end
 
       end
@@ -43,8 +43,8 @@ describe HttpStub::Models::OmittedValueMatcher  do
       let(:stub_value) { "some other stub value" }
       let(:actual_value) { nil }
 
-      it "should return false" do
-        perform_match.should be_false
+      it "returns false" do
+        expect(perform_match).to be_falsey
       end
 
     end

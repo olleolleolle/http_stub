@@ -18,8 +18,8 @@ describe HttpStub::Configurer::CommandProcessor do
 
         let(:request) { Net::HTTP::Get.new("/stubs") }
 
-        it "should execute without error" do
-          lambda { command_processor.process(command) }.should_not raise_error
+        it "executes without error" do
+          expect { command_processor.process(command) }.not_to raise_error
         end
 
       end
@@ -28,12 +28,12 @@ describe HttpStub::Configurer::CommandProcessor do
 
         let(:request) { Net::HTTP::Get.new("/causes_error") }
 
-        it "should raise an exception that includes the server base URI" do
-          lambda { command_processor.process(command) }.should raise_error(/#{server_base_uri}/)
+        it "raises an exception that includes the server base URI" do
+          expect { command_processor.process(command) }.to raise_error(/#{server_base_uri}/)
         end
 
-        it "should raise an exception that includes the commands description" do
-          lambda { command_processor.process(command) }.should raise_error(/performing an operation/)
+        it "raises an exception that includes the commands description" do
+          expect { command_processor.process(command) }.to raise_error(/performing an operation/)
         end
 
       end
@@ -48,12 +48,12 @@ describe HttpStub::Configurer::CommandProcessor do
 
     describe "#process" do
 
-      it "should raise an exception that includes the server base URI" do
-        lambda { command_processor.process(command) }.should raise_error(/#{server_base_uri}/)
+      it "raises an exception that includes the server base URI" do
+        expect { command_processor.process(command) }.to raise_error(/#{server_base_uri}/)
       end
 
-      it "should raise an exception that includes the commands description" do
-        lambda { command_processor.process(command) }.should raise_error(/performing an operation/)
+      it "raises an exception that includes the commands description" do
+        expect { command_processor.process(command) }.to raise_error(/performing an operation/)
       end
 
     end

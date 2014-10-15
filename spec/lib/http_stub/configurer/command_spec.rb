@@ -7,8 +7,8 @@ describe HttpStub::Configurer::Command do
 
   describe "#execute" do
 
-    it "should delegate to the provided processor" do
-      processor.should_receive(:process).with(command)
+    it "delegates to the provided processor" do
+      expect(processor).to receive(:process).with(command)
 
       command.execute
     end
@@ -19,18 +19,18 @@ describe HttpStub::Configurer::Command do
 
     describe "when created with a resetable flag that is true" do
 
-      before(:each) { args.merge!(resetable: true) }
+      before(:example) { args.merge!(resetable: true) }
 
-      it "should return true" do
-        command.resetable?.should be_true
+      it "returns true" do
+        expect(command.resetable?).to be_truthy
       end
 
     end
 
     describe "when created without a resetable flag" do
 
-      it "should return false" do
-        command.resetable?.should be_false
+      it "returns false" do
+        expect(command.resetable?).to be_falsey
       end
 
     end

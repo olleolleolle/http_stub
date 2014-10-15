@@ -9,12 +9,12 @@ describe HttpStub::Configurer do
 
   describe ".get_base_uri" do
 
-    it "should return a uri that combines the provided host and port" do
-      TestableConfigurer.get_base_uri.should include("some_host:8888")
+    it "returns a uri that combines the provided host and port" do
+      expect(TestableConfigurer.get_base_uri).to include("some_host:8888")
     end
 
-    it "should return a uri accessed via http" do
-      TestableConfigurer.get_base_uri.should match(/^http:\/\//)
+    it "returns a uri accessed via http" do
+      expect(TestableConfigurer.get_base_uri).to match(/^http:\/\//)
     end
 
   end

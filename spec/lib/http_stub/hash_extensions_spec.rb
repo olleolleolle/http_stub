@@ -8,8 +8,8 @@ describe HttpStub::HashExtensions do
         { "lower" => 1, "UPPER" => 2, "MiXeDcAsE" => 3 }
       end
 
-      it "should downcase the string keys" do
-        hash.downcase_and_underscore_keys.should eql({ "lower" => 1, "upper" => 2, "mixedcase" => 3 })
+      it "downcases the string keys" do
+        expect(hash.downcase_and_underscore_keys).to eql({ "lower" => 1, "upper" => 2, "mixedcase" => 3 })
       end
 
       describe "and keys contain underscores and hyphens" do
@@ -18,8 +18,8 @@ describe HttpStub::HashExtensions do
           { "has_underscore" => 1, "has-hypen" => 2, "has_underscore_and-hypen" => 3 }
         end
 
-        it "should downcase the string keys" do
-          hash.downcase_and_underscore_keys.should eql({ "has_underscore" => 1,
+        it "downcases the string keys" do
+          expect(hash.downcase_and_underscore_keys).to eql({ "has_underscore" => 1,
                                                          "has_hypen" => 2,
                                                          "has_underscore_and_hypen" => 3 })
         end
@@ -34,8 +34,8 @@ describe HttpStub::HashExtensions do
         { 1 => 2, :symbol => 3, nil => 4 }
       end
 
-      it "should not alter a hash" do
-        hash.downcase_and_underscore_keys.should eql({ 1 => 2, :symbol => 3, nil => 4 })
+      it "does not alter a hash" do
+        expect(hash.downcase_and_underscore_keys).to eql({ 1 => 2, :symbol => 3, nil => 4 })
       end
 
     end
@@ -52,8 +52,8 @@ describe HttpStub::HashExtensions do
 
         let(:hash) { hash_parameter }
 
-        it "should return true" do
-          hash.has_hash?(hash_parameter).should be(true)
+        it "returns true" do
+          expect(hash.has_hash?(hash_parameter)).to be(true)
         end
 
       end
@@ -62,8 +62,8 @@ describe HttpStub::HashExtensions do
 
         let(:hash) { hash_parameter.merge("key4" => "value4") }
 
-        it "should return true" do
-          hash.has_hash?(hash_parameter).should be(true)
+        it "returns true" do
+          expect(hash.has_hash?(hash_parameter)).to be(true)
         end
 
       end
@@ -72,8 +72,8 @@ describe HttpStub::HashExtensions do
 
         let(:hash) { { "key1" => "value1", "key2" => "nonMatchingValue", "key3" => "value3" } }
 
-        it "should return false" do
-          hash.has_hash?(hash_parameter).should be(false)
+        it "returns false" do
+          expect(hash.has_hash?(hash_parameter)).to be(false)
         end
 
       end
@@ -82,8 +82,8 @@ describe HttpStub::HashExtensions do
 
         let(:hash) { { "key1" => "value1", "key3" => "value3" } }
 
-        it "should return false" do
-          hash.has_hash?(hash_parameter).should be(false)
+        it "returns false" do
+          expect(hash.has_hash?(hash_parameter)).to be(false)
         end
 
       end
@@ -92,8 +92,8 @@ describe HttpStub::HashExtensions do
 
         let(:hash) { {} }
 
-        it "should return false" do
-          hash.has_hash?(hash_parameter).should be(false)
+        it "returns false" do
+          expect(hash.has_hash?(hash_parameter)).to be(false)
         end
 
       end
@@ -108,8 +108,8 @@ describe HttpStub::HashExtensions do
 
         let(:hash) { {} }
 
-        it "should return true" do
-          hash.has_hash?(hash_parameter).should be(true)
+        it "returns true" do
+          expect(hash.has_hash?(hash_parameter)).to be(true)
         end
 
       end
@@ -118,8 +118,8 @@ describe HttpStub::HashExtensions do
 
         let(:hash) { { "key" => "value" } }
 
-        it "should return true" do
-          hash.has_hash?(hash_parameter).should be(true)
+        it "returns true" do
+          expect(hash.has_hash?(hash_parameter)).to be(true)
         end
 
       end
@@ -134,8 +134,8 @@ describe HttpStub::HashExtensions do
 
         let(:hash) { {} }
 
-        it "should return true" do
-          hash.has_hash?(hash_parameter).should be(true)
+        it "returns true" do
+          expect(hash.has_hash?(hash_parameter)).to be(true)
         end
 
       end
@@ -144,8 +144,8 @@ describe HttpStub::HashExtensions do
 
         let(:hash) { { "key" => "value" } }
 
-        it "should return true" do
-          hash.has_hash?(hash_parameter).should be(true)
+        it "returns true" do
+          expect(hash.has_hash?(hash_parameter)).to be(true)
         end
 
       end
