@@ -4,21 +4,15 @@ module HttpStub
 
       class Stub < Net::HTTP::Post
 
-        def initialize(uri, args)
+        def initialize(payload)
           super("/stubs")
+          @payload = payload
           self.content_type = "application/json"
-          self.body = {
-              "uri" => HttpStub::Configurer::Request::ControllableValue.format(uri),
-              "method" => args[:method],
-              "headers" => HttpStub::Configurer::Request::ControllableValue.format(args[:headers] || {}),
-              "parameters" => HttpStub::Configurer::Request::ControllableValue.format(args[:parameters] || {}),
-              "response" => {
-                  "status" => args[:response][:status] || "",
-                  "headers" => args[:response][:headers] || {},
-                  "body" => args[:response][:body],
-                  "delay_in_seconds" => args[:response][:delay_in_seconds] || ""
-              }
-          }.to_json
+          self.body = payload.to_json
+        end
+
+        def stub_uri
+          @payload[:uri]
         end
 
       end

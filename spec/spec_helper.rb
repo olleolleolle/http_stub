@@ -4,7 +4,7 @@ Bundler.require(:development)
 SimpleCov.start do
   add_filter "/spec/"
   add_filter "/vendor/"
-  minimum_coverage 99.2
+  minimum_coverage 99.3
   refuse_coverage_drop
 end if ENV["coverage"]
 

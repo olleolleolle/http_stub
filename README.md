@@ -126,8 +126,7 @@ Responses may also impose delays, for example:
     stub! /prefix\/[^\/]*\/postfix/, method: :post, response: { status: 200, delay_in_seconds: 8 }
 ```
 
-The stubs known by the server can also be cleared via class methods ```clear_activators!``` and ```clear!```,
-which clears stubs only.
+The stubs known by the server can also be cleared via class methods ```clear_activators!``` and ```clear_stubs!```.
 
 ##### Configurer Initialization ######
 

@@ -4,11 +4,15 @@ module HttpStub
 
       class StubActivator < Net::HTTP::Post
 
-        def initialize(activation_uri, stub_uri, options)
+        def initialize(payload)
           super("/stubs/activators")
-          stub_request = HttpStub::Configurer::Request::Stub.new(stub_uri, options)
-          self.content_type = stub_request.content_type
-          self.body = JSON.parse(stub_request.body).merge({ "activation_uri" => activation_uri }).to_json
+          @payload = payload
+          self.content_type = "application/json"
+          self.body = payload.to_json
+        end
+
+        def activation_uri
+          @payload[:activation_uri]
         end
 
       end

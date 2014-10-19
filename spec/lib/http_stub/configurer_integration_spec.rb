@@ -159,9 +159,9 @@ describe HttpStub::Configurer, "when the server is running" do
 
           end
 
-          context "and the stub is cleared" do
+          context "and stubs are cleared" do
 
-            before(:example) { configurer.clear! }
+            before(:example) { configurer.clear_stubs! }
 
             context "and the original request is made" do
 

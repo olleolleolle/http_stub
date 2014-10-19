@@ -21,13 +21,14 @@ Gem::Specification.new do |s|
 
   s.required_ruby_version = ">= 1.9.3"
 
-  s.add_runtime_dependency "rake", "~> 10.1", "~> 10.1"
+  s.add_runtime_dependency "rake", "~> 10.3", "~> 10.3"
 
   s.add_dependency "sinatra",             "~> 1.4"
   s.add_dependency "sinatra-partial",     "~> 0.4"
   s.add_dependency "haml",                "~> 4.0"
   s.add_dependency "sass",                "~> 3.4"
   s.add_dependency "http_server_manager", "~> 0.4"
+  s.add_dependency "activesupport",       "~> 4.0"
 
   s.add_development_dependency "travis-lint", "~> 2.0"
   s.add_development_dependency "metric_fu",   "~> 4.11"
