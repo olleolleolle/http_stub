@@ -4,29 +4,46 @@ module HttpStub
     class ConfigurerWithManyActivators
       include HttpStub::Configurer
 
-      stub_activator "/activator_1", "/path_1", method: :get,
-                                                headers: { request_header_1: "request_header_value_1" },
-                                                parameters: { parameter_1: "parameter_value_1" },
-                                                response: { status: 201,
-                                                            headers: { response_header_1: "response_header_value_1" },
-                                                            body: "Plain text body",
-                                                            delay_in_seconds: 8 * 1 }
+      [ "Plain text body",
+        { "key" => "JSON body" }.to_json,
+        "<html><body>HTML body</body></html>" ].each_with_index do |response_body, i|
+        activator_number = i + 1
+        triggers = (1..3).map do |trigger_number|
+          stub_server.build_stub do |stub|
+            stub_identifier = "#{activator_number}_trigger_#{trigger_number}"
+            stub.match_request(
+              "/path_#{activator_number}_trigger_#{trigger_number}",
+              method: :get,
+              headers: { "request_header_#{stub_identifier}" => "request_header_value_#{stub_identifier}" },
+              parameters: { "parameter_#{stub_identifier}" => "parameter_value_#{stub_identifier}" }
+            )
+            stub.with_response(
+              status: 300 + (activator_number * trigger_number),
+              headers: { "response_header_#{stub_identifier}" => "response_header_value_#{stub_identifier}" },
+              body: "Body of activator #{stub_identifier}",
+              delay_in_seconds: 3 * activator_number * trigger_number
+            )
+          end
+        end
 
-      stub_activator "/activator_2", "/path_2", method: :get,
-                                                headers: { request_header_2: "request_header_value_2" },
-                                                parameters: { parameter_2: "parameter_value_2" },
-                                                response: { status: 202,
-                                                            headers: { response_header_2: "response_header_value_2" },
-                                                            body: { "key" => "JSON body" }.to_json,
-                                                            delay_in_seconds: 8 * 2 }
+        stub_server.add_activator! do |activator|
+          activator.path("/activator_#{activator_number}")
+          activator.match_request(
+            "/path_#{activator_number}",
+            method: :get,
+            headers: { "request_header_#{activator_number}" => "request_header_value_#{activator_number}" },
+            parameters: { "parameter_#{activator_number}" => "parameter_value_#{activator_number}" }
+          )
+          activator.with_response(
+            status: 200 + activator_number,
+            headers: { "response_header_#{activator_number}" => "response_header_value_#{activator_number}" },
+            body: response_body,
+            delay_in_seconds: 8 * activator_number
+          )
+          triggers.each { |trigger| activator.and_add_stub(trigger) }
+        end
+      end
 
-      stub_activator "/activator_3", "/path_3", method: :get,
-                                                headers: { request_header_3: "request_header_value_3" },
-                                                parameters: { parameter_3: "parameter_value_3" },
-                                                response: { status: 203,
-                                                            headers: { response_header_3: "response_header_value_3" },
-                                                            body: "<html><body>HTML body</body></html>",
-                                                            delay_in_seconds: 8 * 3 }
     end
 
   end

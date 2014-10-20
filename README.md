@@ -63,7 +63,7 @@ These methods issue HTTP requests to the server, configuring it's responses.  An
         include HttpStub::Configurer
 
         server "localhost" # Often localhost for automated test purposes
-        port 8001 # The server post number
+        port 8001 # The server port number
 
         # Register stub for POST "/"
         stub! "/", method: :post, response: { status: 201 }
@@ -76,10 +76,10 @@ These methods issue HTTP requests to the server, configuring it's responses.  An
 
         def deny_access_for!(username)
             # Registers another stub for POST "/" matching on headers and parameters
-            stub!("/", method: :get,
-                       headers: { api_key: "some_fixed_key" },
+            stub!("/", method:     :get,
+                       headers:    { api_key: "some_fixed_key" },
                        parameters: { username: username },
-                       response: { status: 403 })
+                       response:   { status: 403 })
         end
 
     end
@@ -95,20 +95,20 @@ regular expressions:
     stub! /prefix\/[^\/]*\/postfix/, method: :post, response: { status: 200 }
 
     stub_activator "/activate_this", /prefix\/[^\/]+\/postfix/,
-                   method: :post,
-                   headers: { api_key: /^some_.+_key$/ },
+                   method:     :post,
+                   headers:    { api_key: /^some_.+_key$/ },
                    parameters: { username: /^user_.+/ },
-                   response: { status: 201 }
+                   response:   { status: 201 }
 ```
 
 Parameter and header values can also be mandatory omissions, for example:
 
 ```ruby
     stub! "/some/path",
-          method: :post,
-          headers: { header_name: :omitted },
+          method:     :post,
+          headers:    { header_name: :omitted },
           parameters: { parameter_name: :omitted },
-          response: { status: 201 }
+          response:   { status: 201 }
 ```
 
 Responses may contain headers, for example:
@@ -116,7 +116,7 @@ Responses may contain headers, for example:
 ```ruby
     stub! /prefix\/[^\/]*\/postfix/,
           method: :post,
-          response: { status: 201,
+          response: { status:  201,
                       headers: { "content-type" => "application/xhtml+xml", "location" => "http://some/resource/path" } }
 ```
 
@@ -235,21 +235,21 @@ To configure a stub response, POST to /stubs with the following JSON payload:
 
 ```javascript
     {
-        "uri": "/some/path",
-        "method": "some method",
-        "headers": {
-            "a_header": "a_value",
+        "uri":        "/some/path",
+        "method":     "some method",
+        "headers":    {
+            "a_header":       "a_value",
             "another_header": "another_value"
             ...
         },
         "parameters": {
-            "a_param": "a_value",
+            "a_param":       "a_value",
             "another_param": "another_value"
             ...
         },
-        "response": {
-            "status": 200,
-            "body": "Some body",
+        "response":   {
+            "status":           200,
+            "body":             "Some body",
             "delay_in_seconds": 8
         }
     }
@@ -259,8 +259,8 @@ The stub uri, header values and parameter values can be regular expressions by p
 
 ```javascript
     {
-        "uri": "regexp:/prefix/.+",
-        "headers": {
+        "uri":        "regexp:/prefix/.+",
+        "headers":    {
             "a_header": "regexp:^some.+value$",
         },
         "parameters": {
@@ -299,5 +299,5 @@ DELETE to /stubs/activators in order to clear configured stub activators.
 Requirements
 ------------
 
-* Ruby 1.9.3, 2.0 or 2.1
+* Ruby >= 1.9.3
 * Rack server
