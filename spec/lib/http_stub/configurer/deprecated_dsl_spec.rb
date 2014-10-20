@@ -98,7 +98,7 @@ describe HttpStub::Configurer::DeprecatedDSL do
 
   shared_examples_for "a deprecated DSL object" do
 
-    %i{ reset! clear_stubs! clear_activators! }.each do |stub_server_delegate_method|
+    [ :reset!, :clear_stubs!, :clear_activators! ].each do |stub_server_delegate_method|
 
       describe "##{stub_server_delegate_method}" do
 
@@ -136,7 +136,7 @@ describe HttpStub::Configurer::DeprecatedDSL do
 
     end
 
-    %i{ stub! stub_response! }.each do |method|
+    [ :stub!, :stub_response! ].each do |method|
 
       describe "##{method}" do
 

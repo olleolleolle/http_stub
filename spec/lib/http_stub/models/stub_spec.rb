@@ -15,6 +15,18 @@ describe HttpStub::Models::Stub do
     }
   end
   let(:stub_method) { "get" }
+  let(:stub_trigger) do
+    {
+      "uri" => "/a_triggered_path",
+      "method" => "poset",
+      "headers" => { "triggered_header" => "triggered_header_value" },
+      "parameters" => { "triggered_parameter" => "triggered_parameter_value" },
+      "response" => {
+        "status" => 203,
+        "body" => "Triggered body"
+      }
+    }
+  end
   let(:stub_args) do
     {
       "uri" => "/a_path",
@@ -23,20 +35,23 @@ describe HttpStub::Models::Stub do
       "parameters" => raw_stub_parameters,
       "response" => {
         "status" => 201,
-        "body" => "Foo"
-      }
+        "body" => "Some body"
+      },
+      "triggers" => [ stub_trigger ]
     }
   end
-  let(:stub_uri) { double(HttpStub::Models::StubUri, match?: true) }
-  let(:stub_parameters) { double(HttpStub::Models::StubParameters, match?: true) }
-  let(:stub_headers) { double(HttpStub::Models::StubHeaders, match?: true) }
+  let(:stub_uri)        { instance_double(HttpStub::Models::StubUri, match?: true) }
+  let(:stub_headers)    { instance_double(HttpStub::Models::StubHeaders, match?: true) }
+  let(:stub_parameters) { instance_double(HttpStub::Models::StubParameters, match?: true) }
+  let(:stub_triggers)   { instance_double(HttpStub::Models::StubTriggers) }
 
   let(:the_stub) { HttpStub::Models::Stub.new(stub_args) }
 
   before(:example) do
     allow(HttpStub::Models::StubUri).to receive(:new).and_return(stub_uri)
-    allow(HttpStub::Models::StubParameters).to receive(:new).and_return(stub_parameters)
     allow(HttpStub::Models::StubHeaders).to receive(:new).and_return(stub_headers)
+    allow(HttpStub::Models::StubParameters).to receive(:new).and_return(stub_parameters)
+    allow(HttpStub::Models::StubTriggers).to receive(:new).and_return(stub_triggers)
   end
 
   describe "#satisfies?" do
@@ -160,7 +175,15 @@ describe HttpStub::Models::Stub do
     end
 
     it "exposes the provided response body" do
-      expect(the_stub.response.body).to eql("Foo")
+      expect(the_stub.response.body).to eql("Some body")
+    end
+
+  end
+
+  describe "#triggers" do
+
+    it "returns the triggers model encapsulating the triggers provided in the request body" do
+      expect(the_stub.triggers).to eql(stub_triggers)
     end
 
   end

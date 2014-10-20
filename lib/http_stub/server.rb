@@ -8,7 +8,7 @@ module HttpStub
 
     def initialize
       super()
-      @stub_registry = HttpStub::Models::Registry.new("stub")
+      @stub_registry = HttpStub::Models::StubRegistry.new
       @stub_activator_registry = HttpStub::Models::Registry.new("stub_activator")
       @stub_controller = HttpStub::Controllers::StubController.new(@stub_registry)
       @stub_activator_controller =

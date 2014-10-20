@@ -3,7 +3,7 @@ module HttpStub
 
     class Stub
 
-      attr_reader :uri, :headers, :parameters, :response
+      attr_reader :uri, :headers, :parameters, :response, :triggers
 
       def initialize(args)
         @args = args
@@ -11,6 +11,7 @@ module HttpStub
         @headers = HttpStub::Models::StubHeaders.new(args["headers"])
         @parameters = HttpStub::Models::StubParameters.new(args["parameters"])
         @response = HttpStub::Models::Response.new(args["response"])
+        @triggers = HttpStub::Models::StubTriggers.new(args["triggers"])
       end
 
       def satisfies?(request)

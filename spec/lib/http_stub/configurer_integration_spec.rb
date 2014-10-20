@@ -1,7 +1,8 @@
 describe HttpStub::Configurer, "when the server is running" do
   include_context "server integration"
 
-  let(:configurer) { HttpStub::Examples::ConfigurerWithClassActivator.new }
+  let(:configurer)  { HttpStub::Examples::ConfigurerWithClassActivator.new }
+  let(:stub_server) { configurer.stub_server }
 
   after(:example) do
     configurer.clear_stubs!
@@ -135,7 +136,7 @@ describe HttpStub::Configurer, "when the server is running" do
 
     end
 
-    context "and a response for a request is stubbed" do
+    context "and a stub is submitted" do
 
       context "that contains no headers or parameters" do
 
@@ -486,6 +487,55 @@ describe HttpStub::Configurer, "when the server is running" do
 
             it "responds with a 404 status code" do
               expect(response.code).to eql("404")
+            end
+
+          end
+
+        end
+
+      end
+
+      context "that contains triggers" do
+
+        let(:triggers) do
+          (1..3).map do |trigger_number|
+            stub_server.build_stub do |stub|
+              stub.match_request("/triggered_stub_#{trigger_number}", method: :get)
+              stub.with_response(status: 200 + trigger_number, body: "Triggered stub body #{trigger_number}")
+            end
+          end
+        end
+
+        before(:example) do
+          stub_server.add_stub! do |stub|
+            stub.match_request("/stub_with_triggers", method: :get)
+            stub.with_response(body: "Trigger stub body")
+            triggers.each { |trigger| stub.and_add_stub(trigger) }
+          end
+        end
+
+        context "and a request is made matching the stub" do
+
+          before(:example) do
+            @stub_with_triggers_response = Net::HTTP.get_response(server_host, "/stub_with_triggers", server_port)
+          end
+
+          it "replays the stubbed response" do
+            expect(@stub_with_triggers_response.code).to eql("200")
+            expect(@stub_with_triggers_response.body).to eql("Trigger stub body")
+          end
+
+          (1..3).each do |trigger_number|
+
+            context "and then a request matching triggered stub ##{trigger_number} is made" do
+
+              let(:response) { Net::HTTP.get_response(server_host, "/triggered_stub_#{trigger_number}", server_port) }
+
+              it "replays the triggered response" do
+                expect(response.code).to eql("20#{trigger_number}")
+                expect(response.body).to eql("Triggered stub body #{trigger_number}")
+              end
+
             end
 
           end

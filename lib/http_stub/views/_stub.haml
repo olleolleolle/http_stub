@@ -23,3 +23,10 @@
   %tr
     %td Response Delay:
     %td=h(the_stub.response.delay_in_seconds)
+  %tr
+    %td Triggers:
+    %td
+      - the_stub.triggers.each do |trigger|
+        = partial :stub, locals: { the_stub: trigger }
+        %br
+
