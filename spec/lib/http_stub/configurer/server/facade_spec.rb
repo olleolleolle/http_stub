@@ -107,11 +107,18 @@ describe HttpStub::Configurer::Server::Facade do
 
     before(:example) do
       allow(Net::HTTP::Post).to receive(:new).and_return(request)
+      allow(request).to receive(:body=)
       allow(request_processor).to receive(:submit)
     end
 
     it "creates a POST request for /stubs/memory endpoint" do
       expect(Net::HTTP::Post).to receive(:new).with("/stubs/memory").and_return(request)
+
+      subject
+    end
+
+    it "establishes an empty body on the POST request" do
+      expect(request).to receive(:body=).with("")
 
       subject
     end

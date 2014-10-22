@@ -21,9 +21,9 @@ module HttpStub
         end
 
         def remember_stubs
-          @request_processor.submit(
-            request: Net::HTTP::Post.new("/stubs/memory"), description: "committing stubs to memory"
-          )
+          request = Net::HTTP::Post.new("/stubs/memory")
+          request.body = ""
+          @request_processor.submit(request: request, description: "committing stubs to memory")
         end
 
         def recall_stubs
