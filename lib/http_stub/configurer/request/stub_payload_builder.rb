@@ -8,7 +8,7 @@ module HttpStub
           @args = { triggers: [] }
         end
 
-        def match_request(uri, args={})
+        def match_requests(uri, args={})
           @uri = uri
           @args.merge!(args)
         end

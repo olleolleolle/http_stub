@@ -12,20 +12,20 @@ describe HttpStub::Configurer::DeprecatedDSL do
     let(:options)    { { method: method, headers: headers, parameters: parameters, response: response } }
 
     before(:example) do
-      allow(builder).to receive(:match_request)
+      allow(builder).to receive(:match_requests)
       allow(builder).to receive(:respond_with)
     end
 
-    it "causes the builder being added to match on the provided uri" do
-      expect(builder).to receive(:match_request).with(stub_uri, anything)
+    it "causes the builder being added to match requests on the provided uri" do
+      expect(builder).to receive(:match_requests).with(stub_uri, anything)
 
       subject
     end
 
     context "when a method is provided" do
 
-      it "causes the builder being added to match on the provided method" do
-        expect(builder).to receive(:match_request).with(anything, hash_including(method: method))
+      it "causes the builder being added to match requests on the provided method" do
+        expect(builder).to receive(:match_requests).with(anything, hash_including(method: method))
 
         subject
       end
@@ -36,8 +36,8 @@ describe HttpStub::Configurer::DeprecatedDSL do
 
       let(:options) { {} }
 
-      it "causes the builder being added to not match on method" do
-        expect(builder).to receive(:match_request).with(anything, hash_excluding(:method))
+      it "causes the builder being added to not match requests based on method" do
+        expect(builder).to receive(:match_requests).with(anything, hash_excluding(:method))
 
         subject
       end
@@ -46,8 +46,8 @@ describe HttpStub::Configurer::DeprecatedDSL do
 
     context "when parameters are provided" do
 
-      it "causes the builder being added to match on the provided parameters" do
-        expect(builder).to receive(:match_request).with(anything, hash_including(parameters: parameters))
+      it "causes the builder being added to match requests on the provided parameters" do
+        expect(builder).to receive(:match_requests).with(anything, hash_including(parameters: parameters))
 
         subject
       end
@@ -58,8 +58,8 @@ describe HttpStub::Configurer::DeprecatedDSL do
 
       let(:options) { {} }
 
-      it "causes the builder being added to not match on parameters" do
-        expect(builder).to receive(:match_request).with(anything, hash_excluding(:parameters))
+      it "causes the builder being added to not match requests based on parameters" do
+        expect(builder).to receive(:match_requests).with(anything, hash_excluding(:parameters))
 
         subject
       end
@@ -68,8 +68,8 @@ describe HttpStub::Configurer::DeprecatedDSL do
 
     context "when headers are provided" do
 
-      it "causes the builder being added to match on the provided headers" do
-        expect(builder).to receive(:match_request).with(anything, hash_including(headers: headers))
+      it "causes the builder being added to match requests on the provided headers" do
+        expect(builder).to receive(:match_requests).with(anything, hash_including(headers: headers))
 
         subject
       end
@@ -80,8 +80,8 @@ describe HttpStub::Configurer::DeprecatedDSL do
 
       let(:options) { {} }
 
-      it "causes the builder being added to not match on headers" do
-        expect(builder).to receive(:match_request).with(anything, hash_excluding(:headers))
+      it "causes the builder being added to not match requests based on headers" do
+        expect(builder).to receive(:match_requests).with(anything, hash_excluding(:headers))
 
         subject
       end
@@ -170,7 +170,7 @@ describe HttpStub::Configurer::DeprecatedDSL do
 
       before(:example) do
         allow(stub_server).to receive(:add_activator!).and_yield(builder)
-        allow(builder).to receive(:path)
+        allow(builder).to receive(:on)
       end
 
       it "adds an activator to the stub server" do
@@ -180,7 +180,7 @@ describe HttpStub::Configurer::DeprecatedDSL do
       end
 
       it "causes the builder being added to activate on the provided uri" do
-        expect(builder).to receive(:path).with(activation_uri)
+        expect(builder).to receive(:on).with(activation_uri)
 
         subject
       end

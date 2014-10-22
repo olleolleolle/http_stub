@@ -500,7 +500,7 @@ describe HttpStub::Configurer, "when the server is running" do
         let(:triggers) do
           (1..3).map do |trigger_number|
             stub_server.build_stub do |stub|
-              stub.match_request("/triggered_stub_#{trigger_number}", method: :get)
+              stub.match_requests("/triggered_stub_#{trigger_number}", method: :get)
               stub.respond_with(status: 200 + trigger_number, body: "Triggered stub body #{trigger_number}")
             end
           end
@@ -508,7 +508,7 @@ describe HttpStub::Configurer, "when the server is running" do
 
         before(:example) do
           stub_server.add_stub! do |stub|
-            stub.match_request("/stub_with_triggers", method: :get)
+            stub.match_requests("/stub_with_triggers", method: :get)
             stub.respond_with(body: "Trigger stub body")
             stub.and_add_stubs(triggers)
           end

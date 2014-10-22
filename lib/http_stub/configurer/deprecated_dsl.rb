@@ -22,7 +22,7 @@ module HttpStub
 
         def stub_activator(activation_uri, stub_uri, options)
           stub_server.add_activator! do |activator|
-            activator.path(activation_uri)
+            activator.on(activation_uri)
             add_stub_options_to_builder(activator, stub_uri, options)
           end
         end
@@ -46,7 +46,7 @@ module HttpStub
         private
 
         def add_stub_options_to_builder(stub, uri, options)
-          stub.match_request(uri, options.slice(:method, :headers, :parameters))
+          stub.match_requests(uri, options.slice(:method, :headers, :parameters))
           stub.respond_with(options[:response])
         end
 

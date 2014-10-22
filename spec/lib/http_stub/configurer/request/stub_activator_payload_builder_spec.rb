@@ -11,12 +11,12 @@ describe HttpStub::Configurer::Request::StubActivatorPayloadBuilder do
     allow(HttpStub::Configurer::Request::StubPayloadBuilder).to receive(:new).and_return(stub_builder)
   end
 
-  describe "#match_request" do
+  describe "#match_requests" do
 
     it "delegates to a stub payload builder" do
-      expect(stub_builder).to receive(:match_request).with(uri, request_options)
+      expect(stub_builder).to receive(:match_requests).with(uri, request_options)
 
-      builder.match_request(uri, request_options)
+      builder.match_requests(uri, request_options)
     end
 
   end
@@ -59,11 +59,11 @@ describe HttpStub::Configurer::Request::StubActivatorPayloadBuilder do
 
     subject { builder.build }
 
-    context "when a path is established" do
+    context "when a path on which the activator is activated is established" do
 
       let(:activation_uri) { "http://some/activation/uri" }
 
-      before(:example) { builder.path(activation_uri) }
+      before(:example) { builder.on(activation_uri) }
 
       it "returns a payload that includes the activation uri" do
         expect(subject).to include(activation_uri: activation_uri)

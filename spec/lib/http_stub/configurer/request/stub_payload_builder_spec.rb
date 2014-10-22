@@ -37,7 +37,7 @@ describe HttpStub::Configurer::Request::StubPayloadBuilder do
       before(:example) do
         allow(HttpStub::Configurer::Request::ControllableValue).to receive(:format)
 
-        builder.match_request(uri, request_options)
+        builder.match_requests(uri, request_options)
         builder.respond_with(response_options)
       end
 
