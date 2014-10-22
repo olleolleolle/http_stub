@@ -15,6 +15,14 @@ module HttpStub
         stub
       end
 
+      def remember
+        @remembered_registry = @registry.copy
+      end
+
+      def recall
+        @registry = @remembered_registry.copy if @remembered_registry
+      end
+
     end
 
   end

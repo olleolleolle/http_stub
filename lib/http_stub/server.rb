@@ -17,7 +17,7 @@ module HttpStub
 
     private
 
-    SUPPORTED_REQUEST_TYPES = [:get, :post, :put, :delete, :patch, :options].freeze
+    SUPPORTED_REQUEST_TYPES = [ :get, :post, :put, :delete, :patch, :options ].freeze
 
     def self.any_request_type(path, opts={}, &block)
       SUPPORTED_REQUEST_TYPES.each { |type| self.send(type, path, opts, &block) }
@@ -53,7 +53,17 @@ module HttpStub
 
     delete "/stubs" do
       @stub_controller.clear(request)
-      halt 200
+      halt 200, "OK"
+    end
+
+    post "/stubs/memory" do
+      @stub_registry.remember
+      halt 200, "OK"
+    end
+
+    get "/stubs/memory" do
+      @stub_registry.recall
+      halt 200, "OK"
     end
 
     # Sample request body:
@@ -72,7 +82,7 @@ module HttpStub
 
     delete "/stubs/activators" do
       @stub_activator_controller.clear(request)
-      halt 200
+      halt 200, "OK"
     end
 
     get "/application.css" do

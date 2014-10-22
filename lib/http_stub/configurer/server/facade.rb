@@ -5,40 +5,49 @@ module HttpStub
       class Facade
 
         def initialize(configurer)
-          @state_manager = HttpStub::Configurer::Server::StateManager.new(configurer)
+          @request_processor = HttpStub::Configurer::Server::RequestProcessor.new(configurer)
         end
 
         def stub_response(request)
-          @state_manager.add(request: request, description: "stubbing '#{request.stub_uri}'", resetable: true)
+          @request_processor.submit(request: request, description: "stubbing '#{request.stub_uri}'")
         end
 
         def stub_activator(request)
-          @state_manager.add(request: request, description: "registering activator '#{request.activation_uri}'")
+          @request_processor.submit(request: request, description: "registering activator '#{request.activation_uri}'")
         end
 
         def activate(uri)
-          @state_manager.add(request: Net::HTTP::Get.new(uri), description: "activating '#{uri}'", resetable: true)
+          @request_processor.submit(request: Net::HTTP::Get.new(uri), description: "activating '#{uri}'")
         end
 
-        def flush_pending_state
-          @state_manager.flush_pending_state
+        def remember_stubs
+          @request_processor.submit(
+            request: Net::HTTP::Post.new("/stubs/memory"), description: "committing stubs to memory"
+          )
         end
 
-        def remember_state
-          @state_manager.remember
-        end
-
-        def recall_state
-          clear_stubs
-          @state_manager.recall
+        def recall_stubs
+          @request_processor.submit(
+            request: Net::HTTP::Get.new("/stubs/memory"), description: "recalling stubs in memory"
+          )
         end
 
         def clear_stubs
-          @state_manager.add(request: Net::HTTP::Delete.new("/stubs"), description: "clearing stubs")
+          @request_processor.submit(request: Net::HTTP::Delete.new("/stubs"), description: "clearing stubs")
         end
 
         def clear_activators
-          @state_manager.add(request: Net::HTTP::Delete.new("/stubs/activators"), description: "clearing activators")
+          @request_processor.submit(
+            request: Net::HTTP::Delete.new("/stubs/activators"), description: "clearing activators"
+          )
+        end
+
+        def server_has_started
+          @request_processor.disable_buffering!
+        end
+
+        def flush_requests
+          @request_processor.flush!
         end
 
       end

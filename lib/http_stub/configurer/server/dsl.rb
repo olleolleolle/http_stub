@@ -9,7 +9,7 @@ module HttpStub
         end
 
         def has_started!
-          @server_facade.remember_state
+          @server_facade.server_has_started
         end
 
         def build_stub(&block)
@@ -33,8 +33,12 @@ module HttpStub
           @server_facade.activate(uri)
         end
 
-        def reset!
-          @server_facade.recall_state
+        def remember_stubs
+          @server_facade.remember_stubs
+        end
+
+        def recall_stubs!
+          @server_facade.recall_stubs
         end
 
         def clear_stubs!

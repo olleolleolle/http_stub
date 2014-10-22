@@ -17,25 +17,25 @@ describe HttpStub::Models::Stub do
   let(:stub_method) { "get" }
   let(:stub_trigger) do
     {
-      "uri" => "/a_triggered_path",
-      "method" => "poset",
-      "headers" => { "triggered_header" => "triggered_header_value" },
+      "uri" =>        "/a_triggered_path",
+      "method" =>     "post",
+      "headers" =>    { "triggered_header" => "triggered_header_value" },
       "parameters" => { "triggered_parameter" => "triggered_parameter_value" },
       "response" => {
         "status" => 203,
-        "body" => "Triggered body"
+        "body" =>   "Triggered body"
       }
     }
   end
   let(:stub_args) do
     {
-      "uri" => "/a_path",
-      "method" => stub_method,
-      "headers" => raw_stub_headers,
+      "uri" =>        "/a_path",
+      "method" =>     stub_method,
+      "headers" =>    raw_stub_headers,
       "parameters" => raw_stub_parameters,
       "response" => {
         "status" => 201,
-        "body" => "Some body"
+        "body" =>   "Some body"
       },
       "triggers" => [ stub_trigger ]
     }

@@ -1,9 +1,9 @@
 describe HttpStub::Models::Registry do
 
-  let(:registry) { HttpStub::Models::Registry.new("a_model") }
-
-  let(:logger) { double("Logger").as_null_object }
+  let(:logger)  { double("Logger").as_null_object }
   let(:request) { double("HttpRequest", logger: logger, inspect: "Request inspect result") }
+
+  let(:registry) { HttpStub::Models::Registry.new("a_model") }
 
   describe "#add" do
 
@@ -112,6 +112,49 @@ describe HttpStub::Models::Registry do
         expect(registry.all).to eql([])
       end
 
+    end
+
+  end
+
+  describe "#copy" do
+
+    class HttpStub::Models::CopyableModel
+
+      attr_reader :name
+
+      def initialize(name)
+        @name = name
+      end
+
+      def eql?(other)
+        @name = other.name
+      end
+
+    end
+
+    subject { registry.copy }
+
+    context "when multiple models have been registered" do
+
+      let(:models) { (1..3).map { |i| HttpStub::Models::CopyableModel.new("model_#{i}") } }
+
+      before(:each) { models.each { |model| registry.add(model, request) } }
+
+      it "returns a registry containing the models" do
+        result = subject
+
+        expect(result.all).to eql(models)
+      end
+
+    end
+
+    it "returns a registry that changes independently of the copied registry" do
+      model_to_add = HttpStub::Models::CopyableModel.new("model_to_add")
+
+      result = subject
+
+      registry.add(model_to_add, request)
+      expect(result.all).not_to include(model_to_add)
     end
 
   end

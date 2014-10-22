@@ -22,6 +22,10 @@ module HttpStub
         Array.new(@models)
       end
 
+      def copy
+        Marshal.load(Marshal.dump(self))
+      end
+
       def clear(request)
         request.logger.info "Clearing #{@model_name} registry"
         @models.clear

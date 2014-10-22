@@ -26,11 +26,8 @@ module HttpStub
       end
 
       def define_initialize_task(args)
-        desc "Configures stub #{args[:name]} in its initial state"
-        task(:configure) do
-          args[:configurer].initialize!
-          args[:configurer].reset!
-        end
+        desc "Configures stub #{args[:name]}"
+        task(:configure) { args[:configurer].initialize! }
       end
 
     end

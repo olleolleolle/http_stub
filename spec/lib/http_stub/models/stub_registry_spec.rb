@@ -64,6 +64,59 @@ describe HttpStub::Models::StubRegistry do
 
   end
 
+  describe "#remember" do
+
+    it "copies the underlying registry" do
+      expect(registry).to receive(:copy)
+
+      stub_registry.remember
+    end
+
+  end
+
+  describe "#recall" do
+
+    subject { stub_registry.recall }
+
+    context "when the state of the registry has been remembered" do
+
+      let(:remembered_registry)         { instance_double(HttpStub::Models::Registry) }
+      let(:copy_of_remembered_registry) { instance_double(HttpStub::Models::Registry) }
+
+      before(:example) do
+        allow(registry).to receive(:copy).and_return(remembered_registry)
+        allow(remembered_registry).to receive(:copy).and_return(copy_of_remembered_registry)
+        stub_registry.remember
+      end
+
+      it "copies the remembered registry to ensure subsequent recalls recall the same stubs" do
+        expect(remembered_registry).to receive(:copy)
+
+        subject
+      end
+
+      it "causes subsequent method calls to delegate to the copy" do
+        subject
+
+        expect(copy_of_remembered_registry).to receive(:all)
+        stub_registry.all
+      end
+
+    end
+
+    context "when the state of the registry has not been remembered" do
+
+      it "does not effect subsequent method calls" do
+        subject
+
+        expect(registry).to receive(:all)
+        stub_registry.all
+      end
+
+    end
+
+  end
+
   describe "#all" do
 
     let(:stubs) { (1..3).map { instance_double(HttpStub::Models::Stub) } }

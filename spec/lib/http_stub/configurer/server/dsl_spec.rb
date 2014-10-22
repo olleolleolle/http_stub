@@ -6,8 +6,8 @@ describe HttpStub::Configurer::Server::DSL do
 
   describe "#has_started!" do
 
-    it "informs the facade to freeze the initial state of the server" do
-      expect(server_facade).to receive(:remember_state)
+    it "informs the facade that the server has started" do
+      expect(server_facade).to receive(:server_has_started)
 
       dsl.has_started!
     end
@@ -198,12 +198,22 @@ describe HttpStub::Configurer::Server::DSL do
 
   end
 
-  describe "#reset!" do
+  describe "#remember_stubs" do
 
-    it "informs the server facade to restore the servers initial state" do
-      expect(server_facade).to receive(:recall_state)
+    it "delegates to the server facade" do
+      expect(server_facade).to receive(:remember_stubs)
 
-      dsl.reset!
+      dsl.remember_stubs
+    end
+
+  end
+
+  describe "#recall_stubs!" do
+
+    it "delegates to the server facade" do
+      expect(server_facade).to receive(:recall_stubs)
+
+      dsl.recall_stubs!
     end
 
   end

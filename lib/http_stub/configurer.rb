@@ -36,8 +36,8 @@ module HttpStub
 
       def initialize!
         on_initialize if self.respond_to?(:on_initialize) && !@initialized
-        server_facade.remember_state
-        server_facade.flush_pending_state
+        server_facade.flush_requests
+        server_facade.remember_stubs
         @initialized = true
       end
 

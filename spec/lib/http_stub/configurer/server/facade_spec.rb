@@ -1,11 +1,23 @@
 describe HttpStub::Configurer::Server::Facade do
 
-  let(:configurer)    { double(HttpStub::Configurer) }
-  let(:state_manager) { instance_double(HttpStub::Configurer::Server::StateManager) }
+  let(:configurer)        { double(HttpStub::Configurer) }
+  let(:request_processor) { instance_double(HttpStub::Configurer::Server::RequestProcessor) }
 
   let(:facade) { HttpStub::Configurer::Server::Facade.new(configurer) }
 
-  before(:example) { allow(HttpStub::Configurer::Server::StateManager).to receive(:new).and_return(state_manager) }
+  before(:example) do
+    allow(HttpStub::Configurer::Server::RequestProcessor).to receive(:new).and_return(request_processor)
+  end
+  
+  describe "constructor" do
+
+    it "creates a request processor with the provided configurer" do
+      expect(HttpStub::Configurer::Server::RequestProcessor).to receive(:new).with(configurer)
+      
+      facade
+    end
+
+  end
 
   describe "#stub_response" do
 
@@ -14,22 +26,16 @@ describe HttpStub::Configurer::Server::Facade do
 
     subject { facade.stub_response(request) }
 
-    before(:example) { allow(state_manager).to receive(:add) }
+    before(:example) { allow(request_processor).to receive(:submit) }
 
-    it "adds the stub request to the server state" do
-      expect(state_manager).to receive(:add).with(hash_including(request: request))
+    it "submits the stub request via the request processor" do
+      expect(request_processor).to receive(:submit).with(hash_including(request: request))
 
       subject
     end
 
     it "describes the stub via its stub uri" do
-      expect(state_manager).to receive(:add).with(hash_including(description: "stubbing '#{stub_uri}'"))
-
-      subject
-    end
-
-    it "declares the request is resetable" do
-      expect(state_manager).to receive(:add).with(hash_including(resetable: true))
+      expect(request_processor).to receive(:submit).with(hash_including(description: "stubbing '#{stub_uri}'"))
 
       subject
     end
@@ -43,24 +49,18 @@ describe HttpStub::Configurer::Server::Facade do
 
     subject { facade.stub_activator(request) }
 
-    before(:example) { allow(state_manager).to receive(:add) }
+    before(:example) { allow(request_processor).to receive(:submit) }
 
-    it "adds the stub request to the server state" do
-      expect(state_manager).to receive(:add).with(hash_including(request: request))
+    it "submits the stub request via the request processor" do
+      expect(request_processor).to receive(:submit).with(hash_including(request: request))
 
       subject
     end
 
     it "describes the stub via its activation uri" do
-      expect(state_manager).to(
-        receive(:add).with(hash_including(description: "registering activator '#{activation_uri}'"))
+      expect(request_processor).to(
+        receive(:submit).with(hash_including(description: "registering activator '#{activation_uri}'"))
       )
-
-      subject
-    end
-
-    it "does not declare that the request is resetable" do
-      expect(state_manager).to receive(:add).with(hash_excluding(:resetable))
 
       subject
     end
@@ -76,7 +76,7 @@ describe HttpStub::Configurer::Server::Facade do
 
     before(:example) do
       allow(Net::HTTP::Get).to receive(:new).and_return(request)
-      allow(state_manager).to receive(:add)
+      allow(request_processor).to receive(:submit)
     end
 
     it "creates a GET request for the uri" do
@@ -85,63 +85,78 @@ describe HttpStub::Configurer::Server::Facade do
       subject
     end
 
-    it "adds the GET request to the server state" do
-      expect(state_manager).to receive(:add).with(hash_including(request: request))
+    it "submits the GET request via the request processor" do
+      expect(request_processor).to receive(:submit).with(hash_including(request: request))
 
       subject
     end
 
     it "describes the activation request via the provided uri" do
-      expect(state_manager).to receive(:add).with(hash_including(description: "activating '#{uri}'"))
-
-      subject
-    end
-
-    it "declares the request is resetable" do
-      expect(state_manager).to receive(:add).with(hash_including(resetable: true))
+      expect(request_processor).to receive(:submit).with(hash_including(description: "activating '#{uri}'"))
 
       subject
     end
 
   end
 
-  describe "#remember_state" do
+  describe "#remember_stubs" do
 
-    it "delegates to the state manager" do
-      expect(state_manager).to receive(:remember)
+    let(:request) { instance_double(Net::HTTP::Post) }
 
-      facade.remember_state
-    end
-
-  end
-
-  describe "#flush_pending_state" do
-
-    it "delegates to the state manager" do
-      expect(state_manager).to receive(:flush_pending_state)
-
-      facade.flush_pending_state
-    end
-
-  end
-
-  describe "#recall_state" do
+    subject { facade.remember_stubs }
 
     before(:example) do
-      allow(facade).to receive(:clear_stubs)
-      allow(state_manager).to receive(:recall)
+      allow(Net::HTTP::Post).to receive(:new).and_return(request)
+      allow(request_processor).to receive(:submit)
     end
 
-    it "clears the servers stubs" do
-      expect(facade).to receive(:clear_stubs)
+    it "creates a POST request for /stubs/memory endpoint" do
+      expect(Net::HTTP::Post).to receive(:new).with("/stubs/memory").and_return(request)
 
-      facade.recall_state
+      subject
     end
 
-    it "informs the state manager to replay the initial state" do
-      expect(state_manager).to receive(:recall)
+    it "submits the POST request via the request processor" do
+      expect(request_processor).to receive(:submit).with(hash_including(request: request))
 
-      facade.recall_state
+      subject
+    end
+
+    it "describes the request as committing the servers stubs to memory" do
+      expect(request_processor).to receive(:submit).with(hash_including(description: "committing stubs to memory"))
+
+      subject
+    end
+
+  end
+
+  describe "#recall_stubs" do
+
+    let(:request) { instance_double(Net::HTTP::Get) }
+
+    subject { facade.recall_stubs }
+
+    before(:example) do
+      allow(Net::HTTP::Get).to receive(:new).and_return(request)
+      allow(request_processor).to receive(:submit)
+    end
+
+    it "creates a POST request for /stubs/memory endpoint" do
+      expect(Net::HTTP::Get).to receive(:new).with("/stubs/memory").and_return(request)
+
+      subject
+    end
+
+    it "submits the GET request via the request processor" do
+      expect(request_processor).to receive(:submit).with(hash_including(request: request))
+
+      subject
+    end
+
+    it "describes the request as recalling the servers stubs in memory" do
+      expect(request_processor).to receive(:submit).with(hash_including(description: "recalling stubs in memory"))
+
+      subject
     end
 
   end
@@ -154,7 +169,7 @@ describe HttpStub::Configurer::Server::Facade do
 
     before(:example) do
       allow(Net::HTTP::Delete).to receive(:new).and_return(request)
-      allow(state_manager).to receive(:add)
+      allow(request_processor).to receive(:submit)
     end
 
     it "creates a DELETE request for the /stubs endpoint" do
@@ -164,13 +179,13 @@ describe HttpStub::Configurer::Server::Facade do
     end
 
     it "adds the DELETE request to the server state" do
-      expect(state_manager).to receive(:add).with(hash_including(request: request))
+      expect(request_processor).to receive(:submit).with(hash_including(request: request))
 
       subject
     end
 
     it "describes the request as clearing the server stubs" do
-      expect(state_manager).to receive(:add).with(hash_including(description: "clearing stubs"))
+      expect(request_processor).to receive(:submit).with(hash_including(description: "clearing stubs"))
 
       subject
     end
@@ -185,7 +200,7 @@ describe HttpStub::Configurer::Server::Facade do
 
     before(:example) do
       allow(Net::HTTP::Delete).to receive(:new).and_return(request)
-      allow(state_manager).to receive(:add)
+      allow(request_processor).to receive(:submit)
     end
 
     it "creates a DELETE request for the /stubs/activators endpoint" do
@@ -195,15 +210,35 @@ describe HttpStub::Configurer::Server::Facade do
     end
 
     it "adds the DELETE request to the server state" do
-      expect(state_manager).to receive(:add).with(hash_including(request: request))
+      expect(request_processor).to receive(:submit).with(hash_including(request: request))
 
       subject
     end
 
     it "describes the request as clearing the server stub activators" do
-      expect(state_manager).to receive(:add).with(hash_including(description: "clearing activators"))
+      expect(request_processor).to receive(:submit).with(hash_including(description: "clearing activators"))
 
       subject
+    end
+
+  end
+
+  describe "#server_has_started" do
+
+    it "informs the request processor to disable buffering requests" do
+      expect(request_processor).to receive(:disable_buffering!)
+
+      facade.server_has_started
+    end
+
+  end
+
+  describe "#flush_requests" do
+
+    it "informs the request processor to flush it's requests" do
+      expect(request_processor).to receive(:flush!)
+
+      facade.flush_requests
     end
 
   end

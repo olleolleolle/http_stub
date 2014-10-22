@@ -106,9 +106,9 @@ describe HttpStub::Configurer, "when the server is running" do
           configurer.stub_response!("/another_stub", method: :get, response: { body: "Another stub body" })
         end
 
-        context "and the configurer is reset" do
+        context "and the servers remembered stubs are recalled" do
 
-          before(:example) { configurer.reset! }
+          before(:example) { configurer.recall_stubs! }
 
           it "removes the stub registered post-initialization" do
             response = Net::HTTP.get_response(server_host, "/another_stub", server_port)

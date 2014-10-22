@@ -31,8 +31,8 @@ module HttpStub
           stub_server.activate!(uri)
         end
 
-        def reset!
-          stub_server.reset!
+        def recall_stubs!
+          stub_server.recall_stubs!
         end
 
         def clear_stubs!

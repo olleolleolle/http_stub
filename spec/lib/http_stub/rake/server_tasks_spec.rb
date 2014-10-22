@@ -30,12 +30,6 @@ describe HttpStub::Rake::ServerTasks do
           Rake::Task["#{server_name}:configure"].execute
         end
 
-        it "resets the provided configurer to ensure stubs are in their initial state" do
-          expect(configurer).to receive(:reset!)
-
-          Rake::Task["#{server_name}:configure"].execute
-        end
-
       end
 
     end
