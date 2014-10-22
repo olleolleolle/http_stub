@@ -510,7 +510,7 @@ describe HttpStub::Configurer, "when the server is running" do
           stub_server.add_stub! do |stub|
             stub.match_request("/stub_with_triggers", method: :get)
             stub.with_response(body: "Trigger stub body")
-            triggers.each { |trigger| stub.and_add_stub(trigger) }
+            stub.and_add_stubs(triggers)
           end
         end
 

@@ -21,6 +21,10 @@ module HttpStub
           @args[:triggers] << stub_builder
         end
 
+        def and_add_stubs(stub_builders)
+          @args[:triggers].concat(stub_builders)
+        end
+
         def build
           {
             uri: HttpStub::Configurer::Request::ControllableValue.format(@uri),

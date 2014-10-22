@@ -43,6 +43,18 @@ describe HttpStub::Configurer::Request::StubActivatorPayloadBuilder do
 
   end
 
+  describe "#and_add_stubs" do
+
+    let(:trigger_builders) { (1..3).map { instance_double(HttpStub::Configurer::Request::StubPayloadBuilder) } }
+
+    it "delegates to a stub payload builder" do
+      expect(stub_builder).to receive(:and_add_stubs).with(trigger_builders)
+
+      builder.and_add_stubs(trigger_builders)
+    end
+
+  end
+
   describe "#build" do
 
     subject { builder.build }

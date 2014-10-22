@@ -85,7 +85,7 @@ describe HttpStub::Configurer::Server::DSL do
         subject
       end
 
-      it "informs the server facade to stub the response" do
+      it "informs the server facade of the stub request" do
         expect(server_facade).to receive(:stub_response).with(stub_request)
 
         subject
@@ -124,6 +124,53 @@ describe HttpStub::Configurer::Server::DSL do
       end
 
       it_behaves_like "adding a stub payload"
+
+    end
+
+  end
+
+  describe "#add_stubs!" do
+
+    context "when multiple stub payload builders are provided" do
+
+      let(:stub_payloads)         { (1..3).map { |i| { "stub_payload_key_#{i}" => "stub payload value #{i}" } } }
+      let(:stub_payload_builders) do
+        stub_payloads.map do |payload|
+          instance_double(HttpStub::Configurer::Request::StubPayloadBuilder, build: payload)
+        end
+      end
+      let(:stub_requests)         do
+        (1..stub_payloads.length).map { instance_double(HttpStub::Configurer::Request::Stub) }
+      end
+
+      subject { dsl.add_stubs!(stub_payload_builders) }
+
+      before(:example) do
+        allow(HttpStub::Configurer::Request::Stub).to receive(:new).and_return(*stub_requests)
+        allow(server_facade).to receive(:stub_response)
+      end
+
+      it "builds the each stub payload" do
+        stub_payload_builders.zip(stub_payloads).each do |stub_payload_builder, stub_payload|
+          expect(stub_payload_builder).to receive(:build).and_return(stub_payload)
+        end
+
+        subject
+      end
+
+      it "creates a stub request for each built payload" do
+        stub_payloads.zip(stub_requests).each do |stub_payload, stub_request|
+          expect(HttpStub::Configurer::Request::Stub).to receive(:new).with(stub_payload).and_return(stub_request)
+        end
+
+        subject
+      end
+
+      it "informs the server facade of each stub request" do
+        stub_requests.each { |stub_request| expect(server_facade).to receive(:stub_response).with(stub_request) }
+
+        subject
+      end
 
     end
 

@@ -23,6 +23,10 @@ module HttpStub
           @server_facade.stub_response(HttpStub::Configurer::Request::Stub.new(resolved_builder.build))
         end
 
+        def add_stubs!(builders)
+          builders.each { |builder| add_stub!(builder) }
+        end
+
         def add_activator!(&block)
           builder = HttpStub::Configurer::Request::StubActivatorPayloadBuilder.new
           block.call(builder)

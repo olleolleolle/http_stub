@@ -2,6 +2,17 @@ describe HttpStub::Configurer::Request::StubPayloadBuilder do
 
   let(:builder) { HttpStub::Configurer::Request::StubPayloadBuilder.new }
 
+  shared_context "add stub trigger" do
+
+    let(:trigger_payload) { { "trigger_key" => "trigger value" } }
+    let(:trigger_builder) do
+      instance_double(HttpStub::Configurer::Request::StubPayloadBuilder, build: trigger_payload)
+    end
+
+    before(:example) { builder.and_add_stub(trigger_builder) }
+
+  end
+
   shared_context "add stub triggers" do
 
     let(:trigger_payloads) { (1..3).map { |i| { "trigger_#{i}_key" => "trigger #{i} value" } } }
@@ -11,13 +22,13 @@ describe HttpStub::Configurer::Request::StubPayloadBuilder do
       end
     end
 
-    before(:example) { trigger_builders.each { |trigger_builder| builder.and_add_stub(trigger_builder) } }
+    before(:example) { builder.and_add_stubs(trigger_builders) }
 
   end
 
   describe "#build" do
 
-    context "when provided a uri and stub arguments" do
+    context "when provided a request match and response data" do
 
       include_context "stub payload builder arguments"
 
@@ -176,8 +187,18 @@ describe HttpStub::Configurer::Request::StubPayloadBuilder do
 
         end
 
-        context "when stub triggers are added" do
+        context "when a stub trigger is added" do
           
+          include_context "add stub trigger"
+
+          it "has a triggers entry containing the stub trigger payload" do
+            expect(subject).to include(triggers: [ trigger_payload ])
+          end
+
+        end
+
+        context "when stub triggers are added" do
+
           include_context "add stub triggers"
 
           it "has a triggers entry containing the stub trigger payloads" do

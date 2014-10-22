@@ -14,7 +14,7 @@ module HttpStub
       stub_server.add_stub! do |stub|
         stub.match_request("/a_stub", method: :get)
         stub.with_response(body: "Stub activator body")
-        triggered_stubs.each { |triggered_stub| stub.and_add_stub(triggered_stub) }
+        stub.and_add_stubs(triggered_stubs)
       end
     end
 
