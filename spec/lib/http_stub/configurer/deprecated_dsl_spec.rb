@@ -13,7 +13,7 @@ describe HttpStub::Configurer::DeprecatedDSL do
 
     before(:example) do
       allow(builder).to receive(:match_request)
-      allow(builder).to receive(:with_response)
+      allow(builder).to receive(:respond_with)
     end
 
     it "causes the builder being added to match on the provided uri" do
@@ -89,7 +89,7 @@ describe HttpStub::Configurer::DeprecatedDSL do
     end
 
     it "adds the provided response data to the builder" do
-      expect(builder).to receive(:with_response).with(response)
+      expect(builder).to receive(:respond_with).with(response)
 
       subject
     end

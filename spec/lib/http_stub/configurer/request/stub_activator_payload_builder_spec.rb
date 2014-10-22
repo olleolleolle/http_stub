@@ -21,12 +21,12 @@ describe HttpStub::Configurer::Request::StubActivatorPayloadBuilder do
 
   end
 
-  describe "#with_response" do
+  describe "#respond_with" do
 
     it "delegates to a stub payload builder" do
-      expect(stub_builder).to receive(:with_response).with(response_options)
+      expect(stub_builder).to receive(:respond_with).with(response_options)
 
-      builder.with_response(response_options)
+      builder.respond_with(response_options)
     end
 
   end

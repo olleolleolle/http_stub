@@ -38,7 +38,7 @@ describe HttpStub::Configurer::Request::StubPayloadBuilder do
         allow(HttpStub::Configurer::Request::ControllableValue).to receive(:format)
 
         builder.match_request(uri, request_options)
-        builder.with_response(response_options)
+        builder.respond_with(response_options)
       end
 
       context "when request header is provided" do

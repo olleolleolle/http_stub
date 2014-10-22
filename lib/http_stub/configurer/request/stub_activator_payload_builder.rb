@@ -4,7 +4,7 @@ module HttpStub
 
       class StubActivatorPayloadBuilder
 
-        delegate :match_request, :with_response, :and_add_stub, :and_add_stubs, to: :@stub_payload_builder
+        delegate :match_request, :respond_with, :and_add_stub, :and_add_stubs, to: :@stub_payload_builder
         
         def initialize
           @stub_payload_builder = HttpStub::Configurer::Request::StubPayloadBuilder.new

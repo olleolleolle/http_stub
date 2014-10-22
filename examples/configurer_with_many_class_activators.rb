@@ -17,7 +17,7 @@ module HttpStub
               headers: { "request_header_#{stub_identifier}" => "request_header_value_#{stub_identifier}" },
               parameters: { "parameter_#{stub_identifier}" => "parameter_value_#{stub_identifier}" }
             )
-            stub.with_response(
+            stub.respond_with(
               status: 300 + (activator_number * trigger_number),
               headers: { "response_header_#{stub_identifier}" => "response_header_value_#{stub_identifier}" },
               body: "Body of activator #{stub_identifier}",
@@ -34,7 +34,7 @@ module HttpStub
             headers: { "request_header_#{activator_number}" => "request_header_value_#{activator_number}" },
             parameters: { "parameter_#{activator_number}" => "parameter_value_#{activator_number}" }
           )
-          activator.with_response(
+          activator.respond_with(
             status: 200 + activator_number,
             headers: { "response_header_#{activator_number}" => "response_header_value_#{activator_number}" },
             body: response_body,

@@ -13,7 +13,7 @@ module HttpStub
           @args.merge!(args)
         end
 
-        def with_response(args)
+        def respond_with(args)
           @args.merge!(response: args)
         end
 

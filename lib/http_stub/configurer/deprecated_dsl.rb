@@ -47,7 +47,7 @@ module HttpStub
 
         def add_stub_options_to_builder(stub, uri, options)
           stub.match_request(uri, options.slice(:method, :headers, :parameters))
-          stub.with_response(options[:response])
+          stub.respond_with(options[:response])
         end
 
       end
