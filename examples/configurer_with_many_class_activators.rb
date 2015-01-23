@@ -8,7 +8,7 @@ module HttpStub
         { "key" => "JSON body" }.to_json,
         "<html><body>HTML body</body></html>" ].each_with_index do |response_body, i|
         activator_number = i + 1
-        triggers = (1..3).map do |trigger_number|
+        triggered_stubs = (1..3).map do |trigger_number|
           stub_server.build_stub do |stub|
             stub_identifier = "#{activator_number}_trigger_#{trigger_number}"
             stub.match_requests(
@@ -40,7 +40,7 @@ module HttpStub
             body: response_body,
             delay_in_seconds: 8 * activator_number
           )
-          triggers.each { |trigger| activator.and_add_stub(trigger) }
+          triggered_stubs.each { |triggered_stub| activator.trigger(triggered_stub) }
         end
       end
 

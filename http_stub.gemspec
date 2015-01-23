@@ -7,9 +7,9 @@ Gem::Specification.new do |s|
   s.version           = HttpStub::VERSION
   s.platform          = Gem::Platform::RUBY
   s.authors           = ["Matthew Ueckerman", "Russell Van Bert"]
-  s.summary           = %q{A HTTP Server replaying configured stub responses.}
-  s.description       = %q{fakeweb for a HTTP server, informing it to stub / fake responses.}
-  s.email             = %q{matthew.ueckerman@myob.com}
+  s.summary           = "A HTTP Server replaying configured stub responses"
+  s.description       = "fakeweb for a HTTP server, informing it to stub / fake responses"
+  s.email             = "matthew.ueckerman@myob.com"
   s.homepage          = "http://github.com/MYOB-Technology/http_stub"
   s.rubyforge_project = "http_stub"
   s.license           = "MIT"
@@ -21,14 +21,14 @@ Gem::Specification.new do |s|
 
   s.required_ruby_version = ">= 1.9.3"
 
-  s.add_runtime_dependency "rake", "~> 10.3", "~> 10.3"
+  s.add_runtime_dependency "rake", "~> 10.4", "~> 10.4"
 
   s.add_dependency "sinatra",             "~> 1.4"
   s.add_dependency "sinatra-partial",     "~> 0.4"
   s.add_dependency "haml",                "~> 4.0"
   s.add_dependency "sass",                "~> 3.4"
   s.add_dependency "http_server_manager", "~> 0.4"
-  s.add_dependency "activesupport",       "~> 4.0"
+  s.add_dependency "activesupport",       "~> 4.2"
 
   s.add_development_dependency "travis-lint", "~> 2.0"
   s.add_development_dependency "metric_fu",   "~> 4.11"

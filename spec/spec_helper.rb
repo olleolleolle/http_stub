@@ -2,8 +2,11 @@ require 'bundler'
 Bundler.require(:development)
 
 SimpleCov.start do
+  coverage_dir "tmp/coverage"
+
   add_filter "/spec/"
   add_filter "/vendor/"
+
   minimum_coverage 99.41
   refuse_coverage_drop
 end if ENV["coverage"]

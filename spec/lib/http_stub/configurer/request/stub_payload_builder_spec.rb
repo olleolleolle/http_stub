@@ -2,18 +2,18 @@ describe HttpStub::Configurer::Request::StubPayloadBuilder do
 
   let(:builder) { HttpStub::Configurer::Request::StubPayloadBuilder.new }
 
-  shared_context "add stub trigger" do
+  shared_context "triggers one stub" do
 
     let(:trigger_payload) { { "trigger_key" => "trigger value" } }
     let(:trigger_builder) do
       instance_double(HttpStub::Configurer::Request::StubPayloadBuilder, build: trigger_payload)
     end
 
-    before(:example) { builder.and_add_stub(trigger_builder) }
+    before(:example) { builder.trigger(trigger_builder) }
 
   end
 
-  shared_context "add stub triggers" do
+  shared_context "triggers many stubs" do
 
     let(:trigger_payloads) { (1..3).map { |i| { "trigger_#{i}_key" => "trigger #{i} value" } } }
     let(:trigger_builders) do
@@ -22,7 +22,7 @@ describe HttpStub::Configurer::Request::StubPayloadBuilder do
       end
     end
 
-    before(:example) { builder.and_add_stubs(trigger_builders) }
+    before(:example) { builder.trigger(trigger_builders) }
 
   end
 
@@ -85,9 +85,9 @@ describe HttpStub::Configurer::Request::StubPayloadBuilder do
 
       end
 
-      context "when stub triggers are added" do
+      context "when many triggers are added" do
         
-        include_context "add stub triggers"
+        include_context "triggers many stubs"
 
         it "builds the payload for each trigger" do
           trigger_builders.each { |trigger_builder| expect(trigger_builder).to receive(:build) }
@@ -187,9 +187,9 @@ describe HttpStub::Configurer::Request::StubPayloadBuilder do
 
         end
 
-        context "when a stub trigger is added" do
+        context "when a trigger is added" do
           
-          include_context "add stub trigger"
+          include_context "triggers one stub"
 
           it "has a triggers entry containing the stub trigger payload" do
             expect(subject).to include(triggers: [ trigger_payload ])
@@ -197,9 +197,9 @@ describe HttpStub::Configurer::Request::StubPayloadBuilder do
 
         end
 
-        context "when stub triggers are added" do
+        context "when many triggers are added" do
 
-          include_context "add stub triggers"
+          include_context "triggers many stubs"
 
           it "has a triggers entry containing the stub trigger payloads" do
             expect(subject).to include(triggers: trigger_payloads)
@@ -207,7 +207,7 @@ describe HttpStub::Configurer::Request::StubPayloadBuilder do
 
         end
 
-        context "when no stub triggers are added" do
+        context "when no triggers are added" do
 
           it "has a triggers entry containing an empty hash" do
             expect(subject).to include(triggers: [])

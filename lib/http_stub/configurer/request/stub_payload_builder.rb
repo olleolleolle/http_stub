@@ -17,12 +17,10 @@ module HttpStub
           @args.merge!(response: args)
         end
 
-        def and_add_stub(stub_builder)
-          @args[:triggers] << stub_builder
-        end
-
-        def and_add_stubs(stub_builders)
-          @args[:triggers].concat(stub_builders)
+        def trigger(stub_builder_or_builders)
+          resolved_builders =
+            stub_builder_or_builders.is_a?(Array) ? stub_builder_or_builders : [ stub_builder_or_builders ]
+          @args[:triggers].concat(resolved_builders)
         end
 
         def build

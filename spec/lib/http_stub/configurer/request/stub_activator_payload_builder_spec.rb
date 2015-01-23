@@ -31,26 +31,30 @@ describe HttpStub::Configurer::Request::StubActivatorPayloadBuilder do
 
   end
 
-  describe "#and_add_stub" do
+  describe "#trigger" do
 
-    let(:trigger_builder) { instance_double(HttpStub::Configurer::Request::StubPayloadBuilder) }
+    context "when one triggered stub is provided" do
 
-    it "delegates to a stub payload builder" do
-      expect(stub_builder).to receive(:and_add_stub).with(trigger_builder)
+      let(:trigger_builder) { instance_double(HttpStub::Configurer::Request::StubPayloadBuilder) }
 
-      builder.and_add_stub(trigger_builder)
+      it "delegates to a stub payload builder" do
+        expect(stub_builder).to receive(:trigger).with(trigger_builder)
+
+        builder.trigger(trigger_builder)
+      end
+
     end
 
-  end
+    context "when many triggered stubs are provided" do
 
-  describe "#and_add_stubs" do
+      let(:trigger_builders) { (1..3).map { instance_double(HttpStub::Configurer::Request::StubPayloadBuilder) } }
 
-    let(:trigger_builders) { (1..3).map { instance_double(HttpStub::Configurer::Request::StubPayloadBuilder) } }
+      it "delegates to a stub payload builder" do
+        expect(stub_builder).to receive(:trigger).with(trigger_builders)
 
-    it "delegates to a stub payload builder" do
-      expect(stub_builder).to receive(:and_add_stubs).with(trigger_builders)
+        builder.trigger(trigger_builders)
+      end
 
-      builder.and_add_stubs(trigger_builders)
     end
 
   end
