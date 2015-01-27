@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    http_stub (0.14.0.rc4)
+    http_stub (0.14.0.rc5)
       activesupport (~> 4.2)
       haml (~> 4.0)
       http_server_manager (~> 0.4)

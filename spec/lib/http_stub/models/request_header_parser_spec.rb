@@ -1,35 +1,45 @@
 describe HttpStub::Models::RequestHeaderParser do
 
-  let(:non_http_env_elements) do
+  let(:non_header_env_elements) do
     {
-        "GATEWAY_INTERFACE" => "CGI/1.1",
-        "QUERY_STRING" => "some string",
-        "REMOTE_ADDR" => "127.0.0.1",
-        "SCRIPT_NAME" => "some script",
-        "SERVER_NAME" => "localhost",
+      "rack.version"       => [1, 3],
+      "rack.multithreaded" => true,
+      "rack.multiprocess"  => false
     }
   end
-  let(:env) { non_http_env_elements.merge(http_env_elements) }
+  let(:env) { non_header_env_elements.merge(header_env_elements) }
   let(:request) { double("HttpRequest", env: env) }
 
-  describe ".parse" do
-    
-    describe "when the request contains request environment entries prefixed with 'HTTP_'" do
+  describe "::parse" do
 
-      let(:http_env_elements) { { "HTTP_KEY1" => "value1", "HTTP_KEY2" => "value2", "HTTP_KEY3" => "value3" } }
+    describe "when the request contains environment entries in upper case" do
 
-      it "returns a hash containing only those entries with the prefix removed" do
-        expect(HttpStub::Models::RequestHeaderParser.parse(request)).to eql({ "KEY1" => "value1",
-                                                                          "KEY2" => "value2",
-                                                                          "KEY3" => "value3" })
+      let(:header_env_elements) { { "KEY_1" => "value1", "KEY_2" => "value2", "KEY_3" => "value3" } }
+
+      it "returns a hash containing those entries" do
+        expect(HttpStub::Models::RequestHeaderParser.parse(request)).to eql("KEY_1" => "value1",
+                                                                            "KEY_2" => "value2",
+                                                                            "KEY_3" => "value3")
       end
 
     end
-    
-    describe "when the request does not contain request environment entries prefixed with 'HTTP_'" do
 
-      let(:http_env_elements) { {} }
-      
+    describe "when the request contains environment entries in upper case prefixed with 'HTTP_'" do
+
+      let(:header_env_elements) { { "HTTP_KEY_1" => "value1", "HTTP_KEY_2" => "value2", "HTTP_KEY_3" => "value3" } }
+
+      it "returns a hash containing those entries with the prefix removed" do
+        expect(HttpStub::Models::RequestHeaderParser.parse(request)).to include("KEY_1" => "value1",
+                                                                                "KEY_2" => "value2",
+                                                                                "KEY_3" => "value3")
+      end
+
+    end
+
+    describe "when only has environment entries in lower case" do
+
+      let(:header_env_elements) { {} }
+
       it "returns an empty hash" do
         expect(HttpStub::Models::RequestHeaderParser.parse(request)).to eql({})
       end
