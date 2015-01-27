@@ -2,13 +2,26 @@ describe HttpStub::Configurer::Request::StubActivatorPayloadBuilder do
 
   include_context "stub payload builder arguments"
 
-  let(:stub_payload) { { "stub_payload_key" => "stub payload value" } }
-  let(:stub_builder) { instance_double(HttpStub::Configurer::Request::StubPayloadBuilder, build: stub_payload) }
+  let(:response_defaults) { {} }
+  let(:stub_payload)      { { "stub_payload_key" => "stub payload value" } }
+  let(:stub_builder)      { instance_double(HttpStub::Configurer::Request::StubPayloadBuilder, build: stub_payload) }
 
-  let(:builder) { HttpStub::Configurer::Request::StubActivatorPayloadBuilder.new }
+  let(:builder) { HttpStub::Configurer::Request::StubActivatorPayloadBuilder.new(response_defaults) }
 
   before(:example) do
     allow(HttpStub::Configurer::Request::StubPayloadBuilder).to receive(:new).and_return(stub_builder)
+  end
+
+  describe "constructor" do
+
+    subject { builder }
+
+    it "creates a stub payload builder with the provided response defaults" do
+      expect(HttpStub::Configurer::Request::StubPayloadBuilder).to receive(:new).with(response_defaults)
+
+      subject
+    end
+
   end
 
   describe "#match_requests" do

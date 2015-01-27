@@ -22,10 +22,30 @@ describe HttpStub::Configurer::Server::DSL do
       allow(HttpStub::Configurer::Request::StubPayloadBuilder).to receive(:new).and_return(stub_payload_builder)
     end
 
-    it "creates a stub payload builder" do
-      expect(HttpStub::Configurer::Request::StubPayloadBuilder).to receive(:new)
+    subject { dsl.build_stub }
 
-      dsl.build_stub
+    context "when response defaults have been established" do
+
+      let(:response_defaults) { { key: "value" } }
+
+      before(:example) { dsl.response_defaults = { key: "value" } }
+
+      it "creates a stub payload builder containing the response defaults" do
+        expect(HttpStub::Configurer::Request::StubPayloadBuilder).to receive(:new).with(response_defaults)
+
+        subject
+      end
+
+    end
+
+    context "when no response defaults have been established" do
+
+      it "creates a stub payload builder with empty response defaults" do
+        expect(HttpStub::Configurer::Request::StubPayloadBuilder).to receive(:new).with({})
+
+        subject
+      end
+
     end
 
     context "when a block is provided" do
@@ -198,6 +218,14 @@ describe HttpStub::Configurer::Server::DSL do
     end
 
     subject { dsl.add_activator!(&block) }
+
+    context "when response defaults have been established" do
+
+    end
+
+    context "when no response defaults have been established" do
+
+    end
 
     it "creates a stub activator payload builder" do
       expect(HttpStub::Configurer::Request::StubActivatorPayloadBuilder).to receive(:new)

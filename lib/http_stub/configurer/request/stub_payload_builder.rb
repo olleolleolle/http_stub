@@ -4,8 +4,8 @@ module HttpStub
 
       class StubPayloadBuilder
         
-        def initialize
-          @args = { triggers: [] }
+        def initialize(response_defaults)
+          @args = { response: response_defaults ? response_defaults.clone : {}, triggers: [] }
         end
 
         def match_requests(uri, args={})
@@ -14,7 +14,7 @@ module HttpStub
         end
 
         def respond_with(args)
-          @args.merge!(response: args)
+          @args[:response].deep_merge!(args)
         end
 
         def trigger(stub_builder_or_builders)

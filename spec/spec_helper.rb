@@ -16,10 +16,11 @@ require 'http_server_manager/test_support'
 require_relative '../lib/http_stub/rake/task_generators'
 require_relative '../lib/http_stub'
 require_relative '../examples/configurer_with_class_activator'
+require_relative '../examples/configurer_with_many_class_activators'
 require_relative '../examples/configurer_with_class_stub'
 require_relative '../examples/configurer_with_initialize_callback'
 require_relative '../examples/configurer_with_complex_initializer'
-require_relative '../examples/configurer_with_many_class_activators'
+require_relative '../examples/configurer_with_response_defaults'
 
 HttpStub::ServerDaemon.log_dir = File.expand_path('../../tmp/log', __FILE__)
 HttpStub::ServerDaemon.pid_dir = File.expand_path('../../tmp/pids', __FILE__)

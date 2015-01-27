@@ -6,8 +6,8 @@ module HttpStub
 
         delegate :match_requests, :respond_with, :trigger, to: :@stub_payload_builder
         
-        def initialize
-          @stub_payload_builder = HttpStub::Configurer::Request::StubPayloadBuilder.new
+        def initialize(response_defaults)
+          @stub_payload_builder = HttpStub::Configurer::Request::StubPayloadBuilder.new(response_defaults)
         end
 
         def on(uri)

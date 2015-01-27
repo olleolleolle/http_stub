@@ -196,6 +196,21 @@ A common use case is to ```recall_stubs!``` before each test is run:
     end
 ```
 
+##### Default Response Data #####
+
+Often some aspects of response data is identical, such as content-type headers.
+```http_stub``` provides a mechanism for declaring default attributes of a response that will take effect for all
+stubbed responses:
+
+```ruby
+    class FooService
+        include HttpStub::Configurer
+
+        stub_server.response_defaults = { headers: "content-type" => "application/json; charset=utf-8" }
+
+        ...
+```
+
 ### Informational HTML pages ###
 
 ```http_stub``` has been designed to aid exploratory testing and application demonstrations.

@@ -559,6 +559,18 @@ describe HttpStub::Configurer, "when the server is running" do
 
     end
 
+    context "and the configurer declares response defaults" do
+
+      let(:configurer) { HttpStub::Examples::ConfigurerWithResponseDefaults.new }
+
+      it "includes the defaults in each response" do
+        response = Net::HTTP.get_response(server_host, "/response_with_defaults", server_port)
+
+        expect(response["defaulted_header"]).to eql("Header value")
+      end
+
+    end
+
   end
 
   context "and the configurer is uninitialized" do

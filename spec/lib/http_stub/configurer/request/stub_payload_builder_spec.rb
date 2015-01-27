@@ -1,6 +1,8 @@
 describe HttpStub::Configurer::Request::StubPayloadBuilder do
 
-  let(:builder) { HttpStub::Configurer::Request::StubPayloadBuilder.new }
+  let(:response_defaults) { {} }
+
+  let(:builder) { HttpStub::Configurer::Request::StubPayloadBuilder.new(response_defaults) }
 
   shared_context "triggers one stub" do
 
@@ -23,6 +25,18 @@ describe HttpStub::Configurer::Request::StubPayloadBuilder do
     end
 
     before(:example) { builder.trigger(trigger_builders) }
+
+  end
+
+  describe "#respond_with" do
+
+    it "does not modify any provided response defaults" do
+      original_response_defaults = response_defaults.clone
+
+      builder.respond_with(status: 201)
+
+      expect(response_defaults).to eql(original_response_defaults)
+    end
 
   end
 
@@ -211,6 +225,72 @@ describe HttpStub::Configurer::Request::StubPayloadBuilder do
 
           it "has a triggers entry containing an empty hash" do
             expect(subject).to include(triggers: [])
+          end
+
+        end
+
+        context "when a root level response attribute is defaulted" do
+
+          let(:response_defaults) { { status: 204 } }
+
+          context "and is not overridden" do
+
+            let(:response_options) { {} }
+
+            it "assumes the defaulted value" do
+              expect(subject[:response]).to include(status: 204)
+            end
+
+          end
+
+          context "and is overridden" do
+
+            let(:response_status) { 302 }
+
+            it "assumes the override value" do
+              expect(subject[:response]).to include(status: 302)
+            end
+
+          end
+
+        end
+
+        context "when a nested response attribute is defaulted" do
+
+          let(:response_defaults) { { headers: { response_header_name: "default value" } } }
+
+          context "and the attribute has no other values defined" do
+
+            let(:response_headers) { {} }
+
+            it "assumes the defaults attributes" do
+              expect(subject[:response]).to include(response_defaults)
+            end
+
+          end
+
+          context "and the attribute has additional values defined" do
+
+            let(:response_headers) { { additional_header_name: "additional value" } }
+
+            it "includes the defaults values" do
+              expect(subject[:response][:headers]).to include(response_defaults[:headers])
+            end
+
+            it "includes the additional values" do
+              expect(subject[:response][:headers]).to include(response_headers)
+            end
+
+          end
+
+          context "and the attributes default values have been overridden" do
+
+            let(:response_headers) { { response_header_name: "override value"} }
+
+            it "assumes the defaults attributes" do
+              expect(subject[:response]).to include(headers: response_headers)
+            end
+
           end
 
         end

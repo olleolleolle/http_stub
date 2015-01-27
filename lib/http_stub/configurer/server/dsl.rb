@@ -5,7 +5,12 @@ module HttpStub
       class DSL
 
         def initialize(server_facade)
-          @server_facade = server_facade
+          @server_facade     = server_facade
+          @response_defaults = {}
+        end
+
+        def response_defaults=(args)
+          @response_defaults = args
         end
 
         def has_started!
@@ -13,7 +18,7 @@ module HttpStub
         end
 
         def build_stub(&block)
-          builder = HttpStub::Configurer::Request::StubPayloadBuilder.new
+          builder = HttpStub::Configurer::Request::StubPayloadBuilder.new(@response_defaults)
           block.call(builder) if block_given?
           builder
         end
@@ -28,7 +33,7 @@ module HttpStub
         end
 
         def add_activator!(&block)
-          builder = HttpStub::Configurer::Request::StubActivatorPayloadBuilder.new
+          builder = HttpStub::Configurer::Request::StubActivatorPayloadBuilder.new(@response_defaults)
           block.call(builder)
           @server_facade.stub_activator(HttpStub::Configurer::Request::StubActivator.new(builder.build))
         end
