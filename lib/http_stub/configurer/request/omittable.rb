@@ -4,12 +4,22 @@ module HttpStub
 
       class Omittable
 
-        def self.format(value)
-          value.is_a?(Hash) ? value.reduce({}) do |result, entry|
-            key, value = entry
-            result[key] = value == :omitted ? "control:omitted" : value
-            result
-          end : value
+        class << self
+
+          def format(value)
+            value.is_a?(Hash) ? format_hash(value) : value
+          end
+
+          private
+
+          def format_hash(value)
+            value.reduce({}) do |result, entry|
+              key, value  = entry
+              result[key] = value == :omitted ? "control:omitted" : value
+              result
+            end
+          end
+
         end
 
       end
