@@ -5,10 +5,13 @@ require 'sass'
 require 'net/http'
 require 'json'
 require 'http_server_manager'
+
+require 'active_support/core_ext/module/aliasing'
 require 'active_support/core_ext/module/delegation'
 require 'active_support/core_ext/hash/slice'
 require 'active_support/core_ext/hash/deep_merge'
 
+require_relative 'http_stub/extensions/rack/handler'
 require_relative 'http_stub/hash_extensions'
 require_relative 'http_stub/models/headers'
 require_relative 'http_stub/models/response'
