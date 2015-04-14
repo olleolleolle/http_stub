@@ -20,7 +20,7 @@ describe HttpStub::Extensions::Rack::Handler do
 
     end
 
-    HttpStub::TestableRackHandler.include(HttpStub::Extensions::Rack::Handler)
+    HttpStub::TestableRackHandler.send(:include, HttpStub::Extensions::Rack::Handler)
 
     describe "the modules ::get" do
 
