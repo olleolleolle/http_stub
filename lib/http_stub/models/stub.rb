@@ -5,6 +5,10 @@ module HttpStub
 
       attr_reader :uri, :headers, :parameters, :response, :triggers
 
+      def self.create_from(request)
+        self.new(JSON.parse(request.params["payload"] || request.body.read))
+      end
+
       def initialize(args)
         @args = args
         @uri = HttpStub::Models::StubUri.new(args["uri"])

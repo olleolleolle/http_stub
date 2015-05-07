@@ -1,12 +1,51 @@
 describe HttpStub::Models::StubActivator do
 
   let(:activation_uri) { "/some/activation/uri" }
-  let(:args) do
-    { "activation_uri" => activation_uri }
-  end
+  let(:args)           { { "activation_uri" => activation_uri } }
   let(:stub_activator) { HttpStub::Models::StubActivator.new(args) }
 
   before(:example) { allow(HttpStub::Models::Stub).to receive(:new).and_return(double(HttpStub::Models::Stub)) }
+
+  describe "::create_from" do
+
+    let(:payload) { args.to_json }
+
+    subject { HttpStub::Models::StubActivator.create_from(request) }
+
+    shared_context "verification a stub activator is created from a request" do
+
+      it "creates a stub activator with JSON parsed from the request payload" do
+        expect(HttpStub::Models::StubActivator).to receive(:new).with(args)
+
+        subject
+      end
+
+      it "returns the created stub activator" do
+        created_stub_activator = instance_double(HttpStub::Models::StubActivator)
+        allow(HttpStub::Models::StubActivator).to receive(:new).and_return(created_stub_activator)
+
+        expect(subject).to eql(created_stub_activator)
+      end
+
+    end
+
+    context "when the request body contains the payload" do
+
+      let(:request) { double("HttpRequest", params: {}, body: double("RequestBody", read: payload)) }
+
+      include_context "verification a stub activator is created from a request"
+
+    end
+
+    context "when the request contains a payload parameter" do
+
+      let(:request) { double("HttpRequest", params: { "payload" => payload }) }
+
+      include_context "verification a stub activator is created from a request"
+
+    end
+
+  end
 
   describe "#satisfies?" do
 

@@ -1,15 +1,16 @@
 describe HttpStub::Configurer::Server::Command do
 
-  let(:request)     { double("HttpRequest") }
-  let(:description) { "Some Description" }
-  let(:args)        { { request: request, description: description } }
+  let(:http_request) { double("HttpRequest") }
+  let(:request)      { double("HttpStubRequest", to_http_request: http_request) }
+  let(:description)  { "Some Description" }
+  let(:args)         { { request: request, description: description } }
 
   let(:command) { HttpStub::Configurer::Server::Command.new(args) }
 
-  describe "#request" do
+  describe "#http_request" do
 
-    it "exposes the provided request" do
-      expect(command.request).to eql(request)
+    it "returns the provided request adapted to a http request" do
+      expect(command.http_request).to eql(http_request)
     end
 
   end

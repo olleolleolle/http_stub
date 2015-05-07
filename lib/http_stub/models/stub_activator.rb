@@ -3,6 +3,10 @@ module HttpStub
 
     class StubActivator
 
+      def self.create_from(request)
+        self.new(JSON.parse(request.params["payload"] || request.body.read))
+      end
+
       def initialize(args)
         @args = args
         @stub = HttpStub::Models::Stub.new(args)

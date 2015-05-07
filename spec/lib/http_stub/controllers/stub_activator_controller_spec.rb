@@ -1,42 +1,33 @@
 describe HttpStub::Controllers::StubActivatorController do
 
-  let(:request_body) { "Some request body" }
-  let(:request) { double("HttpRequest", body: double("RequestBody", read: request_body)) }
-  let(:stub_activator_options) { double("StubActivatorOptions") }
-  let(:the_stub) { double(HttpStub::Models::Stub) }
-  let(:stub_activator) { double(HttpStub::Models::StubActivator, the_stub: the_stub) }
+  let(:request)                 { double("HttpRequest") }
+  let(:the_stub)                { double(HttpStub::Models::Stub) }
+  let(:stub_activator)          { double(HttpStub::Models::StubActivator, the_stub: the_stub) }
   let(:stub_activator_registry) { double("HttpStub::Models::StubActivatorRegistry").as_null_object }
-  let(:stub_registry) { double("HttpStub::Models::StubRegistry").as_null_object }
+  let(:stub_registry)           { double("HttpStub::Models::StubRegistry").as_null_object }
+
   let(:controller) { HttpStub::Controllers::StubActivatorController.new(stub_activator_registry, stub_registry) }
 
-  before(:example) { allow(JSON).to receive(:parse).and_return(stub_activator_options) }
+  before(:example) { allow(HttpStub::Models::StubActivator).to receive(:create_from).and_return(stub_activator) }
 
   describe "#register" do
 
-    before(:example) do
-      allow(HttpStub::Models::StubActivator).to receive(:new).and_return(stub_activator)
+    subject { controller.register(request) }
+
+    it "creates a stub activator from the provided request" do
+      expect(HttpStub::Models::StubActivator).to receive(:create_from).with(request).and_return(stub_activator)
+
+      subject
     end
 
-    it "parses an options hash from the JSON request body" do
-      expect(JSON).to receive(:parse).with(request_body).and_return(stub_activator_options)
-
-      controller.register(request)
-    end
-
-    it "creates a stub activator from the parsed options" do
-      expect(HttpStub::Models::StubActivator).to receive(:new).with(stub_activator_options).and_return(stub_activator)
-
-      controller.register(request)
-    end
-
-    it "adds the created activator to the activator registry" do
+    it "adds the created activator to the activator registry with the provided request" do
       expect(stub_activator_registry).to receive(:add).with(stub_activator, request)
 
-      controller.register(request)
+      subject
     end
 
     it "returns a success response" do
-      expect(controller.register(request)).to eql(HttpStub::Models::Response::SUCCESS)
+      expect(subject).to eql(HttpStub::Models::Response::SUCCESS)
     end
 
   end

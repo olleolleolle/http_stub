@@ -17,7 +17,7 @@ describe HttpStub::Rake::ServerDaemonTasks do
 
       it "starts a stub server that responds to stub requests" do
         request = Net::HTTP::Post.new("/stubs")
-        request.body = { "response" => { "status" => 302, "body" => "Some Body" } }.to_json
+        request.body = { response: { status: 302, body: "Some Body" } }.to_json
 
         response = Net::HTTP.new("localhost", 8002).start { |http| http.request(request) }
 

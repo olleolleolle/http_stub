@@ -9,7 +9,7 @@ module HttpStub
       end
 
       def register(request)
-        @stub_activator_registry.add(HttpStub::Models::StubActivator.new(JSON.parse(request.body.read)), request)
+        @stub_activator_registry.add(HttpStub::Models::StubActivator.create_from(request), request)
         HttpStub::Models::Response::SUCCESS
       end
 

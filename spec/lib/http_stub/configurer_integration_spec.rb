@@ -23,10 +23,10 @@ describe HttpStub::Configurer, "when the server is running" do
 
       context "and the stub request is made" do
 
-        let(:response) { Net::HTTP.get_response(server_host, "/stub_path", server_port) }
+        let(:response) { HTTParty.get("#{server_uri}/stub_path") }
 
         it "replays the stubbed response" do
-          expect(response.code).to eql("200")
+          expect(response.code).to eql(200)
           expect(response.body).to eql("Stub activator body")
         end
 
@@ -38,10 +38,10 @@ describe HttpStub::Configurer, "when the server is running" do
 
       context "and the stub request is made" do
 
-        let(:response) { Net::HTTP.get_response(server_host, "/stub_path", server_port) }
+        let(:response) { HTTParty.get("#{server_uri}/stub_path") }
 
         it "responds with a 404 status code" do
-          expect(response.code).to eql("404")
+          expect(response.code).to eql(404)
         end
 
       end
@@ -53,9 +53,9 @@ describe HttpStub::Configurer, "when the server is running" do
       let(:configurer) { HttpStub::Examples::ConfigurerWithClassStub.new }
 
       it "registers the stub" do
-        response = Net::HTTP.get_response(server_host, "/a_class_stub", server_port)
+        response = HTTParty.get("#{server_uri}/a_class_stub")
 
-        expect(response.code).to eql("201")
+        expect(response.code).to eql(201)
         expect(response.body).to eql("Class stub body")
       end
 
@@ -67,12 +67,14 @@ describe HttpStub::Configurer, "when the server is running" do
 
         context "and the configurer is re-initialized" do
 
-          before(:example) { configurer.class.initialize! }
+          before(:example) do
+            configurer.class.initialize!
+          end
 
           it "re-establishes the class stub as having priority" do
-            response = Net::HTTP.get_response(server_host, "/a_class_stub", server_port)
+            response = HTTParty.get("#{server_uri}/a_class_stub")
 
-            expect(response.code).to eql("201")
+            expect(response.code).to eql(201)
             expect(response.body).to eql("Class stub body")
           end
 
@@ -87,16 +89,16 @@ describe HttpStub::Configurer, "when the server is running" do
       let(:configurer) { HttpStub::Examples::ConfigurerWithComplexInitializer.new }
 
       it "registers the activated activator" do
-        response = Net::HTTP.get_response(server_host, "/activated_during_initialization_stub_path", server_port)
+        response = HTTParty.get("#{server_uri}/activated_during_initialization_stub_path")
 
-        expect(response.code).to eql("200")
+        expect(response.code).to eql(200)
         expect(response.body).to eql("Activated during initialization body")
       end
 
       it "registers the stub" do
-        response = Net::HTTP.get_response(server_host, "/stubbed_during_initialization_path", server_port)
+        response = HTTParty.get("#{server_uri}/stubbed_during_initialization_path")
 
-        expect(response.code).to eql("200")
+        expect(response.code).to eql(200)
         expect(response.body).to eql("Stubbed during initialization body")
       end
 
@@ -111,22 +113,22 @@ describe HttpStub::Configurer, "when the server is running" do
           before(:example) { configurer.recall_stubs! }
 
           it "removes the stub registered post-initialization" do
-            response = Net::HTTP.get_response(server_host, "/another_stub", server_port)
+            response = HTTParty.get("#{server_uri}/another_stub")
 
-            expect(response.code).to eql("404")
+            expect(response.code).to eql(404)
           end
 
           it "retains the activated activator during initialization" do
-            response = Net::HTTP.get_response(server_host, "/activated_during_initialization_stub_path", server_port)
+            response = HTTParty.get("#{server_uri}/activated_during_initialization_stub_path")
 
-            expect(response.code).to eql("200")
+            expect(response.code).to eql(200)
             expect(response.body).to eql("Activated during initialization body")
           end
 
           it "retains the stub registered during initialization" do
-            response = Net::HTTP.get_response(server_host, "/stubbed_during_initialization_path", server_port)
+            response = HTTParty.get("#{server_uri}/stubbed_during_initialization_path")
 
-            expect(response.code).to eql("200")
+            expect(response.code).to eql(200)
             expect(response.body).to eql("Stubbed during initialization body")
           end
 
@@ -148,10 +150,10 @@ describe HttpStub::Configurer, "when the server is running" do
 
           context "and that request is made" do
 
-            let(:response) { Net::HTTP.get_response(server_host, "/stub_with_status", server_port) }
+            let(:response) { HTTParty.get("#{server_uri}/stub_with_status") }
 
             it "responds with the stubbed status" do
-              expect(response.code).to eql("201")
+              expect(response.code).to eql(201)
             end
 
             it "replays the stubbed body" do
@@ -166,10 +168,10 @@ describe HttpStub::Configurer, "when the server is running" do
 
             context "and the original request is made" do
 
-              let(:response) { Net::HTTP.get_response(server_host, "/stub_with_status", server_port) }
+              let(:response) { HTTParty.get("#{server_uri}/stub_with_status") }
 
               it "responds with a 404 status code" do
-                expect(response.code).to eql("404")
+                expect(response.code).to eql(404)
               end
 
             end
@@ -186,7 +188,7 @@ describe HttpStub::Configurer, "when the server is running" do
 
           context "and that request is made" do
 
-            let(:response) { Net::HTTP.get_response(server_host, "/stub_without_status", server_port) }
+            let(:response) { HTTParty.get("#{server_uri}/stub_without_status") }
 
             it "responds with the stubbed body" do
               expect(response.body).to eql("Stub body")
@@ -202,7 +204,7 @@ describe HttpStub::Configurer, "when the server is running" do
 
             context "and a request is made whose uri matches the regular expression" do
 
-              let(:response) { Net::HTTP.get_response(server_host, "/match/stub/regexp/$key=value", server_port) }
+              let(:response) { HTTParty.get("#{server_uri}/match/stub/regexp/$key=value") }
 
               it "responds with the stubbed body" do
                 expect(response.body).to eql("Stub body")
@@ -212,10 +214,10 @@ describe HttpStub::Configurer, "when the server is running" do
 
             context "and a request is made whose uri does not match the regular expression" do
 
-              let(:response) { Net::HTTP.get_response(server_host, "/stub/no_match/regexp", server_port) }
+              let(:response) { HTTParty.get("#{server_uri}/stub/no_match/regexp") }
 
               it "responds with a 404 status code" do
-                expect(response.code).to eql("404")
+                expect(response.code).to eql(404)
               end
 
             end
@@ -310,10 +312,10 @@ describe HttpStub::Configurer, "when the server is running" do
 
           context "and that request is made" do
 
-            let(:response) { Net::HTTP.get_response(server_host, "/stub_with_parameters?key=value", server_port) }
+            let(:response) { HTTParty.get("#{server_uri}/stub_with_parameters?key=value") }
 
             it "replays the stubbed response" do
-              expect(response.code).to eql("202")
+              expect(response.code).to eql(202)
               expect(response.body).to eql("Another stub body")
             end
 
@@ -321,12 +323,10 @@ describe HttpStub::Configurer, "when the server is running" do
 
           context "and a request with different parameters is made" do
 
-            let(:response) do
-              Net::HTTP.get_response(server_host, "/stub_with_parameters?key=another_value", server_port)
-            end
+            let(:response) { HTTParty.get("#{server_uri}/stub_with_parameters?key=another_value") }
 
             it "responds with a 404 status code" do
-              expect(response.code).to eql("404")
+              expect(response.code).to eql(404)
             end
 
           end
@@ -344,12 +344,10 @@ describe HttpStub::Configurer, "when the server is running" do
 
           context "and a request that matches is made" do
 
-            let(:response) do
-              Net::HTTP.get_response(server_host, "/stub_with_parameters?key=matching_value", server_port)
-            end
+            let(:response) { HTTParty.get("#{server_uri}/stub_with_parameters?key=matching_value") }
 
             it "replays the stubbed response" do
-              expect(response.code).to eql("202")
+              expect(response.code).to eql(202)
               expect(response.body).to eql("Another stub body")
             end
 
@@ -357,12 +355,10 @@ describe HttpStub::Configurer, "when the server is running" do
 
           context "and a request that does not match is made" do
 
-            let(:response) do
-              Net::HTTP.get_response(server_host, "/stub_with_parameters?key=does_not_match_value", server_port)
-            end
+            let(:response) { HTTParty.get("#{server_uri}/stub_with_parameters?key=does_not_match_value") }
 
             it "responds with a 404 status code" do
-              expect(response.code).to eql("404")
+              expect(response.code).to eql(404)
             end
 
           end
@@ -380,10 +376,10 @@ describe HttpStub::Configurer, "when the server is running" do
 
           context "and a request that matches is made" do
 
-            let(:response) { Net::HTTP.get_response(server_host, "/stub_with_omitted_parameters", server_port) }
+            let(:response) { HTTParty.get("#{server_uri}/stub_with_omitted_parameters") }
 
             it "replays the stubbed response" do
-              expect(response.code).to eql("202")
+              expect(response.code).to eql(202)
               expect(response.body).to eql("Omitted parameter stub body")
             end
 
@@ -391,12 +387,10 @@ describe HttpStub::Configurer, "when the server is running" do
 
           context "and a request that does not match is made" do
 
-            let(:response) do
-              Net::HTTP.get_response(server_host, "/stub_with_omitted_parameters?key=must_be_omitted", server_port)
-            end
+            let(:response) { HTTParty.get("#{server_uri}/stub_with_omitted_parameters?key=must_be_omitted") }
 
             it "responds with a 404 status code" do
-              expect(response.code).to eql("404")
+              expect(response.code).to eql(404)
             end
 
           end
@@ -412,10 +406,10 @@ describe HttpStub::Configurer, "when the server is running" do
 
           context "and that request is made" do
 
-            let(:response) { Net::HTTP.get_response(server_host, "/stub_with_parameters?key=88", server_port) }
+            let(:response) { HTTParty.get("#{server_uri}/stub_with_parameters?key=88") }
 
             it "replays the stubbed response" do
-              expect(response.code).to eql("203")
+              expect(response.code).to eql(203)
               expect(response.body).to eql("Body for parameter number")
             end
 
@@ -434,12 +428,10 @@ describe HttpStub::Configurer, "when the server is running" do
 
           context "and a request that matches is made" do
 
-            let(:response) do
-              Net::HTTP.get_response(server_host, "/stub_with_parameters?key=matching_value", server_port)
-            end
+            let(:response) { HTTParty.get("#{server_uri}/stub_with_parameters?key=matching_value") }
 
             it "replays the stubbed response" do
-              expect(response.code).to eql("202")
+              expect(response.code).to eql(202)
               expect(response.body).to eql("Another stub body")
             end
 
@@ -447,12 +439,10 @@ describe HttpStub::Configurer, "when the server is running" do
 
           context "and a request that does not match is made" do
 
-            let(:response) do
-              Net::HTTP.get_response(server_host, "/stub_with_parameters?key=does_not_match_value", server_port)
-            end
+            let(:response) { HTTParty.get("#{server_uri}/stub_with_parameters?key=does_not_match_value") }
 
             it "responds with a 404 status code" do
-              expect(response.code).to eql("404")
+              expect(response.code).to eql(404)
             end
 
           end
@@ -470,10 +460,10 @@ describe HttpStub::Configurer, "when the server is running" do
 
           context "and a request that matches is made" do
 
-            let(:response) { Net::HTTP.get_response(server_host, "/stub_with_omitted_parameters", server_port) }
+            let(:response) { HTTParty.get("#{server_uri}/stub_with_omitted_parameters") }
 
             it "replays the stubbed response" do
-              expect(response.code).to eql("202")
+              expect(response.code).to eql(202)
               expect(response.body).to eql("Omitted parameter stub body")
             end
 
@@ -481,12 +471,10 @@ describe HttpStub::Configurer, "when the server is running" do
 
           context "and a request that does not match is made" do
 
-            let(:response) do
-              Net::HTTP.get_response(server_host, "/stub_with_omitted_parameters?key=must_be_omitted", server_port)
-            end
+            let(:response) { HTTParty.get("#{server_uri}/stub_with_omitted_parameters?key=must_be_omitted") }
 
             it "responds with a 404 status code" do
-              expect(response.code).to eql("404")
+              expect(response.code).to eql(404)
             end
 
           end
@@ -516,12 +504,10 @@ describe HttpStub::Configurer, "when the server is running" do
 
         context "and a request is made matching the stub" do
 
-          before(:example) do
-            @stub_with_triggers_response = Net::HTTP.get_response(server_host, "/stub_with_triggers", server_port)
-          end
+          before(:example) { @stub_with_triggers_response = HTTParty.get("#{server_uri}/stub_with_triggers") }
 
           it "replays the stubbed response" do
-            expect(@stub_with_triggers_response.code).to eql("200")
+            expect(@stub_with_triggers_response.code).to eql(200)
             expect(@stub_with_triggers_response.body).to eql("Trigger stub body")
           end
 
@@ -529,10 +515,10 @@ describe HttpStub::Configurer, "when the server is running" do
 
             context "and then a request matching triggered stub ##{trigger_number} is made" do
 
-              let(:response) { Net::HTTP.get_response(server_host, "/triggered_stub_#{trigger_number}", server_port) }
+              let(:response) { HTTParty.get("#{server_uri}/triggered_stub_#{trigger_number}") }
 
               it "replays the triggered response" do
-                expect(response.code).to eql("20#{trigger_number}")
+                expect(response.code).to eql("20#{trigger_number}".to_i)
                 expect(response.body).to eql("Triggered stub body #{trigger_number}")
               end
 
@@ -551,9 +537,9 @@ describe HttpStub::Configurer, "when the server is running" do
       let(:configurer) { HttpStub::Examples::ConfigurerWithInitializeCallback.new }
 
       it "executes the callback" do
-        response = Net::HTTP.get_response(server_host, "/stubbed_on_initialize_path", server_port)
+        response = HTTParty.get("#{server_uri}/stubbed_on_initialize_path")
 
-        expect(response.code).to eql("200")
+        expect(response.code).to eql(200)
         expect(response.body).to eql("Stubbed on initialize body")
       end
 
@@ -588,13 +574,13 @@ describe HttpStub::Configurer, "when the server is running" do
       context "and an attempt is made to register a stub" do
 
         before(:example) do
-          configurer.stub_response!("/some_stub_path", method: :get, response: { body: "Some stub body"})
+          configurer.stub_response!("/some_stub_path", method: :get, response: { body: "Some stub body" })
         end
 
         it "registers the stub" do
-          response = Net::HTTP.get_response(server_host, "/some_stub_path", server_port)
+          response = HTTParty.get("#{server_uri}/some_stub_path")
 
-          expect(response.code).to eql("200")
+          expect(response.code).to eql(200)
           expect(response.body).to eql("Some stub body")
         end
 
@@ -603,14 +589,14 @@ describe HttpStub::Configurer, "when the server is running" do
       context "and an attempt is made to register a stub with a timeout" do
 
         before(:example) do
-          configurer.stub_response!("/some_stub_path", method: :get, response: {:delay_in_seconds => 2})
+          configurer.stub_response!("/some_stub_path", method: :get, response: { delay_in_seconds: 2 })
         end
 
         it "delegates to request pipeline" do
           before = Time.new
 
-          response = Net::HTTP.get_response(server_host, "/some_stub_path", server_port)
-          expect(response.code).to eql("200")
+          response = HTTParty.get("#{server_uri}/some_stub_path")
+          expect(response.code).to eql(200)
 
           after = Time.now
 
@@ -629,7 +615,7 @@ describe HttpStub::Configurer, "when the server is running" do
         end
 
         it "registers the stub" do
-          response = Net::HTTP.get_response("localhost", "/some_stub_path", 8001)
+          response = HTTParty.get("#{server_uri}/some_stub_path")
 
           expect(response.content_type).to eql("application/xhtml")
         end
@@ -681,9 +667,9 @@ describe HttpStub::Configurer, "when the server is running" do
       let(:configurer) { HttpStub::Examples::ConfigurerWithInitializeCallback.new }
 
       it "does not execute the callback" do
-        response = Net::HTTP.get_response(server_host, "/stubbed_on_initialize_path", server_port)
+        response = HTTParty.get("#{server_uri}/stubbed_on_initialize_path")
 
-        expect(response.code).to eql("404")
+        expect(response.code).to eql(404)
       end
 
     end

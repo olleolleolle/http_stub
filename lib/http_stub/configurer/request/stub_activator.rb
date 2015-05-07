@@ -2,13 +2,14 @@ module HttpStub
   module Configurer
     module Request
 
-      class StubActivator < Net::HTTP::Post
+      class StubActivator
 
         def initialize(payload)
-          super("/stubs/activators")
           @payload = payload
-          self.content_type = "application/json"
-          self.body = payload.to_json
+        end
+
+        def to_http_request
+          Net::HTTP::Post::Multipart.new("/stubs/activators", payload: @payload.to_json)
         end
 
         def activation_uri

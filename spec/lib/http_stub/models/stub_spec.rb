@@ -54,6 +54,47 @@ describe HttpStub::Models::Stub do
     allow(HttpStub::Models::StubTriggers).to receive(:new).and_return(stub_triggers)
   end
 
+  describe "::create_from" do
+
+    let(:payload) { stub_args.to_json }
+
+    subject { HttpStub::Models::Stub.create_from(request) }
+
+    shared_context "verification a stub is created from a request" do
+
+      it "creates a stub with JSON parsed from the request payload" do
+        expect(HttpStub::Models::Stub).to receive(:new).with(stub_args)
+
+        subject
+      end
+
+      it "returns the created stub activator" do
+        created_stub = instance_double(HttpStub::Models::Stub)
+        allow(HttpStub::Models::Stub).to receive(:new).and_return(created_stub)
+
+        expect(subject).to eql(created_stub)
+      end
+
+    end
+
+    context "when the request body contains the payload" do
+
+      let(:request) { double("HttpRequest", params: {}, body: double("RequestBody", read: payload)) }
+
+      include_context "verification a stub is created from a request"
+
+    end
+
+    context "when the request contains a payload parameter" do
+
+      let(:request) { double("HttpRequest", params: { "payload" => payload }) }
+
+      include_context "verification a stub is created from a request"
+
+    end
+
+  end
+
   describe "#satisfies?" do
 
     let(:request_uri) { "/a_request_uri" }

@@ -2,13 +2,14 @@ module HttpStub
   module Configurer
     module Request
 
-      class Stub < Net::HTTP::Post
+      class Stub
 
         def initialize(payload)
-          super("/stubs")
           @payload = payload
-          self.content_type = "application/json"
-          self.body = payload.to_json
+        end
+
+        def to_http_request
+          Net::HTTP::Post::Multipart.new("/stubs", payload: @payload.to_json)
         end
 
         def stub_uri

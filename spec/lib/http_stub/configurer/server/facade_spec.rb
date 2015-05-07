@@ -69,24 +69,32 @@ describe HttpStub::Configurer::Server::Facade do
 
   describe "#activate" do
 
-    let(:uri)     { "/some/activation/uri" }
-    let(:request) { instance_double(Net::HTTP::Get) }
+    let(:uri)               { "/some/activation/uri" }
+    let(:http_request)      { instance_double(Net::HTTP::Get) }
+    let(:http_stub_request) { instance_double(HttpStub::Configurer::Request::PlainHttp) }
 
     subject { facade.activate(uri) }
 
     before(:example) do
-      allow(Net::HTTP::Get).to receive(:new).and_return(request)
+      allow(Net::HTTP::Get).to receive(:new).and_return(http_request)
+      allow(HttpStub::Configurer::Request::PlainHttp).to receive(:new).and_return(http_stub_request)
       allow(request_processor).to receive(:submit)
     end
 
     it "creates a GET request for the uri" do
-      expect(Net::HTTP::Get).to receive(:new).with(uri).and_return(request)
+      expect(Net::HTTP::Get).to receive(:new).with(uri).and_return(http_request)
 
       subject
     end
 
-    it "submits the GET request via the request processor" do
-      expect(request_processor).to receive(:submit).with(hash_including(request: request))
+    it "wraps the GET request in a HTTP Stub plain request" do
+      expect(HttpStub::Configurer::Request::PlainHttp).to receive(:new).with(http_request).and_return(http_stub_request)
+
+      subject
+    end
+
+    it "submits the HTTP Stub request via the request processor" do
+      expect(request_processor).to receive(:submit).with(hash_including(request: http_stub_request))
 
       subject
     end
@@ -101,30 +109,38 @@ describe HttpStub::Configurer::Server::Facade do
 
   describe "#remember_stubs" do
 
-    let(:request) { instance_double(Net::HTTP::Post) }
+    let(:http_request)      { instance_double(Net::HTTP::Post) }
+    let(:http_stub_request) { instance_double(HttpStub::Configurer::Request::PlainHttp) }
 
     subject { facade.remember_stubs }
 
     before(:example) do
-      allow(Net::HTTP::Post).to receive(:new).and_return(request)
-      allow(request).to receive(:body=)
+      allow(Net::HTTP::Post).to receive(:new).and_return(http_request)
+      allow(http_request).to receive(:body=)
+      allow(HttpStub::Configurer::Request::PlainHttp).to receive(:new).and_return(http_stub_request)
       allow(request_processor).to receive(:submit)
     end
 
     it "creates a POST request for /stubs/memory endpoint" do
-      expect(Net::HTTP::Post).to receive(:new).with("/stubs/memory").and_return(request)
+      expect(Net::HTTP::Post).to receive(:new).with("/stubs/memory").and_return(http_request)
 
       subject
     end
 
     it "establishes an empty body on the POST request" do
-      expect(request).to receive(:body=).with("")
+      expect(http_request).to receive(:body=).with("")
 
       subject
     end
 
-    it "submits the POST request via the request processor" do
-      expect(request_processor).to receive(:submit).with(hash_including(request: request))
+    it "wraps the POST request in a HTTP Stub plain request" do
+      expect(HttpStub::Configurer::Request::PlainHttp).to receive(:new).with(http_request).and_return(http_stub_request)
+
+      subject
+    end
+
+    it "submits the HTTP Stub request via the request processor" do
+      expect(request_processor).to receive(:submit).with(hash_including(request: http_stub_request))
 
       subject
     end
@@ -139,23 +155,31 @@ describe HttpStub::Configurer::Server::Facade do
 
   describe "#recall_stubs" do
 
-    let(:request) { instance_double(Net::HTTP::Get) }
+    let(:http_request)      { instance_double(Net::HTTP::Get) }
+    let(:http_stub_request) { instance_double(HttpStub::Configurer::Request::PlainHttp) }
 
     subject { facade.recall_stubs }
 
     before(:example) do
-      allow(Net::HTTP::Get).to receive(:new).and_return(request)
+      allow(Net::HTTP::Get).to receive(:new).and_return(http_request)
+      allow(HttpStub::Configurer::Request::PlainHttp).to receive(:new).and_return(http_stub_request)
       allow(request_processor).to receive(:submit)
     end
 
-    it "creates a POST request for /stubs/memory endpoint" do
-      expect(Net::HTTP::Get).to receive(:new).with("/stubs/memory").and_return(request)
+    it "creates a GET request for /stubs/memory endpoint" do
+      expect(Net::HTTP::Get).to receive(:new).with("/stubs/memory").and_return(http_request)
 
       subject
     end
 
-    it "submits the GET request via the request processor" do
-      expect(request_processor).to receive(:submit).with(hash_including(request: request))
+    it "wraps the GET request in a HTTP Stub plain request" do
+      expect(HttpStub::Configurer::Request::PlainHttp).to receive(:new).with(http_request).and_return(http_stub_request)
+
+      subject
+    end
+
+    it "submits the HTTP Stub request via the request processor" do
+      expect(request_processor).to receive(:submit).with(hash_including(request: http_stub_request))
 
       subject
     end
@@ -170,23 +194,31 @@ describe HttpStub::Configurer::Server::Facade do
 
   describe "#clear_stubs" do
 
-    let(:request) { instance_double(Net::HTTP::Delete) }
+    let(:http_request)      { instance_double(Net::HTTP::Delete) }
+    let(:http_stub_request) { instance_double(HttpStub::Configurer::Request::PlainHttp) }
 
     subject { facade.clear_stubs }
 
     before(:example) do
-      allow(Net::HTTP::Delete).to receive(:new).and_return(request)
+      allow(Net::HTTP::Delete).to receive(:new).and_return(http_request)
+      allow(HttpStub::Configurer::Request::PlainHttp).to receive(:new).and_return(http_stub_request)
       allow(request_processor).to receive(:submit)
     end
 
     it "creates a DELETE request for the /stubs endpoint" do
-      expect(Net::HTTP::Delete).to receive(:new).with("/stubs").and_return(request)
+      expect(Net::HTTP::Delete).to receive(:new).with("/stubs").and_return(http_request)
 
       subject
     end
 
-    it "adds the DELETE request to the server state" do
-      expect(request_processor).to receive(:submit).with(hash_including(request: request))
+    it "wraps the DELETE request in a HTTP Stub plain request" do
+      expect(HttpStub::Configurer::Request::PlainHttp).to receive(:new).with(http_request).and_return(http_stub_request)
+
+      subject
+    end
+
+    it "submits the HTTP Stub request via the request processor" do
+      expect(request_processor).to receive(:submit).with(hash_including(request: http_stub_request))
 
       subject
     end
@@ -201,23 +233,31 @@ describe HttpStub::Configurer::Server::Facade do
 
   describe "#clear_activators" do
 
-    let(:request) { instance_double(Net::HTTP::Delete) }
+    let(:http_request)      { instance_double(Net::HTTP::Delete) }
+    let(:http_stub_request) { instance_double(HttpStub::Configurer::Request::PlainHttp) }
 
     subject { facade.clear_activators }
 
     before(:example) do
-      allow(Net::HTTP::Delete).to receive(:new).and_return(request)
+      allow(Net::HTTP::Delete).to receive(:new).and_return(http_request)
+      allow(HttpStub::Configurer::Request::PlainHttp).to receive(:new).and_return(http_stub_request)
       allow(request_processor).to receive(:submit)
     end
 
     it "creates a DELETE request for the /stubs/activators endpoint" do
-      expect(Net::HTTP::Delete).to receive(:new).with("/stubs/activators").and_return(request)
+      expect(Net::HTTP::Delete).to receive(:new).with("/stubs/activators").and_return(http_request)
 
       subject
     end
 
-    it "adds the DELETE request to the server state" do
-      expect(request_processor).to receive(:submit).with(hash_including(request: request))
+    it "wraps the DELETE request in a HTTP Stub plain request" do
+      expect(HttpStub::Configurer::Request::PlainHttp).to receive(:new).with(http_request).and_return(http_stub_request)
+
+      subject
+    end
+
+    it "submits the HTTP Stub request via the request processor" do
+      expect(request_processor).to receive(:submit).with(hash_including(request: http_stub_request))
 
       subject
     end

@@ -19,7 +19,7 @@ describe HttpStub::Configurer::Server::CommandProcessor do
 
       describe "and the server responds with a 200 response" do
 
-        let(:request) { Net::HTTP::Get.new("/stubs") }
+        let(:request) { create_get_request("/stubs") }
 
         it "executes without error" do
           expect { subject }.not_to raise_error
@@ -29,7 +29,7 @@ describe HttpStub::Configurer::Server::CommandProcessor do
 
       describe "and the server responds with a non-200 response" do
 
-        let(:request) { Net::HTTP::Get.new("/causes_error") }
+        let(:request) { create_get_request("/causes_error") }
 
         it "raises an exception that includes the server base URI" do
           expect { subject }.to raise_error(/#{server_base_uri}/)
@@ -45,7 +45,7 @@ describe HttpStub::Configurer::Server::CommandProcessor do
 
     context "when the server is unavailable" do
 
-      let(:request) { Net::HTTP::Get.new("/does/not/exist") }
+      let(:request) { create_get_request("/does/not/exist") }
 
       it "raises an exception that includes the server base URI" do
         expect { subject }.to raise_error(/#{server_base_uri}/)
@@ -55,6 +55,10 @@ describe HttpStub::Configurer::Server::CommandProcessor do
         expect { subject }.to raise_error(/performing an operation/)
       end
 
+    end
+
+    def create_get_request(path)
+      HttpStub::Configurer::Request::PlainHttp.new(Net::HTTP::Get.new(path))
     end
 
   end

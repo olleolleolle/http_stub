@@ -17,28 +17,36 @@ module HttpStub
         end
 
         def activate(uri)
-          @request_processor.submit(request: Net::HTTP::Get.new(uri), description: "activating '#{uri}'")
+          @request_processor.submit(
+            request: as_plain_request(Net::HTTP::Get.new(uri)),
+            description: "activating '#{uri}'"
+          )
         end
 
         def remember_stubs
-          request = Net::HTTP::Post.new("/stubs/memory")
-          request.body = ""
-          @request_processor.submit(request: request, description: "committing stubs to memory")
+          @request_processor.submit(
+            request: as_plain_request(Net::HTTP::Post.new("/stubs/memory").tap { |request| request.body = "" }),
+            description: "committing stubs to memory"
+          )
         end
 
         def recall_stubs
           @request_processor.submit(
-            request: Net::HTTP::Get.new("/stubs/memory"), description: "recalling stubs in memory"
+            request: as_plain_request(Net::HTTP::Get.new("/stubs/memory")),
+            description: "recalling stubs in memory"
           )
         end
 
         def clear_stubs
-          @request_processor.submit(request: Net::HTTP::Delete.new("/stubs"), description: "clearing stubs")
+          @request_processor.submit(
+            request: as_plain_request(Net::HTTP::Delete.new("/stubs")),
+            description: "clearing stubs")
         end
 
         def clear_activators
           @request_processor.submit(
-            request: Net::HTTP::Delete.new("/stubs/activators"), description: "clearing activators"
+            request: as_plain_request(Net::HTTP::Delete.new("/stubs/activators")),
+            description: "clearing activators"
           )
         end
 
@@ -48,6 +56,12 @@ module HttpStub
 
         def flush_requests
           @request_processor.flush!
+        end
+
+        private
+
+        def as_plain_request(http_request)
+          HttpStub::Configurer::Request::PlainHttp.new(http_request)
         end
 
       end
