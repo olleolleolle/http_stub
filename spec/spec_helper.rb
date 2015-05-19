@@ -23,8 +23,8 @@ require_relative '../examples/configurer_with_complex_initializer'
 require_relative '../examples/configurer_with_response_defaults'
 require_relative '../examples/configurer_with_file_response'
 
-HttpStub::ServerDaemon.log_dir = ::File.expand_path('../../tmp/log', __FILE__)
-HttpStub::ServerDaemon.pid_dir = ::File.expand_path('../../tmp/pids', __FILE__)
+HttpStub::Server::Daemon.log_dir = ::File.expand_path('../../tmp/log', __FILE__)
+HttpStub::Server::Daemon.pid_dir = ::File.expand_path('../../tmp/pids', __FILE__)
 
 HttpServerManager.logger = HttpServerManager::Test::SilentLogger
 

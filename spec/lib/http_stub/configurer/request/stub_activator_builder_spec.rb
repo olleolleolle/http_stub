@@ -24,7 +24,7 @@ describe HttpStub::Configurer::Request::StubActivatorBuilder do
 
   describe "#match_requests" do
 
-    let(:request_payload) { stub_fixture.request.dsl_payload }
+    let(:request_payload) { stub_fixture.request.configurer_payload }
 
     it "delegates to a stub builder" do
       expect(stub_builder).to receive(:match_requests).with(stub_fixture.request.uri, request_payload)
@@ -36,7 +36,7 @@ describe HttpStub::Configurer::Request::StubActivatorBuilder do
 
   describe "#respond_with" do
 
-    let(:response_payload) { stub_fixture.response.dsl_payload }
+    let(:response_payload) { stub_fixture.response.configurer_payload }
 
     it "delegates to a stub builder" do
       expect(stub_builder).to receive(:respond_with).with(response_payload)

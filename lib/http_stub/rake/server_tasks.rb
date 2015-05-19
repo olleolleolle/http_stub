@@ -16,7 +16,7 @@ module HttpStub
         namespace :start do
           desc "Starts stub #{args[:name]} in the foreground"
           task(:foreground) do
-            HttpStub::Server.instance_eval do
+            HttpStub::Server::Application.instance_eval do
               set :environment, :test
               set :port, args[:port]
               run!

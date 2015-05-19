@@ -16,11 +16,11 @@ module HttpStub
         @payload.merge!(options)
       end
 
-      def dsl_payload
+      def symbolized
         @payload
       end
 
-      def http_payload
+      def stringified
         JSON.parse(@payload.to_json)
       end
 
@@ -77,23 +77,23 @@ module HttpStub
       self.tap { @trigger_fixtures.concat(triggers) }
     end
 
-    def dsl_payload
+    def configurer_payload
       {
-        request:  @request.dsl_payload,
-        response: @response.dsl_payload,
-        triggers: @trigger_fixtures.map(&:dsl_payload)
+        request:  @request.symbolized,
+        response: @response.symbolized,
+        triggers: @trigger_fixtures.map(&:configurer_payload)
       }
     end
 
-    def http_payload
+    def server_payload
       {
         "id"         => @id,
         "uri"        => @request.uri,
         "method"     => @request.http_method,
         "headers"    => @request.headers,
         "parameters" => @request.parameters,
-        "response"   => @response.http_payload,
-        "triggers"   => @trigger_fixtures.map(&:http_payload)
+        "response"   => @response.stringified,
+        "triggers"   => @trigger_fixtures.map(&:server_payload)
       }
     end
 

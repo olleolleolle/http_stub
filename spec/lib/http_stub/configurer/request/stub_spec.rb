@@ -5,14 +5,14 @@ describe HttpStub::Configurer::Request::Stub do
   let(:trigger_builders) { [] }
 
   let(:stub) do
-    HttpStub::Configurer::Request::Stub.new(fixture.dsl_payload.merge(triggers: trigger_builders))
+    HttpStub::Configurer::Request::Stub.new(fixture.configurer_payload.merge(triggers: trigger_builders))
   end
 
   before(:example) { allow(HttpStub::Configurer::Request::StubResponse).to receive(:new).and_return(stub_response) }
 
   shared_context "triggers one stub" do
 
-    let(:trigger_payload) { HttpStub::StubFixture.new.dsl_payload }
+    let(:trigger_payload) { HttpStub::StubFixture.new.configurer_payload }
     let(:trigger_files)   { [] }
     let(:trigger) do
       instance_double(HttpStub::Configurer::Request::Stub,
@@ -26,7 +26,7 @@ describe HttpStub::Configurer::Request::Stub do
 
   shared_context "triggers many stubs" do
 
-    let(:trigger_payloads) { (1..3).map { HttpStub::StubFixture.new.dsl_payload } }
+    let(:trigger_payloads) { (1..3).map { HttpStub::StubFixture.new.configurer_payload } }
     let(:triggers_files)   { trigger_payloads.map { [] } }
     let(:triggers) do
       trigger_payloads.zip(triggers_files).map do |payload, files|
@@ -95,7 +95,7 @@ describe HttpStub::Configurer::Request::Stub do
 
     it "creates a stub response with the provided response options" do
       expect(HttpStub::Configurer::Request::StubResponse).to(
-        receive(:new).with(anything, fixture.response.dsl_payload).and_return(stub_response)
+        receive(:new).with(anything, fixture.response.symbolized).and_return(stub_response)
       )
 
       subject

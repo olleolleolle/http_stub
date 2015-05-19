@@ -44,8 +44,8 @@ describe HttpStub::Configurer::Request::StubBuilder do
     let(:stub)    { instance_double(HttpStub::Configurer::Request::Stub) }
 
     subject do
-      builder.match_requests(fixture.request.uri, fixture.request.dsl_payload)
-      builder.respond_with(fixture.response.dsl_payload)
+      builder.match_requests(fixture.request.uri, fixture.request.symbolized)
+      builder.respond_with(fixture.response.symbolized)
 
       builder.build
     end
@@ -55,13 +55,13 @@ describe HttpStub::Configurer::Request::StubBuilder do
     context "when provided a request match and response data" do
 
       it "creates a stub payload with request options that include the uri and the provided request options" do
-        expect_stub_to_be_created_with(request: { uri: fixture.request.uri }.merge(fixture.request.dsl_payload))
+        expect_stub_to_be_created_with(request: { uri: fixture.request.uri }.merge(fixture.request.symbolized))
 
         subject
       end
 
       it "creates a stub payload with response arguments" do
-        expect_stub_to_be_created_with(response: fixture.response.dsl_payload)
+        expect_stub_to_be_created_with(response: fixture.response.symbolized)
 
         subject
       end
@@ -71,7 +71,7 @@ describe HttpStub::Configurer::Request::StubBuilder do
         let(:response_defaults) { { some_options: "default value" } }
 
         it "creates a stub payload with response arguments that includes the defaults" do
-          expect_stub_to_be_created_with(response: fixture.response.dsl_payload.merge(response_defaults))
+          expect_stub_to_be_created_with(response: fixture.response.symbolized.merge(response_defaults))
 
           subject
         end
@@ -80,17 +80,17 @@ describe HttpStub::Configurer::Request::StubBuilder do
 
           let(:response_defaults) do
             {
-              "status"           => 203,
-              "headers"          => { "header-name-1" => "value 1", "header-name-2" => "value 2" },
-              "body"             => "some body",
-              "delay_in_seconds" => 8
+              status:           203,
+              headers:          { "header-name-1" => "value 1", "header-name-2" => "value 2" },
+              body:             "some body",
+              delay_in_seconds: 8
             }
           end
           let(:response_overrides) do
             {
-              "status"  => 302,
-              "headers" => { "header-name-2" => "updated value 2", "header-name-3" => "value 3" },
-              "body"    => "another body"
+              status:  302,
+              headers: { "header-name-2" => "updated value 2", "header-name-3" => "value 3" },
+              body:    "another body"
             }
           end
 
@@ -99,12 +99,12 @@ describe HttpStub::Configurer::Request::StubBuilder do
           it "overriddes the defaults with the provided options" do
             expect_stub_to_be_created_with(
               response: {
-                "status"  => 302,
-                "headers" => { "header-name-1" => "value 1",
-                               "header-name-2" => "updated value 2",
-                               "header-name-3" => "value 3" },
-                "body"    => "another body",
-                "delay_in_seconds" => 8
+                status:           302,
+                headers:          { "header-name-1" => "value 1",
+                                    "header-name-2" => "updated value 2",
+                                    "header-name-3" => "value 3" },
+                body:             "another body",
+                delay_in_seconds: 8
               }
             )
 

@@ -3,7 +3,7 @@ describe HttpStub::Configurer::Request::StubResponse do
   let(:stub_fixture) { HttpStub::StubFixture.new }
   let(:fixture)      { stub_fixture.response }
 
-  let(:stub_response) { HttpStub::Configurer::Request::StubResponse.new(stub_fixture.id, fixture.dsl_payload) }
+  let(:stub_response) { HttpStub::Configurer::Request::StubResponse.new(stub_fixture.id, fixture.symbolized) }
 
   describe "#payload" do
     

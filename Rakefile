@@ -52,8 +52,8 @@ task :validate do
   raise "Travis CI validation failed" unless $?.success?
 end
 
-HttpStub::ServerDaemon.log_dir = ::File.expand_path('../tmp/log', __FILE__)
-HttpStub::ServerDaemon.pid_dir = ::File.expand_path('../tmp/pids', __FILE__)
+HttpStub::Server::Daemon.log_dir = ::File.expand_path('../tmp/log', __FILE__)
+HttpStub::Server::Daemon.pid_dir = ::File.expand_path('../tmp/pids', __FILE__)
 
 HttpStub::Rake::ServerTasks.new(name: :example_server, port: 8001)
 
