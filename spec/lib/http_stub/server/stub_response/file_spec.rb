@@ -12,24 +12,10 @@ describe HttpStub::Server::StubResponse::File do
     }
   end
 
-  let(:expected_file_path) { "#{HttpStub::BASE_DIR}/tmp/response_files/#{file_name}" }
-
   let(:response_file) { HttpStub::Server::StubResponse::File.new(args) }
-
-  after(:example) { FileUtils.rm_rf(expected_file_path) }
 
   it "is a base response" do
     expect(response_file).to be_a(HttpStub::Server::StubResponse::Base)
-  end
-
-  describe "constructor" do
-
-    it "stores the temporary file provided for subsequent use" do
-      response_file
-
-      expect(FileUtils.identical?(expected_file_path, temp_file_path)).to be(true)
-    end
-
   end
 
   describe "#serve_on" do
@@ -38,8 +24,8 @@ describe HttpStub::Server::StubResponse::File do
 
     subject { response_file.serve_on(server) }
 
-    it "sends the file via the server" do
-      expect(server).to receive(:send_file).with(expected_file_path, anything)
+    it "sends the temp file via the server" do
+      expect(server).to receive(:send_file).with(temp_file_path, anything)
 
       subject
     end
@@ -123,16 +109,6 @@ describe HttpStub::Server::StubResponse::File do
         subject
       end
 
-    end
-
-  end
-
-  describe "#clear" do
-
-    it "deletes the stored file" do
-      response_file.clear
-
-      expect(File.exist?(expected_file_path)).to be(false)
     end
 
   end

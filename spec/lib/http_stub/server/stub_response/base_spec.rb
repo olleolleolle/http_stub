@@ -206,14 +206,6 @@ describe HttpStub::Server::StubResponse::Base do
 
   end
 
-  describe "#clear" do
-
-    it "executes without error" do
-      expect { response.clear }.to_not raise_error
-    end
-
-  end
-
   describe "#to_s" do
 
     it "returns the string representation of the provided arguments" do

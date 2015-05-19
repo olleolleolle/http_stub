@@ -33,16 +33,6 @@ describe HttpStub::Server::StubTriggers do
 
   end
 
-  describe "#clear" do
-
-    it "clears each stub" do
-      stubs_for_triggers.each { |stub| expect(stub).to receive(:clear) }
-
-      stub_triggers.clear
-    end
-
-  end
-
   describe "#each" do
 
     it "yields to the stubs for each trigger" do

@@ -22,11 +22,6 @@ module HttpStub
             @parameters.match?(request)
       end
 
-      def clear
-        @response.clear
-        @triggers.clear
-      end
-
       def to_s
         @description
       end

@@ -101,16 +101,6 @@ describe HttpStub::Server::StubActivator do
 
   end
 
-  describe "#clear" do
-
-    it "delegates to a HttpStub::Server::Stub constructed from the activator's arguments" do
-      expect(underlying_stub).to receive(:clear)
-
-      expect(stub_activator.clear)
-    end
-
-  end
-
   describe "#to_s" do
 
     it "returns the string representation of the activation arguments" do

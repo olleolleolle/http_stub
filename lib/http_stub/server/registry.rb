@@ -28,13 +28,11 @@ module HttpStub
 
       def rollback_to(model)
         starting_index = @models.index(model)
-        @models[0..starting_index].each(&:clear)
-        @models = @models.slice(starting_index..-1)
+        @models = @models.slice(starting_index..-1) if starting_index
       end
 
       def clear(request)
         request.logger.info "Clearing #{@model_name} registry"
-        @models.each(&:clear)
         @models.clear
       end
 

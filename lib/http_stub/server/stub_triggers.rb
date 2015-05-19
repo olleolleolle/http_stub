@@ -13,10 +13,6 @@ module HttpStub
         @triggers.each { |trigger| registry.add(trigger, request) }
       end
 
-      def clear
-        @triggers.each(&:clear)
-      end
-
       def to_s
         @triggers.reduce("") { |result, trigger| "#{result}\n#{trigger}" }
       end

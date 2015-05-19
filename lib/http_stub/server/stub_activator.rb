@@ -24,10 +24,6 @@ module HttpStub
         @args["activation_uri"]
       end
 
-      def clear
-        @stub.clear
-      end
-
       def to_s
         @args.to_s
       end

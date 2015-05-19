@@ -43,8 +43,8 @@ describe HttpStub::Server::Stub do
   let(:stub_uri)        { instance_double(HttpStub::Server::StubUri, match?: true) }
   let(:stub_headers)    { instance_double(HttpStub::Server::StubHeaders, match?: true) }
   let(:stub_parameters) { instance_double(HttpStub::Server::StubParameters, match?: true) }
-  let(:stub_response)   { instance_double(HttpStub::Server::StubResponse::Base, clear: nil) }
-  let(:stub_triggers)   { instance_double(HttpStub::Server::StubTriggers, clear: nil) }
+  let(:stub_response)   { instance_double(HttpStub::Server::StubResponse::Base) }
+  let(:stub_triggers)   { instance_double(HttpStub::Server::StubTriggers) }
 
   let(:the_stub) { HttpStub::Server::Stub.new(stub_args) }
 
@@ -182,24 +182,6 @@ describe HttpStub::Server::Stub do
 
     it "returns the triggers model encapsulating the triggers provided in the request body" do
       expect(the_stub.triggers).to eql(stub_triggers)
-    end
-
-  end
-
-  describe "#clear" do
-
-    subject { the_stub.clear }
-
-    it "clears the stub response" do
-      expect(stub_response).to receive(:clear)
-
-      subject
-    end
-
-    it "clears the stub triggers" do
-      expect(stub_triggers).to receive(:clear)
-
-      subject
     end
 
   end

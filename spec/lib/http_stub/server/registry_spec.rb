@@ -7,7 +7,7 @@ describe HttpStub::Server::Registry do
 
   shared_context "register multiple models" do
 
-    let(:models) { (1..3).map { |i| double("HttpStub::Server::Model#{i}", :satisfies? => false, :clear => nil) } }
+    let(:models) { (1..3).map { |i| double("HttpStub::Server::Model#{i}", :satisfies? => false) } }
 
     before(:example) { models.each { |model| registry.add(model, request) } }
 
@@ -136,6 +136,54 @@ describe HttpStub::Server::Registry do
 
   end
 
+  describe "#rollback_to" do
+
+    subject { registry.rollback_to(model) }
+
+    context "when models have been added" do
+
+      include_context "register multiple models"
+
+      context "and the rollback is to one of those models" do
+
+        let(:model) { models[1] }
+
+        it "the models remaining are those added up to and including the provided model" do
+          subject
+
+          expect(registry.all).to eql(models[0, 2].reverse)
+        end
+
+      end
+
+      context "and the rollback is to a model that has not been added" do
+
+        let(:model) { double("HttpStub::Server::Model") }
+
+        it "does not remove any models" do
+          subject
+
+          expect(registry.all).to eql(models.reverse)
+        end
+
+      end
+
+    end
+
+    context "when no models have been added" do
+
+      let(:model) { double("HttpStub::Server::Model") }
+
+      it "does not effect the known models" do
+        subject
+
+        expect(registry.all).to be_empty
+      end
+
+    end
+
+  end
+
   describe "#clear" do
 
     subject { registry.clear(request) }
@@ -149,12 +197,6 @@ describe HttpStub::Server::Registry do
     context "when models have been added" do
 
       include_context "register multiple models"
-
-      it "clears each model" do
-        models.each { |model| expect(model).to receive(:clear) }
-
-        subject
-      end
 
       it "releases all knowledge of the models" do
         subject

@@ -47,10 +47,6 @@ module HttpStub
           @original_args.empty?
         end
 
-        def clear
-          # Intentionally blank
-        end
-
         def to_s
           @original_args.to_s
         end

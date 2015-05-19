@@ -12,12 +12,6 @@ require 'active_support/core_ext/module/delegation'
 require 'active_support/core_ext/hash/slice'
 require 'active_support/core_ext/hash/deep_merge'
 
-module HttpStub
-
-  BASE_DIR = ::File.expand_path("../..", __FILE__)
-
-end
-
 require_relative 'http_stub/extensions/core/hash'
 require_relative 'http_stub/extensions/rack/handler'
 require_relative 'http_stub/server/headers'
