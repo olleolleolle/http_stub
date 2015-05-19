@@ -18,14 +18,14 @@ module HttpStub
         end
 
         def build_stub(&block)
-          builder = HttpStub::Configurer::Request::StubPayloadBuilder.new(@response_defaults)
+          builder = HttpStub::Configurer::Request::StubBuilder.new(@response_defaults)
           block.call(builder) if block_given?
           builder
         end
 
         def add_stub!(builder=nil, &block)
           resolved_builder = builder || self.build_stub(&block)
-          @server_facade.stub_response(HttpStub::Configurer::Request::Stub.new(resolved_builder.build))
+          @server_facade.stub_response(resolved_builder.build)
         end
 
         def add_stubs!(builders)
@@ -33,9 +33,9 @@ module HttpStub
         end
 
         def add_activator!(&block)
-          builder = HttpStub::Configurer::Request::StubActivatorPayloadBuilder.new(@response_defaults)
+          builder = HttpStub::Configurer::Request::StubActivatorBuilder.new(@response_defaults)
           block.call(builder)
-          @server_facade.stub_activator(HttpStub::Configurer::Request::StubActivator.new(builder.build))
+          @server_facade.stub_activator(builder.build)
         end
 
         def activate!(uri)

@@ -8,7 +8,7 @@ module HttpStub
       end
 
       def register(request)
-        @registry.add(HttpStub::Models::Stub.create_from(request), request)
+        @registry.add(HttpStub::Models::StubFactory.create(request), request)
         HttpStub::Models::Response::SUCCESS
       end
 

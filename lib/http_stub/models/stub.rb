@@ -3,34 +3,32 @@ module HttpStub
 
     class Stub
 
-      attr_reader :uri, :headers, :parameters, :response, :triggers
-
-      def self.create_from(request)
-        self.new(JSON.parse(request.params["payload"] || request.body.read))
-      end
+      attr_reader :method, :uri, :headers, :parameters, :response, :triggers
 
       def initialize(args)
-        @args = args
-        @uri = HttpStub::Models::StubUri.new(args["uri"])
-        @headers = HttpStub::Models::StubHeaders.new(args["headers"])
-        @parameters = HttpStub::Models::StubParameters.new(args["parameters"])
-        @response = HttpStub::Models::Response.new(args["response"])
-        @triggers = HttpStub::Models::StubTriggers.new(args["triggers"])
+        @method      = args["method"]
+        @uri         = HttpStub::Models::StubUri.new(args["uri"])
+        @headers     = HttpStub::Models::StubHeaders.new(args["headers"])
+        @parameters  = HttpStub::Models::StubParameters.new(args["parameters"])
+        @response    = HttpStub::Models::StubResponse.create(args["response"])
+        @triggers    = HttpStub::Models::StubTriggers.new(args["triggers"])
+        @description = args.to_s
       end
 
       def satisfies?(request)
         @uri.match?(request) &&
-            method.downcase == request.request_method.downcase &&
+            @method.downcase == request.request_method.downcase &&
             @headers.match?(request) &&
             @parameters.match?(request)
       end
 
-      def method
-        @args["method"]
+      def clear
+        @response.clear
+        @triggers.clear
       end
 
       def to_s
-        @args.to_s
+        @description
       end
 
     end

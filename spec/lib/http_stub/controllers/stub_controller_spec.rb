@@ -7,14 +7,14 @@ describe HttpStub::Controllers::StubController do
 
   let(:controller) { HttpStub::Controllers::StubController.new(registry) }
 
-  before(:example) { allow(HttpStub::Models::Stub).to receive(:create_from).and_return(the_stub) }
+  before(:example) { allow(HttpStub::Models::StubFactory).to receive(:create).and_return(the_stub) }
 
   describe "#register" do
 
     subject { controller.register(request) }
 
-    it "creates a stub from the provided request" do
-      expect(HttpStub::Models::Stub).to receive(:create_from).with(request).and_return(the_stub)
+    it "creates a stub from the provided request via the factory" do
+      expect(HttpStub::Models::StubFactory).to receive(:create).with(request).and_return(the_stub)
 
       subject
     end

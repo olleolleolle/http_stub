@@ -1,42 +1,43 @@
 describe HttpStub::Configurer::Request::StubActivator do
 
-  describe "#to_http_request" do
+  let(:activation_uri) { "some/activation/uri" }
+  let(:stub)           { instance_double(HttpStub::Configurer::Request::Stub) }
 
-    let(:payload) { { some_key: "some value" } }
+  let(:stub_activator) { HttpStub::Configurer::Request::StubActivator.new(activation_uri: activation_uri, stub: stub) }
 
-    let(:stub_activator_request) { HttpStub::Configurer::Request::StubActivator.new(payload) }
+  describe "#payload" do
 
-    subject { stub_activator_request.to_http_request }
+    let(:stub_payload) { { stub_payload_key: "stub payload value " } }
 
-    it "creates a HTTP POST request" do
-      expect(subject.method).to eql("POST")
+    subject { stub_activator.payload }
+
+    before(:example) { allow(stub).to receive(:payload).and_return(stub_payload) }
+
+    it "returns a hash containing the activation uri" do
+      expect(subject).to include(activation_uri: activation_uri)
     end
 
-    it "creates a request whose path is '/stubs/activators'" do
-      expect(subject.path).to eql("/stubs/activators")
-    end
-
-    it "creates a request whose content type is multipart" do
-      expect(subject.content_type).to eql("multipart/form-data")
-    end
-
-    it "creates a request with a payload parameter that contains the JSON representation of the provided payload" do
-      body = subject.body_stream.read
-
-      expect(body).to include("payload")
-      expect(body).to include(payload.to_json)
+    it "returns a hash containing the stub payload" do
+      expect(subject).to include(stub_payload)
     end
 
   end
 
-  describe "#activation_uri" do
+  describe "#response_files" do
 
-    let(:activation_uri) { "http://some/activation/uri" }
+    it "delegates to the stub" do
+      stub_response_files = (1..3).each { instance_double(HttpStub::Configurer::Request::StubResponseFile) }
+      allow(stub).to receive(:response_files).and_return(stub_response_files)
 
-    let(:stub_activator_request) { HttpStub::Configurer::Request::StubActivator.new(activation_uri: activation_uri) }
+      expect(stub_activator.response_files).to eql(stub_response_files)
+    end
 
-    it "should return the activation uri from the payload" do
-      expect(stub_activator_request.activation_uri).to eql(activation_uri)
+  end
+
+  describe "#to_s" do
+
+    it "returns the activation uri" do
+      expect(stub_activator.to_s).to eql(activation_uri)
     end
 
   end

@@ -18,16 +18,23 @@ module HttpStub
         @models.find { |model| model.satisfies?(request) }
       end
 
+      def last
+        @models.first
+      end
+
       def all
         Array.new(@models)
       end
 
-      def copy
-        Marshal.load(Marshal.dump(self))
+      def rollback_to(model)
+        starting_index = @models.index(model)
+        @models[0..starting_index].each(&:clear)
+        @models = @models.slice(starting_index..-1)
       end
 
       def clear(request)
         request.logger.info "Clearing #{@model_name} registry"
+        @models.each(&:clear)
         @models.clear
       end
 

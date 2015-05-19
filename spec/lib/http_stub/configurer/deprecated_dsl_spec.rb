@@ -142,7 +142,7 @@ describe HttpStub::Configurer::DeprecatedDSL do
 
         include_context "a method stubbing a response"
 
-        let(:builder) { instance_double(HttpStub::Configurer::Request::StubPayloadBuilder) }
+        let(:builder) { instance_double(HttpStub::Configurer::Request::StubBuilder) }
 
         subject { dsl_object.send(method, stub_uri, options) }
 
@@ -164,7 +164,7 @@ describe HttpStub::Configurer::DeprecatedDSL do
 
       include_context "a method stubbing a response"
 
-      let(:builder) { instance_double(HttpStub::Configurer::Request::StubActivatorPayloadBuilder) }
+      let(:builder) { instance_double(HttpStub::Configurer::Request::StubActivatorBuilder) }
 
       subject { dsl_object.stub_activator(activation_uri, stub_uri, options) }
 

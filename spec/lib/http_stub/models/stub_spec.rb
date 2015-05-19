@@ -43,7 +43,8 @@ describe HttpStub::Models::Stub do
   let(:stub_uri)        { instance_double(HttpStub::Models::StubUri, match?: true) }
   let(:stub_headers)    { instance_double(HttpStub::Models::StubHeaders, match?: true) }
   let(:stub_parameters) { instance_double(HttpStub::Models::StubParameters, match?: true) }
-  let(:stub_triggers)   { instance_double(HttpStub::Models::StubTriggers) }
+  let(:stub_response)   { instance_double(HttpStub::Models::StubResponse::Base, clear: nil) }
+  let(:stub_triggers)   { instance_double(HttpStub::Models::StubTriggers, clear: nil) }
 
   let(:the_stub) { HttpStub::Models::Stub.new(stub_args) }
 
@@ -51,55 +52,15 @@ describe HttpStub::Models::Stub do
     allow(HttpStub::Models::StubUri).to receive(:new).and_return(stub_uri)
     allow(HttpStub::Models::StubHeaders).to receive(:new).and_return(stub_headers)
     allow(HttpStub::Models::StubParameters).to receive(:new).and_return(stub_parameters)
+    allow(HttpStub::Models::StubResponse).to receive(:create).and_return(stub_response)
     allow(HttpStub::Models::StubTriggers).to receive(:new).and_return(stub_triggers)
-  end
-
-  describe "::create_from" do
-
-    let(:payload) { stub_args.to_json }
-
-    subject { HttpStub::Models::Stub.create_from(request) }
-
-    shared_context "verification a stub is created from a request" do
-
-      it "creates a stub with JSON parsed from the request payload" do
-        expect(HttpStub::Models::Stub).to receive(:new).with(stub_args)
-
-        subject
-      end
-
-      it "returns the created stub activator" do
-        created_stub = instance_double(HttpStub::Models::Stub)
-        allow(HttpStub::Models::Stub).to receive(:new).and_return(created_stub)
-
-        expect(subject).to eql(created_stub)
-      end
-
-    end
-
-    context "when the request body contains the payload" do
-
-      let(:request) { double("HttpRequest", params: {}, body: double("RequestBody", read: payload)) }
-
-      include_context "verification a stub is created from a request"
-
-    end
-
-    context "when the request contains a payload parameter" do
-
-      let(:request) { double("HttpRequest", params: { "payload" => payload }) }
-
-      include_context "verification a stub is created from a request"
-
-    end
-
   end
 
   describe "#satisfies?" do
 
-    let(:request_uri) { "/a_request_uri" }
+    let(:request_uri)    { "/a_request_uri" }
     let(:request_method) { stub_method }
-    let(:request) { double("HttpRequest", :request_method => request_method) }
+    let(:request)        { instance_double(Rack::Request, :request_method => request_method) }
 
     describe "when the request uri matches" do
 
@@ -211,12 +172,8 @@ describe HttpStub::Models::Stub do
 
   describe "#response" do
 
-    it "exposes the provided response status" do
-      expect(the_stub.response.status).to eql(201)
-    end
-
-    it "exposes the provided response body" do
-      expect(the_stub.response.body).to eql("Some body")
+    it "exposes the response model encapsulating the response provided in the request body" do
+      expect(the_stub.response).to eql(stub_response)
     end
 
   end
@@ -225,6 +182,24 @@ describe HttpStub::Models::Stub do
 
     it "returns the triggers model encapsulating the triggers provided in the request body" do
       expect(the_stub.triggers).to eql(stub_triggers)
+    end
+
+  end
+
+  describe "#clear" do
+
+    subject { the_stub.clear }
+
+    it "clears the stub response" do
+      expect(stub_response).to receive(:clear)
+
+      subject
+    end
+
+    it "clears the stub triggers" do
+      expect(stub_triggers).to receive(:clear)
+
+      subject
     end
 
   end

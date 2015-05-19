@@ -58,7 +58,7 @@ describe HttpStub::Configurer::Server::CommandProcessor do
     end
 
     def create_get_request(path)
-      HttpStub::Configurer::Request::PlainHttp.new(Net::HTTP::Get.new(path))
+      HttpStub::Configurer::Request::Http::Basic.new(Net::HTTP::Get.new(path))
     end
 
   end

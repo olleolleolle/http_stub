@@ -1,6 +1,6 @@
 module HttpStub
 
-  class Server < ::Sinatra::Base
+  class Server < Sinatra::Base
 
     register Sinatra::Partial
 
@@ -12,7 +12,7 @@ module HttpStub
       @stub_activator_registry = HttpStub::Models::Registry.new("stub_activator")
       @stub_controller = HttpStub::Controllers::StubController.new(@stub_registry)
       @stub_activator_controller =
-          HttpStub::Controllers::StubActivatorController.new(@stub_activator_registry, @stub_registry)
+        HttpStub::Controllers::StubActivatorController.new(@stub_activator_registry, @stub_registry)
     end
 
     private
@@ -22,6 +22,8 @@ module HttpStub
     def self.any_request_type(path, opts={}, &block)
       SUPPORTED_REQUEST_TYPES.each { |type| self.send(type, path, opts, &block) }
     end
+
+    before { @response_pipeline = HttpStub::Models::ResponsePipeline.new(self) }
 
     public
 
@@ -44,7 +46,7 @@ module HttpStub
     # }
     post "/stubs" do
       response = @stub_controller.register(request)
-      halt(response.status, response.body)
+      @response_pipeline.process(response)
     end
 
     get "/stubs" do
@@ -73,7 +75,7 @@ module HttpStub
     # }
     post "/stubs/activators" do
       response = @stub_activator_controller.register(request)
-      halt(response.status, response.body)
+      @response_pipeline.process(response)
     end
 
     get "/stubs/activators" do
@@ -105,8 +107,7 @@ module HttpStub
       response = @stub_controller.replay(request)
       response = @stub_activator_controller.activate(request) if response.empty?
       response = HttpStub::Models::Response::ERROR if response.empty?
-      HttpStub::Models::RequestPipeline.before_halt(response)
-      halt(response.status, response.headers.to_hash, response.body)
+      @response_pipeline.process(response)
     end
 
   end

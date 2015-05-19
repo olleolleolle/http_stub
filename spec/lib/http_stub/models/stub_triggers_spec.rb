@@ -33,6 +33,26 @@ describe HttpStub::Models::StubTriggers do
 
   end
 
+  describe "#clear" do
+
+    it "clears each stub" do
+      stubs_for_triggers.each { |stub| expect(stub).to receive(:clear) }
+
+      stub_triggers.clear
+    end
+
+  end
+
+  describe "#each" do
+
+    it "yields to the stubs for each trigger" do
+      yielded_stubs = stub_triggers.each.map.to_a
+
+      expect(yielded_stubs).to eql(stubs_for_triggers)
+    end
+
+  end
+
   describe "#to_s" do
 
     let(:trigger_strings) { (1..stubs_for_triggers.length).map { |i| "trigger string ##{i}" } }
@@ -47,16 +67,6 @@ describe HttpStub::Models::StubTriggers do
       result = stub_triggers.to_s
 
       trigger_strings.each { |trigger_string| expect(result).to include(trigger_string) }
-    end
-
-  end
-
-  describe "#each" do
-
-    it "yields to the stubs for each trigger" do
-      yielded_stubs = stub_triggers.each.map.to_a
-
-      expect(yielded_stubs).to eql(stubs_for_triggers)
     end
 
   end

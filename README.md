@@ -117,7 +117,19 @@ Responses may contain headers, for example:
     stub! /prefix\/[^\/]*\/postfix/,
           method: :post,
           response: { status:  201,
-                      headers: { "content-type" => "application/xhtml+xml", "location" => "http://some/resource/path" } }
+                      headers: { "content-type" => "application/xhtml+xml",
+                                 "location" => "http://some/resource/path" } }
+```
+
+Responses may contain files, for example:
+
+```ruby
+    stub! "/some/resource/path",
+          headers: { "Accept": "application/pdf" },
+          method: :get,
+          response: { status:  200,
+                      headers: { "content-type" => "application/pdf" },
+                      body: { file: { path: "/some/path/on/disk.pdf", name: "resource.pdf" } } }
 ```
 
 Responses may also impose delays, for example:
@@ -137,7 +149,7 @@ This can be done in one of two ways, via the ```initialize!``` or ```server_has_
 
 These methods are similar in purpose although ```initialize!``` also:
 * Flushes all buffered requests
-* Remembers the stubs so that they can be recalled via ```recall_stubs!```
+* Remembers the buffered stubs allowing the state to be recalled via ```recall_stubs!```
 
 It is recommended that ```initialize!``` is called only once, post server start-up.
 
@@ -170,7 +182,7 @@ An initialization callback is available, useful should you wish to control stub 
     FooService.initialize!
 ```
 
-```remember_stubs``` remembers the stubs so that they can be recalled in future.
+```remember_stubs``` remembers the stubs so that the state can be recalled in future.
 
 ```recall_stubs!``` recalls the remembered stubs and is often used on completion of tests to return the server to a known state:
 
@@ -254,6 +266,7 @@ To configure a stub response, POST to /stubs with the following JSON payload:
 
 ```javascript
   {
+    "id":         "some-unique-value",
     "uri":        "/some/path",
     "method":     "some method",
     "headers":    {
@@ -273,6 +286,7 @@ To configure a stub response, POST to /stubs with the following JSON payload:
     },
     "triggers":  [
       {
+        "uri":        "some-unique-value",
         "uri":        "/some/path",
         "method":     "some method",
         "headers":    {
@@ -298,6 +312,11 @@ To configure a stub response, POST to /stubs with the following JSON payload:
     ]
   }
 ```
+
+Should your response, or trigger responses, contain files, POST to /stubs with a ```multipart/form-data``` content type.
+The JSON payload above must be provided in the ```payload``` parameter.
+Files are provided in  ```response_file_<id>``` parameters, where ```id``` is the id of the associated stub in the
+payload.
 
 The stub uri, header values and parameter values can be regular expressions by prefixing them with ```regexp:```
 

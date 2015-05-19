@@ -64,53 +64,33 @@ describe HttpStub::Models::StubRegistry do
 
   end
 
-  describe "#remember" do
-
-    it "copies the underlying registry" do
-      expect(registry).to receive(:copy)
-
-      stub_registry.remember
-    end
-
-  end
-
   describe "#recall" do
 
     subject { stub_registry.recall }
 
     context "when the state of the registry has been remembered" do
 
-      let(:remembered_registry)         { instance_double(HttpStub::Models::Registry) }
-      let(:copy_of_remembered_registry) { instance_double(HttpStub::Models::Registry) }
+      let(:last_stub_remembered) { instance_double(HttpStub::Models::Stub) }
 
       before(:example) do
-        allow(registry).to receive(:copy).and_return(remembered_registry)
-        allow(remembered_registry).to receive(:copy).and_return(copy_of_remembered_registry)
+        allow(registry).to receive(:last).and_return(last_stub_remembered)
         stub_registry.remember
       end
 
-      it "copies the remembered registry to ensure subsequent recalls recall the same stubs" do
-        expect(remembered_registry).to receive(:copy)
+      it "causes the underlying registry to rollback to the last stub added before the state was remembered" do
+        expect(registry).to receive(:rollback_to).with(last_stub_remembered)
 
         subject
-      end
-
-      it "causes subsequent method calls to delegate to the copy" do
-        subject
-
-        expect(copy_of_remembered_registry).to receive(:all)
-        stub_registry.all
       end
 
     end
 
     context "when the state of the registry has not been remembered" do
 
-      it "does not effect subsequent method calls" do
-        subject
+      it "does not rollback the underlying registry" do
+        expect(registry).to_not receive(:rollback_to)
 
-        expect(registry).to receive(:all)
-        stub_registry.all
+        subject
       end
 
     end

@@ -4,16 +4,31 @@ module HttpStub
 
       class Stub
 
-        def initialize(payload)
-          @payload = payload
+        def initialize(args)
+          @id       = SecureRandom.uuid
+          @request  = args[:request]
+          @response = HttpStub::Configurer::Request::StubResponse.new(@id, args[:response])
+          @triggers = args[:triggers].map(&:build)
         end
 
-        def to_http_request
-          Net::HTTP::Post::Multipart.new("/stubs", payload: @payload.to_json)
+        def payload
+          {
+            id:         @id,
+            uri:        HttpStub::Configurer::Request::ControllableValue.format(@request[:uri]),
+            method:     @request[:method],
+            headers:    HttpStub::Configurer::Request::ControllableValue.format(@request[:headers] || {}),
+            parameters: HttpStub::Configurer::Request::ControllableValue.format(@request[:parameters] || {}),
+            response:   @response.payload,
+            triggers:   @triggers.map(&:payload)
+          }
         end
 
-        def stub_uri
-          @payload[:uri]
+        def response_files
+          ([ @response.file ] + @triggers.map(&:response_files)).flatten.compact
+        end
+
+        def to_s
+          @request[:uri]
         end
 
       end

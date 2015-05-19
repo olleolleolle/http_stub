@@ -8,44 +8,50 @@ module HttpStub
           @request_processor = HttpStub::Configurer::Server::RequestProcessor.new(configurer)
         end
 
-        def stub_response(request)
-          @request_processor.submit(request: request, description: "stubbing '#{request.stub_uri}'")
+        def stub_response(model)
+          @request_processor.submit(
+            request: HttpStub::Configurer::Request::Http::Factory.stub(model),
+            description: "stubbing '#{model}'"
+          )
         end
 
-        def stub_activator(request)
-          @request_processor.submit(request: request, description: "registering activator '#{request.activation_uri}'")
+        def stub_activator(model)
+          @request_processor.submit(
+            request: HttpStub::Configurer::Request::Http::Factory.stub_activator(model),
+            description: "registering activator '#{model}'"
+          )
         end
 
         def activate(uri)
           @request_processor.submit(
-            request: as_plain_request(Net::HTTP::Get.new(uri)),
+            request: HttpStub::Configurer::Request::Http::Factory.get(uri),
             description: "activating '#{uri}'"
           )
         end
 
         def remember_stubs
           @request_processor.submit(
-            request: as_plain_request(Net::HTTP::Post.new("/stubs/memory").tap { |request| request.body = "" }),
+            request: HttpStub::Configurer::Request::Http::Factory.post("/stubs/memory"),
             description: "committing stubs to memory"
           )
         end
 
         def recall_stubs
           @request_processor.submit(
-            request: as_plain_request(Net::HTTP::Get.new("/stubs/memory")),
+            request: HttpStub::Configurer::Request::Http::Factory.get("/stubs/memory"),
             description: "recalling stubs in memory"
           )
         end
 
         def clear_stubs
           @request_processor.submit(
-            request: as_plain_request(Net::HTTP::Delete.new("/stubs")),
+            request: HttpStub::Configurer::Request::Http::Factory.delete("/stubs"),
             description: "clearing stubs")
         end
 
         def clear_activators
           @request_processor.submit(
-            request: as_plain_request(Net::HTTP::Delete.new("/stubs/activators")),
+            request: HttpStub::Configurer::Request::Http::Factory.delete("/stubs/activators"),
             description: "clearing activators"
           )
         end
@@ -56,12 +62,6 @@ module HttpStub
 
         def flush_requests
           @request_processor.flush!
-        end
-
-        private
-
-        def as_plain_request(http_request)
-          HttpStub::Configurer::Request::PlainHttp.new(http_request)
         end
 
       end

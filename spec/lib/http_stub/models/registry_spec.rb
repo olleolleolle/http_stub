@@ -5,6 +5,14 @@ describe HttpStub::Models::Registry do
 
   let(:registry) { HttpStub::Models::Registry.new("a_model") }
 
+  shared_context "register multiple models" do
+
+    let(:models) { (1..3).map { |i| double("HttpStub::Models::Model#{i}", :satisfies? => false, :clear => nil) } }
+
+    before(:example) { models.each { |model| registry.add(model, request) } }
+
+  end
+
   describe "#add" do
 
     it "logs that the model has been registered" do
@@ -20,13 +28,7 @@ describe HttpStub::Models::Registry do
 
     describe "when multiple models have been registered" do
 
-      let(:models) do
-        (1..3).map { |i| double("HttpStub::Models::Model#{i}", :satisfies? => false) }
-      end
-
-      before(:example) do
-        models.each { |model| registry.add(model, request) }
-      end
+      include_context "register multiple models"
 
       describe "and one registered model satisfies the request" do
 
@@ -52,9 +54,7 @@ describe HttpStub::Models::Registry do
 
       describe "and multiple registered models satisfy the request" do
 
-        before(:example) do
-          [0, 2].each { |i| allow(models[i]).to receive(:satisfies?).and_return(true) }
-        end
+        before(:example) { [0, 2].each { |i| allow(models[i]).to receive(:satisfies?).and_return(true) } }
 
         it "supports model overrides by returning the last model registered" do
           expect(registry.find_for(request)).to eql(models[2])
@@ -88,17 +88,37 @@ describe HttpStub::Models::Registry do
 
   end
 
+  describe "#last" do
+
+    context "when multiple models have been registered" do
+
+      include_context "register multiple models"
+
+      it "returns the last added model" do
+        expect(registry.last).to eql(models.last)
+      end
+
+    end
+
+    context "when a model has been registered" do
+
+      let(:model) { double("HttpStub::Models::Model") }
+
+      before(:example) { registry.add(model, request) }
+
+      it "returns the model" do
+        expect(registry.last).to eql(model)
+      end
+
+    end
+
+  end
+
   describe "#all" do
 
-    describe "when multiple models have been registered" do
+    context "when multiple models have been registered" do
 
-      let(:models) do
-        (1..3).map { |i| double("HttpStub::Models::Model#{i}", :satisfies? => false) }
-      end
-
-      before(:example) do
-        models.each { |model| registry.add(model, request) }
-      end
+      include_context "register multiple models"
 
       it "returns the registered models in the order they were added" do
         expect(registry.all).to eql(models.reverse)
@@ -106,7 +126,7 @@ describe HttpStub::Models::Registry do
 
     end
 
-    describe "when no model has been registered" do
+    context "when no model has been registered" do
 
       it "returns an empty list" do
         expect(registry.all).to eql([])
@@ -116,55 +136,32 @@ describe HttpStub::Models::Registry do
 
   end
 
-  describe "#copy" do
-
-    class HttpStub::Models::CopyableModel
-
-      attr_reader :name
-
-      def initialize(name)
-        @name = name
-      end
-
-      def eql?(other)
-        @name = other.name
-      end
-
-    end
-
-    subject { registry.copy }
-
-    context "when multiple models have been registered" do
-
-      let(:models) { (1..3).map { |i| HttpStub::Models::CopyableModel.new("model_#{i}") } }
-
-      before(:each) { models.each { |model| registry.add(model, request) } }
-
-      it "returns a registry containing the models" do
-        result = subject
-
-        expect(result.all).to eql(models)
-      end
-
-    end
-
-    it "returns a registry that changes independently of the copied registry" do
-      model_to_add = HttpStub::Models::CopyableModel.new("model_to_add")
-
-      result = subject
-
-      registry.add(model_to_add, request)
-      expect(result.all).not_to include(model_to_add)
-    end
-
-  end
-
   describe "#clear" do
+
+    subject { registry.clear(request) }
 
     it "logs that the models are being cleared" do
       expect(logger).to receive(:info).with(/clearing a_model/i)
 
-      registry.clear(request)
+      subject
+    end
+
+    context "when models have been added" do
+
+      include_context "register multiple models"
+
+      it "clears each model" do
+        models.each { |model| expect(model).to receive(:clear) }
+
+        subject
+      end
+
+      it "releases all knowledge of the models" do
+        subject
+
+        expect(registry.all).to be_empty
+      end
+
     end
 
   end

@@ -3,7 +3,7 @@ require 'bundler/gem_tasks'
 Bundler.require(:default, :development)
 require 'rspec/core/rake_task'
 require_relative 'lib/http_stub/rake/task_generators'
-require_relative 'examples/configurer_with_complex_initializer'
+require_relative 'examples/configurer_with_file_response'
 
 directory "pkg"
 
@@ -46,18 +46,18 @@ end
 
 task :validate do
   print " Travis CI Validation ".center(80, "*") + "\n"
-  result = `travis-lint #{File.expand_path('../.travis.yml', __FILE__)}`
+  result = `travis-lint #{::File.expand_path('../.travis.yml', __FILE__)}`
   puts result
   print "*" * 80+ "\n"
   raise "Travis CI validation failed" unless $?.success?
 end
 
-HttpStub::ServerDaemon.log_dir = File.expand_path('../tmp/log', __FILE__)
-HttpStub::ServerDaemon.pid_dir = File.expand_path('../tmp/pids', __FILE__)
+HttpStub::ServerDaemon.log_dir = ::File.expand_path('../tmp/log', __FILE__)
+HttpStub::ServerDaemon.pid_dir = ::File.expand_path('../tmp/pids', __FILE__)
 
 HttpStub::Rake::ServerTasks.new(name: :example_server, port: 8001)
 
-example_configurer = HttpStub::Examples::ConfigurerWithComplexInitializer
+example_configurer = HttpStub::Examples::ConfigurerWithFileResponse
 example_configurer.host("localhost")
 example_configurer.port(8002)
 HttpStub::Rake::ServerDaemonTasks.new(name: :example_server_daemon, port: 8002, configurer: example_configurer)

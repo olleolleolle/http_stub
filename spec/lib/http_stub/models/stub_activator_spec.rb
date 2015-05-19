@@ -1,10 +1,12 @@
 describe HttpStub::Models::StubActivator do
 
-  let(:activation_uri) { "/some/activation/uri" }
-  let(:args)           { { "activation_uri" => activation_uri } }
+  let(:activation_uri)  { "/some/activation/uri" }
+  let(:args)            { { "activation_uri" => activation_uri } }
+  let(:underlying_stub) { instance_double(HttpStub::Models::Stub) }
+
   let(:stub_activator) { HttpStub::Models::StubActivator.new(args) }
 
-  before(:example) { allow(HttpStub::Models::Stub).to receive(:new).and_return(double(HttpStub::Models::Stub)) }
+  before(:example) { allow(HttpStub::Models::Stub).to receive(:new).and_return(underlying_stub) }
 
   describe "::create_from" do
 
@@ -86,10 +88,7 @@ describe HttpStub::Models::StubActivator do
   describe "#the_stub" do
 
     it "returns a HttpStub::Models::Stub constructed from the activator's arguments" do
-      stub = double(HttpStub::Models::Stub)
-      expect(HttpStub::Models::Stub).to receive(:new).with(args).and_return(stub)
-
-      expect(stub_activator.the_stub).to eql(stub)
+      expect(stub_activator.the_stub).to eql(underlying_stub)
     end
 
   end
@@ -98,6 +97,16 @@ describe HttpStub::Models::StubActivator do
 
     it "returns the value provided in the request body" do
       expect(stub_activator.activation_uri).to eql(activation_uri)
+    end
+
+  end
+
+  describe "#clear" do
+
+    it "delegates to a HttpStub::Models::Stub constructed from the activator's arguments" do
+      expect(underlying_stub).to receive(:clear)
+
+      expect(stub_activator.clear)
     end
 
   end

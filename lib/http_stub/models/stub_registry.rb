@@ -16,11 +16,11 @@ module HttpStub
       end
 
       def remember
-        @remembered_registry = @registry.copy
+        @remembered_stub = @registry.last
       end
 
       def recall
-        @registry = @remembered_registry.copy if @remembered_registry
+        @registry.rollback_to(@remembered_stub) if @remembered_stub
       end
 
     end

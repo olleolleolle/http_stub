@@ -4,16 +4,19 @@ module HttpStub
 
       class StubActivator
 
-        def initialize(payload)
-          @payload = payload
+        delegate :response_files, to: :@stub
+
+        def initialize(args)
+          @activation_uri = args[:activation_uri]
+          @stub           = args[:stub]
         end
 
-        def to_http_request
-          Net::HTTP::Post::Multipart.new("/stubs/activators", payload: @payload.to_json)
+        def payload
+          { activation_uri: @activation_uri }.merge(@stub.payload)
         end
 
-        def activation_uri
-          @payload[:activation_uri]
+        def to_s
+          @activation_uri
         end
 
       end
