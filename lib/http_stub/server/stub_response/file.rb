@@ -7,12 +7,12 @@ module HttpStub
         add_default_headers "content-type" => "application/octet-stream"
 
         def initialize(args)
-          @file_path = args["body"][:tempfile].path
-          super(args.merge("body" => @file_path))
+          @file = args["body"][:tempfile]
+          super(args.merge("body" => @file.path))
         end
 
         def serve_on(server)
-          server.send_file(@file_path, send_options)
+          server.send_file(@file.path, send_options)
         end
 
         private
