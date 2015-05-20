@@ -5,10 +5,11 @@ module HttpStub
 
       def initialize(registry)
         @registry = registry
+        @request_translator = HttpStub::Server::RequestTranslator.new(HttpStub::Server::Stub)
       end
 
       def register(request)
-        @registry.add(HttpStub::Server::StubFactory.create(request), request)
+        @registry.add(@request_translator.translate(request), request)
         HttpStub::Server::Response::SUCCESS
       end
 

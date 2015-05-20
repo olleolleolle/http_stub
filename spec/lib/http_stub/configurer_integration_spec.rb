@@ -19,15 +19,38 @@ describe HttpStub::Configurer, "when the server is running" do
 
     context "and a stub is activated" do
 
-      before(:example) { configurer.activate!("/an_activator") }
+      context "and the response contains text" do
 
-      context "and the stub request is made" do
+        before(:example) { configurer.activate!("/an_activator") }
 
-        let(:response) { HTTParty.get("#{server_uri}/stub_path") }
+        context "and the stub request is made" do
 
-        it "replays the stubbed response" do
-          expect(response.code).to eql(200)
-          expect(response.body).to eql("Stub activator body")
+          let(:response) { HTTParty.get("#{server_uri}/stub_path") }
+
+          it "replays the stubbed response" do
+            expect(response.code).to eql(200)
+            expect(response.body).to eql("Stub activator body")
+          end
+
+        end
+
+      end
+
+      context "and the response contains a file" do
+
+        let(:configurer)  { HttpStub::Examples::ConfigurerWithFileResponse.new }
+
+        before(:example) { configurer.activate!("/a_file_activator") }
+
+        context "and the stub request is made" do
+
+          let(:response) { HTTParty.get("#{server_uri}/activated_response_with_file") }
+
+          it "replays the stubbed response" do
+            expect(response.code).to eql(200)
+            expect_response_to_contain_file(HttpStub::Examples::ConfigurerWithFileResponse::FILE_PATH)
+          end
+
         end
 
       end
@@ -584,7 +607,7 @@ describe HttpStub::Configurer, "when the server is running" do
 
             it "replays the triggered response" do
               expect(response.code).to eql(201)
-              assert_response_contains_file(pdf_file_path)
+              expect_response_to_contain_file(pdf_file_path)
             end
 
           end
@@ -655,7 +678,7 @@ describe HttpStub::Configurer, "when the server is running" do
         end
 
         it "responds with the file" do
-          assert_response_contains_file(HttpStub::Examples::ConfigurerWithFileResponse::FILE_PATH)
+          expect_response_to_contain_file(HttpStub::Examples::ConfigurerWithFileResponse::FILE_PATH)
         end
 
       end
@@ -781,7 +804,7 @@ describe HttpStub::Configurer, "when the server is running" do
 
   end
 
-  def assert_response_contains_file(path)
+  def expect_response_to_contain_file(path)
     response_file = Tempfile.new(File.basename(path)).tap do |file|
       file.write(response.parsed_response)
       file.flush

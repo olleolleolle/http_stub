@@ -14,6 +14,17 @@ module HttpStub
           body: { file: { path: FILE_PATH, name: File.basename(FILE_PATH) } }
         )
       end
+
+      stub_server.add_activator! do |activator|
+        activator.on("/a_file_activator")
+        activator.match_requests("/activated_response_with_file", method: :get)
+        activator.respond_with(
+          status: 200,
+          headers: { "content-type" => "application/pdf" },
+          body: { file: { path: FILE_PATH, name: File.basename(FILE_PATH) } }
+        )
+      end
+
     end
 
   end

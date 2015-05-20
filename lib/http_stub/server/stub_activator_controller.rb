@@ -6,10 +6,11 @@ module HttpStub
       def initialize(stub_activator_registry, stub_registry)
         @stub_activator_registry = stub_activator_registry
         @stub_registry = stub_registry
+        @request_translator = HttpStub::Server::RequestTranslator.new(HttpStub::Server::StubActivator)
       end
 
       def register(request)
-        @stub_activator_registry.add(HttpStub::Server::StubActivator.create_from(request), request)
+        @stub_activator_registry.add(@request_translator.translate(request), request)
         HttpStub::Server::Response::SUCCESS
       end
 

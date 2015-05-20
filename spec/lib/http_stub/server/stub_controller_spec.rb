@@ -1,20 +1,31 @@
 describe HttpStub::Server::StubController do
 
-  let(:request)  { double("HttpRequest") }
-  let(:response) { double(HttpStub::Server::Response) }
-  let(:the_stub) { double(HttpStub::Server::Stub, response: response) }
-  let(:registry) { double(HttpStub::Server::Registry).as_null_object }
+  let(:request)            { double("HttpRequest") }
+  let(:response)           { double(HttpStub::Server::Response) }
+  let(:the_stub)           { double(HttpStub::Server::Stub, response: response) }
+  let(:registry)           { double(HttpStub::Server::Registry).as_null_object }
+  let(:request_translator) { double(HttpStub::Server::RequestTranslator, translate: the_stub) }
 
   let(:controller) { HttpStub::Server::StubController.new(registry) }
 
-  before(:example) { allow(HttpStub::Server::StubFactory).to receive(:create).and_return(the_stub) }
+  before(:example) { allow(HttpStub::Server::RequestTranslator).to receive(:new).and_return(request_translator) }
+
+  describe "#constructor" do
+
+    it "creates a request translator that translates requests to stubs" do
+      expect(HttpStub::Server::RequestTranslator).to receive(:new).with(HttpStub::Server::Stub)
+
+      controller
+    end
+
+  end
 
   describe "#register" do
 
     subject { controller.register(request) }
 
-    it "creates a stub from the provided request via the factory" do
-      expect(HttpStub::Server::StubFactory).to receive(:create).with(request).and_return(the_stub)
+    it "translates the request to a stub" do
+      expect(request_translator).to receive(:translate).with(request).and_return(the_stub)
 
       subject
     end

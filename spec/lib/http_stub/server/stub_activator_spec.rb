@@ -8,43 +8,12 @@ describe HttpStub::Server::StubActivator do
 
   before(:example) { allow(HttpStub::Server::Stub).to receive(:new).and_return(underlying_stub) }
 
-  describe "::create_from" do
+  describe "#constructor" do
 
-    let(:payload) { args.to_json }
+    it "creates an underlying stub from the provided arguments" do
+      expect(HttpStub::Server::Stub).to receive(:new).with(args)
 
-    subject { HttpStub::Server::StubActivator.create_from(request) }
-
-    shared_context "verification a stub activator is created from a request" do
-
-      it "creates a stub activator with JSON parsed from the request payload" do
-        expect(HttpStub::Server::StubActivator).to receive(:new).with(args)
-
-        subject
-      end
-
-      it "returns the created stub activator" do
-        created_stub_activator = instance_double(HttpStub::Server::StubActivator)
-        allow(HttpStub::Server::StubActivator).to receive(:new).and_return(created_stub_activator)
-
-        expect(subject).to eql(created_stub_activator)
-      end
-
-    end
-
-    context "when the request body contains the payload" do
-
-      let(:request) { double("HttpRequest", params: {}, body: double("RequestBody", read: payload)) }
-
-      include_context "verification a stub activator is created from a request"
-
-    end
-
-    context "when the request contains a payload parameter" do
-
-      let(:request) { double("HttpRequest", params: { "payload" => payload }) }
-
-      include_context "verification a stub activator is created from a request"
-
+      stub_activator
     end
 
   end
