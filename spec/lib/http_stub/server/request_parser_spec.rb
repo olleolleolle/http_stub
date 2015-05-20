@@ -1,38 +1,23 @@
-describe HttpStub::Server::RequestTranslator do
+describe HttpStub::Server::RequestParser do
 
-  let(:model)       { double("HttpStub::Server::Model") }
-  let(:model_class) { double("HttpStub::Server::ModelClass", new: model) }
+  let(:request_parser) { HttpStub::Server::RequestParser }
 
-  let(:request_translator) { HttpStub::Server::RequestTranslator.new(model_class) }
-
-  describe "::translate" do
+  describe "::parse" do
 
     let(:params)    { {} }
     let(:body_hash) { {} }
     let(:request)   { instance_double(Rack::Request, params: params, body: StringIO.new(body_hash.to_json)) }
 
-    subject { request_translator.translate(request) }
-
-    shared_context "returns the created model" do
-
-      it "returns the created model" do
-        expect(subject).to eql(model)
-      end
-
-    end
+    subject { request_parser.parse(request) }
 
     context "when the request contains a payload parameter" do
 
       let(:payload) { HttpStub::StubFixture.new.server_payload }
       let(:params)  { { "payload" => payload.to_json } }
 
-      it "creates the model with the payload" do
-        expect(model_class).to receive(:new).with(payload)
-
-        subject
+      it "returns the payload" do
+        expect(subject).to eql(payload)
       end
-
-      include_context "returns the created model"
 
     end
 
@@ -40,13 +25,9 @@ describe HttpStub::Server::RequestTranslator do
 
       let(:body_hash) { HttpStub::StubFixture.new.server_payload }
 
-      it "creates the model with the request body" do
-        expect(model_class).to receive(:new).with(body_hash)
-
-        subject
+      it "returns the request body" do
+        expect(subject).to eql(body_hash)
       end
-
-      include_context "returns the created model"
 
     end
 
@@ -57,14 +38,11 @@ describe HttpStub::Server::RequestTranslator do
       let(:file_params)     { { "response_file_#{payload_fixture.id}" => payload_fixture.file_parameter } }
       let(:params)          { { "payload" => payload.to_json }.merge(file_params) }
 
-      it "creates the model with a response body that contains the file parameter value" do
-        expected_args = payload.clone.tap { |hash| hash["response"]["body"] = payload_fixture.file_parameter }
-        expect(model_class).to receive(:new).with(expected_args)
+      it "returns the payload with a response body that contains the file parameter value" do
+        expected_payload = payload.clone.tap { |hash| hash["response"]["body"] = payload_fixture.file_parameter }
 
-        subject
+        expect(subject).to eql(expected_payload)
       end
-
-      include_context "returns the created model"
 
     end
 
@@ -78,13 +56,9 @@ describe HttpStub::Server::RequestTranslator do
         let(:trigger_fixtures) { (1..3).map { HttpStub::StubFixture.new.with_text_response! } }
         let(:params)           { { "payload" => payload.to_json } }
 
-        it "creates the model with the payload unchanged" do
-          expect(model_class).to receive(:new).with(payload)
-
-          subject
+        it "returns the payload unchanged" do
+          expect(subject).to eql(payload)
         end
-
-        include_context "returns the created model"
 
       end
 
@@ -98,17 +72,14 @@ describe HttpStub::Server::RequestTranslator do
         end
         let(:params)           { { "payload" => payload.to_json }.merge(file_params) }
 
-        it "creates the model with the trigger response bodies replaced by the files" do
-          expected_args = payload_fixture.server_payload
-          expected_args["triggers"].zip(trigger_fixtures.map(&:file_parameter)).each do |trigger, file_param|
+        it "returns the payload with the trigger response bodies replaced by the files" do
+          expected_payload = payload_fixture.server_payload
+          expected_payload["triggers"].zip(trigger_fixtures.map(&:file_parameter)).each do |trigger, file_param|
             trigger["response"]["body"] = file_param
           end
-          expect(model_class).to receive(:new).with(expected_args)
 
-          subject
+          expect(subject).to eql(expected_payload)
         end
-
-        include_context "returns the created model"
 
       end
 

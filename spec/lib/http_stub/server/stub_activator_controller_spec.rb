@@ -1,32 +1,31 @@
 describe HttpStub::Server::StubActivatorController do
 
   let(:request)                 { instance_double(Rack::Request) }
+  let(:payload) { HttpStub::StubFixture.new.server_payload.merge("activation_uri" => "/some/activation/uri") }
   let(:the_stub)                { instance_double(HttpStub::Server::Stub) }
   let(:stub_activator)          { instance_double(HttpStub::Server::StubActivator, the_stub: the_stub) }
   let(:stub_activator_registry) { instance_double(HttpStub::Server::Registry).as_null_object }
   let(:stub_registry)           { instance_double(HttpStub::Server::StubRegistry).as_null_object }
-  let(:request_translator)      { instance_double(HttpStub::Server::RequestTranslator, translate: stub_activator) }
 
   let(:controller) { HttpStub::Server::StubActivatorController.new(stub_activator_registry, stub_registry) }
 
-  before(:example) { allow(HttpStub::Server::RequestTranslator).to receive(:new).and_return(request_translator) }
-
-  describe "#constructor" do
-
-    it "creates a request translator that translates requests to stub activators" do
-      expect(HttpStub::Server::RequestTranslator).to receive(:new).with(HttpStub::Server::StubActivator)
-
-      controller
-    end
-
+  before(:example) do
+    allow(HttpStub::Server::RequestParser).to receive(:parse).and_return(payload)
+    allow(HttpStub::Server::StubActivator).to receive(:new).and_return(stub_activator)
   end
 
   describe "#register" do
 
     subject { controller.register(request) }
 
-    it "translates the request to a stub activator" do
-      expect(request_translator).to receive(:translate).with(request).and_return(stub_activator)
+    it "parses the payload from the request" do
+      expect(HttpStub::Server::RequestParser).to receive(:parse).with(request).and_return(payload)
+
+      subject
+    end
+
+    it "creates a stub activator with the parsed payload" do
+      expect(HttpStub::Server::StubActivator).to receive(:new).with(payload).and_return(stub_activator)
 
       subject
     end

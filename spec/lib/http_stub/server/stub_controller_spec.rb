@@ -1,31 +1,30 @@
 describe HttpStub::Server::StubController do
 
-  let(:request)            { double("HttpRequest") }
-  let(:response)           { double(HttpStub::Server::Response) }
-  let(:the_stub)           { double(HttpStub::Server::Stub, response: response) }
-  let(:registry)           { double(HttpStub::Server::Registry).as_null_object }
-  let(:request_translator) { double(HttpStub::Server::RequestTranslator, translate: the_stub) }
+  let(:request)            { instance_double(Rack::Request) }
+  let(:payload)            { HttpStub::StubFixture.new.server_payload }
+  let(:response)           { instance_double(HttpStub::Server::StubResponse::Base) }
+  let(:the_stub)           { instance_double(HttpStub::Server::Stub, response: response) }
+  let(:registry)           { instance_double(HttpStub::Server::StubRegistry).as_null_object }
 
   let(:controller) { HttpStub::Server::StubController.new(registry) }
 
-  before(:example) { allow(HttpStub::Server::RequestTranslator).to receive(:new).and_return(request_translator) }
-
-  describe "#constructor" do
-
-    it "creates a request translator that translates requests to stubs" do
-      expect(HttpStub::Server::RequestTranslator).to receive(:new).with(HttpStub::Server::Stub)
-
-      controller
-    end
-
+  before(:example) do
+    allow(HttpStub::Server::RequestParser).to receive(:parse).and_return(payload)
+    allow(HttpStub::Server::Stub).to receive(:new).and_return(the_stub)
   end
 
   describe "#register" do
 
     subject { controller.register(request) }
 
-    it "translates the request to a stub" do
-      expect(request_translator).to receive(:translate).with(request).and_return(the_stub)
+    it "parses the payload from the request" do
+      expect(HttpStub::Server::RequestParser).to receive(:parse).with(request).and_return(payload)
+
+      subject
+    end
+
+    it "creates a stub with the parsed payload" do
+      expect(HttpStub::Server::Stub).to receive(:new).with(payload).and_return(the_stub)
 
       subject
     end
