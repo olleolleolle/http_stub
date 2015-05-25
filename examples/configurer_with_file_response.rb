@@ -15,6 +15,11 @@ module HttpStub
         )
       end
 
+      stub_server.add_stub! do |stub|
+        stub.match_requests("/stub_response_with_file_and_no_content_type", method: :get)
+        stub.respond_with(body: { file: { path: FILE_PATH, name: File.basename(FILE_PATH) } })
+      end
+
       stub_server.add_activator! do |activator|
         activator.on("/a_file_activator")
         activator.match_requests("/activated_response_with_file", method: :get)

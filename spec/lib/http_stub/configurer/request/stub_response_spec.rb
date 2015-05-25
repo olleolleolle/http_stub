@@ -6,7 +6,7 @@ describe HttpStub::Configurer::Request::StubResponse do
   let(:stub_response) { HttpStub::Configurer::Request::StubResponse.new(stub_fixture.id, fixture.symbolized) }
 
   describe "#payload" do
-    
+
     subject { stub_response.payload }
 
     context "when a status response argument is provided" do
@@ -75,12 +75,13 @@ describe HttpStub::Configurer::Request::StubResponse do
 
     context "when the body contains a file hash" do
 
-      let(:content_type) { "some-content-type" }
-      let(:file_path)    { "some/file/path" }
-      let(:file_name)    { "some_file.name" }
+      let(:content_type_key)   { "content-type" }
+      let(:content_type_value) { "some-content-type" }
+      let(:file_path)          { "some/file/path" }
+      let(:file_name)          { "some_file.name" }
 
       before(:example) do
-        fixture.headers = { "content-type" => content_type }
+        fixture.headers = { content_type_key => content_type_value }
         fixture.body    = { file: { path: file_path, name: file_name } }
       end
 
@@ -102,10 +103,44 @@ describe HttpStub::Configurer::Request::StubResponse do
         subject
       end
 
-      it "creates a response file whose type is the content-type response header" do
-        expect_response_file_to_be_created_with(type: content_type)
+      context "when the content type header key is provided" do
 
-        subject
+        context "in lower case" do
+
+          let(:content_type_key) { "content-type" }
+
+          it "creates a response file whose type is the content-type response header" do
+            expect_response_file_to_be_created_with(type: content_type_value)
+
+            subject
+          end
+
+        end
+
+        context "in upper case" do
+
+          let(:content_type_key) { "Content-Type" }
+
+          it "creates a response file whose type is the content-type response header" do
+            expect_response_file_to_be_created_with(type: content_type_value)
+
+            subject
+          end
+
+        end
+
+      end
+
+      context "when the content type header is not provided" do
+
+        let(:content_type_value) { nil }
+
+        it "creates a response file whose type is nil, which allows the server to default the value" do
+          expect_response_file_to_be_created_with(type: nil)
+
+          subject
+        end
+
       end
 
       it "returns the created response file" do

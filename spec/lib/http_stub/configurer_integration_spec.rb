@@ -665,20 +665,42 @@ describe HttpStub::Configurer, "when the server is running" do
 
     end
 
-    context "and the configurer stubs a response with a file body" do
+    context "and the configurer stubs responses with a file body" do
 
       let(:configurer) { HttpStub::Examples::ConfigurerWithFileResponse.new }
 
       context "and a request that matches is made" do
 
-        let(:response) { HTTParty.get("#{server_uri}/stub_response_with_file") }
+        context "that matches a stub with a custom content-type" do
 
-        it "responds with the configured status code" do
-          expect(response.code).to eql(200)
+          let(:response) { HTTParty.get("#{server_uri}/stub_response_with_file") }
+
+          it "responds with the configured status code" do
+            expect(response.code).to eql(200)
+          end
+
+          it "responds with the configured content type" do
+            expect(response.content_type).to eql("application/pdf")
+          end
+
+          it "responds with the configured file" do
+            expect_response_to_contain_file(HttpStub::Examples::ConfigurerWithFileResponse::FILE_PATH)
+          end
+
         end
 
-        it "responds with the file" do
-          expect_response_to_contain_file(HttpStub::Examples::ConfigurerWithFileResponse::FILE_PATH)
+        context "that matches a stub with no content-type" do
+
+          let(:response) { HTTParty.get("#{server_uri}/stub_response_with_file_and_no_content_type") }
+
+          it "responds with a default content type of 'application/octet-stream'" do
+            expect(response.content_type).to eql("application/octet-stream")
+          end
+
+          it "responds with the configured response" do
+            expect_response_to_contain_file(HttpStub::Examples::ConfigurerWithFileResponse::FILE_PATH)
+          end
+
         end
 
       end

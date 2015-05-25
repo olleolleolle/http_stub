@@ -17,6 +17,10 @@ module HttpStub
           end
         end
 
+        def with_indifferent_and_insensitive_access
+          HttpStub::HashWithIndifferentAndInsensitiveAccess.new(self)
+        end
+
       end
 
     end

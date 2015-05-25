@@ -154,4 +154,29 @@ describe HttpStub::Extensions::Core::Hash do
 
   end
 
+  describe "#with_indifferent_and_insensitive_access" do
+
+    let(:hash)                             { { key: "value" } }
+    let(:indifferent_and_insensitive_hash) { instance_double(HttpStub::HashWithIndifferentAndInsensitiveAccess) }
+
+    subject { hash.with_indifferent_and_insensitive_access }
+
+    before(:example) do
+      allow(HttpStub::HashWithIndifferentAndInsensitiveAccess).to(
+        receive(:new).and_return(indifferent_and_insensitive_hash)
+      )
+    end
+
+    it "creates a hash with indifferent and insensitive access containing the current hash" do
+      expect(HttpStub::HashWithIndifferentAndInsensitiveAccess).to receive(:new).with(hash)
+
+      subject
+    end
+
+    it "returns the created hash" do
+      expect(subject).to eql(indifferent_and_insensitive_hash)
+    end
+
+  end
+
 end
