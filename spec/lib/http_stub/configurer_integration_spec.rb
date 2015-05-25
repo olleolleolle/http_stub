@@ -38,7 +38,7 @@ describe HttpStub::Configurer, "when the server is running" do
 
       context "and the response contains a file" do
 
-        let(:configurer)  { HttpStub::Examples::ConfigurerWithFileResponse.new }
+        let(:configurer)  { HttpStub::Examples::ConfigurerWithFileResponses.new }
 
         before(:example) { configurer.activate!("/a_file_activator") }
 
@@ -48,7 +48,7 @@ describe HttpStub::Configurer, "when the server is running" do
 
           it "replays the stubbed response" do
             expect(response.code).to eql(200)
-            expect_response_to_contain_file(HttpStub::Examples::ConfigurerWithFileResponse::FILE_PATH)
+            expect_response_to_contain_file(HttpStub::Examples::ConfigurerWithFileResponses::FILE_PATH)
           end
 
         end
@@ -667,7 +667,7 @@ describe HttpStub::Configurer, "when the server is running" do
 
     context "and the configurer stubs responses with a file body" do
 
-      let(:configurer) { HttpStub::Examples::ConfigurerWithFileResponse.new }
+      let(:configurer) { HttpStub::Examples::ConfigurerWithFileResponses.new }
 
       context "and a request that matches is made" do
 
@@ -684,7 +684,7 @@ describe HttpStub::Configurer, "when the server is running" do
           end
 
           it "responds with the configured file" do
-            expect_response_to_contain_file(HttpStub::Examples::ConfigurerWithFileResponse::FILE_PATH)
+            expect_response_to_contain_file(HttpStub::Examples::ConfigurerWithFileResponses::FILE_PATH)
           end
 
         end
@@ -698,7 +698,7 @@ describe HttpStub::Configurer, "when the server is running" do
           end
 
           it "responds with the configured response" do
-            expect_response_to_contain_file(HttpStub::Examples::ConfigurerWithFileResponse::FILE_PATH)
+            expect_response_to_contain_file(HttpStub::Examples::ConfigurerWithFileResponses::FILE_PATH)
           end
 
         end

@@ -1,7 +1,7 @@
 module HttpStub
   module Examples
 
-    class ConfigurerWithManyActivators
+    class ConfigurerWithClassActivators
       include HttpStub::Configurer
 
       [ "Plain text body",

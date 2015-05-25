@@ -1,7 +1,7 @@
 module HttpStub
   module Examples
 
-    class ConfigurerWithFileResponse
+    class ConfigurerWithFileResponses
       include HttpStub::Configurer
 
       FILE_PATH = ::File.expand_path("../resources/some.pdf", __FILE__).freeze

@@ -2,7 +2,7 @@ describe HttpStub::Server::Application, "when the server is running" do
   include Rack::Utils
   include_context "server integration"
 
-  let(:configurer) { HttpStub::Examples::ConfigurerWithManyActivators.new }
+  let(:configurer) { HttpStub::Examples::ConfigurerWithClassActivators.new }
 
   describe "POST #stubs" do
 
@@ -33,7 +33,7 @@ describe HttpStub::Server::Application, "when the server is running" do
   describe "and a configurer with multiple stub activators is initialized" do
 
     before(:context) do
-      configurer = HttpStub::Examples::ConfigurerWithManyActivators
+      configurer = HttpStub::Examples::ConfigurerWithClassActivators
       configurer.host(server_host)
       configurer.port(server_port)
       configurer.initialize!
