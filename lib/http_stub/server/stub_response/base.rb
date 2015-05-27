@@ -47,6 +47,10 @@ module HttpStub
           @original_args.empty?
         end
 
+        def type
+          self.class.name.demodulize.underscore
+        end
+
         def to_s
           @original_args.to_s
         end

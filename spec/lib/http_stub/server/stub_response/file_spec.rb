@@ -18,6 +18,20 @@ describe HttpStub::Server::StubResponse::File do
     expect(response_file).to be_a(HttpStub::Server::StubResponse::Base)
   end
 
+  describe "#uri" do
+
+    subject { response_file.uri }
+
+    it "is prefixed with 'file://' to support display within a hyperlink" do
+      expect(subject).to start_with("file://")
+    end
+
+    it "concludes with the path to the temp file provided" do
+      expect(subject).to end_with(temp_file_path)
+    end
+
+  end
+
   describe "#serve_on" do
 
     let(:server) { instance_double(Sinatra::Base) }

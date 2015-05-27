@@ -184,6 +184,19 @@ describe HttpStub::Server::StubResponse::Base do
 
   end
 
+  describe "#type" do
+
+    class HttpStub::Server::StubResponse::TestableBaseClass < HttpStub::Server::StubResponse::Base
+    end
+
+    let(:testable_response_class) { HttpStub::Server::StubResponse::TestableBaseClass }
+
+    it "returns the name of the concrete base instance underscored" do
+      expect(response.type).to eql("testable_base_class")
+    end
+
+  end
+
   describe "#empty?" do
 
     context "when the response is EMPTY" do

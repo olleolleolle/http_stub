@@ -6,9 +6,12 @@ module HttpStub
 
         add_default_headers "content-type" => "application/octet-stream"
 
+        attr_reader :uri
+
         def initialize(args)
           @file = args["body"][:tempfile]
-          super(args.merge("body" => @file.path))
+          @uri = "file://#{@file.path}"
+          super(args.merge("body" => ""))
         end
 
         def serve_on(server)

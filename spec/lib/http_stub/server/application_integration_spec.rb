@@ -2,24 +2,26 @@ describe HttpStub::Server::Application, "when the server is running" do
   include Rack::Utils
   include_context "server integration"
 
-  let(:configurer) { HttpStub::Examples::ConfigurerWithClassActivators.new }
+  let(:response_document) { Nokogiri::HTML(response.body) }
 
-  describe "POST #stubs" do
+  describe "POST /stubs" do
 
     context "when provided with the minimum data required" do
 
-      before(:example) do
-        @response = HTTParty.post(
+      let(:response) do
+        HTTParty.post(
           "#{server_uri}/stubs",
           body: { uri: "/some/path", method: "get", response: { status: 200, body: "Some body" } }.to_json
         )
       end
 
       it "returns a 200 response code" do
-        expect(@response.code).to eql(200)
+        expect(response.code).to eql(200)
       end
 
       it "registers a stub returning the provided response for a matching request" do
+        response
+
         stubbed_response = HTTParty.get("#{server_uri}/some/path")
 
         expect(stubbed_response.code).to eql(200)
@@ -121,10 +123,17 @@ describe HttpStub::Server::Application, "when the server is running" do
         end
       end
 
-      it "returns a response whose body contains the response body of each stub" do
-        expect(response.body).to match(/Plain text body/)
+      it "returns a response whose body contains the response body of stub returning JSON" do
         expect(response.body).to match(/#{escape_html({ "key" => "JSON body" }.to_json)}/)
+      end
+
+      it "returns a response whose body contains the response body of stub returning HTML" do
         expect(response.body).to match(/#{escape_html("<html><body>HTML body</body></html>")}/)
+      end
+
+      it "returns a response whose body contains the response body of a stub returning a file" do
+        file_link = response_document.css("a.file").first
+        expect(file_link['href']).to match(/^file:\/\/[^']+\.pdf$/)
       end
 
       it "returns a response whose body contains the response body of each stub trigger" do
@@ -149,13 +158,12 @@ describe HttpStub::Server::Application, "when the server is running" do
 
     end
 
-    describe "GET #stubs/activators" do
+    describe "GET /stubs/activators" do
 
-      let(:response)          { HTTParty.get("#{server_uri}/stubs/activators") }
-      let(:response_document) { Nokogiri::HTML(response.body) }
+      let(:response) { HTTParty.get("#{server_uri}/stubs/activators") }
 
       it "returns response whose body contains links to each activator in alphabetical order" do
-        response_document.css("a").each_with_index do |link, i|
+        response_document.css("a.activator").each_with_index do |link, i|
           expect(link['href']).to eql("/activator_#{i + 1}")
         end
       end
@@ -164,16 +172,13 @@ describe HttpStub::Server::Application, "when the server is running" do
 
     end
 
-    describe "GET #stubs" do
+    describe "GET /stubs" do
 
       describe "when multiple stubs are configured" do
 
-        before(:context) do
-          (1..3).each { |i| HTTParty.get("#{server_uri}/activator_#{i}") }
-        end
+        before(:context) { (1..3).each { |i| HTTParty.get("#{server_uri}/activator_#{i}") } }
 
-        let(:response)          { HTTParty.get("#{server_uri}/stubs") }
-        let(:response_document) { Nokogiri::HTML(response.body) }
+        let(:response) { HTTParty.get("#{server_uri}/stubs") }
 
         include_context "the response contains HTML describing the configurers stubs"
 

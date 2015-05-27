@@ -4,9 +4,11 @@ module HttpStub
     class ConfigurerWithClassActivators
       include HttpStub::Configurer
 
-      [ "Plain text body",
-        { "key" => "JSON body" }.to_json,
-        "<html><body>HTML body</body></html>" ].each_with_index do |response_body, i|
+      FILE_PATH = ::File.expand_path("../resources/some.pdf", __FILE__).freeze
+
+      [ { "key" => "JSON body" }.to_json,
+        "<html><body>HTML body</body></html>",
+        { file: { path: FILE_PATH, name: File.basename(FILE_PATH) } }].each_with_index do |response_body, i|
         activator_number = i + 1
         triggered_stubs = (1..3).map do |trigger_number|
           stub_server.build_stub do |stub|

@@ -19,7 +19,7 @@
     %td=h(the_stub.response.headers)
   %tr
     %td Response Body:
-    %td=h(the_stub.response.body)
+    %td=partial "stub_#{the_stub.response.type}_response".to_sym, locals: { response: the_stub.response }
   %tr
     %td Response Delay:
     %td=h(the_stub.response.delay_in_seconds)
@@ -29,4 +29,3 @@
       - the_stub.triggers.each do |trigger|
         = partial :stub, locals: { the_stub: trigger }
         %br
-
