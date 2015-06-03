@@ -1,6 +1,6 @@
 describe HttpStub::Configurer::Request::Omittable do
 
-  describe ".format" do
+  describe "::format" do
 
     context "when the value is a hash" do
 

@@ -11,8 +11,14 @@ module HttpStub
               HttpStub::Configurer::Request::Http::Multipart.new("/stubs", model)
             end
 
-            def stub_activator(model)
-              HttpStub::Configurer::Request::Http::Multipart.new("/stubs/activators", model)
+            def scenario(model)
+              HttpStub::Configurer::Request::Http::Multipart.new("/stubs/scenarios", model)
+            end
+
+            alias_method :stub_activator, :scenario
+
+            def activate(uri)
+              get(uri.start_with?("/") ? uri : "/#{uri}")
             end
 
             def get(path)

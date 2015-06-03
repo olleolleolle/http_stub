@@ -40,7 +40,7 @@ module HttpStub
         end
 
         def clear_activators!
-          stub_server.clear_activators!
+          stub_server.clear_scenarios!
         end
 
         private

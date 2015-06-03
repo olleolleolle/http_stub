@@ -32,10 +32,16 @@ module HttpStub
           builders.each { |builder| add_stub!(builder) }
         end
 
+        def add_scenario!(activation_uri, &block)
+          builder = HttpStub::Configurer::Request::ScenarioBuilder.new(@response_defaults, activation_uri)
+          block.call(builder)
+          @server_facade.define_scenario(builder.build)
+        end
+
         def add_activator!(&block)
           builder = HttpStub::Configurer::Request::StubActivatorBuilder.new(@response_defaults)
           block.call(builder)
-          @server_facade.stub_activator(builder.build)
+          @server_facade.define_scenario(builder.build)
         end
 
         def activate!(uri)
@@ -54,8 +60,8 @@ module HttpStub
           @server_facade.clear_stubs
         end
 
-        def clear_activators!
-          @server_facade.clear_activators
+        def clear_scenarios!
+          @server_facade.clear_scenarios
         end
 
       end

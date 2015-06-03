@@ -9,11 +9,10 @@ module HttpStub
 
       def initialize
         super()
-        @stub_registry = HttpStub::Server::StubRegistry.new
-        @stub_activator_registry = HttpStub::Server::Registry.new("stub_activator")
-        @stub_controller = HttpStub::Server::StubController.new(@stub_registry)
-        @stub_activator_controller =
-          HttpStub::Server::StubActivatorController.new(@stub_activator_registry, @stub_registry)
+        @stub_registry       = HttpStub::Server::Stub::Registry.new
+        @scenario_registry   = HttpStub::Server::Registry.new("scenario")
+        @stub_controller     = HttpStub::Server::Stub::Controller.new(@stub_registry)
+        @scenario_controller = HttpStub::Server::Scenario::Controller.new(@scenario_registry, @stub_registry)
       end
 
       private
@@ -72,19 +71,24 @@ module HttpStub
       # Sample request body:
       # {
       #   "activation_uri": "/some/path",
-      #   ... see /stub ...
+      #   "stubs": [
+      #     {
+      #       ... see /stub ...
+      #     },
+      #     ...
+      #   ]
       # }
-      post "/stubs/activators" do
-        response = @stub_activator_controller.register(request)
+      post "/stubs/scenarios" do
+        response = @scenario_controller.register(request)
         @response_pipeline.process(response)
       end
 
-      get "/stubs/activators" do
-        haml :stub_activators, {}, stub_activators: @stub_activator_registry.all.sort_by(&:activation_uri)
+      get "/stubs/scenarios" do
+        haml :scenarios, {}, scenarios: @scenario_registry.all.sort_by(&:activation_uri)
       end
 
-      delete "/stubs/activators" do
-        @stub_activator_controller.clear(request)
+      delete "/stubs/scenarios" do
+        @scenario_controller.clear(request)
         halt 200, "OK"
       end
 
@@ -106,7 +110,7 @@ module HttpStub
 
       def handle_request
         response = @stub_controller.replay(request)
-        response = @stub_activator_controller.activate(request) if response.empty?
+        response = @scenario_controller.activate(request) if response.empty?
         response = HttpStub::Server::Response::ERROR if response.empty?
         @response_pipeline.process(response)
       end

@@ -98,7 +98,7 @@ describe HttpStub::Configurer::DeprecatedDSL do
 
   shared_examples_for "a deprecated DSL object" do
 
-    [ :recall_stubs!, :clear_stubs!, :clear_activators! ].each do |stub_server_delegate_method|
+    [ :recall_stubs!, :clear_stubs! ].each do |stub_server_delegate_method|
 
       describe "##{stub_server_delegate_method}" do
 
@@ -183,6 +183,16 @@ describe HttpStub::Configurer::DeprecatedDSL do
         expect(builder).to receive(:on).with(activation_uri)
 
         subject
+      end
+
+    end
+
+    describe "#clear_activators!" do
+
+      it "informs the stub server to clear scenarios" do
+        expect(stub_server).to receive(:clear_scenarios!)
+
+        dsl_object.clear_activators!
       end
 
     end

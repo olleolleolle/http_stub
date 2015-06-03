@@ -4,42 +4,42 @@ describe HttpStub::Server::Application do
   let(:response)      { last_response }
   let(:response_body) { response.body.to_s }
 
-  let(:stub_registry)           { instance_double(HttpStub::Server::StubRegistry).as_null_object }
-  let(:stub_activator_registry) { instance_double(HttpStub::Server::Registry).as_null_object }
+  let(:stub_registry)     { instance_double(HttpStub::Server::Stub::Registry).as_null_object }
+  let(:scenario_registry) { instance_double(HttpStub::Server::Registry).as_null_object }
 
-  let(:stub_controller)           { instance_double(HttpStub::Server::StubController).as_null_object }
-  let(:stub_activator_controller) { instance_double(HttpStub::Server::StubActivatorController).as_null_object }
+  let(:stub_controller)     { instance_double(HttpStub::Server::Stub::Controller).as_null_object }
+  let(:scenario_controller) { instance_double(HttpStub::Server::Scenario::Controller).as_null_object }
 
   let(:response_pipeline) { instance_double(HttpStub::Server::ResponsePipeline, process: nil) }
 
   let(:app) { HttpStub::Server::Application.new! }
 
   before(:example) do
-    allow(HttpStub::Server::StubRegistry).to receive(:new).and_return(stub_registry)
-    allow(HttpStub::Server::Registry).to receive(:new).with("stub_activator").and_return(stub_activator_registry)
-    allow(HttpStub::Server::StubController).to receive(:new).and_return(stub_controller)
-    allow(HttpStub::Server::StubActivatorController).to receive(:new).and_return(stub_activator_controller)
+    allow(HttpStub::Server::Stub::Registry).to receive(:new).and_return(stub_registry)
+    allow(HttpStub::Server::Registry).to receive(:new).with("scenario").and_return(scenario_registry)
+    allow(HttpStub::Server::Stub::Controller).to receive(:new).and_return(stub_controller)
+    allow(HttpStub::Server::Scenario::Controller).to receive(:new).and_return(scenario_controller)
     allow(HttpStub::Server::ResponsePipeline).to receive(:new).and_return(response_pipeline)
   end
 
-  context "when a stub insertion request is received" do
+  context "when a stub registration request is received" do
 
-    let(:stub_controller_response) { instance_double(HttpStub::Server::StubResponse::Base) }
+    let(:registration_response) { instance_double(HttpStub::Server::Stub::Response::Base) }
 
     subject do
       post "/stubs", { uri: "/a_path", method: "a method", response: { status: 200, body: "Foo" } }.to_json
     end
 
-    before(:example) { allow(stub_controller).to receive(:register).and_return(stub_controller_response) }
+    before(:example) { allow(stub_controller).to receive(:register).and_return(registration_response) }
 
-    it "registers the inserted stub via the controller" do
-      expect(stub_controller).to receive(:register).and_return(stub_controller_response)
+    it "registers the stub via the stub controller" do
+      expect(stub_controller).to receive(:register).and_return(registration_response)
 
       subject
     end
 
     it "processes the stub controllers response via the response pipeline" do
-      expect(response_pipeline).to receive(:process).with(stub_controller_response)
+      expect(response_pipeline).to receive(:process).with(registration_response)
 
       subject
     end
@@ -100,39 +100,39 @@ describe HttpStub::Server::Application do
 
   end
 
-  context "when a stub activator insertion request is received" do
+  context "when a scenario registration request is received" do
 
-    let(:stub_activator_response) { instance_double(HttpStub::Server::StubResponse::Base) }
+    let(:registration_response) { instance_double(HttpStub::Server::Stub::Response::Base) }
 
-    before(:example) { allow(stub_activator_controller).to receive(:register).and_return(stub_activator_response) }
+    before(:example) { allow(scenario_controller).to receive(:register).and_return(registration_response) }
 
     subject do
-      post "/stubs/activators", {
-        activation_uri: "/an_activation_path", uri: "/a_path", method: "a method",
+      post "/stubs/scenarios", {
+        activation_uri: "/a_scenario_path", uri: "/a_path", method: "a method",
         response: { status: 200, body: "Foo" }
       }.to_json
     end
 
-    it "registers the insertion via the stub activator controller" do
-      expect(stub_activator_controller).to receive(:register).and_return(stub_activator_response)
+    it "registers the scenario via the scenario controller" do
+      expect(scenario_controller).to receive(:register).and_return(registration_response)
 
       subject
     end
 
-    it "processes the stub activators response via the response pipeline" do
-      expect(response_pipeline).to receive(:process).with(stub_activator_response)
+    it "processes the scenarion controllers response via the response pipeline" do
+      expect(response_pipeline).to receive(:process).with(registration_response)
 
       subject
     end
 
   end
 
-  context "when a request to clear the stub activators has been received" do
+  context "when a request to clear the scenarios has been received" do
 
-    subject { delete "/stubs/activators" }
+    subject { delete "/stubs/scenarios" }
 
-    it "delegates clearing to the stub activator controller" do
-      expect(stub_activator_controller).to receive(:clear)
+    it "delegates clearing to the scenario controller" do
+      expect(scenario_controller).to receive(:clear)
 
       subject
     end
@@ -147,7 +147,7 @@ describe HttpStub::Server::Application do
 
   context "when another type of request is received" do
 
-    let(:stub_response) { instance_double(HttpStub::Server::StubResponse::Base) }
+    let(:stub_response) { instance_double(HttpStub::Server::Stub::Response::Base) }
 
     subject { get "/a_path" }
 
@@ -167,28 +167,28 @@ describe HttpStub::Server::Application do
 
     context "and the stub controller does not replay a response" do
 
-      let(:stub_activator_response) { double(HttpStub::Server::StubResponse::Base, serve_on: nil) }
+      let(:scenario_response) { double(HttpStub::Server::Stub::Response::Base, serve_on: nil) }
 
       before(:example) do
         allow(stub_response).to receive(:empty?).and_return(true)
-        allow(stub_activator_controller).to receive(:activate).and_return(stub_activator_response)
+        allow(scenario_controller).to receive(:activate).and_return(scenario_response)
       end
 
-      context "but the stub activator controller activates a stub" do
+      context "but the scenario controller activates a scenario" do
 
-        before(:each) { allow(stub_activator_response).to receive(:empty?).and_return(false) }
+        before(:each) { allow(scenario_response).to receive(:empty?).and_return(false) }
 
-        it "processes the stub activator response via the response pipeline" do
-          expect(response_pipeline).to receive(:process).with(stub_activator_response)
+        it "processes the scenario response via the response pipeline" do
+          expect(response_pipeline).to receive(:process).with(scenario_response)
 
           subject
         end
 
       end
 
-      context "and the stub activator controller does not activate a stub" do
+      context "and the scenario controller does not activate a scenario" do
 
-        before(:each) { allow(stub_activator_response).to receive(:empty?).and_return(true) }
+        before(:each) { allow(scenario_response).to receive(:empty?).and_return(true) }
 
         it "processes an error response via the response pipeline" do
           expect(response_pipeline).to receive(:process).with(HttpStub::Server::Response::ERROR)

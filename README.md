@@ -15,9 +15,11 @@ Motivation
 
 Need to simulate a HTTP service with which your application integrates?  Enter ```http_stub```.
 
-```http_stub``` is similar in motivation to the ```fakeweb``` gem, although ```http_stub``` provides a separately running HTTP process whose responses can be faked / stubbed.
+```http_stub``` is similar in motivation to the ```fakeweb``` gem, although ```http_stub``` provides a separately 
+running HTTP process whose responses can be faked / stubbed.
 
-```http_stub``` appears to be very similar in purpose to the ```HTTParrot``` and ```rack-stubs``` gems, although these appear to be inactive.
+```http_stub``` appears to be very similar in purpose to the ```HTTParrot``` and ```rack-stubs``` gems, although these
+ appear to be inactive.
 
 Installation
 ------------
@@ -36,11 +38,11 @@ Usage
 Start a ```http_stub``` server via a rake task, generated via ```http_stub```:
 
 ```ruby
-    require 'http_stub/rake/task_generators'
+  require 'http_stub/rake/task_generators'
 
-    HttpStub::Rake::DaemonTasks.new(name: :some_server, port: 8001) # Generates 'some_server:start', 'some_server:stop', 'some_server:restart', 'some_server:status' tasks
+  HttpStub::Rake::DaemonTasks.new(name: :some_server, port: 8001) # Generates 'some_server:start', 'some_server:stop', 'some_server:restart', 'some_server:status' tasks
 
-    HttpStub::Rake::ServerTasks.new(name: :some_server, port: 8001) # Generates 'some_server:start:foreground' task
+  HttpStub::Rake::ServerTasks.new(name: :some_server, port: 8001) # Generates 'some_server:start:foreground' task
 ```
 
 ### Stubbing Server Responses ###
@@ -49,96 +51,149 @@ Start a ```http_stub``` server via a rake task, generated via ```http_stub```:
 
 A unit of configuration that matches an incoming server request to a response.
 
-### What is a stub activator? ###
+### What is a scenario? ###
 
-A unit of configuration that activates, or enables, a stub when a url is hit on the server.
+A unit of configuration that activates a set of stubs when a url is hit on the server.
 
 #### Stub via API ####
 
-```HttpStub::Configurer``` offers an API to configure a stub server via the class and instance methods ```stub_activator```, ```stub!``` and ```activate!```.
-These methods issue HTTP requests to the server, configuring it's responses.  An example follows:
+```HttpStub::Configurer``` offers an API to configure a ```stub_server```, which is accessible within both class and
+instance objects of a ```Configurer```.  The ```stub_server``` is configured via the methods ```add_stub!```,
+```add_scenario!``` and ```activate!```.  These methods issue HTTP requests to the server, configuring its responses.
+Examples follow:
 
 ```ruby
-    class AuthenticationService
-        include HttpStub::Configurer
+  class SomeRestService
+    include HttpStub::Configurer
 
-        server "localhost" # Often localhost for automated test purposes
-        port 8001 # The server port number
+    server "localhost" # Often localhost for automated test purposes
+    port 8001 # The server port number
 
-        # Register stub for POST "/"
-        stub! "/", method: :post, response: { status: 201 }
-        # Register stub for POST "/" when GET "/unavailable" request is made
-        stub_activator "/unavailable", "/", method: :post, response: { status: 404 }
-
-        def unavailable!
-            activate!("/unavailable") # Activates the "/unavailable" stub
-        end
-
-        def deny_access_for!(username)
-            # Registers another stub for POST "/" matching on headers and parameters
-            stub!("/", method:     :get,
-                       headers:    { api_key: "some_fixed_key" },
-                       parameters: { username: username },
-                       response:   { status: 403 })
-        end
-
+    # Register stub for GET "/resource"
+    stub_server.add_stub! do |stub|
+      stub.match_requests("/resource", method: :get).with_response(status: 200, body: "resource body")
     end
+
+    # Register stub that triggers other stubs to be registered when a matching request is received
+    stub_server.add_stub! do |stub|
+      stub.match_requests("/resource", method: :post)
+      stub.with_response(status: 201)
+      stub.trigger(
+        stub_server.build_stub do |triggered_stub|
+          triggered_stub.match_requests("/resource", method: :get)
+          triggered_stub.with_response(status: 200, body: "created resource")
+        end
+      )
+      end
+    end 
+
+    # Register a scenario that is activated when a GET "/unavailable" request is made
+    stub_server.add_scenario!("unavailable") do |scenario|
+      scenario.add_stub! do |stub|
+        stub.match_requests("/resource").with_response(status: 404)
+      end
+    end
+
+    def unavailable!
+      stub_server.activate!("unavailable") # Activates the "/unavailable" scenario
+    end
+
+    # Registers stubs for "/resource" matching on parameters
+    def deny_access_to!(username)
+      stub_server.add_stub! do |stub|
+        stub.match_requests("/resource", parameters: { username: username }).with_response(status: 403)
+      end
+    end
+
+  end
 ```
 
-The ```stub!``` and ```stub_activator``` methods share the same signatures, except a ```stub_activator``` accepts an
-activation url as the first argument.
-
-A stubs uri, parameter and header values accepted in the ```stub!``` and ```stub_activator``` methods can be
-regular expressions:
+When matching a request, a stubs uri, parameter or header values can be regular expressions:
 
 ```ruby
-    stub! /prefix\/[^\/]*\/postfix/, method: :post, response: { status: 200 }
+  stub_server.add_stub! do |stub|
+    stub.match_requests(/prefix\/[^\/]*\/postfix/, method: :post).with_response(status: 200)
+  end
 
-    stub_activator "/activate_this", /prefix\/[^\/]+\/postfix/,
-                   method:     :post,
-                   headers:    { api_key: /^some_.+_key$/ },
-                   parameters: { username: /^user_.+/ },
-                   response:   { status: 201 }
+  stub_server.add_stub! do |stub|
+    stub.match_requests(/prefix\/[^\/]+\/postfix/, method:     :post,
+                                                   headers:    { api_key: /^some_.+_key$/ },
+                                                   parameters: { username: /^user_.+/ })
+    stub.with_response(status: 201)
+  end
 ```
 
 Parameter and header values can also be mandatory omissions, for example:
 
 ```ruby
-    stub! "/some/path",
-          method:     :post,
-          headers:    { header_name: :omitted },
-          parameters: { parameter_name: :omitted },
-          response:   { status: 201 }
+  stub_server.add_stub! do |stub|
+    stub.match_requests("/some/path", method:     :post,
+                                      headers:    { header_name: :omitted },
+                                      parameters: { parameter_name: :omitted })
+    stub.with_response(status: 201)
+  end
 ```
 
 Responses may contain headers, for example:
 
 ```ruby
-    stub! /prefix\/[^\/]*\/postfix/,
-          method: :post,
-          response: { status:  201,
-                      headers: { "content-type" => "application/xhtml+xml",
-                                 "location" => "http://some/resource/path" } }
+  stub_server.add_stub! do |stub|
+    stub.match_requests(/prefix\/[^\/]*\/postfix/, method: :post)
+    stub.with_response(status:  201, headers: { "content-type" => "application/xhtml+xml",
+                                                "location" => "http://some/resource/path" })
+  end
 ```
 
 Responses may contain files, for example:
 
 ```ruby
-    stub! "/some/resource/path",
-          headers: { "Accept": "application/pdf" },
-          method: :get,
-          response: { status:  200,
-                      headers: { "content-type" => "application/pdf" },
-                      body: { file: { path: "/some/path/on/disk.pdf", name: "resource.pdf" } } }
+  stub_server.add_stub! do |stub|
+    stub.match_requests("/some/resource/path", headers: { "Accept": "application/pdf" }, method: :get)
+    stub.with_response(status:  200, headers: { "content-type" => "application/pdf" },
+                                     body: { file: { path: "/some/path/on/disk.pdf", name: "resource.pdf" } })
+  end
 ```
 
 Responses may also impose delays, for example:
 
 ```ruby
-    stub! /prefix\/[^\/]*\/postfix/, method: :post, response: { status: 200, delay_in_seconds: 8 }
+  stub_server.add_stub! do |stub|
+    stub.match_requests(/prefix\/[^\/]*\/postfix/, method: :post).with_response(status: 200, delay_in_seconds: 8)
+  end
 ```
 
-The stubs known by the server can also be cleared via class methods ```clear_activators!``` and ```clear_stubs!```.
+Scenario's provide a means to conveniently place the server in a known state.  Take these examples:
+
+```ruby
+  stub_server.add_scenario!("3_pages_of_resources") do |scenario|
+    scenario.add_stub! do |stub|
+      stub.match_requests("/resource").with_response(status: 200, body: (1..60).map { |i| "resource_#{i}" }.to_json)
+    end
+  end
+
+  stub_server.add_scenario!("no_resources") do |scenario|
+    scenario.add_stub! do |stub|
+      stub.match_requests("/resource").with_response(status: 200, body: [].to_json)
+    end
+  end
+  
+  stub_server.add_scenario!("happy_flow") do |scenario|
+    scenario.add_stub! do |stub|
+      stub.match_requests("/login").with_response(status: 204)
+    end
+    scenario.add_stub! do |stub|
+      stub.match_requests("/resource").with_response(status: 200, body: (1..3).map { |i| "resource_#{i}" }.to_json)
+    end
+  end
+```
+
+To activate a scenario:
+
+```ruby
+  stub_server.activate!("happy_flow")
+```
+
+The stubs and scenarios known by the server can be cleared via ```clear_stubs!``` and ```clear_scenarios!```.
 
 ##### Configurer Initialization ######
 
@@ -172,7 +227,9 @@ An initialization callback is available, useful should you wish to control stub 
         cattr_accessor :some_state
 
         def self.on_initialize
-          stub! "/registered_on_initialize", method: :get, response: { body: some_state }
+          stub_server.add_stub! do |stub|
+            stub.match_requests("/registered_on_initialize", method: :get).with_response(body: some_state)
+          end
         end
     end
 ```
@@ -184,7 +241,8 @@ An initialization callback is available, useful should you wish to control stub 
 
 ```remember_stubs``` remembers the stubs so that the state can be recalled in future.
 
-```recall_stubs!``` recalls the remembered stubs and is often used on completion of tests to return the server to a known state:
+```recall_stubs!``` recalls the remembered stubs and is often used on completion of tests to return the server to a
+known state:
 
 ```ruby
     let(:authentication_service) { AuthenticationService.new }
@@ -226,39 +284,49 @@ stubbed responses:
 ### Informational HTML pages ###
 
 ```http_stub``` has been designed to aid exploratory testing and application demonstrations.
-A GET request to /stubs/activators returns HTML listing all activators with links for each one - very useful for
-changing the behavior of the server on-the-fly.
+A GET request to /stubs/scenarios returns HTML listing all scenarios with activation links for each - very useful for
+changing the behavior of the stub server on-the-fly.
 
 To diagnose the state of the server, a GET request to /stubs returns HTML listing all stubs, in top-down priority order.
 
 ### Request configuration rules ###
 
-#### uri and method (mandatory) ####
+#### uri (mandatory) ####
 
-Only subsequent requests matching these criteria will respond with the configured response.
-Stubs for GET, POST, PUT, DELETE, PATCH and OPTIONS methods are supported.
+Only subsequent requests with matching the uri will respond with the configured response.
+Regular expressions are permitted.
+
+#### method (optional) ####
+
+Only subsequent requests matching the method will respond with the configured response.
+GET, POST, PUT, DELETE, PATCH and OPTIONS is supported.
 
 #### headers (optional) ####
 
 When included, requests containing headers matching these names and values will return the stub response.
-Due to header name rewriting performed by Rack, header name matches are case-insensitive and consider underscores and hyphens to be synonymous.
+Due to header name rewriting performed by Rack, header name matches are case-insensitive and consider underscores and
+hyphens to be synonymous.
 The 'HTTP_' prefix added to the header names by Rack is removed prior to any comparison.
-Requests containing additional headers will also match.
+Requests containing any additional headers will match.
+Regular expression values are permitted.
+Headers may be mandatory omissions.
 
 #### parameters (optional) ####
 
 When included, requests containing parameters matching these names and values will return the stub response.
 The name match is case sensitive.
-Requests containing additional parameters will also match.
+Requests containing any additional parameters will match.
+Regular expression values are permitted.
+Parameters may be mandatory omissions.
 
 #### Match Order ####
 
-The most-recent matching configured stub request wins.
+The most-recently configured matching stub request wins.
 
 Languages other than Ruby
 -------------------------
 
-```http_stub``` support other languages via it's REST API.
+```http_stub``` supports other languages via its REST API.
 
 ### /stubs ###
 
@@ -345,27 +413,36 @@ Headers and parameters can also be mandatory omissions by providing the control 
     }
 ```
 
-DELETE to /stubs in order to clear configured stubs.
+DELETE to /stubs in order to clear all configured stubs.
 
 #### /stubs/memory ####
 
 POST to /stubs/memory to remember the current stubs for future use.
 GET /stub/memory to recall the the remembered stubs.
 
-### /stubs/activators ###
+### /stubs/scenarios ###
 
-To configure a stub activator, POST to /stubs/activators with the following JSON payload:
+To configure a scenario, POST to /stubs/scenarios with the following JSON payload:
 
 ```javascript
     {
-        "activation_uri": "/some/activation/path",
-        // remainder same as stub request...
+        "activation_uri": "some/activation/path",
+        "stubs": [
+          {
+            // same as stub request...
+          },
+          {
+            // same as stub request...
+          },
+          ...
+        ]
+        
     }
 ```
 
-To activate a stub activator, GET the activation_uri.
+The number of stubs in a scenario is arbitrary.  To activate, issue a GET to the activation_uri.
 
-DELETE to /stubs/activators in order to clear configured stub activators.
+DELETE to /stubs/scenarios in order to clear all configured scenarios.
 
 Requirements
 ------------

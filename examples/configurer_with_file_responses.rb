@@ -20,14 +20,15 @@ module HttpStub
         stub.respond_with(body: { file: { path: FILE_PATH, name: File.basename(FILE_PATH) } })
       end
 
-      stub_server.add_activator! do |activator|
-        activator.on("/a_file_activator")
-        activator.match_requests("/activated_response_with_file", method: :get)
-        activator.respond_with(
-          status: 200,
-          headers: { "content-type" => "application/pdf" },
-          body: { file: { path: FILE_PATH, name: File.basename(FILE_PATH) } }
-        )
+      stub_server.add_scenario!("scenario_with_file") do |scenario|
+        scenario.add_stub! do |stub|
+          stub.match_requests("/activated_response_with_file", method: :get)
+          stub.respond_with(
+            status: 200,
+            headers: { "content-type" => "application/pdf" },
+            body: { file: { path: FILE_PATH, name: File.basename(FILE_PATH) } }
+          )
+        end
       end
 
     end

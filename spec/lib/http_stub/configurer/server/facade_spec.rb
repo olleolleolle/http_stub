@@ -52,26 +52,26 @@ describe HttpStub::Configurer::Server::Facade do
 
   end
 
-  describe "#stub_activator" do
+  describe "#define_scenario" do
 
     let(:model_description) { "some model description" }
-    let(:model)             { instance_double(HttpStub::Configurer::Request::StubActivator, to_s: model_description) }
+    let(:model)             { instance_double(HttpStub::Configurer::Request::Scenario, to_s: model_description) }
     let(:request)           { instance_double(HttpStub::Configurer::Request::Http::Multipart) }
 
-    subject { facade.stub_activator(model) }
+    subject { facade.define_scenario(model) }
 
     before(:example) do
       allow(request_processor).to receive(:submit)
-      allow(HttpStub::Configurer::Request::Http::Factory).to receive(:stub_activator).and_return(request)
+      allow(HttpStub::Configurer::Request::Http::Factory).to receive(:scenario).and_return(request)
     end
 
-    it "creates a stub activator request with the provided model" do
-      expect(HttpStub::Configurer::Request::Http::Factory).to receive(:stub_activator).with(model)
+    it "creates a scenario request with the provided model" do
+      expect(HttpStub::Configurer::Request::Http::Factory).to receive(:scenario).with(model)
 
       subject
     end
 
-    it "submits the stub activator request via the request processor" do
+    it "submits the scenario request via the request processor" do
       expect(request_processor).to receive(:submit).with(hash_including(request: request))
 
       subject
@@ -79,7 +79,7 @@ describe HttpStub::Configurer::Server::Facade do
 
     it "describes the model via its string representation" do
       expect(request_processor).to(
-        receive(:submit).with(hash_including(description: "registering activator '#{model_description}'"))
+        receive(:submit).with(hash_including(description: "registering scenario '#{model_description}'"))
       )
 
       subject
@@ -95,12 +95,12 @@ describe HttpStub::Configurer::Server::Facade do
     subject { facade.activate(uri) }
 
     before(:example) do
-      allow(HttpStub::Configurer::Request::Http::Factory).to receive(:get).and_return(request)
+      allow(HttpStub::Configurer::Request::Http::Factory).to receive(:activate).and_return(request)
       allow(request_processor).to receive(:submit)
     end
 
-    it "creates a GET request for the uri" do
-      expect(HttpStub::Configurer::Request::Http::Factory).to receive(:get).with(uri).and_return(request)
+    it "creates an activation request for the uri" do
+      expect(HttpStub::Configurer::Request::Http::Factory).to receive(:activate).with(uri).and_return(request)
 
       subject
     end
@@ -212,20 +212,20 @@ describe HttpStub::Configurer::Server::Facade do
 
   end
 
-  describe "#clear_activators" do
+  describe "#clear_scenarios" do
 
     let(:request) { instance_double(HttpStub::Configurer::Request::Http::Basic) }
 
-    subject { facade.clear_activators }
+    subject { facade.clear_scenarios }
 
     before(:example) do
       allow(HttpStub::Configurer::Request::Http::Factory).to receive(:delete).and_return(request)
       allow(request_processor).to receive(:submit)
     end
 
-    it "creates a DELETE request for the /stubs/activators endpoint" do
+    it "creates a DELETE request for the /stubs/scenarios endpoint" do
       expect(HttpStub::Configurer::Request::Http::Factory).to(
-        receive(:delete).with("/stubs/activators").and_return(request)
+        receive(:delete).with("/stubs/scenarios").and_return(request)
       )
 
       subject
@@ -237,8 +237,8 @@ describe HttpStub::Configurer::Server::Facade do
       subject
     end
 
-    it "describes the request as clearing the server stub activators" do
-      expect(request_processor).to receive(:submit).with(hash_including(description: "clearing activators"))
+    it "describes the request as clearing the server scenarios" do
+      expect(request_processor).to receive(:submit).with(hash_including(description: "clearing scenarios"))
 
       subject
     end

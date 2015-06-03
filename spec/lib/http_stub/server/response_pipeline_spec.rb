@@ -6,7 +6,7 @@ describe HttpStub::Server::ResponsePipeline do
 
   describe "#process" do
 
-    let(:response) { double(HttpStub::Server::StubResponse::Base, delay_in_seconds: 5, serve_on: nil) }
+    let(:response) { double(HttpStub::Server::Stub::Response::Base, delay_in_seconds: 5, serve_on: nil) }
 
     before(:example) { allow(response_pipeline).to receive(:sleep) }
 

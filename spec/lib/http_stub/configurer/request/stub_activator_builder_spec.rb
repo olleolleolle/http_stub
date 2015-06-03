@@ -3,19 +3,38 @@ describe HttpStub::Configurer::Request::StubActivatorBuilder do
   let(:stub_fixture) { HttpStub::StubFixture.new }
 
   let(:response_defaults) { {} }
-  let(:stub)              { instance_double(HttpStub::Configurer::Request::Stub) }
-  let(:stub_builder)      { instance_double(HttpStub::Configurer::Request::StubBuilder, build: stub) }
+  let(:activation_uri)    { "/some/activation/uri" }
+  let(:scenario)          { instance_double(HttpStub::Configurer::Request::Scenario) }
+  let(:scenario_builder) do
+    instance_double(HttpStub::Configurer::Request::ScenarioBuilder, build: scenario, add_stub!: nil)
+  end
+  let(:stub_builder)      { instance_double(HttpStub::Configurer::Request::StubBuilder) }
 
   let(:builder) { HttpStub::Configurer::Request::StubActivatorBuilder.new(response_defaults) }
 
-  before(:example) { allow(HttpStub::Configurer::Request::StubBuilder).to receive(:new).and_return(stub_builder) }
+  before(:example) do
+    allow(HttpStub::Configurer::Request::ScenarioBuilder).to receive(:new).and_return(scenario_builder)
+    allow(HttpStub::Configurer::Request::StubBuilder).to receive(:new).and_return(stub_builder)
+  end
 
-  describe "constructor" do
+  describe "#on" do
 
-    subject { builder }
+    subject { builder.on(activation_uri) }
 
-    it "creates a stub builder with the provided response defaults" do
+    it "creates a scenario builder with the response defaults and activation uri" do
+      expect(HttpStub::Configurer::Request::ScenarioBuilder).to receive(:new).with(response_defaults, activation_uri)
+
+      subject
+    end
+
+    it "creates a stub builder with the response defaults" do
       expect(HttpStub::Configurer::Request::StubBuilder).to receive(:new).with(response_defaults)
+
+      subject
+    end
+
+    it "adds the stub builder to the scenario builder" do
+      expect(scenario_builder).to receive(:add_stub!).with(stub_builder)
 
       subject
     end
@@ -25,6 +44,8 @@ describe HttpStub::Configurer::Request::StubActivatorBuilder do
   describe "#match_requests" do
 
     let(:request_payload) { stub_fixture.request.configurer_payload }
+
+    before(:example) { builder.on(activation_uri) }
 
     it "delegates to a stub builder" do
       expect(stub_builder).to receive(:match_requests).with(stub_fixture.request.uri, request_payload)
@@ -38,6 +59,8 @@ describe HttpStub::Configurer::Request::StubActivatorBuilder do
 
     let(:response_payload) { stub_fixture.response.configurer_payload }
 
+    before(:example) { builder.on(activation_uri) }
+
     it "delegates to a stub builder" do
       expect(stub_builder).to receive(:respond_with).with(response_payload)
 
@@ -47,6 +70,8 @@ describe HttpStub::Configurer::Request::StubActivatorBuilder do
   end
 
   describe "#trigger" do
+
+    before(:example) { builder.on(activation_uri) }
 
     context "when one triggered stub is provided" do
 
@@ -76,42 +101,18 @@ describe HttpStub::Configurer::Request::StubActivatorBuilder do
 
   describe "#build" do
 
-    let(:stub_activator) { instance_double(HttpStub::Configurer::Request::StubActivator) }
-
     subject { builder.build }
 
-    before(:example) { allow(HttpStub::Configurer::Request::StubActivator).to receive(:new).and_return(stub_activator) }
+    before(:example) { builder.on(activation_uri) }
 
-    context "when a path on which the activator is activated is established" do
+    it "builds a scenario" do
+      expect(scenario_builder).to receive(:build)
 
-      let(:activation_uri) { "http://some/activation/uri" }
+      subject
+    end
 
-      before(:example) { builder.on(activation_uri) }
-
-      it "creates a stub activator that includes the activation uri" do
-        expect(HttpStub::Configurer::Request::StubActivator).to(
-          receive(:new).with(hash_including(activation_uri: activation_uri))
-        )
-
-        subject
-      end
-
-      it "builds the stub" do
-        expect(stub_builder).to receive(:build)
-
-        subject
-      end
-
-      it "creates a stub activator that includes the built stub" do
-        expect(HttpStub::Configurer::Request::StubActivator).to receive(:new).with(hash_including(stub: stub))
-
-        subject
-      end
-
-      it "returns the created stub activator" do
-        expect(subject).to eql(stub_activator)
-      end
-
+    it "returns the built scenario" do
+      expect(subject).to eql(scenario)
     end
 
   end

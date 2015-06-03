@@ -32,10 +32,10 @@ describe HttpStub::Server::Application, "when the server is running" do
 
   end
 
-  describe "and a configurer with multiple stub activators is initialized" do
+  describe "and a configurer with multiple scenarios is initialized" do
 
     before(:context) do
-      configurer = HttpStub::Examples::ConfigurerWithClassActivators
+      configurer = HttpStub::Examples::ConfigurerWithClassScenarios
       configurer.host(server_host)
       configurer.port(server_port)
       configurer.initialize!
@@ -139,7 +139,7 @@ describe HttpStub::Server::Application, "when the server is running" do
       it "returns a response whose body contains the response body of each stub trigger" do
         (1..3).each do |stub_number|
           (1..3).each do |trigger_number|
-            expect(response.body).to match(/Body of activator #{stub_number}_trigger_#{trigger_number}/)
+            expect(response.body).to match(/Body of scenario #{stub_number}_trigger_#{trigger_number}/)
           end
         end
       end
@@ -158,13 +158,13 @@ describe HttpStub::Server::Application, "when the server is running" do
 
     end
 
-    describe "GET /stubs/activators" do
+    describe "GET /stubs/scenarios" do
 
-      let(:response) { HTTParty.get("#{server_uri}/stubs/activators") }
+      let(:response) { HTTParty.get("#{server_uri}/stubs/scenarios") }
 
-      it "returns response whose body contains links to each activator in alphabetical order" do
-        response_document.css("a.activator").each_with_index do |link, i|
-          expect(link['href']).to eql("/activator_#{i + 1}")
+      it "returns response whose body contains links to each scenario in alphabetical order" do
+        response_document.css("a.scenario").each_with_index do |link, i|
+          expect(link['href']).to eql("/scenario_#{i + 1}")
         end
       end
 
@@ -176,7 +176,7 @@ describe HttpStub::Server::Application, "when the server is running" do
 
       describe "when multiple stubs are configured" do
 
-        before(:context) { (1..3).each { |i| HTTParty.get("#{server_uri}/activator_#{i}") } }
+        before(:context) { (1..3).each { |i| HTTParty.get("#{server_uri}/scenario_#{i}") } }
 
         let(:response) { HTTParty.get("#{server_uri}/stubs") }
 

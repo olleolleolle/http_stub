@@ -3,9 +3,9 @@ module HttpStub
 
     class Response
 
-      SUCCESS = HttpStub::Server::StubResponse::Text.new("status" => 200, "body" => "OK").freeze
-      ERROR   = HttpStub::Server::StubResponse::Text.new("status" => 404, "body" => "ERROR").freeze
-      EMPTY   = HttpStub::Server::StubResponse::Text.new.freeze
+      SUCCESS = HttpStub::Server::Stub::Response::Text.new("status" => 200, "body" => "OK").freeze
+      ERROR   = HttpStub::Server::Stub::Response::Text.new("status" => 404, "body" => "ERROR").freeze
+      EMPTY   = HttpStub::Server::Stub::Response::Text.new.freeze
 
     end
 

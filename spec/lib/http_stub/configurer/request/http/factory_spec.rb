@@ -23,25 +23,66 @@ describe HttpStub::Configurer::Request::Http::Factory do
 
   end
 
-  describe "::stub_activator" do
+  describe "::scenario" do
 
-    let(:model)             { instance_double(HttpStub::Configurer::Request::StubActivator) }
+    let(:model)             { instance_double(HttpStub::Configurer::Request::Scenario) }
     let(:multipart_request) { instance_double(HttpStub::Configurer::Request::Http::Multipart) }
 
-    subject { HttpStub::Configurer::Request::Http::Factory.stub_activator(model) }
+    subject { HttpStub::Configurer::Request::Http::Factory.scenario(model) }
 
     before(:example) do
       allow(HttpStub::Configurer::Request::Http::Multipart).to receive(:new).and_return(multipart_request)
     end
 
-    it "creates a multipart request for the stub activators endpoint with the provided model" do
-      expect(HttpStub::Configurer::Request::Http::Multipart).to receive(:new).with("/stubs/activators", model)
+    it "creates a multipart request for the stub scenarios endpoint with the provided model" do
+      expect(HttpStub::Configurer::Request::Http::Multipart).to receive(:new).with("/stubs/scenarios", model)
 
       subject
     end
 
     it "returns the created request" do
       expect(subject).to eql(multipart_request)
+    end
+
+  end
+
+  describe "::activate" do
+
+    let(:uri)           { "some/activate/uri" }
+    let(:basic_request) { instance_double(HttpStub::Configurer::Request::Http::Basic) }
+
+    subject { HttpStub::Configurer::Request::Http::Factory.activate(uri) }
+
+    before(:example) do
+      allow(HttpStub::Configurer::Request::Http::Factory).to receive(:get).and_return(basic_request)
+    end
+
+    context "when the uri is not prefixed with '/'" do
+
+      let(:uri) { "uri/not/prefixed/with/forward/slash" }
+
+      it "creates a get request with the uri prefixed with '/'" do
+        expect(HttpStub::Configurer::Request::Http::Factory).to receive(:get).with("/#{uri}")
+
+        subject
+      end
+
+    end
+
+    context "when the uri is prefixed with '/'" do
+
+      let(:uri) { "/uri/prefixed/with/forward/slash" }
+
+      it "creates a get request with the provided uri" do
+        expect(HttpStub::Configurer::Request::Http::Factory).to receive(:get).with(uri)
+
+        subject
+      end
+
+    end
+
+    it "returns the created request" do
+      expect(subject).to eql(basic_request)
     end
 
   end

@@ -164,14 +164,80 @@ describe HttpStub::Configurer::Server::DSL do
 
   end
 
-  describe "#add_activator!" do
+  describe "#add_scenario!" do
 
-    let(:stub_activator) { instance_double(HttpStub::Configurer::Request::StubActivator) }
-    let(:stub_activator_builder) do
-      instance_double(HttpStub::Configurer::Request::StubActivatorBuilder, build: stub_activator)
+    let(:activation_uri)   { "some/activation/uri" }
+    let(:scenario)         { instance_double(HttpStub::Configurer::Request::Scenario) }
+    let(:scenario_builder) { instance_double(HttpStub::Configurer::Request::ScenarioBuilder, build: scenario) }
+
+    before(:example) { allow(server_facade).to receive(:define_scenario) }
+
+    let(:block) { lambda { |_scenario| "some block" } }
+
+    before(:example) do
+      allow(HttpStub::Configurer::Request::ScenarioBuilder).to receive(:new).and_return(scenario_builder)
     end
 
-    before(:example) { allow(server_facade).to receive(:stub_activator) }
+    subject { dsl.add_scenario!(activation_uri, &block) }
+
+    context "when response defaults have been established" do
+
+      let(:response_defaults) { { key: "value" } }
+
+      before(:example) { dsl.response_defaults = { key: "value" } }
+
+      it "creates a scenario builder containing the response defaults" do
+        expect(HttpStub::Configurer::Request::ScenarioBuilder).to receive(:new).with(response_defaults, anything)
+
+        subject
+      end
+
+      it "creates a scenario builder containing the provided activation uri" do
+        expect(HttpStub::Configurer::Request::ScenarioBuilder).to receive(:new).with(anything, activation_uri)
+
+        subject
+      end
+
+    end
+
+    context "when no response defaults have been established" do
+
+      it "creates a scenario builder with empty response defaults" do
+        expect(HttpStub::Configurer::Request::ScenarioBuilder).to receive(:new).with({}, anything)
+
+        subject
+      end
+
+    end
+
+    it "yields the created builder to the provided block" do
+      expect(block).to receive(:call).with(scenario_builder)
+
+      subject
+    end
+
+    it "builds the scenario request" do
+      expect(scenario_builder).to receive(:build).and_return(scenario)
+
+      subject
+    end
+
+    it "informs the server facade to submit the scenario request" do
+      expect(server_facade).to receive(:define_scenario).with(scenario)
+
+      subject
+    end
+
+  end
+
+  describe "#add_activator!" do
+
+    let(:scenario) { instance_double(HttpStub::Configurer::Request::Scenario) }
+    let(:stub_activator_builder) do
+      instance_double(HttpStub::Configurer::Request::StubActivatorBuilder, build: scenario)
+    end
+
+    before(:example) { allow(server_facade).to receive(:define_scenario) }
 
     let(:block) { lambda { |_activator| "some block" } }
 
@@ -211,14 +277,14 @@ describe HttpStub::Configurer::Server::DSL do
       subject
     end
 
-    it "builds the stub activator request" do
-      expect(stub_activator_builder).to receive(:build).and_return(stub_activator)
+    it "builds a scenario request" do
+      expect(stub_activator_builder).to receive(:build).and_return(scenario)
 
       subject
     end
 
-    it "informs the server facade to submit the stub activator request" do
-      expect(server_facade).to receive(:stub_activator).with(stub_activator)
+    it "informs the server facade to submit the scenario request" do
+      expect(server_facade).to receive(:define_scenario).with(scenario)
 
       subject
     end
@@ -267,12 +333,12 @@ describe HttpStub::Configurer::Server::DSL do
 
   end
 
-  describe "#clear_activators!" do
+  describe "#clear_scenarios!" do
 
     it "delegates to the server facade" do
-      expect(server_facade).to receive(:clear_activators)
+      expect(server_facade).to receive(:clear_scenarios)
 
-      dsl.clear_activators!
+      dsl.clear_scenarios!
     end
 
   end

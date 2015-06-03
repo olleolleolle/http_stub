@@ -7,7 +7,7 @@ SimpleCov.start do
   add_filter "/spec/"
   add_filter "/vendor/"
 
-  minimum_coverage 99.54
+  minimum_coverage 99.6
   refuse_coverage_drop
 end if ENV["coverage"]
 
@@ -15,12 +15,14 @@ require 'http_server_manager/test_support'
 
 require_relative '../lib/http_stub/rake/task_generators'
 require_relative '../lib/http_stub'
-require_relative '../examples/configurer_with_class_activator'
-require_relative '../examples/configurer_with_class_activators'
 require_relative '../examples/configurer_with_class_stub'
+require_relative '../examples/configurer_with_class_activator'
+require_relative '../examples/configurer_with_class_scenario'
+require_relative '../examples/configurer_with_class_scenarios'
 require_relative '../examples/configurer_with_initialize_callback'
 require_relative '../examples/configurer_with_complex_initializer'
 require_relative '../examples/configurer_with_response_defaults'
+require_relative '../examples/configurer_with_triggers'
 require_relative '../examples/configurer_with_file_responses'
 
 HttpStub::Server::Daemon.log_dir = ::File.expand_path('../../tmp/log', __FILE__)
@@ -36,4 +38,7 @@ module HttpStub
 
 end
 
-Dir[::File.expand_path('../support/**/*.rb', __FILE__)].each { |file| require file }
+require_relative 'support/stub_fixture'
+require_relative 'support/scenario_fixture'
+require_relative 'support/server_integration'
+require_relative 'support/configurer_integration'

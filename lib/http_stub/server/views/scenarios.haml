@@ -1,0 +1,7 @@
+- scenarios.each do |scenario|
+  %div
+    %span Response Activation URI:
+    %a{ href: scenario.activation_uri, class: :scenario }= scenario.activation_uri
+    - scenario.stubs.each do |the_stub|
+      = partial :stub, locals: { the_stub: the_stub }
+  %br

@@ -7,7 +7,7 @@ describe HttpStub::Configurer do
     port "8888"
   end
 
-  describe ".get_base_uri" do
+  describe "::get_base_uri" do
 
     it "returns a uri that combines the provided host and port" do
       expect(TestableConfigurer.get_base_uri).to include("some_host:8888")

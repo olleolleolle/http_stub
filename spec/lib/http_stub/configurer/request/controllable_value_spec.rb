@@ -1,6 +1,6 @@
 describe HttpStub::Configurer::Request::ControllableValue do
 
-  describe ".format" do
+  describe "::format" do
 
     let(:value) { "some value" }
 

@@ -1,7 +1,7 @@
 describe HttpStub::Server::Registry do
 
   let(:logger)  { double("Logger").as_null_object }
-  let(:request) { double("HttpRequest", logger: logger, inspect: "Request inspect result") }
+  let(:request) { instance_double(Rack::Request, logger: logger, inspect: "Request inspect result") }
 
   let(:registry) { HttpStub::Server::Registry.new("a_model") }
 
@@ -9,17 +9,56 @@ describe HttpStub::Server::Registry do
 
     let(:models) { (1..3).map { |i| double("HttpStub::Server::Model#{i}", :satisfies? => false) } }
 
-    before(:example) { models.each { |model| registry.add(model, request) } }
+    before(:example) { registry.concat(models, request) }
 
   end
 
   describe "#add" do
 
-    it "logs that the model has been registered" do
-      model = double("HttpStub::Server::Model", to_s: "Model as String")
-      expect(logger).to receive(:info).with(/Model as String/)
+    let(:model_string_representation) { "some model string" }
+    let(:model)                       { double("HttpStub::Server::Model", to_s: model_string_representation) }
 
-      registry.add(model, request)
+    subject { registry.add(model, request) }
+
+    before(:example) { allow(logger).to receive(:info) }
+
+    it "logs that the model has been registered" do
+      expect(logger).to receive(:info).with(/#{model_string_representation}/)
+
+      subject
+    end
+
+    it "adds the model" do
+      subject
+
+      expect(registry.last).to eql(model)
+    end
+
+  end
+
+  describe "#concat" do
+
+    let(:model_string_representations) { (1..3).map { |i| "model string ##{i}" } }
+    let(:models) do
+      model_string_representations.map do |string_representation|
+        double("HttpStub::Server::Model", to_s: string_representation)
+      end
+    end
+
+    subject { registry.concat(models, request) }
+
+    it "logs that the models have been registered" do
+      model_string_representations.each do |string_representation|
+        expect(logger).to receive(:info).with(/#{string_representation}/)
+      end
+
+      subject
+    end
+
+    it "adds the models" do
+      subject
+
+      expect(registry.all).to eql(models.reverse)
     end
 
   end

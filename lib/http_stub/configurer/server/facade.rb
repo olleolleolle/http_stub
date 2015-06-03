@@ -15,16 +15,16 @@ module HttpStub
           )
         end
 
-        def stub_activator(model)
+        def define_scenario(model)
           @request_processor.submit(
-            request: HttpStub::Configurer::Request::Http::Factory.stub_activator(model),
-            description: "registering activator '#{model}'"
+            request: HttpStub::Configurer::Request::Http::Factory.scenario(model),
+            description: "registering scenario '#{model}'"
           )
         end
 
         def activate(uri)
           @request_processor.submit(
-            request: HttpStub::Configurer::Request::Http::Factory.get(uri),
+            request: HttpStub::Configurer::Request::Http::Factory.activate(uri),
             description: "activating '#{uri}'"
           )
         end
@@ -49,10 +49,10 @@ module HttpStub
             description: "clearing stubs")
         end
 
-        def clear_activators
+        def clear_scenarios
           @request_processor.submit(
-            request: HttpStub::Configurer::Request::Http::Factory.delete("/stubs/activators"),
-            description: "clearing activators"
+            request: HttpStub::Configurer::Request::Http::Factory.delete("/stubs/scenarios"),
+            description: "clearing scenarios"
           )
         end
 

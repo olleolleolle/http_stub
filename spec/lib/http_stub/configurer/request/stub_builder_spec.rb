@@ -26,14 +26,42 @@ describe HttpStub::Configurer::Request::StubBuilder do
 
   end
 
+  describe "#match_requests" do
+
+    let(:fixture) { HttpStub::StubFixture.new }
+
+    subject { builder.match_requests(fixture.request.uri, fixture.request.symbolized) }
+
+    it "returns the builder to support method chaining" do
+      expect(subject).to eql(builder)
+    end
+
+  end
+
   describe "#respond_with" do
+
+    subject { builder.respond_with(status: 201) }
 
     it "does not modify any provided response defaults" do
       original_response_defaults = response_defaults.clone
 
-      builder.respond_with(status: 201)
+      subject
 
       expect(response_defaults).to eql(original_response_defaults)
+    end
+
+    it "returns the builder to support method chaining" do
+      expect(subject).to eql(builder)
+    end
+
+  end
+
+  describe "#trigger" do
+
+    subject { builder.trigger(instance_double(HttpStub::Configurer::Request::StubBuilder)) }
+
+    it "returns the builder to support method chaining" do
+      expect(subject).to eql(builder)
     end
 
   end

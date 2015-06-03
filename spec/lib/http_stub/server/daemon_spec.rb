@@ -6,7 +6,7 @@ describe HttpStub::Server::Daemon do
 
   before(:example) { allow(server_daemon.logger).to receive(:info) }
 
-  describe ".log_dir" do
+  describe "::log_dir" do
 
     before(:example) { @original_log_dir = HttpServerManager.log_dir }
 
@@ -20,7 +20,7 @@ describe HttpStub::Server::Daemon do
 
   end
 
-  describe ".pid_dir" do
+  describe "::pid_dir" do
 
     before(:example) { @original_pid_dir = HttpServerManager.pid_dir }
 

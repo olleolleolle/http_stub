@@ -13,6 +13,10 @@ module HttpStub
         request.logger.info "Registered #{@model_name}: #{model}"
       end
 
+      def concat(models, request)
+        models.each { |model| self.add(model, request) }
+      end
+
       def find_for(request)
         request.logger.info "Finding #{@model_name} satisfying: #{request.inspect}"
         @models.find { |model| model.satisfies?(request) }
