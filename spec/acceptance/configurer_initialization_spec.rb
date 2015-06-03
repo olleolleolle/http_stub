@@ -1,7 +1,7 @@
 describe "Configurer initialization acceptance" do
   include_context "configurer integration"
 
-  let(:configurer)  { HttpStub::Examples::ConfigurerWithClassActivator.new }
+  let(:configurer) { HttpStub::Examples::ConfigurerWithComplexInitializer.new }
 
   context "when a configurer is initialized" do
 

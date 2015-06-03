@@ -7,6 +7,10 @@ describe HttpStub::Configurer::Request::ScenarioBuilder do
 
   let(:scenario_builder) { HttpStub::Configurer::Request::ScenarioBuilder.new(response_defaults, activation_uri) }
 
+  it "produces stub builders" do
+    expect(scenario_builder).to be_a(HttpStub::Configurer::Request::StubBuilderProducer)
+  end
+
   describe "#add_stub!" do
 
     let(:stub_builder) { instance_double(HttpStub::Configurer::Request::StubBuilder) }

@@ -1,7 +1,7 @@
 module HttpStub
   module Examples
 
-    class ConfigurerWithClassActivator
+    class ConfigurerWithDeprecatedActivator
       include HttpStub::Configurer
 
       stub_server.add_activator! do |activator|

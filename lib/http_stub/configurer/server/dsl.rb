@@ -3,6 +3,7 @@ module HttpStub
     module Server
 
       class DSL
+        include HttpStub::Configurer::Request::StubBuilderProducer
 
         def initialize(server_facade)
           @server_facade     = server_facade
@@ -17,19 +18,9 @@ module HttpStub
           @server_facade.server_has_started
         end
 
-        def build_stub(&block)
-          builder = HttpStub::Configurer::Request::StubBuilder.new(@response_defaults)
-          block.call(builder) if block_given?
-          builder
-        end
-
         def add_stub!(builder=nil, &block)
           resolved_builder = builder || self.build_stub(&block)
           @server_facade.stub_response(resolved_builder.build)
-        end
-
-        def add_stubs!(builders)
-          builders.each { |builder| add_stub!(builder) }
         end
 
         def add_scenario!(activation_uri, &block)

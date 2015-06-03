@@ -70,8 +70,8 @@ Examples follow:
     port 8001 # The server port number
 
     # Register stub for GET "/resource"
-    stub_server.add_stub! do |stub|
-      stub.match_requests("/resource", method: :get).with_response(status: 200, body: "resource body")
+    stub_server.add_stub! do
+      match_requests("/resource", method: :get).with_response(status: 200, body: "resource body")
     end
 
     # Register stub that triggers other stubs to be registered when a matching request is received
@@ -89,9 +89,7 @@ Examples follow:
 
     # Register a scenario that is activated when a GET "/unavailable" request is made
     stub_server.add_scenario!("unavailable") do |scenario|
-      scenario.add_stub! do |stub|
-        stub.match_requests("/resource").with_response(status: 404)
-      end
+      scenario.add_stub! { match_requests("/resource").with_response(status: 404) }
     end
 
     def unavailable!
@@ -100,8 +98,8 @@ Examples follow:
 
     # Registers stubs for "/resource" matching on parameters
     def deny_access_to!(username)
-      stub_server.add_stub! do |stub|
-        stub.match_requests("/resource", parameters: { username: username }).with_response(status: 403)
+      stub_server.add_stub! do
+        match_requests("/resource", parameters: { username: username }).with_response(status: 403)
       end
     end
 
@@ -111,54 +109,52 @@ Examples follow:
 When matching a request, a stubs uri, parameter or header values can be regular expressions:
 
 ```ruby
-  stub_server.add_stub! do |stub|
-    stub.match_requests(/prefix\/[^\/]*\/postfix/, method: :post).with_response(status: 200)
-  end
+  stub_server.add_stub! { match_requests(/prefix\/[^\/]*\/postfix/, method: :post).with_response(status: 200) }
 
-  stub_server.add_stub! do |stub|
-    stub.match_requests(/prefix\/[^\/]+\/postfix/, method:     :post,
-                                                   headers:    { api_key: /^some_.+_key$/ },
-                                                   parameters: { username: /^user_.+/ })
-    stub.with_response(status: 201)
+  stub_server.add_stub! do
+    match_requests(/prefix\/[^\/]+\/postfix/, method:     :post,
+                                              headers:    { api_key: /^some_.+_key$/ },
+                                              parameters: { username: /^user_.+/ })
+    with_response(status: 201)
   end
 ```
 
 Parameter and header values can also be mandatory omissions, for example:
 
 ```ruby
-  stub_server.add_stub! do |stub|
-    stub.match_requests("/some/path", method:     :post,
-                                      headers:    { header_name: :omitted },
-                                      parameters: { parameter_name: :omitted })
-    stub.with_response(status: 201)
+  stub_server.add_stub! do
+    match_requests("/some/path", method:     :post,
+                                 headers:    { header_name: :omitted },
+                                 parameters: { parameter_name: :omitted })
+    with_response(status: 201)
   end
 ```
 
 Responses may contain headers, for example:
 
 ```ruby
-  stub_server.add_stub! do |stub|
-    stub.match_requests(/prefix\/[^\/]*\/postfix/, method: :post)
-    stub.with_response(status:  201, headers: { "content-type" => "application/xhtml+xml",
-                                                "location" => "http://some/resource/path" })
+  stub_server.add_stub! do
+    match_requests(/prefix\/[^\/]*\/postfix/, method: :post)
+    with_response(status:  201, headers: { "content-type" => "application/xhtml+xml",
+                                           "location" => "http://some/resource/path" })
   end
 ```
 
 Responses may contain files, for example:
 
 ```ruby
-  stub_server.add_stub! do |stub|
-    stub.match_requests("/some/resource/path", headers: { "Accept": "application/pdf" }, method: :get)
-    stub.with_response(status:  200, headers: { "content-type" => "application/pdf" },
-                                     body: { file: { path: "/some/path/on/disk.pdf", name: "resource.pdf" } })
+  stub_server.add_stub! do
+    match_requests("/some/resource/path", headers: { "Accept": "application/pdf" }, method: :get)
+    with_response(status:  200, headers: { "content-type" => "application/pdf" },
+                                body: { file: { path: "/some/path/on/disk.pdf", name: "resource.pdf" } })
   end
 ```
 
 Responses may also impose delays, for example:
 
 ```ruby
-  stub_server.add_stub! do |stub|
-    stub.match_requests(/prefix\/[^\/]*\/postfix/, method: :post).with_response(status: 200, delay_in_seconds: 8)
+  stub_server.add_stub! do
+    match_requests(/prefix\/[^\/]*\/postfix/, method: :post).with_response(status: 200, delay_in_seconds: 8)
   end
 ```
 
@@ -166,23 +162,21 @@ Scenario's provide a means to conveniently place the server in a known state.  T
 
 ```ruby
   stub_server.add_scenario!("3_pages_of_resources") do |scenario|
-    scenario.add_stub! do |stub|
-      stub.match_requests("/resource").with_response(status: 200, body: (1..60).map { |i| "resource_#{i}" }.to_json)
+    scenario.add_stub! do
+      match_requests("/resource", method: :get)
+      with_response(status: 200, body: (1..60).map { |i| "resource_#{i}" }.to_json)
     end
   end
 
   stub_server.add_scenario!("no_resources") do |scenario|
-    scenario.add_stub! do |stub|
-      stub.match_requests("/resource").with_response(status: 200, body: [].to_json)
-    end
+    scenario.add_stub! { match_requests("/resource", method: :get).with_response(status: 200, body: [].to_json) }
   end
   
   stub_server.add_scenario!("happy_flow") do |scenario|
-    scenario.add_stub! do |stub|
-      stub.match_requests("/login").with_response(status: 204)
-    end
-    scenario.add_stub! do |stub|
-      stub.match_requests("/resource").with_response(status: 200, body: (1..3).map { |i| "resource_#{i}" }.to_json)
+    scenario.add_stub! { match_requests("/login", method: :post).with_response(status: 204) }
+    scenario.add_stub! do
+      match_requests("/resource", method: :get)
+      with_response(status: 200, body: (1..3).map { |i| "resource_#{i}" }.to_json)
     end
   end
 ```
@@ -211,32 +205,32 @@ It is recommended that ```initialize!``` is called only once, post server start-
 Tasks generated by ```http_stub``` will initialize a configurer when provided:
 
 ```ruby
-    require 'http_stub/rake/task_generators'
+  require 'http_stub/rake/task_generators'
 
-    HttpStub::Rake::DaemonTasks.new(name: :some_server, port: 8001, configurer: MyConfigurer) # Generates 'some_server:start' task which also initializes the configurer
+  HttpStub::Rake::DaemonTasks.new(name: :some_server, port: 8001, configurer: MyConfigurer) # Generates 'some_server:start' task which also initializes the configurer
 
-    HttpStub::Rake::ServerTasks.new(name: :some_server, port: 8001, configurer: MyConfigurer) # Generates 'some_server:configure' task
+  HttpStub::Rake::ServerTasks.new(name: :some_server, port: 8001, configurer: MyConfigurer) # Generates 'some_server:configure' task
 ```
 
 An initialization callback is available, useful should you wish to control stub data via Configurer state:
 
 ```ruby
-    class FooService
-        include HttpStub::Configurer
+  class FooService
+    include HttpStub::Configurer
 
-        cattr_accessor :some_state
+    cattr_accessor :some_state
 
-        def self.on_initialize
-          stub_server.add_stub! do |stub|
-            stub.match_requests("/registered_on_initialize", method: :get).with_response(body: some_state)
-          end
-        end
+    def self.on_initialize
+      stub_server.add_stub! do
+        match_requests("/registered_on_initialize", method: :get).with_response(body: some_state)
+      end
     end
+  end
 ```
 
 ```ruby
-    FooService.some_state = "bar" # Establishes the response body of the on_initialize stub
-    FooService.initialize!
+  FooService.some_state = "bar" # Establishes the response body of the on_initialize stub
+  FooService.initialize!
 ```
 
 ```remember_stubs``` remembers the stubs so that the state can be recalled in future.
@@ -245,25 +239,25 @@ An initialization callback is available, useful should you wish to control stub 
 known state:
 
 ```ruby
-    let(:authentication_service) { AuthenticationService.new }
+  let(:authentication_service) { AuthenticationService.new }
 
-    # Returns server to post-initialize state
-    after(:example) { authentication_service.recall_stubs! }
+  # Returns server to post-initialize state
+  after(:example) { authentication_service.recall_stubs! }
 
-    describe "when the service is unavailable" do
+  describe "when the service is unavailable" do
 
-        before(:example) { authentication_service.unavailable! }
+    before(:example) { authentication_service.unavailable! }
 
-        #...
+    #...
 ```
 
 A common use case is to ```recall_stubs!``` before each test is run:
 
 ```ruby
-    Before do                              # Before each acceptance test scenario
-        SomeConfigurer.server_has_started! # Ensure operations are not buffered
-        SomeConfigurer.recall_stubs!       # Return to post-initialization state
-    end
+  Before do                              # Before each acceptance test scenario
+    SomeConfigurer.server_has_started! # Ensure operations are not buffered
+    SomeConfigurer.recall_stubs!       # Return to post-initialization state
+  end
 ```
 
 ##### Default Response Data #####
@@ -273,12 +267,12 @@ Often some aspects of response data is identical, such as content-type headers.
 stubbed responses:
 
 ```ruby
-    class FooService
-        include HttpStub::Configurer
+  class FooService
+    include HttpStub::Configurer
 
-        stub_server.response_defaults = { headers: "content-type" => "application/json; charset=utf-8" }
+    stub_server.response_defaults = { headers: "content-type" => "application/json; charset=utf-8" }
 
-        ...
+    ...
 ```
 
 ### Informational HTML pages ###
@@ -389,28 +383,28 @@ payload.
 The stub uri, header values and parameter values can be regular expressions by prefixing them with ```regexp:```
 
 ```javascript
-    {
-        "uri":        "regexp:/prefix/.+",
-        "headers":    {
-            "a_header": "regexp:^some.+value$",
-        },
-        "parameters": {
-            "a_param": "regexp:^some.+a_value$",
-        }
+  {
+    "uri":        "regexp:/prefix/.+",
+    "headers":    {
+        "a_header": "regexp:^some.+value$",
+    },
+    "parameters": {
+        "a_param": "regexp:^some.+a_value$",
     }
+  }
 ```
 
 Headers and parameters can also be mandatory omissions by providing the control value: ```control:omitted```:
 
 ```javascript
-    {
-        "headers": {
-            "a_header": "control:omitted",
-        },
-        "parameters": {
-            "a_param": "control:omitted",
-        }
+  {
+    "headers": {
+        "a_header": "control:omitted",
+    },
+    "parameters": {
+        "a_param": "control:omitted",
     }
+  }
 ```
 
 DELETE to /stubs in order to clear all configured stubs.
@@ -425,19 +419,18 @@ GET /stub/memory to recall the the remembered stubs.
 To configure a scenario, POST to /stubs/scenarios with the following JSON payload:
 
 ```javascript
-    {
-        "activation_uri": "some/activation/path",
-        "stubs": [
-          {
-            // same as stub request...
-          },
-          {
-            // same as stub request...
-          },
-          ...
-        ]
-        
-    }
+  {
+    "activation_uri": "some/activation/path",
+    "stubs": [
+      {
+        // same as stub request...
+      },
+      {
+        // same as stub request...
+      },
+      ...
+    ]
+  }
 ```
 
 The number of stubs in a scenario is arbitrary.  To activate, issue a GET to the activation_uri.

@@ -3,6 +3,7 @@ module HttpStub
     module Request
 
       class ScenarioBuilder
+        include HttpStub::Configurer::Request::StubBuilderProducer
 
         def initialize(response_defaults, activation_uri)
           @response_defaults = response_defaults
@@ -19,14 +20,6 @@ module HttpStub
           HttpStub::Configurer::Request::Scenario.new(
             activation_uri: @activation_uri, stubs: @stub_builders.map(&:build)
           )
-        end
-
-        private
-
-        def build_stub(&block)
-          builder = HttpStub::Configurer::Request::StubBuilder.new(@response_defaults)
-          block.call(builder) if block_given?
-          builder
         end
 
       end

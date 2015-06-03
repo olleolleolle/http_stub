@@ -3,7 +3,7 @@ describe "Stub activator acceptance" do
 
   context "when a configurer that contains a stub activator is initialised" do
 
-    let(:configurer) { HttpStub::Examples::ConfigurerWithClassActivator.new }
+    let(:configurer) { HttpStub::Examples::ConfigurerWithDeprecatedActivator.new }
 
     before(:example) { configurer.class.initialize! }
 
