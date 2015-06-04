@@ -172,19 +172,22 @@ Scenario's provide a means to conveniently place the server in a known state.  T
     scenario.add_stub! { match_requests("/resource", method: :get).with_response(status: 200, body: [].to_json) }
   end
   
-  stub_server.add_scenario!("happy_flow") do |scenario|
+  stub_server.add_scenario!("grant_access") do |scenario|
     scenario.add_stub! { match_requests("/login", method: :post).with_response(status: 204) }
-    scenario.add_stub! do
-      match_requests("/resource", method: :get)
-      with_response(status: 200, body: (1..3).map { |i| "resource_#{i}" }.to_json)
-    end
+  end
+
+  # Scenarios can refer to other scenarios
+  stub_server.add_scenario!("happy_flow") do |scenario|
+    scenario.activate!("grant_access", "3_pages_of_resources")
   end
 ```
 
-To activate a scenario:
+To activate scenario's:
 
 ```ruby
-  stub_server.activate!("happy_flow")
+  stub_server.activate!("happy_flow")                   # Activates a scenario
+  stub_server.activate!("grant_access", "no_resources") # Activates many scenario's, array is also supported
+
 ```
 
 The stubs and scenarios known by the server can be cleared via ```clear_stubs!``` and ```clear_scenarios!```.
@@ -348,7 +351,7 @@ To configure a stub response, POST to /stubs with the following JSON payload:
     },
     "triggers":  [
       {
-        "uri":        "some-unique-value",
+        "id":        "some-unique-value",
         "uri":        "/some/path",
         "method":     "some method",
         "headers":    {
@@ -398,7 +401,8 @@ Headers and parameters can also be mandatory omissions by providing the control 
 
 ```javascript
   {
-    "headers": {
+    "uri":        "/some/uri",
+    "headers":    {
         "a_header": "control:omitted",
     },
     "parameters": {
@@ -420,7 +424,7 @@ To configure a scenario, POST to /stubs/scenarios with the following JSON payloa
 
 ```javascript
   {
-    "activation_uri": "some/activation/path",
+    "name": "some_scenario_name",
     "stubs": [
       {
         // same as stub request...
@@ -429,11 +433,17 @@ To configure a scenario, POST to /stubs/scenarios with the following JSON payloa
         // same as stub request...
       },
       ...
+    ],
+    "triggered_scenario_names": [
+      "other_scenario_name",
+      "another_scenario_name",
+      ...
     ]
   }
 ```
 
-The number of stubs in a scenario is arbitrary.  To activate, issue a GET to the activation_uri.
+The number of stubs and other scenarios to activate in a scenario is arbitrary.
+To activate a scenario, issue a GET to its name.
 
 DELETE to /stubs/scenarios in order to clear all configured scenarios.
 

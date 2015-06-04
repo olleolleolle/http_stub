@@ -17,9 +17,9 @@ module HttpStub
         models.each { |model| self.add(model, request) }
       end
 
-      def find_for(request)
-        request.logger.info "Finding #{@model_name} satisfying: #{request.inspect}"
-        @models.find { |model| model.satisfies?(request) }
+      def find(args)
+        args[:request].logger.info "Finding #{@model_name} satisfying: #{args[:criteria]}"
+        @models.find { |model| model.satisfies?(args[:criteria]) }
       end
 
       def last

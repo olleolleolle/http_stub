@@ -1,15 +1,18 @@
 describe HttpStub::Server::Scenario::Controller do
 
-  let(:request)           { instance_double(Rack::Request) }
+  let(:request_path_info) { "/some/request/path" }
+  let(:request)           { instance_double(Rack::Request, path_info: request_path_info) }
   let(:payload)           { HttpStub::ScenarioFixture.new.server_payload }
   let(:stubs)             { (1..3).map { instance_double(HttpStub::Server::Stub::Instance) } }
   let(:scenario)          { instance_double(HttpStub::Server::Scenario::Instance, stubs: stubs) }
   let(:scenario_registry) { instance_double(HttpStub::Server::Registry).as_null_object }
   let(:stub_registry)     { instance_double(HttpStub::Server::Stub::Registry).as_null_object }
+  let(:activator)         { instance_double(HttpStub::Server::Scenario::Activator).as_null_object }
 
   let(:controller) { HttpStub::Server::Scenario::Controller.new(scenario_registry, stub_registry) }
 
   before(:example) do
+    allow(HttpStub::Server::Scenario::Activator).to receive(:new).and_return(activator)
     allow(HttpStub::Server::Scenario::RequestParser).to receive(:parse).and_return(payload)
     allow(HttpStub::Server::Scenario).to receive(:create).and_return(scenario)
   end
@@ -46,12 +49,18 @@ describe HttpStub::Server::Scenario::Controller do
 
     subject { controller.activate(request) }
 
-    describe "when a scenario has been registered that is activated by the request" do
+    it "finds a scenario whose name matches the request path omitting the '/' prefix" do
+      expect(scenario_registry).to receive(:find).with(criteria: "some/request/path", request: request)
 
-      before(:example) { allow(scenario_registry).to receive(:find_for).with(request).and_return(scenario) }
+      subject
+    end
 
-      it "adds the scenario's stubs to the stub registry" do
-        expect(stub_registry).to receive(:concat).with(stubs, request)
+    describe "when a scenario is found that satisfies the request" do
+
+      before(:example) { allow(scenario_registry).to receive(:find).and_return(scenario) }
+
+      it "activates the scenario via the activator" do
+        expect(activator).to receive(:activate).with(scenario, request)
 
         subject
       end
@@ -64,7 +73,7 @@ describe HttpStub::Server::Scenario::Controller do
 
     describe "when no stub activator is activated by the request" do
 
-      before(:example) { allow(scenario_registry).to receive(:find_for).with(request).and_return(nil) }
+      before(:example) { allow(scenario_registry).to receive(:find).and_return(nil) }
 
       it "does not add a stub to the registry" do
         expect(stub_registry).not_to receive(:concat)

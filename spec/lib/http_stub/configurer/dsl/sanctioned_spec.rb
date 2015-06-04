@@ -1,11 +1,11 @@
-describe HttpStub::Configurer::Server::DSL do
+describe HttpStub::Configurer::DSL::Sanctioned do
 
   let(:server_facade) { instance_double(HttpStub::Configurer::Server::Facade) }
 
-  let(:dsl) { HttpStub::Configurer::Server::DSL.new(server_facade) }
+  let(:dsl) { HttpStub::Configurer::DSL::Sanctioned.new(server_facade) }
 
   it "produces stub builders" do
-    expect(dsl).to be_a(HttpStub::Configurer::Request::StubBuilderProducer)
+    expect(dsl).to be_a(HttpStub::Configurer::DSL::StubBuilderProducer)
   end
 
   describe "#has_started!" do
@@ -21,7 +21,7 @@ describe HttpStub::Configurer::Server::DSL do
   describe "#add_stub!" do
 
     let(:stub)         { instance_double(HttpStub::Configurer::Request::Stub) }
-    let(:stub_builder) { instance_double(HttpStub::Configurer::Request::StubBuilder, build: stub) }
+    let(:stub_builder) { instance_double(HttpStub::Configurer::DSL::StubBuilder, build: stub) }
 
     before(:example) { allow(server_facade).to receive(:stub_response) }
 
@@ -53,12 +53,12 @@ describe HttpStub::Configurer::Server::DSL do
 
       let(:block) { lambda { |_stub| "some block" } }
 
-      before(:example) { allow(HttpStub::Configurer::Request::StubBuilder).to receive(:new).and_return(stub_builder) }
+      before(:example) { allow(HttpStub::Configurer::DSL::StubBuilder).to receive(:new).and_return(stub_builder) }
 
       subject { dsl.add_stub!(&block) }
 
       it "creates a stub builder" do
-        expect(HttpStub::Configurer::Request::StubBuilder).to receive(:new)
+        expect(HttpStub::Configurer::DSL::StubBuilder).to receive(:new)
 
         subject
       end
@@ -77,19 +77,19 @@ describe HttpStub::Configurer::Server::DSL do
 
   describe "#add_scenario!" do
 
-    let(:activation_uri)   { "some/activation/uri" }
+    let(:scenario_name)    { "some/scenario/name" }
     let(:scenario)         { instance_double(HttpStub::Configurer::Request::Scenario) }
-    let(:scenario_builder) { instance_double(HttpStub::Configurer::Request::ScenarioBuilder, build: scenario) }
+    let(:scenario_builder) { instance_double(HttpStub::Configurer::DSL::ScenarioBuilder, build: scenario) }
 
     before(:example) { allow(server_facade).to receive(:define_scenario) }
 
     let(:block) { lambda { |_scenario| "some block" } }
 
     before(:example) do
-      allow(HttpStub::Configurer::Request::ScenarioBuilder).to receive(:new).and_return(scenario_builder)
+      allow(HttpStub::Configurer::DSL::ScenarioBuilder).to receive(:new).and_return(scenario_builder)
     end
 
-    subject { dsl.add_scenario!(activation_uri, &block) }
+    subject { dsl.add_scenario!(scenario_name, &block) }
 
     context "when response defaults have been established" do
 
@@ -98,13 +98,13 @@ describe HttpStub::Configurer::Server::DSL do
       before(:example) { dsl.response_defaults = { key: "value" } }
 
       it "creates a scenario builder containing the response defaults" do
-        expect(HttpStub::Configurer::Request::ScenarioBuilder).to receive(:new).with(response_defaults, anything)
+        expect(HttpStub::Configurer::DSL::ScenarioBuilder).to receive(:new).with(response_defaults, anything)
 
         subject
       end
 
-      it "creates a scenario builder containing the provided activation uri" do
-        expect(HttpStub::Configurer::Request::ScenarioBuilder).to receive(:new).with(anything, activation_uri)
+      it "creates a scenario builder containing the provided scenario name" do
+        expect(HttpStub::Configurer::DSL::ScenarioBuilder).to receive(:new).with(anything, scenario_name)
 
         subject
       end
@@ -114,7 +114,7 @@ describe HttpStub::Configurer::Server::DSL do
     context "when no response defaults have been established" do
 
       it "creates a scenario builder with empty response defaults" do
-        expect(HttpStub::Configurer::Request::ScenarioBuilder).to receive(:new).with({}, anything)
+        expect(HttpStub::Configurer::DSL::ScenarioBuilder).to receive(:new).with({}, anything)
 
         subject
       end
@@ -145,7 +145,7 @@ describe HttpStub::Configurer::Server::DSL do
 
     let(:scenario) { instance_double(HttpStub::Configurer::Request::Scenario) }
     let(:stub_activator_builder) do
-      instance_double(HttpStub::Configurer::Request::StubActivatorBuilder, build: scenario)
+      instance_double(HttpStub::Configurer::DSL::StubActivatorBuilder, build: scenario)
     end
 
     before(:example) { allow(server_facade).to receive(:define_scenario) }
@@ -153,7 +153,7 @@ describe HttpStub::Configurer::Server::DSL do
     let(:block) { lambda { |_activator| "some block" } }
 
     before(:example) do
-      allow(HttpStub::Configurer::Request::StubActivatorBuilder).to receive(:new).and_return(stub_activator_builder)
+      allow(HttpStub::Configurer::DSL::StubActivatorBuilder).to receive(:new).and_return(stub_activator_builder)
     end
 
     subject { dsl.add_activator!(&block) }
@@ -165,7 +165,7 @@ describe HttpStub::Configurer::Server::DSL do
       before(:example) { dsl.response_defaults = { key: "value" } }
 
       it "creates a stub activator builder containing the response defaults" do
-        expect(HttpStub::Configurer::Request::StubActivatorBuilder).to receive(:new).with(response_defaults)
+        expect(HttpStub::Configurer::DSL::StubActivatorBuilder).to receive(:new).with(response_defaults)
 
         subject
       end
@@ -175,7 +175,7 @@ describe HttpStub::Configurer::Server::DSL do
     context "when no response defaults have been established" do
 
       it "creates a stub activator builder with empty response defaults" do
-        expect(HttpStub::Configurer::Request::StubActivatorBuilder).to receive(:new).with({})
+        expect(HttpStub::Configurer::DSL::StubActivatorBuilder).to receive(:new).with({})
 
         subject
       end
@@ -204,12 +204,12 @@ describe HttpStub::Configurer::Server::DSL do
 
   describe "#activate!" do
 
-    let(:uri) { "/some/activation/uri" }
+    let(:scenario_name) { "/some/scenario/name" }
 
     it "delegates to the server facade" do
-      expect(server_facade).to receive(:activate).with(uri)
+      expect(server_facade).to receive(:activate).with(scenario_name)
 
-      dsl.activate!(uri)
+      dsl.activate!(scenario_name)
     end
 
   end

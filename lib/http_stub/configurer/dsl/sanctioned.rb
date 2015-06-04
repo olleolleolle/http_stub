@@ -1,9 +1,10 @@
 module HttpStub
   module Configurer
-    module Server
+    module DSL
 
-      class DSL
-        include HttpStub::Configurer::Request::StubBuilderProducer
+      class Sanctioned
+        include HttpStub::Configurer::DSL::StubBuilderProducer
+        include HttpStub::Configurer::DSL::ScenarioActivator
 
         def initialize(server_facade)
           @server_facade     = server_facade
@@ -23,20 +24,16 @@ module HttpStub
           @server_facade.stub_response(resolved_builder.build)
         end
 
-        def add_scenario!(activation_uri, &block)
-          builder = HttpStub::Configurer::Request::ScenarioBuilder.new(@response_defaults, activation_uri)
+        def add_scenario!(name, &block)
+          builder = HttpStub::Configurer::DSL::ScenarioBuilder.new(@response_defaults, name)
           block.call(builder)
           @server_facade.define_scenario(builder.build)
         end
 
         def add_activator!(&block)
-          builder = HttpStub::Configurer::Request::StubActivatorBuilder.new(@response_defaults)
+          builder = HttpStub::Configurer::DSL::StubActivatorBuilder.new(@response_defaults)
           block.call(builder)
           @server_facade.define_scenario(builder.build)
-        end
-
-        def activate!(uri)
-          @server_facade.activate(uri)
         end
 
         def remember_stubs
@@ -53,6 +50,12 @@ module HttpStub
 
         def clear_scenarios!
           @server_facade.clear_scenarios
+        end
+
+        private
+
+        def activate_all!(scenario_names)
+          scenario_names.each { |scenario_name| @server_facade.activate(scenario_name) }
         end
 
       end

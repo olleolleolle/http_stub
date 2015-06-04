@@ -5,12 +5,13 @@ module HttpStub
       class Scenario
 
         def initialize(args)
-          @activation_uri = args[:activation_uri]
-          @stubs          = args[:stubs]
+          @name                     = args[:name]
+          @stubs                    = args[:stubs]
+          @triggered_scenario_names = args[:triggered_scenario_names]
         end
 
         def payload
-          { activation_uri: @activation_uri, stubs: @stubs.map(&:payload) }
+          { name: @name, stubs: @stubs.map(&:payload), triggered_scenario_names: @triggered_scenario_names }
         end
 
         def response_files
@@ -18,7 +19,7 @@ module HttpStub
         end
 
         def to_s
-          @activation_uri
+          @name
         end
 
       end

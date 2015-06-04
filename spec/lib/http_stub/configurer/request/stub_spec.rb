@@ -19,7 +19,7 @@ describe HttpStub::Configurer::Request::Stub do
                       payload: trigger_payload, response_files: trigger_files)
     end
     let(:trigger_builders) do
-      [ instance_double(HttpStub::Configurer::Request::StubBuilder, build: trigger) ]
+      [ instance_double(HttpStub::Configurer::DSL::StubBuilder, build: trigger) ]
     end
 
   end
@@ -35,7 +35,7 @@ describe HttpStub::Configurer::Request::Stub do
     end
     let(:trigger_builders) do
       triggers.map do |trigger|
-        instance_double(HttpStub::Configurer::Request::StubBuilder, build: trigger)
+        instance_double(HttpStub::Configurer::DSL::StubBuilder, build: trigger)
       end
     end
 

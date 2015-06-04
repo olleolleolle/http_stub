@@ -5,8 +5,8 @@ module HttpStub
       class Controller
 
         def initialize(scenario_registry, stub_registry)
-          @scenario_registry = scenario_registry
-          @stub_registry = stub_registry
+          @scenario_registry  = scenario_registry
+          @scenario_activator = HttpStub::Server::Scenario::Activator.new(scenario_registry, stub_registry)
         end
 
         def register(request)
@@ -16,9 +16,9 @@ module HttpStub
         end
 
         def activate(request)
-          scenario = @scenario_registry.find_for(request)
+          scenario = @scenario_registry.find(criteria: request.path_info.gsub(/^\//, ""), request: request)
           if scenario
-            @stub_registry.concat(scenario.stubs, request)
+            @scenario_activator.activate(scenario, request)
             HttpStub::Server::Response::SUCCESS
           else
             HttpStub::Server::Response::EMPTY

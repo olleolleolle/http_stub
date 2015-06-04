@@ -45,9 +45,7 @@ describe HttpStub::Server::Stub::Controller do
 
     describe "when a stub has been registered that should be replayed for the request" do
 
-      before(:example) do
-        allow(registry).to receive(:find_for).with(request).and_return(the_stub)
-      end
+      before(:example) { allow(registry).to receive(:find_for).with(request).and_return(the_stub) }
 
       it "returns the stubs response" do
         expect(the_stub).to receive(:response).and_return(response)
@@ -59,9 +57,7 @@ describe HttpStub::Server::Stub::Controller do
 
     describe "when no stub should be replayed for the request" do
 
-      before(:example) do
-        allow(registry).to receive(:find_for).with(request).and_return(nil)
-      end
+      before(:example) { allow(registry).to receive(:find_for).with(request).and_return(nil) }
 
       it "returns an empty response" do
         expect(controller.replay(request)).to eql(HttpStub::Server::Response::EMPTY)

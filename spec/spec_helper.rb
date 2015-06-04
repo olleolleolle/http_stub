@@ -7,7 +7,7 @@ SimpleCov.start do
   add_filter "/spec/"
   add_filter "/vendor/"
 
-  minimum_coverage 99.6
+  minimum_coverage 99.62
   refuse_coverage_drop
 end if ENV["coverage"]
 
@@ -15,10 +15,10 @@ require 'http_server_manager/test_support'
 
 require_relative '../lib/http_stub/rake/task_generators'
 require_relative '../lib/http_stub'
-require_relative '../examples/configurer_with_class_stub'
+require_relative '../examples/configurer_with_stub'
 require_relative '../examples/configurer_with_deprecated_activator'
-require_relative '../examples/configurer_with_class_scenario'
-require_relative '../examples/configurer_with_class_scenarios'
+require_relative '../examples/configurer_with_trivial_scenarios'
+require_relative '../examples/configurer_with_exhaustive_scenarios'
 require_relative '../examples/configurer_with_initialize_callback'
 require_relative '../examples/configurer_with_complex_initializer'
 require_relative '../examples/configurer_with_response_defaults'

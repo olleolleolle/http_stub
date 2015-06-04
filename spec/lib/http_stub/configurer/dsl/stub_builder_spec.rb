@@ -1,14 +1,14 @@
-describe HttpStub::Configurer::Request::StubBuilder do
+describe HttpStub::Configurer::DSL::StubBuilder do
 
   let(:response_defaults) { {} }
 
-  let(:builder) { HttpStub::Configurer::Request::StubBuilder.new(response_defaults) }
+  let(:builder) { HttpStub::Configurer::DSL::StubBuilder.new(response_defaults) }
 
   shared_context "triggers one stub" do
 
     let(:trigger_stub) { instance_double(HttpStub::Configurer::Request::Stub) }
     let(:trigger_builder) do
-      instance_double(HttpStub::Configurer::Request::StubBuilder, build: trigger_stub)
+      instance_double(HttpStub::Configurer::DSL::StubBuilder, build: trigger_stub)
     end
 
     before(:example) { builder.trigger(trigger_builder) }
@@ -19,7 +19,7 @@ describe HttpStub::Configurer::Request::StubBuilder do
 
     let(:trigger_stubs) { (1..3).map { instance_double(HttpStub::Configurer::Request::Stub) } }
     let(:trigger_builders) do
-      trigger_stubs.map { |stub| instance_double(HttpStub::Configurer::Request::StubBuilder, build: stub) }
+      trigger_stubs.map { |stub| instance_double(HttpStub::Configurer::DSL::StubBuilder, build: stub) }
     end
 
     before(:example) { builder.trigger(trigger_builders) }
@@ -58,7 +58,7 @@ describe HttpStub::Configurer::Request::StubBuilder do
 
   describe "#trigger" do
 
-    subject { builder.trigger(instance_double(HttpStub::Configurer::Request::StubBuilder)) }
+    subject { builder.trigger(instance_double(HttpStub::Configurer::DSL::StubBuilder)) }
 
     it "returns the builder to support method chaining" do
       expect(subject).to eql(builder)

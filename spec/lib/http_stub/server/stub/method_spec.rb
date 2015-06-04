@@ -70,8 +70,24 @@ describe HttpStub::Server::Stub::Method do
 
   describe "#to_s" do
 
-    it "returns the stub method provided" do
-      expect(the_method.to_s).to eql(raw_stub_method)
+    context "when the stub method provided is not nil" do
+
+      let(:raw_stub_method) { "not_nil" }
+
+      it "returns the stub method provided" do
+        expect(the_method.to_s).to eql(raw_stub_method)
+      end
+
+    end
+
+    context "when the stub method provided is nil" do
+
+      let(:raw_stub_method) { nil }
+
+      it "returns an empty string" do
+        expect(the_method.to_s).to eql("")
+      end
+
     end
 
   end

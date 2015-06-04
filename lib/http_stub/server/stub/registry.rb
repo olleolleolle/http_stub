@@ -11,7 +11,7 @@ module HttpStub
         end
 
         def find_for(request)
-          stub = @registry.find_for(request)
+          stub = @registry.find(criteria: request, request: request)
           stub.triggers.add_to(self, request) if stub
           stub
         end

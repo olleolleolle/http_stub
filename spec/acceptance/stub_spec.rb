@@ -1,21 +1,23 @@
 describe "Stub basics acceptance" do
   include_context "configurer integration"
 
-  let(:configurer)  { HttpStub::Examples::ConfigurerWithClassStub.new }
+  let(:configurer)  { HttpStub::Examples::ConfigurerWithStub.new }
 
   before(:example) { configurer.class.initialize! }
 
   context "when a stub is submitted" do
 
-    context "that contains no headers or parameters" do
+    context "that contains no request headers or parameters" do
 
-      context "and contains a response status" do
+      context "and it contains a response status" do
 
         before(:example) do
-          configurer.stub_response!("/stub_with_status", method: :get, response: { status: 201, body: "Stub body" })
+          stub_server.add_stub! do
+            match_requests("/stub_with_status", method: :get).respond_with(status: 201, body: "Stub body")
+          end
         end
 
-        context "and that request is made" do
+        context "and a matching request is made" do
 
           let(:response) { HTTParty.get("#{server_uri}/stub_with_status") }
 
@@ -33,7 +35,7 @@ describe "Stub basics acceptance" do
 
           before(:example) { configurer.clear_stubs! }
 
-          context "and the original request is made" do
+          context "and a matching request is made" do
 
             let(:response) { HTTParty.get("#{server_uri}/stub_with_status") }
 
@@ -47,15 +49,33 @@ describe "Stub basics acceptance" do
 
       end
 
-      context "and does not contain a response status" do
+      context "and it does not contain a response status" do
 
         before(:example) do
-          configurer.stub_response!("/stub_without_status", method: :get, response: { body: "Stub body" })
+          stub_server.add_stub! { match_requests("/stub_without_status", method: :get).respond_with(body: "Stub body") }
         end
 
-        context "and that request is made" do
+        context "and a matching request is made" do
 
           let(:response) { HTTParty.get("#{server_uri}/stub_without_status") }
+
+          it "replays the stubbed body" do
+            expect(response.body).to eql("Stub body")
+          end
+
+        end
+
+      end
+
+      context "and it does not contain a request method" do
+
+        before(:example) do
+          stub_server.add_stub! { match_requests("/stub_without_method").respond_with(body: "Stub body") }
+        end
+
+        context "and a request is made with a matching uri" do
+
+          let(:response) { HTTParty.get("#{server_uri}/stub_without_method") }
 
           it "replays the stubbed body" do
             expect(response.body).to eql("Stub body")
@@ -72,10 +92,10 @@ describe "Stub basics acceptance" do
       context "whose values are strings" do
 
         before(:example) do
-          configurer.stub_response!(
-            "/stub_with_headers", method: :get, headers: { key: "value" },
-            response: { status: 202, body: "Another stub body" }
-          )
+          stub_server.add_stub! do
+            match_requests("/stub_with_headers", method: :get, headers: { key: "value" })
+            respond_with(status: 202, body: "Another stub body")
+          end
         end
 
         context "and that request is made" do
@@ -108,8 +128,10 @@ describe "Stub basics acceptance" do
       context "whose values are strings" do
 
         before(:example) do
-          configurer.stub_response!("/stub_with_parameters", method: :get, parameters: { key: "value" },
-                                    response: { status: 202, body: "Another stub body" })
+          stub_server.add_stub! do
+            match_requests("/stub_with_parameters", method: :get, parameters: { key: "value" })
+            respond_with(status: 202, body: "Another stub body")
+          end
         end
 
         context "and that request is made" do
@@ -138,8 +160,10 @@ describe "Stub basics acceptance" do
       context "whose values are numbers" do
 
         before(:example) do
-          configurer.stub_response!("/stub_with_parameters", method: :get, parameters: { key: 88 },
-                                    response: { status: 203, body: "Body for parameter number" })
+          stub_server.add_stub! do
+            match_requests("/stub_with_parameters", method: :get, parameters: { key: 88 })
+            respond_with(status: 203, body: "Body for parameter number")
+          end
         end
 
         context "and that request is made" do
@@ -174,10 +198,10 @@ describe "Stub basics acceptance" do
       context "with a content-type header" do
 
         before(:example) do
-          configurer.stub_response!(
-            "/some_stub_path", method: :get, response: { body: "Some stub body",
-                                                         headers: { "content-type" => "application/xhtml" } }
-          )
+          stub_server.add_stub! do
+            match_requests("/some_stub_path", method: :get)
+            respond_with(body: "Some stub body", headers: { "content-type" => "application/xhtml" })
+          end
         end
 
         it "registers the stub" do
@@ -201,9 +225,10 @@ describe "Stub basics acceptance" do
           end
 
           before(:example) do
-            configurer.stub_response!(
-              "/some_stub_path", method: :get, response: { body: "Some stub body", headers: response_headers }
-            )
+            stub_server.add_stub! do |stub|
+              stub.match_requests("/some_stub_path", method: :get)
+              stub.respond_with(body: "Some stub body", headers: response_headers)
+            end
           end
 
           it "registers the stub" do

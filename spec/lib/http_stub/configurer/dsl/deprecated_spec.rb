@@ -1,4 +1,4 @@
-describe HttpStub::Configurer::DeprecatedDSL do
+describe HttpStub::Configurer::DSL::Deprecated do
 
   let(:stub_server) { double("StubServer") }
 
@@ -114,8 +114,6 @@ describe HttpStub::Configurer::DeprecatedDSL do
 
     describe "#server_has_started!" do
 
-      let(:activation_uri) { "http://some/activation/uri" }
-
       it "informs the stub server that it has started" do
         expect(stub_server).to receive(:has_started!)
 
@@ -126,7 +124,7 @@ describe HttpStub::Configurer::DeprecatedDSL do
 
     describe "#activate!" do
 
-      let(:activation_uri) { "http://some/activation/uri" }
+      let(:activation_uri) { "/some/activation/uri" }
 
       it "delegates to the stub server available to the dsl" do
         expect(stub_server).to receive(:activate!).with(activation_uri)
@@ -142,7 +140,7 @@ describe HttpStub::Configurer::DeprecatedDSL do
 
         include_context "a method stubbing a response"
 
-        let(:builder) { instance_double(HttpStub::Configurer::Request::StubBuilder) }
+        let(:builder) { instance_double(HttpStub::Configurer::DSL::StubBuilder) }
 
         subject { dsl_object.send(method, stub_uri, options) }
 
@@ -160,11 +158,11 @@ describe HttpStub::Configurer::DeprecatedDSL do
 
     describe "#stub_activator" do
 
-      let(:activation_uri) { "http://some/activator/uri" }
+      let(:activation_uri) { "/some/activation/uri" }
 
       include_context "a method stubbing a response"
 
-      let(:builder) { instance_double(HttpStub::Configurer::Request::StubActivatorBuilder) }
+      let(:builder) { instance_double(HttpStub::Configurer::DSL::StubActivatorBuilder) }
 
       subject { dsl_object.stub_activator(activation_uri, stub_uri, options) }
 
@@ -201,8 +199,8 @@ describe HttpStub::Configurer::DeprecatedDSL do
 
   context "when included in a class" do
 
-    class HttpStub::Configurer::DeprecatedDSLTest
-      include HttpStub::Configurer::DeprecatedDSL
+    class HttpStub::Configurer::DSL::DeprecatedTest
+      include HttpStub::Configurer::DSL::Deprecated
 
       class << self
 
@@ -217,8 +215,8 @@ describe HttpStub::Configurer::DeprecatedDSL do
     describe "the class in which the module was included" do
 
       let(:dsl_object) do
-        HttpStub::Configurer::DeprecatedDSLTest.stub_server = stub_server
-        HttpStub::Configurer::DeprecatedDSLTest
+        HttpStub::Configurer::DSL::DeprecatedTest.stub_server = stub_server
+        HttpStub::Configurer::DSL::DeprecatedTest
       end
 
       it_behaves_like "a deprecated DSL object"
@@ -228,7 +226,7 @@ describe HttpStub::Configurer::DeprecatedDSL do
     describe "an instance of the class in which the module was included" do
 
       let(:dsl_object) do
-        dsl_object = HttpStub::Configurer::DeprecatedDSLTest.new
+        dsl_object = HttpStub::Configurer::DSL::DeprecatedTest.new
         dsl_object.stub_server = stub_server
         dsl_object
       end

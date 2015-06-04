@@ -1,6 +1,6 @@
 module HttpStub
   module Configurer
-    module Request
+    module DSL
 
       class StubBuilder
         

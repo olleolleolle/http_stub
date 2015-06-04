@@ -70,12 +70,15 @@ module HttpStub
 
       # Sample request body:
       # {
-      #   "activation_uri": "/some/path",
+      #   "name": "some_scenario_name",
       #   "stubs": [
       #     {
       #       ... see /stub ...
       #     },
-      #     ...
+      #   ],
+      #   "triggered_scenario_names": [
+      #     "some_other_scenario_name",
+      #    ...
       #   ]
       # }
       post "/stubs/scenarios" do
@@ -84,7 +87,7 @@ module HttpStub
       end
 
       get "/stubs/scenarios" do
-        haml :scenarios, {}, scenarios: @scenario_registry.all.sort_by(&:activation_uri)
+        haml :scenarios, {}, scenarios: @scenario_registry.all.sort_by(&:uri)
       end
 
       delete "/stubs/scenarios" do

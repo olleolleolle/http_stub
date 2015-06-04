@@ -5,7 +5,7 @@ module HttpStub
     def self.included(mod)
       mod.extend(HttpStub::Configurer::ClassMethods)
       mod.send(:include, HttpStub::Configurer::InstanceMethods)
-      mod.send(:include, HttpStub::Configurer::DeprecatedDSL)
+      mod.send(:include, HttpStub::Configurer::DSL::Deprecated)
     end
 
     module ClassMethods
@@ -31,7 +31,7 @@ module HttpStub
       end
 
       def stub_server
-        @dsl ||= HttpStub::Configurer::Server::DSL.new(server_facade)
+        @dsl ||= HttpStub::Configurer::DSL::Sanctioned.new(server_facade)
       end
 
       def initialize!

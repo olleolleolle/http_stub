@@ -1,25 +1,50 @@
 describe "Scenario acceptance" do
   include_context "configurer integration"
 
-  context "when a configurer that contains a scenario is initialized" do
+  context "when a configurer that contains scenario's is initialized" do
 
-    let(:configurer)  { HttpStub::Examples::ConfigurerWithClassScenario.new }
+    let(:configurer)  { HttpStub::Examples::ConfigurerWithTrivialScenarios.new }
 
     before(:example) { configurer.class.initialize! }
 
-    context "and the scenario is activated" do
+    context "and a scenario is activated" do
 
-      before(:example) { configurer.activate!("/a_scenario") }
+      context "containing stubs" do
 
-      (1..3).each do |stub_number|
+        before(:example) { configurer.activate!("scenario_1") }
 
-        context "and scenario stub request ##{stub_number} is made" do
+        (1..3).each do |stub_number|
 
-          let(:response) { HTTParty.get("#{server_uri}/scenario_stub_path_#{stub_number}") }
+          context "and scenario stub request ##{stub_number} is made" do
 
-          it "replays the stubbed response" do
-            expect(response.code).to eql(200 + stub_number)
-            expect(response.body).to eql("Scenario stub #{stub_number} body")
+            let(:response) { HTTParty.get("#{server_uri}/scenario_stub_path_#{stub_number}") }
+
+            it "replays the stubbed response" do
+              expect(response.code).to eql(200 + stub_number)
+              expect(response.body).to eql("Scenario stub #{stub_number} body")
+            end
+
+          end
+
+        end
+
+      end
+
+      context "containing triggered scenarios" do
+
+        before(:example) { configurer.activate!("scenario_activating_another_scenario") }
+
+        (1..3).each do |stub_number|
+
+          context "and a request is made matching stub ##{stub_number} within the triggered scenario" do
+
+            let(:response) { HTTParty.get("#{server_uri}/scenario_stub_path_#{stub_number}") }
+
+            it "triggers all related scenarios" do
+              expect(response.code).to eql(200 + stub_number)
+              expect(response.body).to eql("Scenario stub #{stub_number} body")
+            end
+
           end
 
         end

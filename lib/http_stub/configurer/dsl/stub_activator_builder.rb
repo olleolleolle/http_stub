@@ -1,6 +1,6 @@
 module HttpStub
   module Configurer
-    module Request
+    module DSL
 
       class StubActivatorBuilder
 
@@ -12,8 +12,8 @@ module HttpStub
         end
 
         def on(activation_uri)
-          @scenario_builder = HttpStub::Configurer::Request::ScenarioBuilder.new(@response_defaults, activation_uri)
-          @stub_builder     = HttpStub::Configurer::Request::StubBuilder.new(@response_defaults)
+          @scenario_builder = HttpStub::Configurer::DSL::ScenarioBuilder.new(@response_defaults, activation_uri)
+          @stub_builder     = HttpStub::Configurer::DSL::StubBuilder.new(@response_defaults)
           @scenario_builder.add_stub!(@stub_builder)
         end
 

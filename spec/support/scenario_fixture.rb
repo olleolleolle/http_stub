@@ -3,22 +3,28 @@ module HttpStub
   class ScenarioFixture
 
     def initialize
-      @activation_uri = "/some/activation/uri"
-      @stub_fixtures  = []
+      @name                     = "some/scenario/name"
+      @stub_fixtures            = []
+      @triggered_scenario_names = []
     end
 
-    def with_activation_uri!(uri)
-      self.tap { @activation_uri = uri }
+    def with_name!(name)
+      self.tap { @name = name }
     end
 
     def with_stubs!(number)
       self.tap { @stub_fixtures.concat((1..number).map { HttpStub::StubFixture.new }) }
     end
 
+    def with_triggered_scenario_names!(uris)
+      self.tap { @triggered_scenario_names.concat(uris) }
+    end
+
     def server_payload
       {
-        "activation_uri"  => @activation_uri,
-        "stubs" => @stub_fixtures.map(&:server_payload)
+        "name"                     => @name,
+        "stubs"                    => @stub_fixtures.map(&:server_payload),
+        "triggered_scenario_names" => @triggered_scenario_names
       }
     end
 

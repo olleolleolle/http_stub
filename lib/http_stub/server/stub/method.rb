@@ -13,7 +13,7 @@ module HttpStub
         end
 
         def to_s
-          @method
+          @method || ""
         end
 
       end

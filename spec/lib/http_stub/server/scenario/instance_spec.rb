@@ -1,10 +1,14 @@
 describe HttpStub::Server::Scenario::Instance do
 
-  let(:activation_uri)  { "/some/activation/uri" }
-  let(:number_of_stubs) { 3 }
-  let(:stubs)           { (1..number_of_stubs).map { instance_double(HttpStub::Server::Stub::Instance) } }
+  let(:name)                     { "some_scenario_name" }
+  let(:number_of_stubs)          { 3 }
+  let(:stubs)                    { (1..number_of_stubs).map { instance_double(HttpStub::Server::Stub::Instance) } }
+  let(:triggered_scenario_names) { (1..3).map { |i| "triggered/scenario/name/#{i}" } }
   let(:args) do
-    HttpStub::ScenarioFixture.new.with_activation_uri!(activation_uri).with_stubs!(number_of_stubs).server_payload
+    HttpStub::ScenarioFixture.new.with_name!(name).
+      with_stubs!(number_of_stubs).
+      with_triggered_scenario_names!(triggered_scenario_names).
+      server_payload
   end
 
   let(:scenario) { HttpStub::Server::Scenario::Instance.new(args) }
@@ -13,7 +17,7 @@ describe HttpStub::Server::Scenario::Instance do
 
   describe "#constructor" do
 
-    context "when many stubs payloads are provided" do
+    context "when many stub payloads are provided" do
 
       let(:number_of_stubs) { 3 }
 
@@ -41,36 +45,44 @@ describe HttpStub::Server::Scenario::Instance do
 
   describe "#satisfies?" do
 
-    let(:request) { instance_double(Rack::Request, path_info: request_path_info) }
+    subject { scenario.satisfies?(other_name) }
 
-    describe "when the request uri exactly matches the scenario's activation uri" do
+    describe "when the scenario's name exactly matches the provided name" do
 
-      let(:request_path_info) { activation_uri }
+      let(:other_name) { name }
 
       it "returns true" do
-        expect(scenario.satisfies?(request)).to be(true)
+        expect(subject).to be(true)
       end
 
     end
 
-    describe "when the scenario's activation uri is a substring of the request uri" do
+    describe "when the scenario's name is a substring of the provided name" do
 
-      let(:request_path_info) { "#{activation_uri}/with/additional/paths" }
+      let(:other_name) { "#{name}_with_additional_context" }
 
       it "returns false" do
-        expect(scenario.satisfies?(request)).to be(false)
+        expect(subject).to be(false)
       end
 
     end
 
-    describe "when the request uri is completely different to the scenario's activation uri" do
+    describe "when the scenario's name is completely different to the provided name" do
 
-      let(:request_path_info) { "/completely/different/path" }
+      let(:other_name) { "completely_different_scenario_name" }
 
       it "returns false" do
-        expect(scenario.satisfies?(request)).to be(false)
+        expect(subject).to be(false)
       end
 
+    end
+
+  end
+
+  describe "#uri" do
+
+    it "returns the scenario's name with '/' prefixed" do
+      expect(scenario.uri).to eql("/#{name}")
     end
 
   end
@@ -83,26 +95,20 @@ describe HttpStub::Server::Scenario::Instance do
 
   end
 
-  describe "#activation_uri" do
+  describe "#triggered_scenario_names" do
 
-    context "when the value provided in the payload contains a '/' prefix" do
-
-      let(:activation_uri)  { "/has/forward/slash/prefix" }
-
-      it "returns the value provided in the payload" do
-        expect(scenario.activation_uri).to eql(activation_uri)
-      end
-
+    it "returns the value provided in the payload" do
+      expect(scenario.triggered_scenario_names).to eql(triggered_scenario_names)
     end
 
-    context "when the value provided in the payload does not have a '/' prefix" do
+  end
 
-      let(:activation_uri)  { "does/not/have/forward/slash/prefix" }
+  describe "#triggered_scenarios" do
 
-      it "returns the value provided in the payload prefixed with '/'" do
-        expect(scenario.activation_uri).to eql("/#{activation_uri}")
-      end
+    it "returns an array containing the triggered scenario names and uris" do
+      expected_details = triggered_scenario_names.reduce([]) { |result, name| result << [name, "/#{name}"] }
 
+      expect(scenario.triggered_scenarios).to eql(expected_details)
     end
 
   end

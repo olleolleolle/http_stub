@@ -11,7 +11,7 @@ describe "Stub activator acceptance" do
 
       context "and the response contains text" do
 
-        before(:example) { configurer.activate!("/an_activator") }
+        before(:example) { configurer.activate!("an_activator") }
 
         context "and the stub request is made" do
 

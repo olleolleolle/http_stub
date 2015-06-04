@@ -1,4 +1,4 @@
-describe HttpStub::Configurer::Request::StubActivatorBuilder do
+describe HttpStub::Configurer::DSL::StubActivatorBuilder do
 
   let(:stub_fixture) { HttpStub::StubFixture.new }
 
@@ -6,15 +6,15 @@ describe HttpStub::Configurer::Request::StubActivatorBuilder do
   let(:activation_uri)    { "/some/activation/uri" }
   let(:scenario)          { instance_double(HttpStub::Configurer::Request::Scenario) }
   let(:scenario_builder) do
-    instance_double(HttpStub::Configurer::Request::ScenarioBuilder, build: scenario, add_stub!: nil)
+    instance_double(HttpStub::Configurer::DSL::ScenarioBuilder, build: scenario, add_stub!: nil)
   end
-  let(:stub_builder)      { instance_double(HttpStub::Configurer::Request::StubBuilder) }
+  let(:stub_builder)      { instance_double(HttpStub::Configurer::DSL::StubBuilder) }
 
-  let(:builder) { HttpStub::Configurer::Request::StubActivatorBuilder.new(response_defaults) }
+  let(:builder) { HttpStub::Configurer::DSL::StubActivatorBuilder.new(response_defaults) }
 
   before(:example) do
-    allow(HttpStub::Configurer::Request::ScenarioBuilder).to receive(:new).and_return(scenario_builder)
-    allow(HttpStub::Configurer::Request::StubBuilder).to receive(:new).and_return(stub_builder)
+    allow(HttpStub::Configurer::DSL::ScenarioBuilder).to receive(:new).and_return(scenario_builder)
+    allow(HttpStub::Configurer::DSL::StubBuilder).to receive(:new).and_return(stub_builder)
   end
 
   describe "#on" do
@@ -22,13 +22,13 @@ describe HttpStub::Configurer::Request::StubActivatorBuilder do
     subject { builder.on(activation_uri) }
 
     it "creates a scenario builder with the response defaults and activation uri" do
-      expect(HttpStub::Configurer::Request::ScenarioBuilder).to receive(:new).with(response_defaults, activation_uri)
+      expect(HttpStub::Configurer::DSL::ScenarioBuilder).to receive(:new).with(response_defaults, activation_uri)
 
       subject
     end
 
     it "creates a stub builder with the response defaults" do
-      expect(HttpStub::Configurer::Request::StubBuilder).to receive(:new).with(response_defaults)
+      expect(HttpStub::Configurer::DSL::StubBuilder).to receive(:new).with(response_defaults)
 
       subject
     end
@@ -75,7 +75,7 @@ describe HttpStub::Configurer::Request::StubActivatorBuilder do
 
     context "when one triggered stub is provided" do
 
-      let(:trigger_builder) { instance_double(HttpStub::Configurer::Request::StubBuilder) }
+      let(:trigger_builder) { instance_double(HttpStub::Configurer::DSL::StubBuilder) }
 
       it "delegates to a stub builder" do
         expect(stub_builder).to receive(:trigger).with(trigger_builder)
@@ -87,7 +87,7 @@ describe HttpStub::Configurer::Request::StubActivatorBuilder do
 
     context "when many triggered stubs are provided" do
 
-      let(:trigger_builders) { (1..3).map { instance_double(HttpStub::Configurer::Request::StubBuilder) } }
+      let(:trigger_builders) { (1..3).map { instance_double(HttpStub::Configurer::DSL::StubBuilder) } }
 
       it "delegates to a stub builder" do
         expect(stub_builder).to receive(:trigger).with(trigger_builders)

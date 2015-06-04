@@ -38,8 +38,8 @@ describe HttpStub::Server::Stub::Registry do
 
     subject { stub_registry.find_for(request) }
 
-    it "delegates to an underlying simple registry" do
-      expect(registry).to receive(:find_for).with(request)
+    it "delegates to an underlying simple registry to find based on the request" do
+      expect(registry).to receive(:find).with(criteria: request, request: request)
 
       subject
     end
@@ -49,7 +49,7 @@ describe HttpStub::Server::Stub::Registry do
       let(:triggers) { instance_double(HttpStub::Server::Stub::Triggers) }
       let(:stub)     { instance_double(HttpStub::Server::Stub::Instance, triggers: triggers) }
 
-      before(:example) { allow(registry).to receive(:find_for).and_return(stub) }
+      before(:example) { allow(registry).to receive(:find).and_return(stub) }
 
       it "should add the stubs triggers to the registry" do
         expect(triggers).to receive(:add_to).with(stub_registry, request)
@@ -67,7 +67,7 @@ describe HttpStub::Server::Stub::Registry do
 
     context "when a stub is not found" do
 
-      before(:example) { allow(registry).to receive(:find_for).and_return(nil) }
+      before(:example) { allow(registry).to receive(:find).and_return(nil) }
 
       it "returns the result from the underlying registry" do
         expect(subject).to eql(nil)

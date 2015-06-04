@@ -35,7 +35,7 @@ describe HttpStub::Server::Application, "when the server is running" do
   describe "and a configurer with multiple scenarios is initialized" do
 
     before(:context) do
-      configurer = HttpStub::Examples::ConfigurerWithClassScenarios
+      configurer = HttpStub::Examples::ConfigurerWithExhaustiveScenarios
       configurer.host(server_host)
       configurer.port(server_port)
       configurer.initialize!
@@ -70,7 +70,7 @@ describe HttpStub::Server::Application, "when the server is running" do
       it "returns a response whose body contains the request headers of each stub trigger" do
         (1..3).each do |stub_number|
           (1..3).each do |trigger_number|
-            expected_header_key = "request_header_#{stub_number}_trigger_#{trigger_number}"
+            expected_header_key   = "request_header_#{stub_number}_trigger_#{trigger_number}"
             expected_header_value = "request_header_value_#{stub_number}_trigger_#{trigger_number}"
             expect(response.body).to match(/#{expected_header_key}:#{expected_header_value}/)
           end
@@ -86,7 +86,7 @@ describe HttpStub::Server::Application, "when the server is running" do
       it "returns a response whose body contains the parameters of each stub trigger" do
         (1..3).each do |stub_number|
           (1..3).each do |trigger_number|
-            expected_parameter_key = "parameter_#{stub_number}_trigger_#{trigger_number}"
+            expected_parameter_key   = "parameter_#{stub_number}_trigger_#{trigger_number}"
             expected_parameter_value = "parameter_value_#{stub_number}_trigger_#{trigger_number}"
             expect(response.body).to match(/#{expected_parameter_key}=#{expected_parameter_value}/)
           end
@@ -107,7 +107,7 @@ describe HttpStub::Server::Application, "when the server is running" do
 
       it "returns a response whose body contains the response headers of each stub" do
         (1..3).each do |stub_number|
-          expected_header_key = "response_header_#{stub_number}"
+          expected_header_key   = "response_header_#{stub_number}"
           expected_header_value = "response_header_value_#{stub_number}"
           expect(response.body).to match(/#{expected_header_key}:#{expected_header_value}/)
         end
@@ -116,7 +116,7 @@ describe HttpStub::Server::Application, "when the server is running" do
       it "returns a response whose body contains the response headers of each stub trigger" do
         (1..3).each do |stub_number|
           (1..3).each do |trigger_number|
-            expected_header_key = "response_header_#{stub_number}_trigger_#{trigger_number}"
+            expected_header_key   = "response_header_#{stub_number}_trigger_#{trigger_number}"
             expected_header_value = "response_header_value_#{stub_number}_trigger_#{trigger_number}"
             expect(response.body).to match(/#{expected_header_key}:#{expected_header_value}/)
           end
@@ -139,7 +139,7 @@ describe HttpStub::Server::Application, "when the server is running" do
       it "returns a response whose body contains the response body of each stub trigger" do
         (1..3).each do |stub_number|
           (1..3).each do |trigger_number|
-            expect(response.body).to match(/Body of scenario #{stub_number}_trigger_#{trigger_number}/)
+            expect(response.body).to match(/Body of scenario stub #{stub_number}_trigger_#{trigger_number}/)
           end
         end
       end
@@ -162,9 +162,19 @@ describe HttpStub::Server::Application, "when the server is running" do
 
       let(:response) { HTTParty.get("#{server_uri}/stubs/scenarios") }
 
-      it "returns response whose body contains links to each scenario in alphabetical order" do
-        response_document.css("a.scenario").each_with_index do |link, i|
-          expect(link['href']).to eql("/scenario_#{i + 1}")
+      it "returns a response whose body contains links to each scenario in alphabetical order" do
+        expected_scenario_links = %w{ nested_scenario scenario }.map do |scenario_name_prefix|
+          (1..3).map { |i| "/#{scenario_name_prefix}_#{i}" }
+        end.flatten
+
+        scenario_links = response_document.css("a.scenario").map { |link| link['href'] }
+
+        expect(scenario_links).to eql(expected_scenario_links)
+      end
+
+      it "returns a response whose body contains links to the scenarios triggered by each scenario" do
+        response_document.css("a.triggered_scenario").each_with_index do |link, i|
+          expect(link['href']).to eql("/nested_scenario_#{i + 1}")
         end
       end
 

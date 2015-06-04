@@ -9,7 +9,7 @@ describe "Configurer initialization acceptance" do
 
     context "that contains a class stub" do
 
-      let(:configurer) { HttpStub::Examples::ConfigurerWithClassStub.new }
+      let(:configurer) { HttpStub::Examples::ConfigurerWithStub.new }
 
       it "registers the stub" do
         response = HTTParty.get("#{server_uri}/a_class_stub")
@@ -105,9 +105,9 @@ describe "Configurer initialization acceptance" do
       before(:example) { configurer.server_has_started! }
 
       it "does not initialize the configurer" do
-        activation_lambda = lambda { configurer.activate!("/an_activator") }
+        activation_lambda = lambda { configurer.activate!("an_activator") }
 
-        expect(activation_lambda).to raise_error(/error occurred activating '\/an_activator'/i)
+        expect(activation_lambda).to raise_error(/error occurred activating 'an_activator'/i)
       end
 
       context "and an attempt is made to register a stub" do
@@ -132,9 +132,9 @@ describe "Configurer initialization acceptance" do
       context "and an attempt is made to activate a stub" do
 
         it "raises an exception indicating an error occurred during activation" do
-          activation_lambda = lambda { configurer.activate!("/an_activator") }
+          activation_lambda = lambda { configurer.activate!("an_activator") }
 
-          expect(activation_lambda).to raise_error(/error occurred activating '\/an_activator'/i)
+          expect(activation_lambda).to raise_error(/error occurred activating 'an_activator'/i)
         end
 
       end

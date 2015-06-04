@@ -1,7 +1,7 @@
 describe "Stub control value acceptance" do
   include_context "configurer integration"
 
-  let(:configurer)  { HttpStub::Examples::ConfigurerWithClassStub.new }
+  let(:configurer)  { HttpStub::Examples::ConfigurerWithStub.new }
 
   before(:example) { configurer.class.initialize! }
 

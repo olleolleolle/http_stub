@@ -1,7 +1,7 @@
 describe HttpStub::Server::Registry do
 
   let(:logger)  { double("Logger").as_null_object }
-  let(:request) { instance_double(Rack::Request, logger: logger, inspect: "Request inspect result") }
+  let(:request) { instance_double(Rack::Request, logger: logger) }
 
   let(:registry) { HttpStub::Server::Registry.new("a_model") }
 
@@ -63,20 +63,30 @@ describe HttpStub::Server::Registry do
 
   end
 
-  describe "#find_for" do
+  describe "#find" do
+
+    let(:criteria) { double("Criteria", inspect: "Criteria inspect result") }
+
+    subject { registry.find(criteria: criteria, request: request) }
 
     describe "when multiple models have been registered" do
 
       include_context "register multiple models"
 
-      describe "and one registered model satisfies the request" do
+      it "determines if the models satisfy the provided criteria" do
+        models.each { |model| expect(model).to receive(:satisfies?).with(criteria).and_return(false) }
+
+        subject
+      end
+
+      describe "and one registered model satisfies the criteria" do
 
         let(:matching_model) { models[1] }
 
         before(:example) { allow(matching_model).to receive(:satisfies?).and_return(true) }
 
         it "returns the model" do
-          expect(registry.find_for(request)).to eql(matching_model)
+          expect(subject).to eql(matching_model)
         end
 
         describe "and the registry is subsequently cleared" do
@@ -84,27 +94,27 @@ describe HttpStub::Server::Registry do
           before(:example) { registry.clear(request) }
 
           it "returns nil" do
-            expect(registry.find_for(request)).to be_nil
+            expect(subject).to be_nil
           end
 
         end
 
       end
 
-      describe "and multiple registered models satisfy the request" do
+      describe "and multiple registered models satisfy the criteria" do
 
         before(:example) { [0, 2].each { |i| allow(models[i]).to receive(:satisfies?).and_return(true) } }
 
         it "supports model overrides by returning the last model registered" do
-          expect(registry.find_for(request)).to eql(models[2])
+          expect(subject).to eql(models[2])
         end
 
       end
 
-      describe "and no registered models match the request" do
+      describe "and no registered models match the criteria" do
 
         it "returns nil" do
-          expect(registry.find_for(request)).to be_nil
+          expect(subject).to be_nil
         end
 
       end
@@ -114,15 +124,15 @@ describe HttpStub::Server::Registry do
     describe "when no model has been registered" do
 
       it "returns nil" do
-        expect(registry.find_for(request)).to be_nil
+        expect(subject).to be_nil
       end
 
     end
 
-    it "it should log model discovery diagnostics that includes the complete details of the request" do
-      expect(logger).to receive(:info).with(/Request inspect result/)
+    it "it should log model discovery diagnostics that includes the complete details of the criteria" do
+      expect(logger).to receive(:info).with(/Criteria inspect result/)
 
-      registry.find_for(request)
+      subject
     end
 
   end

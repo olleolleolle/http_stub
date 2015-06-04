@@ -1,9 +1,14 @@
 describe HttpStub::Configurer::Request::Scenario do
 
-  let(:activation_uri) { "some/activation/uri" }
-  let(:stubs)          { (1..3).map { instance_double(HttpStub::Configurer::Request::Stub) } }
+  let(:name)                     { "some/scenario/name" }
+  let(:stubs)                    { (1..3).map { instance_double(HttpStub::Configurer::Request::Stub) } }
+  let(:triggered_scenario_names) { (1..3).map { |i| "triggered/scenario/name/#{i}" } }
 
-  let(:scenario) { HttpStub::Configurer::Request::Scenario.new(activation_uri: activation_uri, stubs: stubs) }
+  let(:scenario) do
+    HttpStub::Configurer::Request::Scenario.new(
+      name: name, stubs: stubs, triggered_scenario_names: triggered_scenario_names
+    )
+  end
 
   describe "#payload" do
 
@@ -15,12 +20,16 @@ describe HttpStub::Configurer::Request::Scenario do
       stubs.zip(stub_payloads).each { |stub, payload| allow(stub).to receive(:payload).and_return(payload) }
     end
 
-    it "returns a hash containing the activation uri" do
-      expect(subject).to include(activation_uri: activation_uri)
+    it "returns a hash containing the scenario's name" do
+      expect(subject).to include(name: name)
     end
 
     it "returns a hash containing the stub payloads" do
       expect(subject).to include(stubs: stub_payloads)
+    end
+
+    it "returns a hash containing the uris to activate" do
+      expect(subject).to include(triggered_scenario_names: triggered_scenario_names)
     end
 
   end
@@ -51,8 +60,8 @@ describe HttpStub::Configurer::Request::Scenario do
 
   describe "#to_s" do
 
-    it "returns the activation uri" do
-      expect(scenario.to_s).to eql(activation_uri)
+    it "returns the scenario's name" do
+      expect(scenario.to_s).to eql(name)
     end
 
   end

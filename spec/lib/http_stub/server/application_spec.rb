@@ -107,10 +107,12 @@ describe HttpStub::Server::Application do
     before(:example) { allow(scenario_controller).to receive(:register).and_return(registration_response) }
 
     subject do
-      post "/stubs/scenarios", {
-        activation_uri: "/a_scenario_path", uri: "/a_path", method: "a method",
-        response: { status: 200, body: "Foo" }
-      }.to_json
+      post "/stubs/scenarios",
+           {
+             uri: "/a_scenario_path",
+             stubs: [ { uri: "/a_path", method: "a method", response: { status: 200, body: "Foo" } } ],
+             triggered_scenario_names: [ "some/uri/to/activate" ]
+           }.to_json
     end
 
     it "registers the scenario via the scenario controller" do
