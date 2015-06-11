@@ -22,7 +22,7 @@ require_relative '../examples/configurer_with_exhaustive_scenarios'
 require_relative '../examples/configurer_with_initialize_callback'
 require_relative '../examples/configurer_with_complex_initializer'
 require_relative '../examples/configurer_with_response_defaults'
-require_relative '../examples/configurer_with_triggers'
+require_relative '../examples/configurer_with_stub_triggers'
 require_relative '../examples/configurer_with_file_responses'
 
 HttpStub::Server::Daemon.log_dir = ::File.expand_path('../../tmp/log', __FILE__)

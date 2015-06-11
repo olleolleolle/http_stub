@@ -1,7 +1,7 @@
 describe "Stub trigger acceptance" do
   include_context "configurer integration"
 
-  let(:configurer) { HttpStub::Examples::ConfigurerWithTriggers.new }
+  let(:configurer) { HttpStub::Examples::ConfigurerWithStubTriggers.new }
 
   before(:example) { configurer.class.initialize! }
 

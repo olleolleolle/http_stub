@@ -1,7 +1,7 @@
 module HttpStub
   module Examples
 
-    class ConfigurerWithTriggers
+    class ConfigurerWithStubTriggers
       include HttpStub::Configurer
 
       triggered_stubs = (1..3).map do |trigger_number|
