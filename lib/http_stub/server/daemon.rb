@@ -16,8 +16,10 @@ module HttpStub
       end
 
       def initialize(args)
-        super({ host: "localhost" }.merge(args))
         @configurer = args[:configurer]
+        default_args = @configurer ?
+          { host: @configurer.stub_server.host, port: @configurer.stub_server.port } : { host: "localhost" }
+        super(default_args.merge(args))
       end
 
       def start!

@@ -65,7 +65,7 @@ describe HttpStub::Server::Stub::StringValueMatcher do
       let(:stub_value)                { "some stub value" }
       let(:expected_stub_match_value) { "some stub value" }
 
-      it_should_behave_like "a StringValueMatcher that matches an expected stub value"
+      it_behaves_like "a StringValueMatcher that matches an expected stub value"
 
     end
 
@@ -74,7 +74,7 @@ describe HttpStub::Server::Stub::StringValueMatcher do
       let(:stub_value)                { 88 }
       let(:expected_stub_match_value) { "88" }
 
-      it_should_behave_like "a StringValueMatcher that matches an expected stub value"
+      it_behaves_like "a StringValueMatcher that matches an expected stub value"
 
     end
 

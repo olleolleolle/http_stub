@@ -36,8 +36,8 @@ describe HttpStub::Server::Application, "when the server is running" do
 
     before(:context) do
       configurer = HttpStub::Examples::ConfigurerWithExhaustiveScenarios
-      configurer.host(server_host)
-      configurer.port(server_port)
+      configurer.stub_server.host = server_host
+      configurer.stub_server.port = server_port
       configurer.initialize!
     end
 

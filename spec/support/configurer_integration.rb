@@ -4,8 +4,8 @@ shared_context "configurer integration" do
   let(:stub_server) { configurer.stub_server }
 
   before(:example) do
-    configurer.class.host(server_host)
-    configurer.class.port(server_port)
+    stub_server.host = server_host
+    stub_server.port = server_port
   end
 
   after(:example) do

@@ -2,13 +2,19 @@ module HttpStub
   module Configurer
     module DSL
 
-      class Sanctioned
+      class Server
         include HttpStub::Configurer::DSL::StubBuilderProducer
         include HttpStub::Configurer::DSL::ScenarioActivator
+
+        attr_accessor :host, :port
 
         def initialize(server_facade)
           @server_facade     = server_facade
           @response_defaults = {}
+        end
+
+        def base_uri
+          "http://#{host}:#{port}"
         end
 
         def response_defaults=(args)

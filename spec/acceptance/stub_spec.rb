@@ -1,7 +1,7 @@
 describe "Stub basics acceptance" do
   include_context "configurer integration"
 
-  let(:configurer)  { HttpStub::Examples::ConfigurerWithStub.new }
+  let(:configurer) { HttpStub::Examples::ConfigurerWithTrivialStub.new }
 
   before(:example) { configurer.class.initialize! }
 

@@ -20,15 +20,15 @@ module HttpStub
         private
 
         def host
-          @configurer.get_host
+          @configurer.stub_server.host
         end
 
         def port
-          @configurer.get_port
+          @configurer.stub_server.port
         end
 
         def error_message_prefix(command)
-          "Error occurred #{command.description} whilst configuring #{@configurer.get_base_uri}: "
+          "Error occurred #{command.description} whilst configuring #{@configurer.stub_server.base_uri}: "
         end
 
       end

@@ -1,11 +1,14 @@
 describe HttpStub::Configurer::Server::CommandProcessor do
 
   let(:command) { HttpStub::Configurer::Server::Command.new(request: request, description: "performing an operation") }
-  let(:server_base_uri) { "http://localhost:8001" }
-
-  let(:configurer) do
-    double(HttpStub::Configurer, get_base_uri: server_base_uri, get_host: "localhost", get_port: 8001)
+  let(:server_host)     { "localhost" }
+  let(:server_port)     { 8001 }
+  let(:server_base_uri) { "http://#{server_host}:#{server_port}" }
+  let(:stub_server) do
+    instance_double(HttpStub::Configurer::DSL::Server, base_uri: server_base_uri, host: server_host, port: server_port)
   end
+
+  let(:configurer) { double(HttpStub::Configurer, stub_server: stub_server) }
 
   let(:command_processor) { HttpStub::Configurer::Server::CommandProcessor.new(configurer) }
 

@@ -5,7 +5,7 @@ Bundler.require(:default, :development)
 require 'rspec/core/rake_task'
 
 require_relative 'lib/http_stub/rake/task_generators'
-require_relative 'examples/configurer_with_trivial_scenarios'
+require_relative 'examples/configurer_with_exhaustive_scenarios'
 
 directory "pkg"
 
@@ -59,10 +59,10 @@ HttpStub::Server::Daemon.pid_dir = ::File.expand_path('../tmp/pids', __FILE__)
 
 HttpStub::Rake::ServerTasks.new(name: :example_server, port: 8001)
 
-example_configurer = HttpStub::Examples::ConfigurerWithTrivialScenarios
-example_configurer.host("localhost")
-example_configurer.port(8002)
-HttpStub::Rake::ServerDaemonTasks.new(name: :example_server_daemon, port: 8002, configurer: example_configurer)
+example_configurer = HttpStub::Examples::ConfigurerWithExhaustiveScenarios
+example_configurer.stub_server.host = "localhost"
+example_configurer.stub_server.port = 8002
+HttpStub::Rake::ServerDaemonTasks.new(name: :example_server_daemon, configurer: example_configurer)
 
 task :default => %w{ clobber metrics coverage }
 

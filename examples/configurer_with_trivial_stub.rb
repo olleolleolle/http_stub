@@ -1,7 +1,7 @@
 module HttpStub
   module Examples
 
-    class ConfigurerWithStub
+    class ConfigurerWithTrivialStub
       include HttpStub::Configurer
 
       stub_server.add_stub! do

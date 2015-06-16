@@ -9,7 +9,7 @@ describe "Configurer initialization acceptance" do
 
     context "that contains a class stub" do
 
-      let(:configurer) { HttpStub::Examples::ConfigurerWithStub.new }
+      let(:configurer) { HttpStub::Examples::ConfigurerWithTrivialStub.new }
 
       it "registers the stub" do
         response = HTTParty.get("#{server_uri}/a_class_stub")

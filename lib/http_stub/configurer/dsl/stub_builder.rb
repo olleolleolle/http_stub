@@ -13,6 +13,10 @@ module HttpStub
           self.tap { @request = { uri: uri }.merge(args) }
         end
 
+        def schema(type, definition)
+          { schema: { type => definition } }
+        end
+
         def respond_with(args)
           self.tap { @response.deep_merge!(args) }
         end

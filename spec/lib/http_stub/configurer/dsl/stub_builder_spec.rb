@@ -38,6 +38,24 @@ describe HttpStub::Configurer::DSL::StubBuilder do
 
   end
 
+  describe "#schema" do
+
+    let(:type) { :some_type }
+
+    subject { builder.schema(type, schema_definition) }
+
+    context "when a definition is provided in a ruby hash" do
+
+      let(:schema_definition) { { schema: "definition" } }
+
+      it "returns a hash with a :schema entry containing both the type and schema definition" do
+        expect(subject).to eql(schema: { type => schema_definition })
+      end
+
+    end
+
+  end
+
   describe "#respond_with" do
 
     subject { builder.respond_with(status: 201) }

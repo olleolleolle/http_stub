@@ -18,7 +18,7 @@ module HttpStub
           task(:foreground) do
             HttpStub::Server::Application.instance_eval do
               set :environment, :test
-              set :port, args[:port]
+              set :port, args[:configurer] ? args[:configurer].stub_server.port : args[:port]
               run!
             end
           end

@@ -1,11 +1,30 @@
-describe HttpStub::Configurer::DSL::Sanctioned do
+describe HttpStub::Configurer::DSL::Server do
 
   let(:server_facade) { instance_double(HttpStub::Configurer::Server::Facade) }
 
-  let(:dsl) { HttpStub::Configurer::DSL::Sanctioned.new(server_facade) }
+  let(:server) { HttpStub::Configurer::DSL::Server.new(server_facade) }
 
   it "produces stub builders" do
-    expect(dsl).to be_a(HttpStub::Configurer::DSL::StubBuilderProducer)
+    expect(server).to be_a(HttpStub::Configurer::DSL::StubBuilderProducer)
+  end
+
+  describe "#base_uri" do
+
+    subject { server.base_uri }
+
+    before(:example) do
+      server.host = "some_host"
+      server.port =  8888
+    end
+
+    it "returns a uri that combines any established host and port" do
+      expect(subject).to include("some_host:8888")
+    end
+
+    it "returns a uri accessed via http" do
+      expect(subject).to match(/^http:\/\//)
+    end
+
   end
 
   describe "#has_started!" do
@@ -13,7 +32,7 @@ describe HttpStub::Configurer::DSL::Sanctioned do
     it "informs the facade that the server has started" do
       expect(server_facade).to receive(:server_has_started)
 
-      dsl.has_started!
+      server.has_started!
     end
 
   end
@@ -43,7 +62,7 @@ describe HttpStub::Configurer::DSL::Sanctioned do
 
     context "when a stub builder is provided" do
 
-      subject { dsl.add_stub!(stub_builder) }
+      subject { server.add_stub!(stub_builder) }
 
       it_behaves_like "adding a stub request"
 
@@ -55,7 +74,7 @@ describe HttpStub::Configurer::DSL::Sanctioned do
 
       before(:example) { allow(HttpStub::Configurer::DSL::StubBuilder).to receive(:new).and_return(stub_builder) }
 
-      subject { dsl.add_stub!(&block) }
+      subject { server.add_stub!(&block) }
 
       it "creates a stub builder" do
         expect(HttpStub::Configurer::DSL::StubBuilder).to receive(:new)
@@ -89,13 +108,13 @@ describe HttpStub::Configurer::DSL::Sanctioned do
       allow(HttpStub::Configurer::DSL::ScenarioBuilder).to receive(:new).and_return(scenario_builder)
     end
 
-    subject { dsl.add_scenario!(scenario_name, &block) }
+    subject { server.add_scenario!(scenario_name, &block) }
 
     context "when response defaults have been established" do
 
       let(:response_defaults) { { key: "value" } }
 
-      before(:example) { dsl.response_defaults = { key: "value" } }
+      before(:example) { server.response_defaults = { key: "value" } }
 
       it "creates a scenario builder containing the response defaults" do
         expect(HttpStub::Configurer::DSL::ScenarioBuilder).to receive(:new).with(response_defaults, anything)
@@ -156,13 +175,13 @@ describe HttpStub::Configurer::DSL::Sanctioned do
       allow(HttpStub::Configurer::DSL::StubActivatorBuilder).to receive(:new).and_return(stub_activator_builder)
     end
 
-    subject { dsl.add_activator!(&block) }
+    subject { server.add_activator!(&block) }
 
     context "when response defaults have been established" do
 
       let(:response_defaults) { { key: "value" } }
 
-      before(:example) { dsl.response_defaults = { key: "value" } }
+      before(:example) { server.response_defaults = { key: "value" } }
 
       it "creates a stub activator builder containing the response defaults" do
         expect(HttpStub::Configurer::DSL::StubActivatorBuilder).to receive(:new).with(response_defaults)
@@ -209,7 +228,7 @@ describe HttpStub::Configurer::DSL::Sanctioned do
     it "delegates to the server facade" do
       expect(server_facade).to receive(:activate).with(scenario_name)
 
-      dsl.activate!(scenario_name)
+      server.activate!(scenario_name)
     end
 
   end
@@ -219,7 +238,7 @@ describe HttpStub::Configurer::DSL::Sanctioned do
     it "delegates to the server facade" do
       expect(server_facade).to receive(:remember_stubs)
 
-      dsl.remember_stubs
+      server.remember_stubs
     end
 
   end
@@ -229,7 +248,7 @@ describe HttpStub::Configurer::DSL::Sanctioned do
     it "delegates to the server facade" do
       expect(server_facade).to receive(:recall_stubs)
 
-      dsl.recall_stubs!
+      server.recall_stubs!
     end
 
   end
@@ -239,7 +258,7 @@ describe HttpStub::Configurer::DSL::Sanctioned do
     it "delegates to the server facade" do
       expect(server_facade).to receive(:clear_stubs)
 
-      dsl.clear_stubs!
+      server.clear_stubs!
     end
 
   end
@@ -249,7 +268,7 @@ describe HttpStub::Configurer::DSL::Sanctioned do
     it "delegates to the server facade" do
       expect(server_facade).to receive(:clear_scenarios)
 
-      dsl.clear_scenarios!
+      server.clear_scenarios!
     end
 
   end

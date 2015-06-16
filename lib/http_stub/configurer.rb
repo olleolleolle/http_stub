@@ -10,28 +10,8 @@ module HttpStub
 
     module ClassMethods
 
-      def get_host
-        @host
-      end
-
-      def host(host)
-        @host = host
-      end
-
-      def get_port
-        @port
-      end
-
-      def port(port)
-        @port = port
-      end
-
-      def get_base_uri
-        "http://#{@host}:#{@port}"
-      end
-
       def stub_server
-        @dsl ||= HttpStub::Configurer::DSL::Sanctioned.new(server_facade)
+        @stub_server ||= HttpStub::Configurer::DSL::Server.new(server_facade)
       end
 
       def initialize!
