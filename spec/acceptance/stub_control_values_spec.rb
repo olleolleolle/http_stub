@@ -145,7 +145,7 @@ describe "Stub control value acceptance" do
         configurer.stub_response!("/some_stub_path", method: :get, response: { delay_in_seconds: 2 })
       end
 
-      it "delays to response by the time provided" do
+      it "delays the response by the time provided" do
         start_time = Time.now
 
         response = HTTParty.get("#{server_uri}/some_stub_path")

@@ -12,14 +12,11 @@ describe HttpStub::Rake::ServerTasks do
       context "when invoked" do
 
         before(:example) do
-          @server_thread = Thread.new { task.invoke("--trace") }
+          Thread.new { task.invoke("--trace") }
           wait_until_server_has_started
         end
 
-        after(:example) do
-          @server_thread.kill
-          wait_until_server_has_stopped
-        end
+        after(:example) { wait_until_server_has_stopped }
 
         it "starts a stub server that responds to stub requests" do
           request = Net::HTTP::Post.new("/stubs")
@@ -37,9 +34,7 @@ describe HttpStub::Rake::ServerTasks do
         end
 
         def wait_until_server_has_stopped
-          ::Wait.until_false!("http stub server #{task_args[:name]} stopped") do
-            Net::HTTP.get_response("localhost", "/", port) rescue false
-          end
+          HttpStub::Server::Application.stop!
         end
 
       end
