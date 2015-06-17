@@ -14,7 +14,7 @@ module HttpStub
         end
 
         def schema(type, definition)
-          { schema: { type => definition } }
+          { schema: { type: type, definition: definition } }
         end
 
         def respond_with(args)

@@ -21,6 +21,7 @@ describe HttpStub::Server::Stub::Instance do
       "method" =>     "post",
       "headers" =>    { "triggered_header" => "triggered_header_value" },
       "parameters" => { "triggered_parameter" => "triggered_parameter_value" },
+      "body" =>       { "schema" => { "json" => "trigger schema definition" } },
       "response" => {
         "status" => 203,
         "body" =>   "Triggered body"
@@ -33,6 +34,7 @@ describe HttpStub::Server::Stub::Instance do
       "method" =>     stub_method,
       "headers" =>    request_header_payload,
       "parameters" => request_parameter_payload,
+      "body" =>       { "schema" => { "json" => "stub schema definition" } },
       "response" => {
         "status" => 201,
         "body" =>   "Some body"
@@ -44,6 +46,7 @@ describe HttpStub::Server::Stub::Instance do
   let(:uri)                { instance_double(HttpStub::Server::Stub::Uri, match?: true) }
   let(:request_headers)    { instance_double(HttpStub::Server::Stub::RequestHeaders, match?: true) }
   let(:request_parameters) { instance_double(HttpStub::Server::Stub::RequestParameters, match?: true) }
+  let(:request_body)       { double("HttpStub::Server::Stub::SomeRequestBody", match?: true) }
   let(:response)           { instance_double(HttpStub::Server::Stub::Response::Base) }
   let(:triggers)           { instance_double(HttpStub::Server::Stub::Triggers) }
 
@@ -54,6 +57,7 @@ describe HttpStub::Server::Stub::Instance do
     allow(HttpStub::Server::Stub::Uri).to receive(:new).and_return(uri)
     allow(HttpStub::Server::Stub::RequestHeaders).to receive(:new).and_return(request_headers)
     allow(HttpStub::Server::Stub::RequestParameters).to receive(:new).and_return(request_parameters)
+    allow(HttpStub::Server::Stub::RequestBody).to receive(:create).and_return(request_body)
     allow(HttpStub::Server::Stub::Response).to receive(:create).and_return(response)
     allow(HttpStub::Server::Stub::Triggers).to receive(:new).and_return(triggers)
   end
@@ -63,6 +67,8 @@ describe HttpStub::Server::Stub::Instance do
     let(:request_method) { request_method_payload }
     let(:request_uri)    { "/a_request_uri" }
     let(:request)        { instance_double(Rack::Request, :request_method => request_method_payload) }
+
+    subject { the_stub.satisfies?(request) }
 
     describe "when the request uri matches" do
 
@@ -82,8 +88,18 @@ describe HttpStub::Server::Stub::Instance do
 
                 before(:example) { allow(request_parameters).to receive(:match?).with(request).and_return(true) }
 
-                it "returns true" do
-                  expect(the_stub.satisfies?(request)).to be_truthy
+                describe "and a body match is configured" do
+
+                  describe "that matches" do
+
+                    before(:example) { allow(request_body).to receive(:match?).with(request).and_return(true) }
+
+                    it "returns true" do
+                      expect(subject).to be(true)
+                    end
+
+                  end
+
                 end
 
               end
@@ -98,22 +114,22 @@ describe HttpStub::Server::Stub::Instance do
 
     end
 
-    describe "when the request method does not match" do
-
-      before(:example) { allow(stub_method).to receive(:match?).with(request).and_return(false) }
-
-      it "returns false" do
-        expect(the_stub.satisfies?(request)).to be(false)
-      end
-
-    end
-
     describe "when the request uri does not match" do
 
       before(:example) { allow(uri).to receive(:match?).with(request).and_return(false) }
 
       it "returns false" do
-        expect(the_stub.satisfies?(request)).to be(false)
+        expect(subject).to be(false)
+      end
+
+    end
+
+    describe "when the request method does not match" do
+
+      before(:example) { allow(stub_method).to receive(:match?).with(request).and_return(false) }
+
+      it "returns false" do
+        expect(subject).to be(false)
       end
 
     end
@@ -123,7 +139,7 @@ describe HttpStub::Server::Stub::Instance do
       before(:example) { allow(request_headers).to receive(:match?).with(request).and_return(false) }
 
       it "returns false" do
-        expect(the_stub.satisfies?(request)).to be(false)
+        expect(subject).to be(false)
       end
 
     end
@@ -133,7 +149,17 @@ describe HttpStub::Server::Stub::Instance do
       before(:example) { allow(request_parameters).to receive(:match?).with(request).and_return(false) }
 
       it "returns false" do
-        expect(the_stub.satisfies?(request)).to be(false)
+        expect(subject).to be(false)
+      end
+
+    end
+
+    describe "when the bodies do not match" do
+
+      before(:example) { allow(request_body).to receive(:match?).with(request).and_return(false) }
+
+      it "returns false" do
+        expect(subject).to be(false)
       end
 
     end
@@ -168,6 +194,14 @@ describe HttpStub::Server::Stub::Instance do
 
     it "returns the parameters model encapsulating the parameters provided in the request body" do
       expect(the_stub.parameters).to eql(request_parameters)
+    end
+
+  end
+
+  describe "#body" do
+
+    it "returns the body model encapsulating the body provided in the request body" do
+      expect(the_stub.body).to eql(request_body)
     end
 
   end

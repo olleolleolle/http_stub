@@ -47,48 +47,80 @@ describe HttpStub::Configurer::Request::Stub do
 
     before(:example) { allow(HttpStub::Configurer::Request::ControllableValue).to receive(:format) }
 
-    context "when request headers are provided" do
+    context "when request headers" do
 
-      it "formats the headers into control values" do
-        expect(HttpStub::Configurer::Request::ControllableValue).to receive(:format).with(fixture.request.headers)
+      context "are provided" do
 
-        subject
+        it "formats the headers into control values" do
+          expect(HttpStub::Configurer::Request::ControllableValue).to receive(:format).with(fixture.request.headers)
+
+          subject
+        end
+
+      end
+
+      context "are not provided" do
+
+        before(:example) { fixture.request.headers = nil }
+
+        it "formats an empty header hash" do
+          expect(HttpStub::Configurer::Request::ControllableValue).to receive(:format).with({})
+
+          subject
+        end
+
       end
 
     end
 
-    context "when no request header is provided" do
+    context "when request parameters" do
 
-      before(:example) do
-        fixture.request.headers = nil
+      context "are provided" do
+
+        it "formats the request parameters into control values" do
+          expect(HttpStub::Configurer::Request::ControllableValue).to receive(:format).with(fixture.request.parameters)
+
+          subject
+        end
+
       end
 
-      it "formats an empty header hash" do
-        expect(HttpStub::Configurer::Request::ControllableValue).to receive(:format).with({})
+      context "are not provided" do
 
-        subject
+        before(:example) { fixture.request.parameters = nil }
+
+        it "formats an empty parameter hash" do
+          expect(HttpStub::Configurer::Request::ControllableValue).to receive(:format).with({})
+
+          subject
+        end
+
       end
 
     end
 
-    context "when a request parameter is provided" do
+    context "when a request body" do
 
-      it "formats the request parameters into control values" do
-        expect(HttpStub::Configurer::Request::ControllableValue).to receive(:format).with(fixture.request.parameters)
+      context "is provided" do
 
-        subject
+        it "formats the request body into a control value" do
+          expect(HttpStub::Configurer::Request::ControllableValue).to receive(:format).with(fixture.request.body)
+
+          subject
+        end
+
       end
 
-    end
+      context "is not provided" do
 
-    context "when no request parameter is provided" do
+        before(:example) { fixture.request.body = nil }
 
-      before(:example) { fixture.request.parameters = nil }
+        it "formats an empty parameter hash" do
+          expect(HttpStub::Configurer::Request::ControllableValue).to receive(:format).with({})
 
-      it "formats an empty parameter hash" do
-        expect(HttpStub::Configurer::Request::ControllableValue).to receive(:format).with({})
+          subject
+        end
 
-        subject
       end
 
     end

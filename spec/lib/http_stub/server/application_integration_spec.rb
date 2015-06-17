@@ -93,6 +93,26 @@ describe HttpStub::Server::Application, "when the server is running" do
         end
       end
 
+      it "returns a response whose body contains the bodies of each stub" do
+        (1..3).each do |stub_number|
+          expect(response.body).to(
+            match(/#{escape_html("\"property_#{stub_number}\":{\"type\":\"property_#{stub_number}_type\"")}/)
+          )
+        end
+      end
+
+      it "returns a response whose body contains the bodies of each stub trigger" do
+        (1..3).each do |stub_number|
+          (1..3).each do |trigger_number|
+            expected_property_name = "property_#{stub_number}_trigger_#{trigger_number}"
+            expected_property_type = "property_#{stub_number}_trigger_#{trigger_number}_type"
+            expect(response.body).to(
+              match(/#{escape_html("\"#{expected_property_name}\":{\"type\":\"#{expected_property_type}\"")}/)
+            )
+          end
+        end
+      end
+
       it "returns a response whose body contains the response status of each stub" do
         (1..3).each { |stub_number| expect(response.body).to match(/20#{stub_number}/) }
       end

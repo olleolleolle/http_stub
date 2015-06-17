@@ -49,7 +49,7 @@ describe HttpStub::Configurer::DSL::StubBuilder do
       let(:schema_definition) { { schema: "definition" } }
 
       it "returns a hash with a :schema entry containing both the type and schema definition" do
-        expect(subject).to eql(schema: { type => schema_definition })
+        expect(subject).to eql(schema: { type: type, definition: schema_definition })
       end
 
     end

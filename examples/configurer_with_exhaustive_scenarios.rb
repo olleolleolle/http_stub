@@ -17,7 +17,14 @@ module HttpStub
               "/path_#{scenario_number}_trigger_#{trigger_number}",
               method:     :get,
               headers:    { "request_header_#{stub_identifier}" => "request_header_value_#{stub_identifier}" },
-              parameters: { "parameter_#{stub_identifier}" => "parameter_value_#{stub_identifier}" }
+              parameters: { "parameter_#{stub_identifier}" => "parameter_value_#{stub_identifier}" },
+              body:       stub.schema(:json,
+                                      {
+                                        "type": "object",
+                                        "properties" => {
+                                          "property_#{stub_identifier}": { "type": "property_#{stub_identifier}_type" }
+                                        }
+                                      })
             )
             stub.respond_with(
               status:           300 + (scenario_number * trigger_number),
@@ -41,7 +48,13 @@ module HttpStub
               "/path_#{scenario_number}",
               method:     :get,
               headers:    { "request_header_#{scenario_number}" => "request_header_value_#{scenario_number}" },
-              parameters: { "parameter_#{scenario_number}" => "parameter_value_#{scenario_number}" }
+              parameters: { "parameter_#{scenario_number}" => "parameter_value_#{scenario_number}" },
+              body:       stub.schema(:json,
+                                      { "type": "object",
+                                        "properties" => {
+                                          "property_#{scenario_number}": { "type": "property_#{scenario_number}_type" }
+                                        }
+                                      })
             )
             stub.respond_with(
               status:           200 + scenario_number,

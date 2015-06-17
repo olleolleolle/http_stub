@@ -45,7 +45,8 @@ module HttpStub
         uri:        "/stub/uri/#{@id}",
         method:     "some #{@id} method",
         headers:    { "request_header_name" => "request header value #{@id}" },
-        parameters: { "parameter_name" => "parameter value #{@id}" }
+        parameters: { "parameter_name" => "parameter value #{@id}" },
+        body:       "some body"
       )
       @response = HttpStub::StubFixture::Part.new(
         status:           500,

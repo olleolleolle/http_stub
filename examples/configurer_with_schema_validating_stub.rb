@@ -13,10 +13,11 @@ module HttpStub
                                        integer_property: { type: :integer, minimum: 0 },
                                        float_property:   { type: :number }
                                      },
-                                     required: [ :string_property ] })
+                                     required: [ :float_property ] })
         )
         stub.respond_with(status: 204)
       end
+
     end
 
   end

@@ -14,7 +14,7 @@ describe "Scenario acceptance" do
         let(:response) do
           issue_request(body: { string_property:  "some string",
                                 integer_property: 88,
-                                float_property:   77.7 })
+                                float_property:   77.7 }.to_json)
         end
 
         it "responds with the configured response" do
@@ -27,11 +27,10 @@ describe "Scenario acceptance" do
 
         let(:response) do
           issue_request(body: { string_property: "some string",
-                                integer_property: 88 })
+                                integer_property: 88 }.to_json)
         end
 
         it "responds with a 404 status code" do
-          mark_as_pending
           expect(response.code).to eql(404)
         end
 
@@ -39,10 +38,9 @@ describe "Scenario acceptance" do
 
       context "that is completely different" do
 
-        let(:response) { issue_request(body: { some_other_key: "some string" }) }
+        let(:response) { issue_request(body: { some_other_key: "some string" }.to_json) }
 
         it "responds with a 404 status code" do
-          mark_as_pending
           expect(response.code).to eql(404)
         end
 
@@ -55,7 +53,6 @@ describe "Scenario acceptance" do
       let(:response) { issue_request(query: { some_other_key: "some string" }) }
 
       it "responds with a 404 status code" do
-        mark_as_pending
         expect(response.code).to eql(404)
       end
 
@@ -63,10 +60,6 @@ describe "Scenario acceptance" do
 
     def issue_request(args)
       HTTParty.post("#{server_uri}/matches_on_body_schema", args)
-    end
-
-    def mark_as_pending
-      pending "request body JSON schema validation"
     end
 
   end

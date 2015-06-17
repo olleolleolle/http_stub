@@ -25,7 +25,7 @@ describe HttpStub::Server::Stub::Uri do
     it "delegates to the value matcher representation of the provided uri" do
       expect(value_matcher).to receive(:match?).with(request_uri).and_return(true)
 
-      expect(uri.match?(request)).to be_truthy
+      expect(uri.match?(request)).to be(true)
     end
 
   end

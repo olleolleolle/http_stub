@@ -18,6 +18,7 @@ module HttpStub
             method:     @request[:method],
             headers:    HttpStub::Configurer::Request::ControllableValue.format(@request[:headers] || {}),
             parameters: HttpStub::Configurer::Request::ControllableValue.format(@request[:parameters] || {}),
+            body:       HttpStub::Configurer::Request::ControllableValue.format(@request[:body] || {}),
             response:   @response.payload,
             triggers:   @triggers.map(&:payload)
           }
