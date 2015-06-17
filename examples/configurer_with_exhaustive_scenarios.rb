@@ -20,9 +20,10 @@ module HttpStub
               parameters: { "parameter_#{stub_identifier}" => "parameter_value_#{stub_identifier}" },
               body:       stub.schema(:json,
                                       {
-                                        "type": "object",
+                                        "type" => "object",
                                         "properties" => {
-                                          "property_#{stub_identifier}": { "type": "property_#{stub_identifier}_type" }
+                                          "property_#{stub_identifier}" =>
+                                            { "type" => "property_#{stub_identifier}_type" }
                                         }
                                       })
             )
@@ -50,9 +51,10 @@ module HttpStub
               headers:    { "request_header_#{scenario_number}" => "request_header_value_#{scenario_number}" },
               parameters: { "parameter_#{scenario_number}" => "parameter_value_#{scenario_number}" },
               body:       stub.schema(:json,
-                                      { "type": "object",
+                                      { "type" => "object",
                                         "properties" => {
-                                          "property_#{scenario_number}": { "type": "property_#{scenario_number}_type" }
+                                          "property_#{scenario_number}" =>
+                                            { "type" => "property_#{scenario_number}_type" }
                                         }
                                       })
             )
