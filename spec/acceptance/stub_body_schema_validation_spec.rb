@@ -46,14 +46,14 @@ describe "Scenario acceptance" do
 
       end
 
-    end
+      context "that is empty" do
 
-    context "and a request is made that does not contain a request body" do
+        let(:response) { issue_request(body: {}) }
 
-      let(:response) { issue_request(query: { some_other_key: "some string" }) }
+        it "responds with a 404 status code" do
+          expect(response.code).to eql(404)
+        end
 
-      it "responds with a 404 status code" do
-        expect(response.code).to eql(404)
       end
 
     end
