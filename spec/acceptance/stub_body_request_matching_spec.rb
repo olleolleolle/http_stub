@@ -5,7 +5,10 @@ describe "Scenario acceptance" do
 
     let(:configurer) { HttpStub::Examples::ConfigurerWithSchemaValidatingStub.new }
 
-    before(:example) { configurer.class.initialize! }
+    before(:example) do
+      configurer.class.initialize!
+      configurer.stub_server.activate!("match_body_on_schema_request")
+    end
 
     context "and a request is made with a request body" do
 
@@ -68,7 +71,10 @@ describe "Scenario acceptance" do
 
     let(:configurer) { HttpStub::Examples::ConfigurerWithSimpleRequestBody.new }
 
-    before(:example) { configurer.class.initialize! }
+    before(:example) do
+      configurer.class.initialize!
+      configurer.stub_server.activate!("match_body_on_simple_request")
+    end
 
     context "and a request is made with a string as the request body" do
 
@@ -114,7 +120,10 @@ describe "Scenario acceptance" do
 
     let(:configurer) { HttpStub::Examples::ConfigurerWithRegexRequestBody.new }
 
-    before(:example) { configurer.class.initialize! }
+    before(:example) do
+      configurer.class.initialize!
+      configurer.stub_server.activate!("match_body_on_regex_request")
+    end
 
     context "and a request is made with a string as the request body" do
 
