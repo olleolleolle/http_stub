@@ -3,7 +3,7 @@ describe "Scenario acceptance" do
 
   context "when a configurer that contains a stub matching a request body schema" do
 
-    let(:configurer)  { HttpStub::Examples::ConfigurerWithSchemaValidatingStub.new }
+    let(:configurer) { HttpStub::Examples::ConfigurerWithSchemaValidatingStub.new }
 
     before(:example) { configurer.class.initialize! }
 
@@ -58,10 +58,52 @@ describe "Scenario acceptance" do
 
     end
 
-    def issue_request(args)
-      HTTParty.post("#{server_uri}/matches_on_body_schema", args)
+  end
+
+  context "when a configurer that contains a stub with a simple request body" do
+
+    let(:configurer) { HttpStub::Examples::ConfigurerWithSimpleRequestBody.new }
+
+    before(:example) { configurer.class.initialize! }
+
+    context "and a request is made with a string as the request body" do
+
+      context "that matches" do
+
+        let(:response) { issue_request(body: "This is just a simple request body") }
+
+        it "responds with the configured response" do
+          expect(response.code).to eql(204)
+        end
+
+      end
+
+      context "that does not match" do
+
+        let(:response) { issue_request(body: "This is a request which does not match.") }
+
+        it "responds with a 404 status code" do
+          expect(response.code).to eql(404)
+        end
+
+      end
+
+      context "that is empty" do
+
+        let(:response) { issue_request(body: {}) }
+
+        it "responds with a 404 status code" do
+          expect(response.code).to eql(404)
+        end
+
+      end
+
     end
 
+  end
+
+  def issue_request(args)
+    HTTParty.post("#{server_uri}/matches_on_body_schema", args)
   end
 
 end
