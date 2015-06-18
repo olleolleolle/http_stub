@@ -26,6 +26,7 @@ require_relative '../examples/configurer_with_stub_triggers'
 require_relative '../examples/configurer_with_file_responses'
 require_relative '../examples/configurer_with_schema_validating_stub'
 require_relative '../examples/configurer_with_simple_request_body'
+require_relative '../examples/configurer_with_regex_request_body'
 
 HttpStub::Server::Daemon.log_dir = ::File.expand_path('../../tmp/log', __FILE__)
 HttpStub::Server::Daemon.pid_dir = ::File.expand_path('../../tmp/pids', __FILE__)

@@ -58,6 +58,10 @@ describe "Scenario acceptance" do
 
     end
 
+    def issue_request(args)
+      HTTParty.post("#{server_uri}/matches_on_body_schema", args)
+    end
+
   end
 
   context "when a configurer that contains a stub with a simple request body" do
@@ -100,10 +104,56 @@ describe "Scenario acceptance" do
 
     end
 
+    def issue_request(args)
+      HTTParty.post("#{server_uri}/matches_on_simple_request", args)
+    end
+
   end
 
-  def issue_request(args)
-    HTTParty.post("#{server_uri}/matches_on_body_schema", args)
+  context "when a configurer that contains a stub with a regex request body" do
+
+    let(:configurer) { HttpStub::Examples::ConfigurerWithRegexRequestBody.new }
+
+    before(:example) { configurer.class.initialize! }
+
+    context "and a request is made with a string as the request body" do
+
+      context "that matches" do
+
+        let(:response) { issue_request(body: "Some regex content") }
+
+        it "responds with the configured response" do
+          expect(response.code).to eql(204)
+        end
+
+      end
+
+      context "that does not match" do
+
+        let(:response) { issue_request(body: "Some invalid regex content") }
+
+        it "responds with a 404 status code" do
+          expect(response.code).to eql(404)
+        end
+
+      end
+
+      context "that is empty" do
+
+        let(:response) { issue_request(body: {}) }
+
+        it "responds with a 404 status code" do
+          expect(response.code).to eql(404)
+        end
+
+      end
+
+    end
+
+    def issue_request(args)
+      HTTParty.post("#{server_uri}/matches_on_regex_request", args)
+    end
+
   end
 
 end
