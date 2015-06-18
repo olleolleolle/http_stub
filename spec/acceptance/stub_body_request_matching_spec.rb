@@ -1,166 +1,159 @@
 describe "Scenario acceptance" do
   include_context "configurer integration"
 
-  context "when a configurer that contains a stub matching a request body schema" do
+  context "when a configurer that contains a stub matching a request body" do
 
-    let(:configurer) { HttpStub::Examples::ConfigurerWithSchemaValidatingStub.new }
+    let(:configurer) { HttpStub::Examples::ConfigurerWithStubRequestBody.new }
 
-    before(:example) do
-      configurer.class.initialize!
-      configurer.stub_server.activate!("match_body_on_schema_request")
-    end
+    before(:example) { configurer.class.initialize! }
 
-    context "and a request is made with a request body" do
+    context "against an exact match" do
 
-      context "that completely matches" do
+      before(:example) { stub_server.activate!("match_body_exactly_scenario") }
 
-        let(:response) do
-          issue_request(body: { string_property:  "some string",
-                                integer_property: 88,
-                                float_property:   77.7 }.to_json)
+      context "and a request is made with a request body" do
+
+        context "that exactly matches" do
+
+          let(:response) { issue_request(body: "Exactly matches") }
+
+          it "responds with the configured response" do
+            expect(response.code).to eql(204)
+          end
+
         end
 
-        it "responds with the configured response" do
-          expect(response.code).to eql(204)
+        context "that does not match" do
+
+          let(:response) { issue_request(body: "Does not match") }
+
+          it "responds with a 404 status code" do
+            expect(response.code).to eql(404)
+          end
+
         end
 
-      end
+        context "that is empty" do
 
-      context "that partially matches" do
+          let(:response) { issue_request(body: {}) }
 
-        let(:response) do
-          issue_request(body: { string_property: "some string",
-                                integer_property: 88 }.to_json)
-        end
+          it "responds with a 404 status code" do
+            expect(response.code).to eql(404)
+          end
 
-        it "responds with a 404 status code" do
-          expect(response.code).to eql(404)
-        end
-
-      end
-
-      context "that is completely different" do
-
-        let(:response) { issue_request(body: { some_other_key: "some string" }.to_json) }
-
-        it "responds with a 404 status code" do
-          expect(response.code).to eql(404)
         end
 
       end
 
-      context "that is empty" do
-
-        let(:response) { issue_request(body: {}) }
-
-        it "responds with a 404 status code" do
-          expect(response.code).to eql(404)
-        end
-
+      def issue_request(args)
+        HTTParty.post("#{server_uri}/match_body_exactly", args)
       end
 
     end
 
-    def issue_request(args)
-      HTTParty.post("#{server_uri}/matches_on_body_schema", args)
-    end
+    context "against a regular expression" do
 
-  end
+      before(:example) { stub_server.activate!("match_body_regex_scenario") }
 
-  context "when a configurer that contains a stub with a simple request body" do
+      context "and a request is made with a request body" do
 
-    let(:configurer) { HttpStub::Examples::ConfigurerWithSimpleRequestBody.new }
+        context "that matches the regular expression" do
 
-    before(:example) do
-      configurer.class.initialize!
-      configurer.stub_server.activate!("match_body_on_simple_request")
-    end
+          let(:response) { issue_request(body: "matches with additional content") }
 
-    context "and a request is made with a string as the request body" do
+          it "responds with the configured response" do
+            expect(response.code).to eql(204)
+          end
 
-      context "that matches" do
+        end
 
-        let(:response) { issue_request(body: "This is just a simple request body") }
+        context "that does not match the regular expression" do
 
-        it "responds with the configured response" do
-          expect(response.code).to eql(204)
+          let(:response) { issue_request(body: "Does not match") }
+
+          it "responds with a 404 status code" do
+            expect(response.code).to eql(404)
+          end
+
+        end
+
+        context "that is empty" do
+
+          let(:response) { issue_request(body: {}) }
+
+          it "responds with a 404 status code" do
+            expect(response.code).to eql(404)
+          end
+
         end
 
       end
 
-      context "that does not match" do
-
-        let(:response) { issue_request(body: "This is a request which does not match.") }
-
-        it "responds with a 404 status code" do
-          expect(response.code).to eql(404)
-        end
-
-      end
-
-      context "that is empty" do
-
-        let(:response) { issue_request(body: {}) }
-
-        it "responds with a 404 status code" do
-          expect(response.code).to eql(404)
-        end
-
+      def issue_request(args)
+        HTTParty.post("#{server_uri}/match_body_regex", args)
       end
 
     end
 
-    def issue_request(args)
-      HTTParty.post("#{server_uri}/matches_on_simple_request", args)
-    end
+    context "against a JSON schema" do
 
-  end
+      before(:example) { stub_server.activate!("match_body_json_schema_scenario") }
 
-  context "when a configurer that contains a stub with a regex request body" do
+      context "and a request is made with a request body" do
 
-    let(:configurer) { HttpStub::Examples::ConfigurerWithRegexRequestBody.new }
+        context "that completely matches" do
 
-    before(:example) do
-      configurer.class.initialize!
-      configurer.stub_server.activate!("match_body_on_regex_request")
-    end
+          let(:response) do
+            issue_request(body: { string_property:  "some string",
+                                  integer_property: 88,
+                                  float_property:   77.7 }.to_json)
+          end
 
-    context "and a request is made with a string as the request body" do
+          it "responds with the configured response" do
+            expect(response.code).to eql(204)
+          end
 
-      context "that matches" do
+        end
 
-        let(:response) { issue_request(body: "Some regex content") }
+        context "that partially matches" do
 
-        it "responds with the configured response" do
-          expect(response.code).to eql(204)
+          let(:response) do
+            issue_request(body: { string_property: "some string",
+                                  integer_property: 88 }.to_json)
+          end
+
+          it "responds with a 404 status code" do
+            expect(response.code).to eql(404)
+          end
+
+        end
+
+        context "that is completely different" do
+
+          let(:response) { issue_request(body: { some_other_key: "some string" }.to_json) }
+
+          it "responds with a 404 status code" do
+            expect(response.code).to eql(404)
+          end
+
+        end
+
+        context "that is empty" do
+
+          let(:response) { issue_request(body: {}) }
+
+          it "responds with a 404 status code" do
+            expect(response.code).to eql(404)
+          end
+
         end
 
       end
 
-      context "that does not match" do
-
-        let(:response) { issue_request(body: "Some invalid regex content") }
-
-        it "responds with a 404 status code" do
-          expect(response.code).to eql(404)
-        end
-
+      def issue_request(args)
+        HTTParty.post("#{server_uri}/match_body_json_schema", args)
       end
 
-      context "that is empty" do
-
-        let(:response) { issue_request(body: {}) }
-
-        it "responds with a 404 status code" do
-          expect(response.code).to eql(404)
-        end
-
-      end
-
-    end
-
-    def issue_request(args)
-      HTTParty.post("#{server_uri}/matches_on_regex_request", args)
     end
 
   end
