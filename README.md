@@ -68,6 +68,8 @@ Navigating to the locally running stub server (e.g. ```http://localhost:8000/stu
 
 ![http://localhost:8000/stubs/scenarios/](examples/resources/authentication_service_scenarios.png "Scenarios Diagnostic Page")
 
+```http_stub``` can match requests against a variety of criteria, including JSON schemas, and can respond with arbitrary content including files.
+
 See the [wiki](https://github.com/MYOB-Technology/http_stub/wiki) for more usage details and examples.
 
 Installation
