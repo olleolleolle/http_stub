@@ -32,7 +32,43 @@ Design
 Usage
 -----
 
-See the [wiki](https://github.com/MYOB-Technology/http_stub/wiki)
+To simulate common respones from an authentication service, let's stub a service which will respond to a login request by either granting or denying access:
+
+```ruby
+class AuthenticationServiceConfigurer
+  include HttpStub::Configurer
+
+  stub_server.port = 8000
+
+  stub_server.add_scenario!("grant_access") do |scenario|
+    scenario.add_stub! do |stub|
+      stub.match_requests("/login", method: :post)
+      stub.respond_with(status: 204)
+    end
+  end
+
+  stub_server.add_scenario!("deny_access") do |scenario|
+    scenario.add_stub! do |stub|
+      stub.match_requests("/login", method: :post)
+      stub.respond_with(status: 401)
+    end
+  end
+
+end
+```
+
+Now we can initialize the service and activate the scenarios as needed.
+
+```ruby
+AuthenticationServiceConfigurer.initialize!
+AuthenticationServiceConfigurer.stub_server.activate!("grant_access")
+```
+
+Navigating to the locally running stub server (e.g. ```http://localhost:8000/stubs/scenarios/```) reveals the scenarios which we can activate manually by clicking the links.
+
+![http://localhost:8000/stubs/scenarios/](examples/resources/authentication_service_scenarios.png "Scenarios Diagnostic Page")
+
+See the [wiki](https://github.com/MYOB-Technology/http_stub/wiki) for more usage details and examples.
 
 Installation
 ------------
