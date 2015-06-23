@@ -227,42 +227,14 @@ describe HttpStub::Configurer::DSL::Server do
       subject
     end
 
-    it "returns the created endpoint template" do
-      expect(subject).to eql(endpoint_template)
-    end
-
     it "creates a template for the server" do
-      expect(HttpStub::Configurer::DSL::EndpointTemplate).to(
-        receive(:new).with(server, anything).and_return(endpoint_template)
-      )
+      expect(HttpStub::Configurer::DSL::EndpointTemplate).to receive(:new).with(server).and_return(endpoint_template)
 
       subject
     end
 
-    context "when response defaults have been established" do
-
-      include_context "establish response defaults"
-
-      it "creates a template with the defaults" do
-        expect(HttpStub::Configurer::DSL::EndpointTemplate).to(
-          receive(:new).with(anything, response_defaults).and_return(endpoint_template)
-        )
-
-        subject
-      end
-
-    end
-
-    context "when no response defaults have been established" do
-
-      it "creates a template with empty response defaults" do
-        expect(HttpStub::Configurer::DSL::EndpointTemplate).to(
-          receive(:new).with(anything, {}).and_return(endpoint_template)
-        )
-
-        subject
-      end
-
+    it "returns the created endpoint template" do
+      expect(subject).to eql(endpoint_template)
     end
 
   end

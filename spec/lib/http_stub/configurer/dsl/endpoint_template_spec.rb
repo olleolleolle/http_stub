@@ -1,17 +1,19 @@
 describe HttpStub::Configurer::DSL::EndpointTemplate do
 
-  let(:stub_fixture) { HttpStub::StubFixture.new }
+  let(:server)                { instance_double(HttpStub::Configurer::DSL::Server) }
+  let(:response_defaults)     { {} }
+  let(:template_stub_builder) { instance_double(HttpStub::Configurer::DSL::StubBuilder) }
 
-  let(:server)               { instance_double(HttpStub::Configurer::DSL::Server) }
-  let(:response_defaults)    { {} }
-  let(:default_stub_builder) { instance_double(HttpStub::Configurer::DSL::StubBuilder) }
-
-  let(:endpoint_template) { HttpStub::Configurer::DSL::EndpointTemplate.new(server, response_defaults) }
+  let(:endpoint_template) { HttpStub::Configurer::DSL::EndpointTemplate.new(server) }
 
   before(:example) do
-    allow(HttpStub::Configurer::DSL::StubBuilder).to(
-      receive(:new).with(response_defaults).and_return(default_stub_builder)
-    )
+    allow(HttpStub::Configurer::DSL::StubBuilder).to receive(:new).and_return(template_stub_builder)
+  end
+
+  it "creates a stub builder to hold the templated default values" do
+    expect(HttpStub::Configurer::DSL::StubBuilder).to receive(:new).with(no_args)
+
+    endpoint_template
   end
 
   describe "#match_requests" do
@@ -21,8 +23,8 @@ describe HttpStub::Configurer::DSL::EndpointTemplate do
 
     subject { endpoint_template.match_requests(uri, args) }
 
-    it "delegates to the default stub builder" do
-      expect(default_stub_builder).to receive(:match_requests).with(uri, args)
+    it "delegates to the templates stub builder" do
+      expect(template_stub_builder).to receive(:match_requests).with(uri, args)
 
       subject
     end
@@ -36,8 +38,8 @@ describe HttpStub::Configurer::DSL::EndpointTemplate do
 
     subject { endpoint_template.schema(type, definition) }
 
-    it "delegates to the default stub builder" do
-      expect(default_stub_builder).to receive(:schema).with(type, definition)
+    it "delegates to the templates stub builder" do
+      expect(template_stub_builder).to receive(:schema).with(type, definition)
 
       subject
     end
@@ -50,8 +52,8 @@ describe HttpStub::Configurer::DSL::EndpointTemplate do
 
     subject { endpoint_template.respond_with(args) }
 
-    it "delegates to the default stub builder" do
-      expect(default_stub_builder).to receive(:respond_with).with(args)
+    it "delegates to the templates stub builder" do
+      expect(template_stub_builder).to receive(:respond_with).with(args)
 
       subject
     end
@@ -64,8 +66,8 @@ describe HttpStub::Configurer::DSL::EndpointTemplate do
 
     subject { endpoint_template.trigger(trigger) }
 
-    it "delegates to the default stub builder" do
-      expect(default_stub_builder).to receive(:trigger).with(trigger)
+    it "delegates to the templates stub builder" do
+      expect(template_stub_builder).to receive(:trigger).with(trigger)
 
       subject
     end
@@ -79,8 +81,8 @@ describe HttpStub::Configurer::DSL::EndpointTemplate do
 
     subject { endpoint_template.invoke(&block) }
 
-    it "delegates to the default stub builder" do
-      expect(default_stub_builder).to receive(:invoke).and_yield
+    it "delegates to the templates stub builder" do
+      expect(template_stub_builder).to receive(:invoke).and_yield
       expect(block_verifier).to receive(:verify)
 
       subject
@@ -88,32 +90,19 @@ describe HttpStub::Configurer::DSL::EndpointTemplate do
 
   end
 
-  describe "#add_scenario!" do
-
-    let(:name)         { "some_scenario_name" }
-    let(:stub_builder) { instance_double(HttpStub::Configurer::DSL::StubBuilder).as_null_object }
-
-    before(:example) { allow(server).to receive(:add_one_stub_scenario!).and_yield(stub_builder) }
-
-    subject { endpoint_template.add_scenario!(name) }
-
-    it "add a one stub scenario to the server" do
-      expect(server).to receive(:add_one_stub_scenario!).with(name)
-
-      subject
-    end
+  shared_examples_for "an endpoint template method composing a stub" do
 
     it "merges the added stub with the default stub builder" do
-      expect(stub_builder).to receive(:merge!).with(default_stub_builder)
+      expect(stub_builder).to receive(:merge!).with(template_stub_builder)
 
-      subject
+      subject_without_overrides_and_block
     end
 
     context "when response overrides are provided" do
 
       let(:response_overrides) { { status: 302 } }
 
-      subject { endpoint_template.add_scenario!(name, response_overrides) }
+      subject { subject_with_response_overrides(response_overrides) }
 
       it "informs the stub builder to respond with the response overrides" do
         expect(stub_builder).to receive(:respond_with).with(response_overrides)
@@ -125,7 +114,7 @@ describe HttpStub::Configurer::DSL::EndpointTemplate do
 
     context "when response overrides are not provided" do
 
-      subject { endpoint_template.add_scenario!(name) }
+      subject { subject_without_overrides_and_block }
 
       it "does not change the stub builder by requesting it respond with an empty hash" do
         expect(stub_builder).to receive(:respond_with).with({})
@@ -139,7 +128,7 @@ describe HttpStub::Configurer::DSL::EndpointTemplate do
       expect(stub_builder).to receive(:merge!).ordered
       expect(stub_builder).to receive(:respond_with).ordered
 
-      subject
+      subject_without_overrides_and_block
     end
 
     context "when a block is provided" do
@@ -147,7 +136,7 @@ describe HttpStub::Configurer::DSL::EndpointTemplate do
       let(:block_verifier)     { double("BlockVerifier") }
       let(:block)              { lambda { block_verifier.verify } }
 
-      subject { endpoint_template.add_scenario!(name, &block) }
+      subject { subject_with_block(&block) }
 
       it "requests the added stub builder invoke the provided block" do
         expect(stub_builder).to receive(:invoke).and_yield
@@ -167,7 +156,7 @@ describe HttpStub::Configurer::DSL::EndpointTemplate do
 
     context "when a block is not provided" do
 
-      subject { endpoint_template.add_scenario!(name) }
+      subject { subject_without_overrides_and_block }
 
       it "does not requests the added stub builder invoke a block" do
         expect(stub_builder).not_to receive(:invoke)
@@ -176,6 +165,91 @@ describe HttpStub::Configurer::DSL::EndpointTemplate do
       end
 
     end
+
+  end
+
+  describe "#build_stub" do
+
+    let(:stub_builder) { instance_double(HttpStub::Configurer::DSL::StubBuilder).as_null_object }
+
+    before(:example) { allow(server).to receive(:build_stub).and_yield(stub_builder) }
+
+    def subject_without_overrides_and_block
+      endpoint_template.build_stub
+    end
+
+    def subject_with_response_overrides(overrides)
+      endpoint_template.build_stub(overrides)
+    end
+
+    def subject_with_block(&block)
+      endpoint_template.build_stub(&block)
+    end
+
+    it "builds a stub on the server" do
+      expect(server).to receive(:build_stub)
+
+      subject_without_overrides_and_block
+    end
+
+    it_behaves_like "an endpoint template method composing a stub"
+
+  end
+
+  describe "#add_stub!" do
+
+    let(:stub_builder) { instance_double(HttpStub::Configurer::DSL::StubBuilder).as_null_object }
+
+    before(:example) { allow(server).to receive(:add_stub!).and_yield(stub_builder) }
+
+    def subject_without_overrides_and_block
+      endpoint_template.add_stub!
+    end
+
+    def subject_with_response_overrides(overrides)
+      endpoint_template.add_stub!(overrides)
+    end
+
+    def subject_with_block(&block)
+      endpoint_template.add_stub!(&block)
+    end
+
+    it "builds a stub on the server" do
+      expect(server).to receive(:add_stub!)
+
+      subject_without_overrides_and_block
+    end
+
+    it_behaves_like "an endpoint template method composing a stub"
+
+  end
+
+  describe "#add_scenario!" do
+
+    let(:name)         { "some_scenario_name" }
+    let(:stub_builder) { instance_double(HttpStub::Configurer::DSL::StubBuilder).as_null_object }
+
+    before(:example) { allow(server).to receive(:add_one_stub_scenario!).and_yield(stub_builder) }
+
+    def subject_without_overrides_and_block
+      endpoint_template.add_scenario!(name)
+    end
+
+    def subject_with_response_overrides(overrides)
+      endpoint_template.add_scenario!(name, overrides)
+    end
+
+    def subject_with_block(&block)
+      endpoint_template.add_scenario!(name, &block)
+    end
+
+    it "adds a one stub scenario to the server" do
+      expect(server).to receive(:add_one_stub_scenario!).with(name)
+
+      subject_without_overrides_and_block
+    end
+
+    it_behaves_like "an endpoint template method composing a stub"
 
   end
 

@@ -8,8 +8,8 @@ module HttpStub
 
         public
         
-        def initialize(response_defaults)
-          @response = response_defaults ? response_defaults.clone : {}
+        def initialize(response_defaults={})
+          @response = response_defaults.clone
           @triggers = []
         end
 

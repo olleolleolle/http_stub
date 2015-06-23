@@ -13,6 +13,13 @@ describe "Endpoint Template acceptance" do
       expect(response.code).to eql(404)
     end
 
+    it "registers any stubs added to the template" do
+      response = issue_request("custom_stub_uri")
+
+      expect(response.code).to eql(201)
+      expect(response.body).to eql("custom stub body")
+    end
+
     context "and a templated scenario is activated" do
 
       before(:example) { stub_server.activate!(scenario_name) }
@@ -21,7 +28,7 @@ describe "Endpoint Template acceptance" do
 
         let(:scenario_name) { "custom_request" }
 
-        let(:response) { issue_request("custom_uri") }
+        let(:response) { issue_request("custom_scenario_uri") }
 
         it "registers a templated stub for the scenario" do
           expect(response.code).to eql(200)
@@ -38,7 +45,7 @@ describe "Endpoint Template acceptance" do
 
         it "registers a templated stub for the scenario" do
           expect(response.code).to eql(202)
-          expect(response.body).to eql("custom body")
+          expect(response.body).to eql("custom scenario body")
         end
 
       end

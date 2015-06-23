@@ -43,9 +43,7 @@ module HttpStub
         end
 
         def endpoint_template(&block)
-          HttpStub::Configurer::DSL::EndpointTemplate.new(self, @response_defaults).tap do |template|
-            template.invoke(&block)
-          end
+          HttpStub::Configurer::DSL::EndpointTemplate.new(self).tap { |template| template.invoke(&block) }
         end
 
         def add_activator!(&block)

@@ -4,19 +4,31 @@ module HttpStub
 
       class EndpointTemplate
 
-        delegate :match_requests, :schema, :respond_with, :trigger, :invoke, to: :@default_stub_builder
+        delegate :match_requests, :schema, :respond_with, :trigger, :invoke, to: :@template_stub_builder
 
-        def initialize(server, response_defaults)
+        def initialize(server)
           @server = server
-          @default_stub_builder = HttpStub::Configurer::DSL::StubBuilder.new(response_defaults)
+          @template_stub_builder = HttpStub::Configurer::DSL::StubBuilder.new
+        end
+
+        def build_stub(response_overrides={}, &block)
+          @server.build_stub { |stub| compose_stub(stub, response_overrides, &block) }
+        end
+
+        def add_stub!(response_overrides={}, &block)
+          @server.add_stub! { |stub| compose_stub(stub, response_overrides, &block) }
         end
 
         def add_scenario!(name, response_overrides={}, &block)
-          @server.add_one_stub_scenario!(name) do |stub_builder|
-            stub_builder.merge!(@default_stub_builder)
-            stub_builder.respond_with(response_overrides)
-            stub_builder.invoke(&block) if block_given?
-          end
+          @server.add_one_stub_scenario!(name) { |stub| compose_stub(stub, response_overrides, &block) }
+        end
+
+        private
+
+        def compose_stub(stub_builder, response_overrides, &block)
+          stub_builder.merge!(@template_stub_builder)
+          stub_builder.respond_with(response_overrides)
+          stub_builder.invoke(&block) if block_given?
         end
 
       end
