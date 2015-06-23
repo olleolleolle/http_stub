@@ -32,7 +32,8 @@ Design
 Usage
 -----
 
-To simulate common respones from an authentication service, let's stub a service which will respond to a login request by either granting or denying access:
+To simulate common respones from an authentication service, let's stub a service which will respond to a login request
+by either granting or denying access:
 
 ```ruby
 class AuthenticationServiceConfigurer
@@ -40,20 +41,11 @@ class AuthenticationServiceConfigurer
 
   stub_server.port = 8000
 
-  stub_server.add_scenario!("grant_access") do |scenario|
-    scenario.add_stub! do |stub|
-      stub.match_requests("/login", method: :post)
-      stub.respond_with(status: 204)
-    end
-  end
+  login_template = stub_server.endpoint_template { match_requests("/login", method: :post) }
 
-  stub_server.add_scenario!("deny_access") do |scenario|
-    scenario.add_stub! do |stub|
-      stub.match_requests("/login", method: :post)
-      stub.respond_with(status: 401)
-    end
-  end
-
+  login_template.add_scenario!("grant_access") { respond_with(status: 200) }
+  login_template.add_scenario!("deny_access")  { respond_with(status: 401) }
+  
 end
 ```
 
@@ -64,11 +56,13 @@ AuthenticationServiceConfigurer.initialize!
 AuthenticationServiceConfigurer.stub_server.activate!("grant_access")
 ```
 
-Navigating to the locally running stub server (e.g. ```http://localhost:8000/stubs/scenarios/```) reveals the scenarios which we can activate manually by clicking the links.
+Navigating to the locally running stub server (e.g. ```http://localhost:8000/stubs/scenarios/```) reveals the scenarios
+which we can activate manually by clicking the links.
 
 ![http://localhost:8000/stubs/scenarios/](examples/resources/authentication_service_scenarios.png "Scenarios Diagnostic Page")
 
-```http_stub``` can match requests against a variety of criteria, including JSON schemas, and can respond with arbitrary content including files.
+```http_stub``` can match requests against a variety of criteria, including JSON schemas, and can respond with arbitrary
+content including files.
 
 See the [wiki](https://github.com/MYOB-Technology/http_stub/wiki) for more usage details and examples.
 
