@@ -90,16 +90,12 @@ describe HttpStub::Configurer::DSL::EndpointTemplate do
 
   describe "#add_scenario!" do
 
-    let(:name)               { "some_scenario_name" }
-    let(:response_overrides) { {} }
-    let(:block_verifier)     { double("BlockVerifier") }
-    let(:block)              { lambda { block_verifier.verify } }
-
-    let(:stub_builder)     { instance_double(HttpStub::Configurer::DSL::StubBuilder).as_null_object }
+    let(:name)         { "some_scenario_name" }
+    let(:stub_builder) { instance_double(HttpStub::Configurer::DSL::StubBuilder).as_null_object }
 
     before(:example) { allow(server).to receive(:add_one_stub_scenario!).and_yield(stub_builder) }
 
-    subject { endpoint_template.add_scenario!(name, response_overrides, &block) }
+    subject { endpoint_template.add_scenario!(name) }
 
     it "add a one stub scenario to the server" do
       expect(server).to receive(:add_one_stub_scenario!).with(name)
@@ -117,6 +113,8 @@ describe HttpStub::Configurer::DSL::EndpointTemplate do
 
       let(:response_overrides) { { status: 302 } }
 
+      subject { endpoint_template.add_scenario!(name, response_overrides) }
+
       it "informs the stub builder to respond with the response overrides" do
         expect(stub_builder).to receive(:respond_with).with(response_overrides)
 
@@ -127,7 +125,7 @@ describe HttpStub::Configurer::DSL::EndpointTemplate do
 
     context "when response overrides are not provided" do
 
-      subject { endpoint_template.add_scenario!(name, &block) }
+      subject { endpoint_template.add_scenario!(name) }
 
       it "does not change the stub builder by requesting it respond with an empty hash" do
         expect(stub_builder).to receive(:respond_with).with({})
@@ -144,18 +142,39 @@ describe HttpStub::Configurer::DSL::EndpointTemplate do
       subject
     end
 
-    it "requests the added stub builder invoke the provided block" do
-      expect(stub_builder).to receive(:invoke).and_yield
-      expect(block_verifier).to receive(:verify)
+    context "when a block is provided" do
 
-      subject
+      let(:block_verifier)     { double("BlockVerifier") }
+      let(:block)              { lambda { block_verifier.verify } }
+
+      subject { endpoint_template.add_scenario!(name, &block) }
+
+      it "requests the added stub builder invoke the provided block" do
+        expect(stub_builder).to receive(:invoke).and_yield
+        expect(block_verifier).to receive(:verify)
+
+        subject
+      end
+
+      it "applies the response overrides before invoking the provided block" do
+        expect(stub_builder).to receive(:respond_with).ordered
+        expect(stub_builder).to receive(:invoke).ordered
+
+        subject
+      end
+
     end
 
-    it "applies the response overrides before invoking the provided block" do
-      expect(stub_builder).to receive(:respond_with).ordered
-      expect(stub_builder).to receive(:invoke).ordered
+    context "when a block is not provided" do
 
-      subject
+      subject { endpoint_template.add_scenario!(name) }
+
+      it "does not requests the added stub builder invoke a block" do
+        expect(stub_builder).not_to receive(:invoke)
+
+        subject
+      end
+
     end
 
   end

@@ -11,7 +11,7 @@ module HttpStub
 
       template.add_scenario!("custom_request") { match_requests("/custom_uri") }
 
-      template.add_scenario!("custom_response") { respond_with(status: 202, body: "custom body") }
+      template.add_scenario!("custom_response", status: 202, body: "custom body")
 
     end
 

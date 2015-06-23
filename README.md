@@ -43,8 +43,8 @@ class AuthenticationServiceConfigurer
 
   login_template = stub_server.endpoint_template { match_requests("/login", method: :post) }
 
-  login_template.add_scenario!("grant_access") { respond_with(status: 200) }
-  login_template.add_scenario!("deny_access")  { respond_with(status: 401) }
+  login_template.add_scenario!("grant_access", status: 200)
+  login_template.add_scenario!("deny_access",  status: 401)
   
 end
 ```

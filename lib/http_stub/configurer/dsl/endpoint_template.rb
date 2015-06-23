@@ -15,7 +15,7 @@ module HttpStub
           @server.add_one_stub_scenario!(name) do |stub_builder|
             stub_builder.merge!(@default_stub_builder)
             stub_builder.respond_with(response_overrides)
-            stub_builder.invoke(&block)
+            stub_builder.invoke(&block) if block_given?
           end
         end
 
