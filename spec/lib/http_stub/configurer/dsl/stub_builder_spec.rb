@@ -84,6 +84,269 @@ describe HttpStub::Configurer::DSL::StubBuilder do
 
   end
 
+  describe "#invoke" do
+
+    context "when the block accepts an argument" do
+
+      subject { builder.invoke { |builder| builder.match_requests("/some_uri") } }
+
+      it "invokes the block with the builder as the argument" do
+        expect(builder).to receive(:match_requests).with("/some_uri")
+
+        subject
+      end
+
+    end
+
+    context "when the block accepts no arguments" do
+
+      subject { builder.invoke { match_requests("/some_uri") } }
+
+      it "invokes the block in the context of the builder" do
+        expect(builder).to receive(:match_requests).with("/some_uri")
+
+        subject
+      end
+
+    end
+
+  end
+
+  describe "#merge!" do
+
+    subject { builder.merge!(provided_builder) }
+
+    shared_context "a completely configured provided builder" do
+
+      let(:provided_triggers) { (1..3).map { instance_double(HttpStub::Configurer::DSL::StubBuilder) } }
+
+      let(:provided_builder) do
+        HttpStub::Configurer::DSL::StubBuilder.new({}).tap do |builder|
+          builder.match_requests("/replacement_uri", method: :put,
+                                 headers:    { request_header_key: "replacement request header value",
+                                               other_request_header_key: "other request header value" },
+                                 parameters: { parameter_key: "replacement parameter value",
+                                               other_request_parameter_key: "other request parameter value" })
+          builder.respond_with(status: 203,
+                               headers: { response_header_key: "reaplcement response header value",
+                                          other_response_header_key: "other response header value" },
+                               body: "replacement body value",
+                               delay_in_seconds: 3)
+          builder.trigger(provided_triggers)
+        end
+      end
+
+    end
+
+    context "when the builder has been completely configured" do
+
+      let(:original_triggers) { (1..3).map { instance_double(HttpStub::Configurer::DSL::StubBuilder) } }
+
+      before(:example) do
+        builder.match_requests("/original_uri", method: :get,
+                               headers:    { request_header_key: "original request header value" },
+                               parameters: { parameter_key: "original parameter value" })
+        builder.respond_with(status: 202,
+                             headers: { response_header_key: "original response header value" },
+                             body: "original body",
+                             delay_in_seconds: 2)
+        builder.trigger(original_triggers)
+      end
+
+      context "and a builder that is completely configured is provided" do
+
+        include_context "a completely configured provided builder"
+
+        it "replaces the uri" do
+          subject
+
+          expect(builder.request).to include(uri: "/replacement_uri")
+        end
+
+        it "replaces the request method" do
+          subject
+
+          expect(builder.request).to include(method: :put)
+        end
+
+        it "deeply merges the request headers" do
+          subject
+
+          expect(builder.request).to include(headers: { request_header_key: "replacement request header value",
+                                                        other_request_header_key: "other request header value" })
+        end
+
+        it "deeply merges the request parameters" do
+          subject
+
+          expect(builder.request).to(
+            include(parameters: { parameter_key: "replacement parameter value",
+                                  other_request_parameter_key: "other request parameter value" })
+          )
+        end
+
+        it "replaces the response status" do
+          subject
+
+          expect(builder.response).to include(status: 203)
+        end
+
+        it "deeply merges the response headers" do
+          subject
+
+          expect(builder.response).to include(headers: { response_header_key: "reaplcement response header value",
+                                                         other_response_header_key: "other response header value" })
+        end
+
+        it "replaces the body" do
+          subject
+
+          expect(builder.response).to include(body: "replacement body value")
+        end
+
+        it "replaces the response delay" do
+          subject
+
+          expect(builder.response).to include(delay_in_seconds: 3)
+        end
+
+        it "adds to the triggers" do
+          subject
+
+          expect(builder.triggers).to eql(original_triggers + provided_triggers)
+        end
+
+      end
+
+      context "and a builder that is empty is provided" do
+
+        let(:provided_builder) { HttpStub::Configurer::DSL::StubBuilder.new({}) }
+
+        it "preserves the uri" do
+          subject
+
+          expect(builder.request).to include(uri: "/original_uri")
+        end
+
+        it "preserves the request method" do
+          subject
+
+          expect(builder.request).to include(method: :get)
+        end
+
+        it "preserves the request headers" do
+          subject
+
+          expect(builder.request).to include(headers: { request_header_key: "original request header value" })
+        end
+
+        it "preserves the request parameters" do
+          subject
+
+          expect(builder.request).to include(parameters: { parameter_key: "original parameter value" })
+        end
+
+        it "preserves the response status" do
+          subject
+
+          expect(builder.response).to include(status: 202)
+        end
+
+        it "preserves the response headers" do
+          subject
+
+          expect(builder.response).to include(headers: { response_header_key: "original response header value" })
+        end
+
+        it "preserves the body" do
+          subject
+
+          expect(builder.response).to include(body: "original body")
+        end
+
+        it "preserves the response delay" do
+          subject
+
+          expect(builder.response).to include(delay_in_seconds: 2)
+        end
+
+        it "preserves the triggers" do
+          subject
+
+          expect(builder.triggers).to eql(original_triggers)
+        end
+
+      end
+
+    end
+
+    context "when the builder has not been previously configured" do
+
+      include_context "a completely configured provided builder"
+
+      it "assumes the provided uri" do
+        subject
+
+        expect(builder.request).to include(uri: "/replacement_uri")
+      end
+
+      it "assumes the provided request method" do
+        subject
+
+        expect(builder.request).to include(method: :put)
+      end
+
+      it "assumes the provided request headers" do
+        subject
+
+        expect(builder.request).to include(headers: { request_header_key: "replacement request header value",
+                                                      other_request_header_key: "other request header value" })
+      end
+
+      it "assumes the provided request parameters" do
+        subject
+
+        expect(builder.request).to(
+          include(parameters: { parameter_key: "replacement parameter value",
+                                other_request_parameter_key: "other request parameter value" })
+        )
+      end
+
+      it "assumes the provided response status" do
+        subject
+
+        expect(builder.response).to include(status: 203)
+      end
+
+      it "assumes the provided response headers" do
+        subject
+
+        expect(builder.response).to include(headers: { response_header_key: "reaplcement response header value",
+                                                       other_response_header_key: "other response header value" })
+      end
+
+      it "assumes the provided response body" do
+        subject
+
+        expect(builder.response).to include(body: "replacement body value")
+      end
+
+      it "assumes the provided response delay" do
+        subject
+
+        expect(builder.response).to include(delay_in_seconds: 3)
+      end
+
+      it "assumes the provided triggers" do
+        subject
+
+        expect(builder.triggers).to eql(provided_triggers)
+      end
+
+    end
+
+  end
+
   describe "#build" do
 
     let(:fixture) { HttpStub::StubFixture.new }

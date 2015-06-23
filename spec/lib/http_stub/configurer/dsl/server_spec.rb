@@ -4,6 +4,14 @@ describe HttpStub::Configurer::DSL::Server do
 
   let(:server) { HttpStub::Configurer::DSL::Server.new(server_facade) }
 
+  shared_context "establish response defaults" do
+
+    let(:response_defaults) { { key: "value" } }
+
+    before(:example) { server.response_defaults = { key: "value" } }
+
+  end
+
   it "produces stub builders" do
     expect(server).to be_a(HttpStub::Configurer::DSL::StubBuilderProducer)
   end
@@ -70,9 +78,13 @@ describe HttpStub::Configurer::DSL::Server do
 
     context "when a stub builder is not provided" do
 
-      let(:block) { lambda { |_stub| "some block" } }
+      let(:block_verifier) { double("BlockVerifier") }
+      let(:block)          { lambda { block_verifier.verify } }
 
-      before(:example) { allow(HttpStub::Configurer::DSL::StubBuilder).to receive(:new).and_return(stub_builder) }
+      before(:example) do
+        allow(HttpStub::Configurer::DSL::StubBuilder).to receive(:new).and_return(stub_builder)
+        allow(stub_builder).to receive(:invoke)
+      end
 
       subject { server.add_stub!(&block) }
 
@@ -82,8 +94,9 @@ describe HttpStub::Configurer::DSL::Server do
         subject
       end
 
-      it "yields the created builder to the provided block" do
-        expect(block).to receive(:call).with(stub_builder)
+      it "requests the created builder invoke the provided block" do
+        expect(stub_builder).to receive(:invoke).and_yield
+        expect(block_verifier).to receive(:verify)
 
         subject
       end
@@ -112,9 +125,7 @@ describe HttpStub::Configurer::DSL::Server do
 
     context "when response defaults have been established" do
 
-      let(:response_defaults) { { key: "value" } }
-
-      before(:example) { server.response_defaults = { key: "value" } }
+      include_context "establish response defaults"
 
       it "creates a scenario builder containing the response defaults" do
         expect(HttpStub::Configurer::DSL::ScenarioBuilder).to receive(:new).with(response_defaults, anything)
@@ -156,6 +167,102 @@ describe HttpStub::Configurer::DSL::Server do
       expect(server_facade).to receive(:define_scenario).with(scenario)
 
       subject
+    end
+
+  end
+
+  describe "#add_one_stub_scenario!" do
+
+    let(:scenario_name)  { "some_scenario_name" }
+    let(:block_verifier) { double("BlockVerifier") }
+    let(:block)          { lambda { block_verifier.verify } }
+
+    let(:scenario_builder) { instance_double(HttpStub::Configurer::DSL::ScenarioBuilder) }
+    let(:stub_builder)     { instance_double(HttpStub::Configurer::DSL::StubBuilder, invoke: nil) }
+
+    subject { server.add_one_stub_scenario!(scenario_name, &block) }
+
+    before(:each) do
+      allow(server).to receive(:add_scenario!).and_yield(scenario_builder)
+      allow(scenario_builder).to receive(:add_stub!).and_yield(stub_builder)
+    end
+
+    it "adds a scenario with the provided name" do
+      expect(server).to receive(:add_scenario!).with(scenario_name)
+
+      subject
+    end
+
+    it "adds a stub to the scenario" do
+      expect(scenario_builder).to receive(:add_stub!)
+
+      subject
+    end
+
+    it "requests the stub builder invoke the provided block" do
+      expect(stub_builder).to receive(:invoke).and_yield
+      expect(block_verifier).to receive(:verify)
+
+      subject
+    end
+
+  end
+
+  describe "#endpoint_template" do
+
+    let(:block_verifier)    { double("BlockVerifier") }
+    let(:block)             { lambda { block_verifier.verify } }
+    let(:endpoint_template) { instance_double(HttpStub::Configurer::DSL::EndpointTemplate, invoke: nil) }
+
+    subject { server.endpoint_template(&block) }
+
+    before(:example) do
+      allow(HttpStub::Configurer::DSL::EndpointTemplate).to receive(:new).and_return(endpoint_template)
+    end
+
+    it "requests the endpoint template invoke the provided block" do
+      expect(endpoint_template).to receive(:invoke).and_yield
+      expect(block_verifier).to receive(:verify)
+
+      subject
+    end
+
+    it "returns the created endpoint template" do
+      expect(subject).to eql(endpoint_template)
+    end
+
+    it "creates a template for the server" do
+      expect(HttpStub::Configurer::DSL::EndpointTemplate).to(
+        receive(:new).with(server, anything).and_return(endpoint_template)
+      )
+
+      subject
+    end
+
+    context "when response defaults have been established" do
+
+      include_context "establish response defaults"
+
+      it "creates a template with the defaults" do
+        expect(HttpStub::Configurer::DSL::EndpointTemplate).to(
+          receive(:new).with(anything, response_defaults).and_return(endpoint_template)
+        )
+
+        subject
+      end
+
+    end
+
+    context "when no response defaults have been established" do
+
+      it "creates a template with empty response defaults" do
+        expect(HttpStub::Configurer::DSL::EndpointTemplate).to(
+          receive(:new).with(anything, {}).and_return(endpoint_template)
+        )
+
+        subject
+      end
+
     end
 
   end

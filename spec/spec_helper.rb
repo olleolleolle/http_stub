@@ -7,7 +7,7 @@ SimpleCov.start do
   add_filter "/spec/"
   add_filter "/vendor/"
 
-  minimum_coverage 99.65
+  minimum_coverage 99.67
   refuse_coverage_drop
 end if ENV["coverage"]
 
@@ -26,6 +26,8 @@ require_relative '../examples/configurer_with_stub_triggers'
 require_relative '../examples/configurer_with_file_responses'
 require_relative '../examples/configurer_with_stub_request_body'
 require_relative '../examples/configurer_with_regex_request_body'
+require_relative '../examples/configurer_with_parts'
+require_relative '../examples/configurer_with_endpoint_template'
 
 HttpStub::Server::Daemon.log_dir = ::File.expand_path('../../tmp/log', __FILE__)
 HttpStub::Server::Daemon.pid_dir = ::File.expand_path('../../tmp/pids', __FILE__)

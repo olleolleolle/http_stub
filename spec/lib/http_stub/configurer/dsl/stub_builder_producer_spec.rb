@@ -34,40 +34,20 @@ describe HttpStub::Configurer::DSL::StubBuilderProducer do
 
     context "when a block is provided" do
 
-      context "that declares a stub builder parameter" do
+      let(:block) { lambda { |_stub_builder| "some block" } }
 
-        let(:block) { lambda { |_stub_builder| "some block" } }
+      subject { producer.build_stub(&block) }
 
-        subject { producer.build_stub(&block) }
+      before(:example) { allow(stub_builder).to receive(:invoke) }
 
-        it "yields the created builder to the provided block" do
-          expect(block).to receive(:call).with(stub_builder)
+      it "requests the stub builder invoke block" do
+        expect(stub_builder).to receive(:invoke).and_yield(block)
 
-          subject
-        end
-
-        it "returns the created builder" do
-          expect(subject).to eql(stub_builder)
-        end
-
+        subject
       end
 
-      context "that has no parameters" do
-
-        subject { producer.build_stub { match_requests("/some/request/uri") } }
-
-        before(:example) { allow(stub_builder).to receive(:match_requests) }
-
-        it "executes the block in the context of the builder" do
-          expect(stub_builder).to receive(:match_requests).with("/some/request/uri")
-
-          subject
-        end
-
-        it "returns the created builder" do
-          expect(subject).to eql(stub_builder)
-        end
-
+      it "returns the stub builder" do
+        expect(subject).to eql(stub_builder)
       end
 
     end
@@ -76,7 +56,7 @@ describe HttpStub::Configurer::DSL::StubBuilderProducer do
 
       subject { producer.build_stub }
 
-      it "returns the built stub" do
+      it "returns the stub builder" do
         expect(subject).to eql(stub_builder)
       end
 

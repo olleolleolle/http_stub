@@ -36,11 +36,9 @@ module HttpStub
           end
         end
 
-        stub_server.add_scenario!("nested_scenario_#{scenario_number}") do |scenario|
-          scenario.add_stub! do
-            match_requests("/nested_scenario_stub_path_#{scenario_number}")
-            respond_with(body: "Body of nested scenario stub #{scenario_number}")
-          end
+        stub_server.add_one_stub_scenario!("nested_scenario_#{scenario_number}") do
+          match_requests("/nested_scenario_stub_path_#{scenario_number}")
+          respond_with(body: "Body of nested scenario stub #{scenario_number}")
         end
 
         stub_server.add_scenario!("scenario_#{scenario_number}") do |scenario|

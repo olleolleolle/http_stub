@@ -21,6 +21,14 @@ module HttpStub
         @initialized = true
       end
 
+      def parts=(parts)
+        parts.each do |name, part|
+          part.configure
+          self.define_singleton_method(name) { part }
+          self.send(:define_method, name) { part }
+        end
+      end
+
       private
 
       def server_facade

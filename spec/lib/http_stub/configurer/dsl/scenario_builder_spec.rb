@@ -17,11 +17,12 @@ describe HttpStub::Configurer::DSL::ScenarioBuilder do
 
   describe "#add_stub!" do
 
-    let(:stub_builder) { instance_double(HttpStub::Configurer::DSL::StubBuilder) }
+    let(:stub_builder) { instance_double(HttpStub::Configurer::DSL::StubBuilder, invoke: nil) }
 
     context "when a block is provided" do
 
-      let(:block) { lambda { |_builder| "some block" } }
+      let(:block_verifier) { double("BlockVerifier") }
+      let(:block) { lambda { block_verifier.verify } }
 
       subject { scenario_builder.add_stub!(&block) }
 
@@ -33,8 +34,9 @@ describe HttpStub::Configurer::DSL::ScenarioBuilder do
         subject
       end
 
-      it "yields the stub builder to the provided block" do
-        expect(block).to receive(:call).with(stub_builder)
+      it "requests the stub builder invoke the provided block" do
+        expect(stub_builder).to receive(:invoke).and_yield
+        expect(block_verifier).to receive(:verify)
 
         subject
       end
@@ -81,7 +83,7 @@ describe HttpStub::Configurer::DSL::ScenarioBuilder do
 
       let(:stubs) { (1..3).map { instance_double(HttpStub::Configurer::Request::Stub) } }
       let(:stub_builders) do
-        stubs.map { |stub| instance_double(HttpStub::Configurer::DSL::StubBuilder, build: stub) }
+        stubs.map { |stub| instance_double(HttpStub::Configurer::DSL::StubBuilder, invoke: nil, build: stub) }
       end
 
       before(:example) do
