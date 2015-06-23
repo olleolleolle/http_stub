@@ -1,16 +1,18 @@
 describe HttpStub::Configurer::Part do
 
   let(:configurer) do
-    configurer = Class.new
-    configurer.send(:include, HttpStub::Configurer)
+    Class.new.tap { |configurer| configurer.send(:include, HttpStub::Configurer) }
   end
 
-  let(:part_class) { Class.new(HttpStub::Configurer::Part) }
-  let(:part)       { part_class.new(configurer) }
+  let(:part_class) do
+    Class.new.tap { |part_class| part_class.send(:include, HttpStub::Configurer::Part) }
+  end
+
+  let(:part)       { part_class.new }
 
   describe "#configure" do
 
-    subject { part.configure }
+    subject { part.configure(configurer) }
 
     shared_context "expect configure entity methods to be automatically invoke" do
 

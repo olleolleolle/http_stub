@@ -4,7 +4,8 @@ module HttpStub
     class ConfigurerWithParts
       include HttpStub::Configurer
 
-      class CallbackPart < HttpStub::Configurer::Part
+      class CallbackPart
+        include HttpStub::Configurer::Part
 
         def configure_some_stub
           stub_server.add_stub! do |stub|
@@ -40,7 +41,8 @@ module HttpStub
 
       end
 
-      class AnotherPart < HttpStub::Configurer::Part
+      class AnotherPart
+        include HttpStub::Configurer::Part
 
         def add_stub
           stub_server.add_stub! do |stub|
@@ -51,7 +53,8 @@ module HttpStub
 
       end
 
-      class APart < HttpStub::Configurer::Part
+      class APart
+        include HttpStub::Configurer::Part
 
         def configure_another_stub
           another_part.add_stub
@@ -60,9 +63,9 @@ module HttpStub
       end
 
       self.parts = {
-        callback_part: CallbackPart.new(self),
-        another_part:  AnotherPart.new(self),
-        a_part:        APart.new(self)
+        callback_part: CallbackPart.new,
+        another_part:  AnotherPart.new,
+        a_part:        APart.new
       }
 
     end

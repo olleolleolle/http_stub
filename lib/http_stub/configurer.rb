@@ -23,7 +23,7 @@ module HttpStub
 
       def parts=(parts)
         parts.each do |name, part|
-          part.configure
+          part.configure(self)
           self.define_singleton_method(name) { part }
           self.send(:define_method, name) { part }
         end
