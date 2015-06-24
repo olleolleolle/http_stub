@@ -17,7 +17,7 @@ describe HttpStub::Configurer::DSL::Deprecated do
     end
 
     it "causes the builder being added to match requests on the provided uri" do
-      expect(builder).to receive(:match_requests).with(stub_uri, anything)
+      expect(builder).to receive(:match_requests).with(hash_including(uri: stub_uri))
 
       subject
     end
@@ -25,7 +25,7 @@ describe HttpStub::Configurer::DSL::Deprecated do
     context "when a method is provided" do
 
       it "causes the builder being added to match requests on the provided method" do
-        expect(builder).to receive(:match_requests).with(anything, hash_including(method: method))
+        expect(builder).to receive(:match_requests).with(hash_including(method: method))
 
         subject
       end
@@ -37,7 +37,7 @@ describe HttpStub::Configurer::DSL::Deprecated do
       let(:options) { {} }
 
       it "causes the builder being added to not match requests based on method" do
-        expect(builder).to receive(:match_requests).with(anything, hash_excluding(:method))
+        expect(builder).to receive(:match_requests).with(hash_excluding(:method))
 
         subject
       end
@@ -47,7 +47,7 @@ describe HttpStub::Configurer::DSL::Deprecated do
     context "when parameters are provided" do
 
       it "causes the builder being added to match requests on the provided parameters" do
-        expect(builder).to receive(:match_requests).with(anything, hash_including(parameters: parameters))
+        expect(builder).to receive(:match_requests).with(hash_including(parameters: parameters))
 
         subject
       end
@@ -59,7 +59,7 @@ describe HttpStub::Configurer::DSL::Deprecated do
       let(:options) { {} }
 
       it "causes the builder being added to not match requests based on parameters" do
-        expect(builder).to receive(:match_requests).with(anything, hash_excluding(:parameters))
+        expect(builder).to receive(:match_requests).with(hash_excluding(:parameters))
 
         subject
       end
@@ -69,7 +69,7 @@ describe HttpStub::Configurer::DSL::Deprecated do
     context "when headers are provided" do
 
       it "causes the builder being added to match requests on the provided headers" do
-        expect(builder).to receive(:match_requests).with(anything, hash_including(headers: headers))
+        expect(builder).to receive(:match_requests).with(hash_including(headers: headers))
 
         subject
       end
@@ -81,7 +81,7 @@ describe HttpStub::Configurer::DSL::Deprecated do
       let(:options) { {} }
 
       it "causes the builder being added to not match requests based on headers" do
-        expect(builder).to receive(:match_requests).with(anything, hash_excluding(:headers))
+        expect(builder).to receive(:match_requests).with(hash_excluding(:headers))
 
         subject
       end

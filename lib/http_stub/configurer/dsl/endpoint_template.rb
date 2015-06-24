@@ -20,7 +20,7 @@ module HttpStub
         end
 
         def add_scenario!(name, response_overrides={}, &block)
-          @server.add_one_stub_scenario!(name) { |stub| compose_stub(stub, response_overrides, &block) }
+          @server.add_scenario_with_one_stub!(name) { |stub| compose_stub(stub, response_overrides, &block) }
         end
 
         private

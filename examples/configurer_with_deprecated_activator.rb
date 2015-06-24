@@ -6,7 +6,7 @@ module HttpStub
 
       stub_server.add_activator! do |activator|
         activator.on("an_activator")
-        activator.match_requests("/stub_path", method: :get)
+        activator.match_requests(uri: "/stub_path", method: :get)
         activator.respond_with(status: 200, body: "Stub activator body")
       end
     end

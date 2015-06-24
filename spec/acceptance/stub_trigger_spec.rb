@@ -12,7 +12,7 @@ describe "Stub trigger acceptance" do
       let(:triggered_stubs) do
         (1..3).map do |trigger_number|
           stub_server.build_stub do |stub|
-            stub.match_requests("/triggered_stub_#{trigger_number}", method: :get)
+            stub.match_requests(uri: "/triggered_stub_#{trigger_number}", method: :get)
             stub.respond_with(status: 200 + trigger_number, body: "Triggered stub body #{trigger_number}")
           end
         end
@@ -20,7 +20,7 @@ describe "Stub trigger acceptance" do
 
       before(:example) do
         stub_server.add_stub! do |stub|
-          stub.match_requests("/stub_with_triggers", method: :get)
+          stub.match_requests(uri: "/stub_with_triggers", method: :get)
           stub.respond_with(body: "Trigger stub body")
           stub.trigger(triggered_stubs)
         end
@@ -59,7 +59,7 @@ describe "Stub trigger acceptance" do
       let(:pdf_file_path) { "#{HttpStub::Spec::RESOURCES_DIR}/sample.pdf" }
       let(:pdf_file_trigger) do
         stub_server.build_stub do |stub|
-          stub.match_requests("/triggered_stub_pdf_file", method: :get)
+          stub.match_requests(uri: "/triggered_stub_pdf_file", method: :get)
           stub.respond_with(
             status: 201,
             headers: { "content-type" => "application/pdf" },
@@ -71,7 +71,7 @@ describe "Stub trigger acceptance" do
       let(:text_body) { "Sample trigger stub body" }
       let(:text_trigger) do
         stub_server.build_stub do |stub|
-          stub.match_requests("/triggered_stub_text", method: :get)
+          stub.match_requests(uri: "/triggered_stub_text", method: :get)
           stub.respond_with(status: 202, body: "Sample trigger stub body")
         end
       end
@@ -79,7 +79,7 @@ describe "Stub trigger acceptance" do
       let(:txt_file_path) { "#{HttpStub::Spec::RESOURCES_DIR}/sample.txt" }
       let(:txt_file_trigger) do
         stub_server.build_stub do |stub|
-          stub.match_requests("/triggered_stub_txt_file", method: :get)
+          stub.match_requests(uri: "/triggered_stub_txt_file", method: :get)
           stub.respond_with(
             status: 203,
             headers: { "content-type" => "text/plain" },
@@ -92,7 +92,7 @@ describe "Stub trigger acceptance" do
 
       before(:example) do
         stub_server.add_stub! do |stub|
-          stub.match_requests("/stub_with_triggers", method: :get)
+          stub.match_requests(uri: "/stub_with_triggers", method: :get)
           stub.respond_with(body: "Trigger stub body")
           stub.trigger(triggered_stubs)
         end

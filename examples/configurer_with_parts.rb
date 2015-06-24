@@ -9,21 +9,21 @@ module HttpStub
 
         def configure_some_stub
           stub_server.add_stub! do |stub|
-            stub.match_requests("/registered_in_configure_stub_method", method: :get)
+            stub.match_requests(uri: "/registered_in_configure_stub_method", method: :get)
             stub.respond_with(body: "configure stub response")
           end
         end
 
         def configure_some_stubs
           stub_server.add_stub! do |stub|
-            stub.match_requests("/registered_in_configure_stubs_method", method: :get)
+            stub.match_requests(uri: "/registered_in_configure_stubs_method", method: :get)
             stub.respond_with(body: "configure stubs response")
           end
         end
 
         def configure_some_scenario
-          stub_server.add_one_stub_scenario!("some_scenario") do |stub|
-            stub.match_requests("/registered_in_configure_scenario_method", method: :get)
+          stub_server.add_scenario_with_one_stub!("some_scenario") do |stub|
+            stub.match_requests(uri: "/registered_in_configure_scenario_method", method: :get)
             stub.respond_with(body: "configure scenario response")
           end
 
@@ -31,8 +31,8 @@ module HttpStub
         end
 
         def configure_some_scenarios
-          stub_server.add_one_stub_scenario!("some_scenarios") do |stub|
-            stub.match_requests("/registered_in_configure_scenarios_method", method: :get)
+          stub_server.add_scenario_with_one_stub!("some_scenarios") do |stub|
+            stub.match_requests(uri: "/registered_in_configure_scenarios_method", method: :get)
             stub.respond_with(body: "configure scenarios response")
           end
 
@@ -46,7 +46,7 @@ module HttpStub
 
         def add_stub
           stub_server.add_stub! do |stub|
-            stub.match_requests("/registered_in_another_part", method: :get)
+            stub.match_requests(uri: "/registered_in_another_part", method: :get)
             stub.respond_with(body: "response from another part")
           end
         end

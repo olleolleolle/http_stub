@@ -48,9 +48,9 @@ describe HttpStub::Configurer::DSL::StubActivatorBuilder do
     before(:example) { builder.on(activation_uri) }
 
     it "delegates to a stub builder" do
-      expect(stub_builder).to receive(:match_requests).with(stub_fixture.request.uri, request_payload)
+      expect(stub_builder).to receive(:match_requests).with(request_payload)
 
-      builder.match_requests(stub_fixture.request.uri, request_payload)
+      builder.match_requests(request_payload)
     end
 
   end

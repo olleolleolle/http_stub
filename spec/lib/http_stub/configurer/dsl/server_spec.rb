@@ -1,19 +1,20 @@
 describe HttpStub::Configurer::DSL::Server do
 
-  let(:server_facade) { instance_double(HttpStub::Configurer::Server::Facade) }
+  let(:server_facade)        { instance_double(HttpStub::Configurer::Server::Facade) }
+  let(:default_stub_builder) { instance_double(HttpStub::Configurer::DSL::StubBuilder) }
 
   let(:server) { HttpStub::Configurer::DSL::Server.new(server_facade) }
 
-  shared_context "establish response defaults" do
-
-    let(:response_defaults) { { key: "value" } }
-
-    before(:example) { server.response_defaults = { key: "value" } }
-
+  before(:example) do
+    allow(HttpStub::Configurer::DSL::StubBuilder).to receive(:new).with(no_args).and_return(default_stub_builder)
   end
 
   it "produces stub builders" do
     expect(server).to be_a(HttpStub::Configurer::DSL::StubBuilderProducer)
+  end
+
+  it "activates scenarios" do
+    expect(server).to be_a(HttpStub::Configurer::DSL::ScenarioActivator)
   end
 
   describe "#base_uri" do
@@ -31,6 +32,30 @@ describe HttpStub::Configurer::DSL::Server do
 
     it "returns a uri accessed via http" do
       expect(subject).to match(/^http:\/\//)
+    end
+
+  end
+
+  describe "#request_defaults=" do
+
+    let(:args) { { request_rule_key: "request rule value" } }
+
+    it "establishes request matcher rules on the default stub builder" do
+      expect(default_stub_builder).to receive(:match_requests).with(args)
+
+      server.request_defaults = args
+    end
+
+  end
+
+  describe "#response_defaults=" do
+
+    let(:args) { { response_key: "response value" } }
+
+    it "establishes response values on the default stub builder" do
+      expect(default_stub_builder).to receive(:respond_with).with(args)
+
+      server.response_defaults = args
     end
 
   end
@@ -123,32 +148,16 @@ describe HttpStub::Configurer::DSL::Server do
 
     subject { server.add_scenario!(scenario_name, &block) }
 
-    context "when response defaults have been established" do
+    it "creates a scenario builder containing the servers default stub builder" do
+      expect(HttpStub::Configurer::DSL::ScenarioBuilder).to receive(:new).with(default_stub_builder, anything)
 
-      include_context "establish response defaults"
-
-      it "creates a scenario builder containing the response defaults" do
-        expect(HttpStub::Configurer::DSL::ScenarioBuilder).to receive(:new).with(response_defaults, anything)
-
-        subject
-      end
-
-      it "creates a scenario builder containing the provided scenario name" do
-        expect(HttpStub::Configurer::DSL::ScenarioBuilder).to receive(:new).with(anything, scenario_name)
-
-        subject
-      end
-
+      subject
     end
 
-    context "when no response defaults have been established" do
+    it "creates a scenario builder containing the provided scenario name" do
+      expect(HttpStub::Configurer::DSL::ScenarioBuilder).to receive(:new).with(anything, scenario_name)
 
-      it "creates a scenario builder with empty response defaults" do
-        expect(HttpStub::Configurer::DSL::ScenarioBuilder).to receive(:new).with({}, anything)
-
-        subject
-      end
-
+      subject
     end
 
     it "yields the created builder to the provided block" do
@@ -171,7 +180,7 @@ describe HttpStub::Configurer::DSL::Server do
 
   end
 
-  describe "#add_one_stub_scenario!" do
+  describe "#add_scenario_with_one_stub!" do
 
     let(:scenario_name)  { "some_scenario_name" }
     let(:block_verifier) { double("BlockVerifier") }
@@ -180,7 +189,7 @@ describe HttpStub::Configurer::DSL::Server do
     let(:scenario_builder) { instance_double(HttpStub::Configurer::DSL::ScenarioBuilder) }
     let(:stub_builder)     { instance_double(HttpStub::Configurer::DSL::StubBuilder, invoke: nil) }
 
-    subject { server.add_one_stub_scenario!(scenario_name, &block) }
+    subject { server.add_scenario_with_one_stub!(scenario_name, &block) }
 
     before(:each) do
       allow(server).to receive(:add_scenario!).and_yield(scenario_builder)
@@ -256,28 +265,10 @@ describe HttpStub::Configurer::DSL::Server do
 
     subject { server.add_activator!(&block) }
 
-    context "when response defaults have been established" do
+    it "creates a stub activator builder containing the servers default stub builder" do
+      expect(HttpStub::Configurer::DSL::StubActivatorBuilder).to receive(:new).with(default_stub_builder)
 
-      let(:response_defaults) { { key: "value" } }
-
-      before(:example) { server.response_defaults = { key: "value" } }
-
-      it "creates a stub activator builder containing the response defaults" do
-        expect(HttpStub::Configurer::DSL::StubActivatorBuilder).to receive(:new).with(response_defaults)
-
-        subject
-      end
-
-    end
-
-    context "when no response defaults have been established" do
-
-      it "creates a stub activator builder with empty response defaults" do
-        expect(HttpStub::Configurer::DSL::StubActivatorBuilder).to receive(:new).with({})
-
-        subject
-      end
-
+      subject
     end
 
     it "yields the created builder to the provided block" do

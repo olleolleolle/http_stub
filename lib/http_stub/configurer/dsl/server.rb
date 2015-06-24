@@ -9,16 +9,20 @@ module HttpStub
         attr_accessor :host, :port
 
         def initialize(server_facade)
-          @server_facade     = server_facade
-          @response_defaults = {}
+          @server_facade        = server_facade
+          @default_stub_builder = HttpStub::Configurer::DSL::StubBuilder.new
         end
 
         def base_uri
           "http://#{host}:#{port}"
         end
 
+        def request_defaults=(args)
+          @default_stub_builder.match_requests(args)
+        end
+
         def response_defaults=(args)
-          @response_defaults = args
+          @default_stub_builder.respond_with(args)
         end
 
         def has_started!
@@ -31,12 +35,12 @@ module HttpStub
         end
 
         def add_scenario!(name, &block)
-          builder = HttpStub::Configurer::DSL::ScenarioBuilder.new(@response_defaults, name)
+          builder = HttpStub::Configurer::DSL::ScenarioBuilder.new(@default_stub_builder, name)
           block.call(builder)
           @server_facade.define_scenario(builder.build)
         end
 
-        def add_one_stub_scenario!(name, &block)
+        def add_scenario_with_one_stub!(name, &block)
           add_scenario!(name) do |scenario|
             scenario.add_stub! { |stub| stub.invoke(&block) }
           end
@@ -47,7 +51,7 @@ module HttpStub
         end
 
         def add_activator!(&block)
-          builder = HttpStub::Configurer::DSL::StubActivatorBuilder.new(@response_defaults)
+          builder = HttpStub::Configurer::DSL::StubActivatorBuilder.new(@default_stub_builder)
           block.call(builder)
           @server_facade.define_scenario(builder.build)
         end

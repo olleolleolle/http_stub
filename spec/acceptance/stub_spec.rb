@@ -13,7 +13,7 @@ describe "Stub basics acceptance" do
 
         before(:example) do
           stub_server.add_stub! do
-            match_requests("/stub_with_status", method: :get).respond_with(status: 201, body: "Stub body")
+            match_requests(uri: "/stub_with_status", method: :get).respond_with(status: 201, body: "Stub body")
           end
         end
 
@@ -52,7 +52,7 @@ describe "Stub basics acceptance" do
       context "and it does not contain a response status" do
 
         before(:example) do
-          stub_server.add_stub! { match_requests("/stub_without_status", method: :get).respond_with(body: "Stub body") }
+          stub_server.add_stub! { match_requests(uri: "/stub_without_status", method: :get).respond_with(body: "Stub body") }
         end
 
         context "and a matching request is made" do
@@ -70,7 +70,7 @@ describe "Stub basics acceptance" do
       context "and it does not contain a request method" do
 
         before(:example) do
-          stub_server.add_stub! { match_requests("/stub_without_method").respond_with(body: "Stub body") }
+          stub_server.add_stub! { match_requests(uri: "/stub_without_method").respond_with(body: "Stub body") }
         end
 
         context "and a request is made with a matching uri" do
@@ -93,7 +93,7 @@ describe "Stub basics acceptance" do
 
         before(:example) do
           stub_server.add_stub! do
-            match_requests("/stub_with_headers", method: :get, headers: { key: "value" })
+            match_requests(uri: "/stub_with_headers", method: :get, headers: { key: "value" })
             respond_with(status: 202, body: "Another stub body")
           end
         end
@@ -129,7 +129,7 @@ describe "Stub basics acceptance" do
 
         before(:example) do
           stub_server.add_stub! do
-            match_requests("/stub_with_parameters", method: :get, parameters: { key: "value" })
+            match_requests(uri: "/stub_with_parameters", method: :get, parameters: { key: "value" })
             respond_with(status: 202, body: "Another stub body")
           end
         end
@@ -161,7 +161,7 @@ describe "Stub basics acceptance" do
 
         before(:example) do
           stub_server.add_stub! do
-            match_requests("/stub_with_parameters", method: :get, parameters: { key: 88 })
+            match_requests(uri: "/stub_with_parameters", method: :get, parameters: { key: 88 })
             respond_with(status: 203, body: "Body for parameter number")
           end
         end
@@ -181,25 +181,13 @@ describe "Stub basics acceptance" do
 
     end
 
-    context "that contains response defaults" do
-
-      let(:configurer) { HttpStub::Examples::ConfigurerWithResponseDefaults.new }
-
-      it "includes the defaults in each response" do
-        response = Net::HTTP.get_response(server_host, "/response_with_defaults", server_port)
-
-        expect(response["defaulted_header"]).to eql("Header value")
-      end
-
-    end
-
     describe "that contains response headers" do
 
       context "with a content-type header" do
 
         before(:example) do
           stub_server.add_stub! do
-            match_requests("/some_stub_path", method: :get)
+            match_requests(uri: "/some_stub_path", method: :get)
             respond_with(body: "Some stub body", headers: { "content-type" => "application/xhtml" })
           end
         end
@@ -226,7 +214,7 @@ describe "Stub basics acceptance" do
 
           before(:example) do
             stub_server.add_stub! do |stub|
-              stub.match_requests("/some_stub_path", method: :get)
+              stub.match_requests(uri: "/some_stub_path", method: :get)
               stub.respond_with(body: "Some stub body", headers: response_headers)
             end
           end

@@ -6,15 +6,15 @@ module HttpStub
 
         attr_reader :request, :response, :triggers
 
-        public
-        
-        def initialize(response_defaults={})
-          @response = response_defaults.clone
+        def initialize(default_builder=nil)
+          @request  = {}
+          @response = {}
           @triggers = []
+          self.merge!(default_builder) if default_builder
         end
 
-        def match_requests(uri, args={})
-          self.tap { @request = { uri: uri }.merge(args) }
+        def match_requests(args)
+          self.tap { @request.deep_merge!(args) }
         end
 
         def schema(type, definition)
@@ -37,7 +37,7 @@ module HttpStub
         end
 
         def merge!(stub_builder)
-          @request = (@request || {}).deep_merge(stub_builder.request || {})
+          self.match_requests(stub_builder.request)
           self.respond_with(stub_builder.response)
           self.trigger(stub_builder.triggers)
         end

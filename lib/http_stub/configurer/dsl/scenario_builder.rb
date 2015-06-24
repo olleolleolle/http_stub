@@ -6,8 +6,8 @@ module HttpStub
         include HttpStub::Configurer::DSL::StubBuilderProducer
         include HttpStub::Configurer::DSL::ScenarioActivator
 
-        def initialize(response_defaults, name)
-          @response_defaults         = response_defaults
+        def initialize(default_stub_builder, name)
+          @default_stub_builder      = default_stub_builder
           @name                      = name
           @stub_builders             = []
           @triggered_scenario_names  = []

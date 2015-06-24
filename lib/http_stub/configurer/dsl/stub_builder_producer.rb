@@ -5,7 +5,7 @@ module HttpStub
       module StubBuilderProducer
 
         def build_stub(&block)
-          builder = HttpStub::Configurer::DSL::StubBuilder.new(@response_defaults)
+          builder = HttpStub::Configurer::DSL::StubBuilder.new(@default_stub_builder)
           builder.invoke(&block) if block_given?
           builder
         end

@@ -13,7 +13,7 @@ module HttpStub
         triggered_stubs = (1..3).map do |trigger_number|
           stub_server.build_stub do |stub|
             stub_identifier = "#{scenario_number}_trigger_#{trigger_number}"
-            stub.match_requests(
+            stub.match_requests(uri:
               "/path_#{scenario_number}_trigger_#{trigger_number}",
               method:     :get,
               headers:    { "request_header_#{stub_identifier}" => "request_header_value_#{stub_identifier}" },
@@ -36,14 +36,14 @@ module HttpStub
           end
         end
 
-        stub_server.add_one_stub_scenario!("nested_scenario_#{scenario_number}") do
-          match_requests("/nested_scenario_stub_path_#{scenario_number}")
+        stub_server.add_scenario_with_one_stub!("nested_scenario_#{scenario_number}") do
+          match_requests(uri: "/nested_scenario_stub_path_#{scenario_number}")
           respond_with(body: "Body of nested scenario stub #{scenario_number}")
         end
 
         stub_server.add_scenario!("scenario_#{scenario_number}") do |scenario|
           scenario.add_stub! do |stub|
-            stub.match_requests(
+            stub.match_requests(uri:
               "/path_#{scenario_number}",
               method:     :get,
               headers:    { "request_header_#{scenario_number}" => "request_header_value_#{scenario_number}" },

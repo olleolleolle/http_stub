@@ -5,7 +5,7 @@ module HttpStub
       include HttpStub::Configurer
 
       stub_server.add_stub! do
-        match_requests("/a_class_stub", method: :get).respond_with(status: 201, body: "Class stub body")
+        match_requests(uri: "/a_class_stub", method: :get).respond_with(status: 201, body: "Class stub body")
       end
     end
 

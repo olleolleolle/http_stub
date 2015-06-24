@@ -57,6 +57,10 @@ module HttpStub
       @trigger_fixtures = []
     end
 
+    def request=(options)
+      self.tap { @request.payload = options }
+    end
+
     def response=(options)
       self.tap { @response.payload = options }
     end

@@ -18,13 +18,12 @@ describe HttpStub::Configurer::DSL::EndpointTemplate do
 
   describe "#match_requests" do
 
-    let(:uri)  { "/some/uri" }
     let(:args) { { key: :value } }
 
-    subject { endpoint_template.match_requests(uri, args) }
+    subject { endpoint_template.match_requests(args) }
 
     it "delegates to the templates stub builder" do
-      expect(template_stub_builder).to receive(:match_requests).with(uri, args)
+      expect(template_stub_builder).to receive(:match_requests).with(args)
 
       subject
     end
@@ -229,7 +228,7 @@ describe HttpStub::Configurer::DSL::EndpointTemplate do
     let(:name)         { "some_scenario_name" }
     let(:stub_builder) { instance_double(HttpStub::Configurer::DSL::StubBuilder).as_null_object }
 
-    before(:example) { allow(server).to receive(:add_one_stub_scenario!).and_yield(stub_builder) }
+    before(:example) { allow(server).to receive(:add_scenario_with_one_stub!).and_yield(stub_builder) }
 
     def subject_without_overrides_and_block
       endpoint_template.add_scenario!(name)
@@ -244,7 +243,7 @@ describe HttpStub::Configurer::DSL::EndpointTemplate do
     end
 
     it "adds a one stub scenario to the server" do
-      expect(server).to receive(:add_one_stub_scenario!).with(name)
+      expect(server).to receive(:add_scenario_with_one_stub!).with(name)
 
       subject_without_overrides_and_block
     end

@@ -3,8 +3,8 @@ describe HttpStub::Configurer::DSL::StubBuilderProducer do
   class HttpStub::Configurer::DSL::TestableStubBuilderProducer
     include HttpStub::Configurer::DSL::StubBuilderProducer
 
-    def initialize(response_defaults)
-      @response_defaults = response_defaults
+    def initialize(default_stub_builder)
+      @default_stub_builder = default_stub_builder
       @builders = []
     end
 
@@ -14,9 +14,9 @@ describe HttpStub::Configurer::DSL::StubBuilderProducer do
 
   end
 
-  let(:response_defaults) { { default_key: "default value" } }
+  let(:default_stub_builder) { instance_double(HttpStub::Configurer::DSL::StubBuilder) }
 
-  let(:producer) { HttpStub::Configurer::DSL::TestableStubBuilderProducer.new(response_defaults) }
+  let(:producer) { HttpStub::Configurer::DSL::TestableStubBuilderProducer.new(default_stub_builder) }
 
   describe "#build_stub" do
 
@@ -26,8 +26,8 @@ describe HttpStub::Configurer::DSL::StubBuilderProducer do
 
     subject { producer.build_stub }
 
-    it "creates a stub builder containing the producers response defaults" do
-      expect(HttpStub::Configurer::DSL::StubBuilder).to receive(:new).with(response_defaults)
+    it "creates a stub builder containing the producers default stub builder" do
+      expect(HttpStub::Configurer::DSL::StubBuilder).to receive(:new).with(default_stub_builder)
 
       subject
     end
