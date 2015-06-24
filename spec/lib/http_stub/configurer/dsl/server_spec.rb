@@ -186,15 +186,12 @@ describe HttpStub::Configurer::DSL::Server do
     let(:block_verifier) { double("BlockVerifier") }
     let(:block)          { lambda { block_verifier.verify } }
 
-    let(:scenario_builder) { instance_double(HttpStub::Configurer::DSL::ScenarioBuilder) }
+    let(:scenario_builder) { instance_double(HttpStub::Configurer::DSL::ScenarioBuilder, add_stub!: nil) }
     let(:stub_builder)     { instance_double(HttpStub::Configurer::DSL::StubBuilder, invoke: nil) }
 
-    subject { server.add_scenario_with_one_stub!(scenario_name, &block) }
+    subject { server.add_scenario_with_one_stub!(scenario_name, stub_builder) }
 
-    before(:each) do
-      allow(server).to receive(:add_scenario!).and_yield(scenario_builder)
-      allow(scenario_builder).to receive(:add_stub!).and_yield(stub_builder)
-    end
+    before(:each) { allow(server).to receive(:add_scenario!).and_yield(scenario_builder) }
 
     it "adds a scenario with the provided name" do
       expect(server).to receive(:add_scenario!).with(scenario_name)
@@ -208,11 +205,34 @@ describe HttpStub::Configurer::DSL::Server do
       subject
     end
 
-    it "requests the stub builder invoke the provided block" do
-      expect(stub_builder).to receive(:invoke).and_yield
-      expect(block_verifier).to receive(:verify)
+    context "when a builder is provided" do
 
-      subject
+      subject { server.add_scenario_with_one_stub!(scenario_name, stub_builder) }
+
+      it "adds a stub to the scenario with the provided builder" do
+        expect(scenario_builder).to receive(:add_stub!).with(stub_builder)
+
+        subject
+      end
+
+    end
+
+    context "when a block is provided" do
+
+      let(:block_verifier) { double("BlockVerifier") }
+      let(:block)          { lambda { block_verifier.verify } }
+
+      subject { server.add_scenario_with_one_stub!(scenario_name, &block) }
+
+      before(:example) { allow(scenario_builder).to receive(:add_stub!).and_yield(stub_builder) }
+
+      it "requests the stub builder invoke the provided block" do
+        expect(stub_builder).to receive(:invoke).and_yield
+        expect(block_verifier).to receive(:verify)
+
+        subject
+      end
+
     end
 
   end

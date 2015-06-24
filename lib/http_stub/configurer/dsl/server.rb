@@ -40,9 +40,9 @@ module HttpStub
           @server_facade.define_scenario(builder.build)
         end
 
-        def add_scenario_with_one_stub!(name, &block)
+        def add_scenario_with_one_stub!(name, builder=nil, &block)
           add_scenario!(name) do |scenario|
-            scenario.add_stub! { |stub| stub.invoke(&block) }
+            scenario.add_stub!(builder) { |stub| stub.invoke(&block) }
           end
         end
 

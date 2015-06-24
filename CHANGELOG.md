@@ -38,3 +38,7 @@ Server request defaults supported.
 Breaking changes:
 * ```match_requests``` no longer accepts uri as first argument.  It must be provided in the argument hash, e.g. ```stub.match_requests(uri: "/some/uri")```
 * ```add_scenario_with_one_stub!``` preferred over ```add_one_stub_scenario!```
+
+ ** 0.19.1 **
+ 
+```add_scenario_with_one_stub!``` supports builder as an argument.
