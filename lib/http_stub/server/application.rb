@@ -27,23 +27,6 @@ module HttpStub
 
       public
 
-      # Sample request body:
-      # {
-      #   "uri": "/some/path",
-      #   "method": "get",
-      #   "headers": {
-      #     "key": "value",
-      #     ...
-      #   },
-      #   "parameters": {
-      #     "key": "value",
-      #     ...
-      #   },
-      #   "response": {
-      #     "status": "200",
-      #     "body": "Hello World"
-      #   }
-      # }
       post "/stubs" do
         response = @stub_controller.register(request)
         @response_pipeline.process(response)
@@ -68,19 +51,6 @@ module HttpStub
         halt 200, "OK"
       end
 
-      # Sample request body:
-      # {
-      #   "name": "some_scenario_name",
-      #   "stubs": [
-      #     {
-      #       ... see /stub ...
-      #     },
-      #   ],
-      #   "triggered_scenario_names": [
-      #     "some_other_scenario_name",
-      #    ...
-      #   ]
-      # }
       post "/stubs/scenarios" do
         response = @scenario_controller.register(request)
         @response_pipeline.process(response)

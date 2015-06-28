@@ -1,8 +1,8 @@
-describe HttpStub::Server::Scenario::Instance do
+describe HttpStub::Server::Scenario::Scenario do
 
   let(:name)                     { "some_scenario_name" }
   let(:number_of_stubs)          { 3 }
-  let(:stubs)                    { (1..number_of_stubs).map { instance_double(HttpStub::Server::Stub::Instance) } }
+  let(:stubs)                    { (1..number_of_stubs).map { instance_double(HttpStub::Server::Stub::Stub) } }
   let(:triggered_scenario_names) { (1..3).map { |i| "triggered/scenario/name/#{i}" } }
   let(:args) do
     HttpStub::ScenarioFixture.new.with_name!(name).
@@ -11,7 +11,7 @@ describe HttpStub::Server::Scenario::Instance do
       server_payload
   end
 
-  let(:scenario) { HttpStub::Server::Scenario::Instance.new(args) }
+  let(:scenario) { HttpStub::Server::Scenario::Scenario.new(args) }
 
   before(:example) { allow(HttpStub::Server::Stub).to receive(:create).and_return(*stubs) }
 

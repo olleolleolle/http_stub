@@ -1,7 +1,7 @@
 describe HttpStub::Server::Stub::Triggers do
 
   let(:trigger_bodies)     { (1..3).map { |i| "trigger body #{i}" } }
-  let(:stubs_for_triggers) { (1..trigger_bodies.length).map { instance_double(HttpStub::Server::Stub::Instance) } }
+  let(:stubs_for_triggers) { (1..trigger_bodies.length).map { instance_double(HttpStub::Server::Stub::Stub) } }
   let(:stub_triggers)      { HttpStub::Server::Stub::Triggers.new(trigger_bodies) }
 
   before(:example) { allow(HttpStub::Server::Stub).to receive(:create).and_return(*stubs_for_triggers) }

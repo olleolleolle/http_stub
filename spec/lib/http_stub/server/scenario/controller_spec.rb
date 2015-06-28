@@ -3,8 +3,8 @@ describe HttpStub::Server::Scenario::Controller do
   let(:request_path_info) { "/some/request/path" }
   let(:request)           { instance_double(Rack::Request, path_info: request_path_info) }
   let(:payload)           { HttpStub::ScenarioFixture.new.server_payload }
-  let(:stubs)             { (1..3).map { instance_double(HttpStub::Server::Stub::Instance) } }
-  let(:scenario)          { instance_double(HttpStub::Server::Scenario::Instance, stubs: stubs) }
+  let(:stubs)             { (1..3).map { instance_double(HttpStub::Server::Stub::Stub) } }
+  let(:scenario)          { instance_double(HttpStub::Server::Scenario::Scenario, stubs: stubs) }
   let(:scenario_registry) { instance_double(HttpStub::Server::Registry).as_null_object }
   let(:stub_registry)     { instance_double(HttpStub::Server::Stub::Registry).as_null_object }
   let(:activator)         { instance_double(HttpStub::Server::Scenario::Activator).as_null_object }

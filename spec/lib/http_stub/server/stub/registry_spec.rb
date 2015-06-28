@@ -8,7 +8,7 @@ describe HttpStub::Server::Stub::Registry do
 
   describe "#add" do
 
-    let(:stub)    { instance_double(HttpStub::Server::Stub::Instance) }
+    let(:stub)    { instance_double(HttpStub::Server::Stub::Stub) }
     let(:request) { instance_double(Rack::Request) }
 
     it "delegates to an underlying simple registry" do
@@ -21,7 +21,7 @@ describe HttpStub::Server::Stub::Registry do
 
   describe "#concat" do
 
-    let(:stubs)   { (1..3).map { instance_double(HttpStub::Server::Stub::Instance) } }
+    let(:stubs)   { (1..3).map { instance_double(HttpStub::Server::Stub::Stub) } }
     let(:request) { instance_double(Rack::Request) }
 
     it "delegates to an underlying simple registry" do
@@ -47,7 +47,7 @@ describe HttpStub::Server::Stub::Registry do
     context "when a stub is found" do
 
       let(:triggers) { instance_double(HttpStub::Server::Stub::Triggers) }
-      let(:stub)     { instance_double(HttpStub::Server::Stub::Instance, triggers: triggers) }
+      let(:stub)     { instance_double(HttpStub::Server::Stub::Stub, triggers: triggers) }
 
       before(:example) { allow(registry).to receive(:find).and_return(stub) }
 
@@ -83,7 +83,7 @@ describe HttpStub::Server::Stub::Registry do
 
     context "when the state of the registry has been remembered" do
 
-      let(:last_stub_remembered) { instance_double(HttpStub::Server::Stub::Instance) }
+      let(:last_stub_remembered) { instance_double(HttpStub::Server::Stub::Stub) }
 
       before(:example) do
         allow(registry).to receive(:last).and_return(last_stub_remembered)
@@ -112,7 +112,7 @@ describe HttpStub::Server::Stub::Registry do
 
   describe "#all" do
 
-    let(:stubs) { (1..3).map { instance_double(HttpStub::Server::Stub::Instance) } }
+    let(:stubs) { (1..3).map { instance_double(HttpStub::Server::Stub::Stub) } }
 
     subject { stub_registry.all }
 

@@ -3,7 +3,7 @@ describe HttpStub::Server::Stub::Controller do
   let(:request)  { instance_double(Rack::Request) }
   let(:payload)  { HttpStub::StubFixture.new.server_payload }
   let(:response) { instance_double(HttpStub::Server::Stub::Response::Base) }
-  let(:the_stub) { instance_double(HttpStub::Server::Stub::Instance, response: response) }
+  let(:the_stub) { instance_double(HttpStub::Server::Stub::Stub, response: response) }
   let(:registry) { instance_double(HttpStub::Server::Stub::Registry).as_null_object }
 
   let(:controller) { HttpStub::Server::Stub::Controller.new(registry) }

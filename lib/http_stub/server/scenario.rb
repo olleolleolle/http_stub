@@ -4,7 +4,7 @@ module HttpStub
     module Scenario
 
       def self.create(args)
-        HttpStub::Server::Scenario::Instance.new(args)
+        HttpStub::Server::Scenario::Scenario.new(args)
       end
 
     end

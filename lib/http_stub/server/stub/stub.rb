@@ -2,7 +2,7 @@ module HttpStub
   module Server
     module Stub
 
-      class Instance
+      class Stub
 
         attr_reader :method, :uri, :headers, :parameters, :body, :response, :triggers
 

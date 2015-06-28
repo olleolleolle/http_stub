@@ -1,4 +1,4 @@
-describe HttpStub::Server::Stub::Instance do
+describe HttpStub::Server::Stub::Stub do
 
   let(:request_header_payload) do
     {
@@ -50,7 +50,7 @@ describe HttpStub::Server::Stub::Instance do
   let(:response)           { instance_double(HttpStub::Server::Stub::Response::Base) }
   let(:triggers)           { instance_double(HttpStub::Server::Stub::Triggers) }
 
-  let(:the_stub) { HttpStub::Server::Stub::Instance.new(stub_payload) }
+  let(:the_stub) { HttpStub::Server::Stub::Stub.new(stub_payload) }
 
   before(:example) do
     allow(HttpStub::Server::Stub::Method).to receive(:new).and_return(stub_method)

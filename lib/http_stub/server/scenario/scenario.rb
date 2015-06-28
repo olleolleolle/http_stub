@@ -2,7 +2,7 @@ module HttpStub
   module Server
     module Scenario
 
-      class Instance
+      class Scenario
 
         attr_reader :name, :stubs, :triggered_scenario_names
 
