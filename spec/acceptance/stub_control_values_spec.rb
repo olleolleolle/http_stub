@@ -84,7 +84,8 @@ describe "Stub control value acceptance" do
 
         context "and a request that matches is made" do
 
-          let(:response) { HTTParty.get("#{server_uri}/stub_with_parameters?key=matching_value") }
+          let(:parameters) { { "key" => "matching_value" } }
+          let(:response)   { HTTParty.get("#{server_uri}/stub_with_parameters", query: parameters) }
 
           it "replays the stubbed response" do
             expect(response.code).to eql(202)
@@ -95,7 +96,8 @@ describe "Stub control value acceptance" do
 
         context "and a request that does not match is made" do
 
-          let(:response) { HTTParty.get("#{server_uri}/stub_with_parameters?key=does_not_match_value") }
+          let(:parameters) { { "key" => "does_not_match_value" } }
+          let(:response)   { HTTParty.get("#{server_uri}/stub_with_parameters", query: parameters) }
 
           it "responds with a 404 status code" do
             expect(response.code).to eql(404)
@@ -127,7 +129,8 @@ describe "Stub control value acceptance" do
 
         context "and a request that does not match is made" do
 
-          let(:response) { HTTParty.get("#{server_uri}/stub_with_omitted_parameters?key=must_be_omitted") }
+          let(:parameters) { { "key" => "must_be_omitted" } }
+          let(:response)   { HTTParty.get("#{server_uri}/stub_with_omitted_parameters", query: parameters) }
 
           it "responds with a 404 status code" do
             expect(response.code).to eql(404)

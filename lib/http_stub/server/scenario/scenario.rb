@@ -13,7 +13,7 @@ module HttpStub
           @triggered_scenario_names = @args["triggered_scenario_names"]
         end
 
-        def satisfies?(name)
+        def matches?(name, _logger)
           @name == name
         end
 

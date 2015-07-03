@@ -96,8 +96,14 @@ describe HttpStub::Server::Stub::Response::Base do
 
     let(:response_header_hash) { response.headers.to_hash }
 
-    it "is Headers" do
-      expect(response.headers).to be_a(HttpStub::Server::Stub::Headers)
+    it "is a readable hash" do
+      expect(response.headers).to be_a(HttpStub::Server::FormattedHash)
+    end
+
+    it "formats the hash with a ':' key value delimiter" do
+      expect(HttpStub::Server::FormattedHash).to receive(:new).with(anything, ":")
+
+      response.headers
     end
 
     context "when default headers have been added" do

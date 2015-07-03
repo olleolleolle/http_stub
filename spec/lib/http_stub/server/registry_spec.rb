@@ -1,15 +1,14 @@
 describe HttpStub::Server::Registry do
 
-  let(:logger)  { double("Logger").as_null_object }
-  let(:request) { instance_double(Rack::Request, logger: logger) }
+  let(:logger)  { instance_double(Logger, info: nil) }
 
   let(:registry) { HttpStub::Server::Registry.new("a_model") }
 
   shared_context "register multiple models" do
 
-    let(:models) { (1..3).map { |i| double("HttpStub::Server::Model#{i}", :satisfies? => false) } }
+    let(:models) { (1..3).map { |i| double("HttpStub::Server::Model#{i}", :matches? => false) } }
 
-    before(:example) { registry.concat(models, request) }
+    before(:example) { registry.concat(models, logger) }
 
   end
 
@@ -18,7 +17,7 @@ describe HttpStub::Server::Registry do
     let(:model_string_representation) { "some model string" }
     let(:model)                       { double("HttpStub::Server::Model", to_s: model_string_representation) }
 
-    subject { registry.add(model, request) }
+    subject { registry.add(model, logger) }
 
     before(:example) { allow(logger).to receive(:info) }
 
@@ -45,7 +44,7 @@ describe HttpStub::Server::Registry do
       end
     end
 
-    subject { registry.concat(models, request) }
+    subject { registry.concat(models, logger) }
 
     it "logs that the models have been registered" do
       model_string_representations.each do |string_representation|
@@ -67,23 +66,23 @@ describe HttpStub::Server::Registry do
 
     let(:criteria) { double("Criteria", inspect: "Criteria inspect result") }
 
-    subject { registry.find(criteria: criteria, request: request) }
+    subject { registry.find(criteria, logger) }
 
     describe "when multiple models have been registered" do
 
       include_context "register multiple models"
 
       it "determines if the models satisfy the provided criteria" do
-        models.each { |model| expect(model).to receive(:satisfies?).with(criteria).and_return(false) }
+        models.each { |model| expect(model).to receive(:matches?).with(criteria, logger).and_return(false) }
 
         subject
       end
 
-      describe "and one registered model satisfies the criteria" do
+      describe "and one registered model matches the criteria" do
 
         let(:matching_model) { models[1] }
 
-        before(:example) { allow(matching_model).to receive(:satisfies?).and_return(true) }
+        before(:example) { allow(matching_model).to receive(:matches?).and_return(true) }
 
         it "returns the model" do
           expect(subject).to eql(matching_model)
@@ -91,7 +90,7 @@ describe HttpStub::Server::Registry do
 
         describe "and the registry is subsequently cleared" do
 
-          before(:example) { registry.clear(request) }
+          before(:example) { registry.clear(logger) }
 
           it "returns nil" do
             expect(subject).to be_nil
@@ -103,7 +102,7 @@ describe HttpStub::Server::Registry do
 
       describe "and multiple registered models satisfy the criteria" do
 
-        before(:example) { [0, 2].each { |i| allow(models[i]).to receive(:satisfies?).and_return(true) } }
+        before(:example) { [0, 2].each { |i| allow(models[i]).to receive(:matches?).and_return(true) } }
 
         it "supports model overrides by returning the last model registered" do
           expect(subject).to eql(models[2])
@@ -153,7 +152,7 @@ describe HttpStub::Server::Registry do
 
       let(:model) { double("HttpStub::Server::Model") }
 
-      before(:example) { registry.add(model, request) }
+      before(:example) { registry.add(model, logger) }
 
       it "returns the model" do
         expect(registry.last).to eql(model)
@@ -235,7 +234,7 @@ describe HttpStub::Server::Registry do
 
   describe "#clear" do
 
-    subject { registry.clear(request) }
+    subject { registry.clear(logger) }
 
     it "logs that the models are being cleared" do
       expect(logger).to receive(:info).with(/clearing a_model/i)

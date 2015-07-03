@@ -5,7 +5,7 @@ module HttpStub
       class PayloadFileConsolidator
 
         def self.consolidate!(payload, request)
-          response_file = request.params["response_file_#{payload["id"]}"]
+          response_file = request.parameters["response_file_#{payload["id"]}"]
           payload["response"]["body"] = response_file if response_file
           payload["triggers"].each { |trigger_payload| consolidate!(trigger_payload, request) } if payload["triggers"]
           payload

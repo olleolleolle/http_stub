@@ -28,6 +28,10 @@ describe HttpStub::Configurer::Server::CommandProcessor do
           expect { subject }.not_to raise_error
         end
 
+        it "returns the server response" do
+          expect(subject).to be_a(Net::HTTPResponse)
+        end
+
       end
 
       describe "and the server responds with a non-200 response" do

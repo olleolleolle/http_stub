@@ -4,21 +4,25 @@ describe HttpStub::Server::Application do
   let(:response)      { last_response }
   let(:response_body) { response.body.to_s }
 
+  let(:match_registry)    { instance_double(HttpStub::Server::Stub::Registry).as_null_object }
   let(:stub_registry)     { instance_double(HttpStub::Server::Stub::Registry).as_null_object }
   let(:scenario_registry) { instance_double(HttpStub::Server::Registry).as_null_object }
 
   let(:stub_controller)     { instance_double(HttpStub::Server::Stub::Controller).as_null_object }
   let(:scenario_controller) { instance_double(HttpStub::Server::Scenario::Controller).as_null_object }
 
+  let(:request_pipeline)  { instance_double(HttpStub::Server::RequestPipeline, process: nil) }
   let(:response_pipeline) { instance_double(HttpStub::Server::ResponsePipeline, process: nil) }
 
   let(:app) { HttpStub::Server::Application.new! }
 
   before(:example) do
-    allow(HttpStub::Server::Stub::Registry).to receive(:new).and_return(stub_registry)
+    allow(HttpStub::Server::Registry).to receive(:new).with("match").and_return(match_registry)
     allow(HttpStub::Server::Registry).to receive(:new).with("scenario").and_return(scenario_registry)
+    allow(HttpStub::Server::Stub::Registry).to receive(:new).and_return(stub_registry)
     allow(HttpStub::Server::Stub::Controller).to receive(:new).and_return(stub_controller)
     allow(HttpStub::Server::Scenario::Controller).to receive(:new).and_return(scenario_controller)
+    allow(HttpStub::Server::RequestPipeline).to receive(:new).and_return(request_pipeline)
     allow(HttpStub::Server::ResponsePipeline).to receive(:new).and_return(response_pipeline)
   end
 
@@ -42,6 +46,53 @@ describe HttpStub::Server::Application do
       expect(response_pipeline).to receive(:process).with(registration_response)
 
       subject
+    end
+
+  end
+
+  context "when a request to list the stubs is received" do
+
+    let(:found_stubs) { [ HttpStub::Server::Stub::Empty::INSTANCE ] }
+
+    subject { get "/stubs" }
+
+    it "retrieves the stubs from the registry" do
+      expect(stub_registry).to receive(:all).and_return(found_stubs)
+
+      subject
+    end
+
+  end
+
+  context "when a request to show a stub is received" do
+
+    let(:stub_id)    { SecureRandom.uuid }
+    let(:found_stub) { HttpStub::Server::Stub::Empty::INSTANCE }
+
+    subject { get "/stubs/#{stub_id}" }
+
+    it "retrieves the stub from the registry" do
+      expect(stub_registry).to receive(:find).with(stub_id, anything).and_return(found_stub)
+
+      subject
+    end
+
+  end
+
+  context "when a request to clear the stubs is received" do
+
+    subject { delete "/stubs" }
+
+    it "delegates clearing to the stub controller" do
+      expect(stub_controller).to receive(:clear)
+
+      subject
+    end
+
+    it "responds with a 200 status code" do
+      subject
+
+      expect(response.status).to eql(200)
     end
 
   end
@@ -82,20 +133,16 @@ describe HttpStub::Server::Application do
 
   end
 
-  context "when a request to clear the stubs has been received" do
+  context "when a request to list the matches is received" do
 
-    subject { delete "/stubs" }
+    let(:found_matches) { [ HttpStub::Server::Stub::Match::MatchFixture.empty ] }
 
-    it "delegates clearing to the stub controller" do
-      expect(stub_controller).to receive(:clear)
+    subject { get "/stubs/matches" }
+
+    it "retrieves the matches from the registry" do
+      expect(match_registry).to receive(:all).and_return(found_matches)
 
       subject
-    end
-
-    it "responds with a 200 status code" do
-      subject
-
-      expect(response.status).to eql(200)
     end
 
   end
@@ -129,6 +176,20 @@ describe HttpStub::Server::Application do
 
   end
 
+  context "when a request to list the scenarios is received" do
+
+    let(:found_scenarios) { [ HttpStub::Server::Scenario::ScenarioFixture.empty ] }
+
+    subject { get "/stubs/scenarios" }
+
+    it "retrieves the stubs from the registry" do
+      expect(scenario_registry).to receive(:all).and_return(found_scenarios)
+
+      subject
+    end
+
+  end
+
   context "when a request to clear the scenarios has been received" do
 
     subject { delete "/stubs/scenarios" }
@@ -149,57 +210,24 @@ describe HttpStub::Server::Application do
 
   context "when another type of request is received" do
 
-    let(:stub_response) { instance_double(HttpStub::Server::Stub::Response::Base) }
+    let(:request_pipeline_response) { instance_double(HttpStub::Server::Stub::Response::Base) }
 
     subject { get "/a_path" }
 
-    before(:example) { allow(stub_controller).to receive(:replay).and_return(stub_response) }
+    before(:example) { allow(request_pipeline).to receive(:process).and_return(request_pipeline_response) }
 
-    context "and the stub controller replays a response" do
+    it "determines the response via the request pipeline" do
+      expect(request_pipeline).to(
+        receive(:process).with(an_instance_of(HttpStub::Server::Request), anything)
+      )
 
-      before(:example) { allow(stub_response).to receive(:empty?).and_return(false) }
-
-      it "processes the response via the response pipeline" do
-        expect(response_pipeline).to receive(:process).with(stub_response)
-
-        subject
-      end
-
+      subject
     end
 
-    context "and the stub controller does not replay a response" do
+    it "processes the response via the response pipeline" do
+      expect(response_pipeline).to receive(:process).with(request_pipeline_response)
 
-      let(:scenario_response) { double(HttpStub::Server::Stub::Response::Base, serve_on: nil) }
-
-      before(:example) do
-        allow(stub_response).to receive(:empty?).and_return(true)
-        allow(scenario_controller).to receive(:activate).and_return(scenario_response)
-      end
-
-      context "but the scenario controller activates a scenario" do
-
-        before(:each) { allow(scenario_response).to receive(:empty?).and_return(false) }
-
-        it "processes the scenario response via the response pipeline" do
-          expect(response_pipeline).to receive(:process).with(scenario_response)
-
-          subject
-        end
-
-      end
-
-      context "and the scenario controller does not activate a scenario" do
-
-        before(:each) { allow(scenario_response).to receive(:empty?).and_return(true) }
-
-        it "processes an error response via the response pipeline" do
-          expect(response_pipeline).to receive(:process).with(HttpStub::Server::Response::ERROR)
-
-          subject
-        end
-
-      end
-
+      subject
     end
 
   end

@@ -8,18 +8,18 @@ module HttpStub
         @models = []
       end
 
-      def add(model, request)
+      def add(model, logger)
         @models.unshift(model)
-        request.logger.info "Registered #{@model_name}: #{model}"
+        logger.info "Registered #{@model_name}: #{model}"
       end
 
-      def concat(models, request)
-        models.each { |model| self.add(model, request) }
+      def concat(models, logger)
+        models.each { |model| self.add(model, logger) }
       end
 
-      def find(args)
-        args[:request].logger.info "Finding #{@model_name} satisfying: #{args[:criteria]}"
-        @models.find { |model| model.satisfies?(args[:criteria]) }
+      def find(criteria, logger)
+        logger.info "Finding #{@model_name} matching: #{criteria}"
+        @models.find { |model| model.matches?(criteria, logger) }
       end
 
       def last
@@ -35,8 +35,8 @@ module HttpStub
         @models = @models.slice(starting_index..-1) if starting_index
       end
 
-      def clear(request)
-        request.logger.info "Clearing #{@model_name} registry"
+      def clear(logger)
+        logger.info "Clearing #{@model_name} registry"
         @models.clear
       end
 

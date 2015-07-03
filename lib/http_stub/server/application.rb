@@ -9,10 +9,13 @@ module HttpStub
 
       def initialize
         super()
-        @stub_registry       = HttpStub::Server::Stub::Registry.new
+        @match_registry      = HttpStub::Server::Registry.new("match")
+        @stub_registry       = HttpStub::Server::Stub::Registry.new(@match_registry)
         @scenario_registry   = HttpStub::Server::Registry.new("scenario")
         @stub_controller     = HttpStub::Server::Stub::Controller.new(@stub_registry)
         @scenario_controller = HttpStub::Server::Scenario::Controller.new(@scenario_registry, @stub_registry)
+        @request_pipeline    =
+          HttpStub::Server::RequestPipeline.new(@stub_controller, @scenario_controller, @match_registry)
       end
 
       private
@@ -23,12 +26,15 @@ module HttpStub
         SUPPORTED_REQUEST_TYPES.each { |type| self.send(type, path, opts, &block) }
       end
 
-      before { @response_pipeline = HttpStub::Server::ResponsePipeline.new(self) }
+      before do
+        @response_pipeline = HttpStub::Server::ResponsePipeline.new(self)
+        @http_stub_request = HttpStub::Server::Request.new(request)
+      end
 
       public
 
       post "/stubs" do
-        response = @stub_controller.register(request)
+        response = @stub_controller.register(@http_stub_request, logger)
         @response_pipeline.process(response)
       end
 
@@ -37,7 +43,7 @@ module HttpStub
       end
 
       delete "/stubs" do
-        @stub_controller.clear(request)
+        @stub_controller.clear(logger)
         halt 200, "OK"
       end
 
@@ -51,8 +57,12 @@ module HttpStub
         halt 200, "OK"
       end
 
+      get "/stubs/matches" do
+        haml :matches, {}, matches: @match_registry.all
+      end
+
       post "/stubs/scenarios" do
-        response = @scenario_controller.register(request)
+        response = @scenario_controller.register(@http_stub_request, logger)
         @response_pipeline.process(response)
       end
 
@@ -61,15 +71,22 @@ module HttpStub
       end
 
       delete "/stubs/scenarios" do
-        @scenario_controller.clear(request)
+        @scenario_controller.clear(logger)
         halt 200, "OK"
+      end
+
+      get "/stubs/:id" do
+        haml :stub, {}, the_stub: @stub_registry.find(params[:id], logger)
       end
 
       get "/application.css" do
         sass :application
       end
 
-      any_request_type(//) { handle_request }
+      any_request_type(//) do
+        response = @request_pipeline.process(@http_stub_request, logger)
+        @response_pipeline.process(response)
+      end
 
       helpers do
 
@@ -77,15 +94,6 @@ module HttpStub
           Rack::Utils.escape_html(text)
         end
 
-      end
-
-      private
-
-      def handle_request
-        response = @stub_controller.replay(request)
-        response = @scenario_controller.activate(request) if response.empty?
-        response = HttpStub::Server::Response::ERROR if response.empty?
-        @response_pipeline.process(response)
       end
 
     end

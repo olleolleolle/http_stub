@@ -33,15 +33,15 @@ module HttpStub
 
           end
 
-          attr_reader :status, :body, :delay_in_seconds, :headers
+          attr_reader :status, :headers, :body, :delay_in_seconds
 
           def initialize(args={})
             @original_args    = args
             resolved_args     = self.class.merge_defaults(args)
             @status           = resolved_args["status"]
+            @headers          = HttpStub::Server::FormattedHash.new(resolved_args["headers"], ":")
             @body             = resolved_args["body"]
             @delay_in_seconds = resolved_args["delay_in_seconds"]
-            @headers          = HttpStub::Server::Stub::Headers.new(resolved_args["headers"])
           end
 
           def empty?

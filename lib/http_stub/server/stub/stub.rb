@@ -4,25 +4,37 @@ module HttpStub
 
       class Stub
 
-        attr_reader :method, :uri, :headers, :parameters, :body, :response, :triggers
+        attr_reader :uri, :method, :headers, :parameters, :body, :response, :triggers, :stub_uri
 
         def initialize(args)
-          @method      = HttpStub::Server::Stub::Method.new(args["method"])
-          @uri         = HttpStub::Server::Stub::Uri.new(args["uri"])
-          @headers     = HttpStub::Server::Stub::RequestHeaders.new(args["headers"])
-          @parameters  = HttpStub::Server::Stub::RequestParameters.new(args["parameters"])
-          @body        = HttpStub::Server::Stub::RequestBody.create(args["body"])
+          @id          = args["id"] || SecureRandom.uuid
+          @uri         = HttpStub::Server::Stub::Match::Rule::Uri.new(args["uri"])
+          @method      = HttpStub::Server::Stub::Match::Rule::Method.new(args["method"])
+          @headers     = HttpStub::Server::Stub::Match::Rule::Headers.new(args["headers"])
+          @parameters  = HttpStub::Server::Stub::Match::Rule::Parameters.new(args["parameters"])
+          @body        = HttpStub::Server::Stub::Match::Rule::Body.create(args["body"])
           @response    = HttpStub::Server::Stub::Response.create(args["response"])
           @triggers    = HttpStub::Server::Stub::Triggers.new(args["triggers"])
+          @stub_uri    = "/stubs/#{@id}"
           @description = args.to_s
         end
 
-        def satisfies?(request)
-          [ @uri, @method, @headers, @parameters, @body ].all? { |matcher| matcher.match?(request) }
+        def matches?(criteria, logger)
+          criteria.is_a?(String) ? matches_by_id?(criteria) : matches_by_rules?(criteria, logger)
         end
 
         def to_s
           @description
+        end
+
+        private
+
+        def matches_by_id?(criteria)
+          criteria == @id
+        end
+
+        def matches_by_rules?(request, logger)
+          [ @uri, @method, @headers, @parameters, @body ].all? { |matcher| matcher.matches?(request, logger) }
         end
 
       end

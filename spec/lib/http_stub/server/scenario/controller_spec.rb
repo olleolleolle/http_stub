@@ -1,7 +1,8 @@
 describe HttpStub::Server::Scenario::Controller do
 
-  let(:request_path_info) { "/some/request/path" }
-  let(:request)           { instance_double(Rack::Request, path_info: request_path_info) }
+  let(:request_uri)       { "/some/request/path" }
+  let(:request)           { instance_double(HttpStub::Server::Request, uri: request_uri) }
+  let(:logger)            { instance_double(Logger) }
   let(:payload)           { HttpStub::ScenarioFixture.new.server_payload }
   let(:stubs)             { (1..3).map { instance_double(HttpStub::Server::Stub::Stub) } }
   let(:scenario)          { instance_double(HttpStub::Server::Scenario::Scenario, stubs: stubs) }
@@ -13,16 +14,16 @@ describe HttpStub::Server::Scenario::Controller do
 
   before(:example) do
     allow(HttpStub::Server::Scenario::Activator).to receive(:new).and_return(activator)
-    allow(HttpStub::Server::Scenario::RequestParser).to receive(:parse).and_return(payload)
+    allow(HttpStub::Server::Scenario::Parser).to receive(:parse).and_return(payload)
     allow(HttpStub::Server::Scenario).to receive(:create).and_return(scenario)
   end
 
   describe "#register" do
 
-    subject { controller.register(request) }
+    subject { controller.register(request, logger) }
 
     it "parses the payload from the request" do
-      expect(HttpStub::Server::Scenario::RequestParser).to receive(:parse).with(request).and_return(payload)
+      expect(HttpStub::Server::Scenario::Parser).to receive(:parse).with(request).and_return(payload)
 
       subject
     end
@@ -33,8 +34,8 @@ describe HttpStub::Server::Scenario::Controller do
       subject
     end
 
-    it "adds the created scenario to the scenario registry with the provided request" do
-      expect(scenario_registry).to receive(:add).with(scenario, request)
+    it "adds the created scenario to the scenario registry with the provided logger" do
+      expect(scenario_registry).to receive(:add).with(scenario, logger)
 
       subject
     end
@@ -47,20 +48,20 @@ describe HttpStub::Server::Scenario::Controller do
 
   describe "#activate" do
 
-    subject { controller.activate(request) }
+    subject { controller.activate(request, logger) }
 
     it "finds a scenario whose name matches the request path omitting the '/' prefix" do
-      expect(scenario_registry).to receive(:find).with(criteria: "some/request/path", request: request)
+      expect(scenario_registry).to receive(:find).with("some/request/path", logger)
 
       subject
     end
 
-    describe "when a scenario is found that satisfies the request" do
+    describe "when a scenario is found that matches the request" do
 
       before(:example) { allow(scenario_registry).to receive(:find).and_return(scenario) }
 
       it "activates the scenario via the activator" do
-        expect(activator).to receive(:activate).with(scenario, request)
+        expect(activator).to receive(:activate).with(scenario, logger)
 
         subject
       end
@@ -91,10 +92,12 @@ describe HttpStub::Server::Scenario::Controller do
 
   describe "#clear" do
 
-    it "clears the scenario registry" do
-      expect(scenario_registry).to receive(:clear).with(request)
+    subject { controller.clear(logger) }
 
-      controller.clear(request)
+    it "clears the scenario registry" do
+      expect(scenario_registry).to receive(:clear).with(logger)
+
+      subject
     end
 
   end

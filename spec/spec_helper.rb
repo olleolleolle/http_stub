@@ -7,7 +7,7 @@ SimpleCov.start do
   add_filter "/spec/"
   add_filter "/vendor/"
 
-  minimum_coverage 99.67
+  minimum_coverage 99.92
   refuse_coverage_drop
 end if ENV["coverage"]
 
@@ -42,7 +42,11 @@ module HttpStub
 
 end
 
-require_relative 'support/stub_fixture'
-require_relative 'support/scenario_fixture'
+require_relative 'support/http_stub/server/request_fixture'
+require_relative 'support/http_stub/server/scenario/scenario_fixture'
+require_relative 'support/http_stub/server/stub/match/match_fixture'
+require_relative 'support/http_stub/stub_fixture'
+require_relative 'support/http_stub/scenario_fixture'
+require_relative 'support/http_stub/empty_configurer'
 require_relative 'support/server_integration'
 require_relative 'support/configurer_integration'

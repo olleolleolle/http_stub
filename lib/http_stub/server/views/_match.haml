@@ -1,0 +1,20 @@
+%table
+  %tr
+    %td URI:
+    %td=h(match.request.uri)
+  %tr
+    %td Method:
+    %td=match.request.method
+  %tr
+    %td Headers:
+    %td=h(match.request.headers)
+  %tr
+    %td Parameters:
+    %td=h(match.request.parameters)
+  %tr
+    %td Body:
+    %td=h(match.request.body)
+  %tr
+    %td Matched Stub:
+    %td
+      %a{ href: match.stub.stub_uri, class: :stub } Match

@@ -1,4 +1,5 @@
 shared_context "server integration" do
+  include Rack::Utils
 
   before(:context) do
     @pid = Process.spawn("rake example_server:start:foreground --trace")

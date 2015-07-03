@@ -9,24 +9,24 @@ module HttpStub
           @scenario_activator = HttpStub::Server::Scenario::Activator.new(scenario_registry, stub_registry)
         end
 
-        def register(request)
-          scenario = HttpStub::Server::Scenario.create(HttpStub::Server::Scenario::RequestParser.parse(request))
-          @scenario_registry.add(scenario, request)
+        def register(request, logger)
+          scenario = HttpStub::Server::Scenario.create(HttpStub::Server::Scenario::Parser.parse(request))
+          @scenario_registry.add(scenario, logger)
           HttpStub::Server::Response::SUCCESS
         end
 
-        def activate(request)
-          scenario = @scenario_registry.find(criteria: request.path_info.gsub(/^\//, ""), request: request)
+        def activate(request, logger)
+          scenario = @scenario_registry.find(request.uri.gsub(/^\//, ""), logger)
           if scenario
-            @scenario_activator.activate(scenario, request)
+            @scenario_activator.activate(scenario, logger)
             HttpStub::Server::Response::SUCCESS
           else
             HttpStub::Server::Response::EMPTY
           end
         end
 
-        def clear(request)
-          @scenario_registry.clear(request)
+        def clear(logger)
+          @scenario_registry.clear(logger)
         end
 
       end

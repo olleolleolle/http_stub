@@ -9,12 +9,12 @@ module HttpStub
           @stub_registry     = stub_registry
         end
 
-        def activate(scenario, request)
-          @stub_registry.concat(scenario.stubs, request)
+        def activate(scenario, logger)
+          @stub_registry.concat(scenario.stubs, logger)
           scenario.triggered_scenario_names.each do |triggered_scenario_name|
-            scenario_to_activate = @scenario_registry.find(criteria: triggered_scenario_name, request: request)
+            scenario_to_activate = @scenario_registry.find(triggered_scenario_name, logger)
             raise "Scenario not found with name '#{triggered_scenario_name}'" unless scenario_to_activate
-            activate(scenario_to_activate, request)
+            activate(scenario_to_activate, logger)
           end
         end
 

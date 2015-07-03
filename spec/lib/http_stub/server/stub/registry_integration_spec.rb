@@ -1,9 +1,9 @@
 describe HttpStub::Server::Stub::Registry, "integrating with real stubs" do
 
-  let(:logger)  { double("Logger").as_null_object }
-  let(:request) { instance_double(Rack::Request, logger: logger) }
+  let(:request_match_registry) { HttpStub::Server::Registry.new("request match") }
+  let(:logger)                 { instance_double(Logger, info: nil) }
 
-  let(:stub_registry) { HttpStub::Server::Stub::Registry.new }
+  let(:stub_registry) { HttpStub::Server::Stub::Registry.new(request_match_registry) }
 
   describe "#recall" do
 
@@ -13,7 +13,7 @@ describe HttpStub::Server::Stub::Registry, "integrating with real stubs" do
 
       let(:stubs) { (1..3).map { |i| create_stub(i) } }
 
-      before(:example) { stubs.each { |stub| stub_registry.add(stub, request) } }
+      before(:example) { stubs.each { |stub| stub_registry.add(stub, logger) } }
 
       context "and remembered" do
 
@@ -23,7 +23,7 @@ describe HttpStub::Server::Stub::Registry, "integrating with real stubs" do
 
           let(:stub_to_add) { create_stub(4) }
 
-          before(:example) { stub_registry.add(stub_to_add, request) }
+          before(:example) { stub_registry.add(stub_to_add, logger) }
 
           it "should restore all known stubs to the remembered state" do
             subject

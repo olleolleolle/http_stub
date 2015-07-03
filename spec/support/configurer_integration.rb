@@ -1,6 +1,7 @@
 shared_context "configurer integration" do
   include_context "server integration"
 
+  let(:configurer)  { HttpStub::EmptyConfigurer }
   let(:stub_server) { configurer.stub_server }
 
   before(:example) do

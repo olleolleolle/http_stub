@@ -10,8 +10,8 @@ module HttpStub
           @triggers = (triggers || []).map { |trigger| HttpStub::Server::Stub.create(trigger) }
         end
 
-        def add_to(registry, request)
-          @triggers.each { |trigger| registry.add(trigger, request) }
+        def add_to(registry, logger)
+          @triggers.each { |trigger| registry.add(trigger, logger) }
         end
 
         def to_s

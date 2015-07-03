@@ -1,25 +1,25 @@
 describe HttpStub::Server::Scenario::Activator do
 
-  let(:request)                 { instance_double(Rack::Request) }
-  let(:stubs)                   { (1..3).map { instance_double(HttpStub::Server::Stub::Stub) } }
+  let(:logger)                   { instance_double(Logger) }
+  let(:stubs)                    { (1..3).map { instance_double(HttpStub::Server::Stub::Stub) } }
   let(:triggered_scenario_names) { [] }
-  let(:scenario)                do
+  let(:scenario)                 do
     instance_double(
       HttpStub::Server::Scenario::Scenario, stubs: stubs, triggered_scenario_names: triggered_scenario_names
     )
   end
-  let(:scenario_registry)       { instance_double(HttpStub::Server::Registry).as_null_object }
-  let(:stub_registry)           { instance_double(HttpStub::Server::Stub::Registry).as_null_object }
-  let(:activator_class)         { HttpStub::Server::Scenario::Activator }
+  let(:scenario_registry)        { instance_double(HttpStub::Server::Registry).as_null_object }
+  let(:stub_registry)            { instance_double(HttpStub::Server::Stub::Registry).as_null_object }
+  let(:activator_class)          { HttpStub::Server::Scenario::Activator }
 
   let(:activator) { activator_class.new(scenario_registry, stub_registry) }
 
   describe "#activate" do
 
-    subject { activator.activate(scenario, request) }
+    subject { activator.activate(scenario, logger) }
 
-    it "adds the scenario's stubs to the stub registry with the provided request" do
-      expect(stub_registry).to receive(:concat).with(stubs, request)
+    it "adds the scenario's stubs to the stub registry with the provided logger" do
+      expect(stub_registry).to receive(:concat).with(stubs, logger)
 
       subject
     end
@@ -36,7 +36,7 @@ describe HttpStub::Server::Scenario::Activator do
       before(:each) do
         triggered_scenario_names.zip(triggered_scenarios).each do |triggered_scenario_name, triggered_scenario|
           allow(scenario_registry).to(
-            receive(:find).with(hash_including(criteria: triggered_scenario_name)).and_return(triggered_scenario)
+            receive(:find).with(triggered_scenario_name, anything).and_return(triggered_scenario)
           )
         end
       end
@@ -44,7 +44,7 @@ describe HttpStub::Server::Scenario::Activator do
       it "finds each triggered scenario in the scenario registry" do
         triggered_scenario_names.zip(triggered_scenarios).each do |triggered_scenario_name, triggered_scenario|
           expect(scenario_registry).to(
-            receive(:find).with(criteria: triggered_scenario_name, request: request).and_return(triggered_scenario)
+            receive(:find).with(triggered_scenario_name, logger).and_return(triggered_scenario)
           )
         end
 
@@ -62,8 +62,8 @@ describe HttpStub::Server::Scenario::Activator do
             @activate_args = []
           end
 
-          def activate(scenario, request)
-            @activate_args << [ scenario, request ]
+          def activate(scenario, logger)
+            @activate_args << [ scenario, logger ]
             super
           end
 
@@ -72,8 +72,8 @@ describe HttpStub::Server::Scenario::Activator do
         let(:activator_class) { HttpStub::Server::Scenario::ActivatorRetainingActivateArgs }
 
         it "activates the scenario's" do
-          expected_activate_args = triggered_scenarios.reduce([ [ scenario, request ] ]) do |result, triggered_scenario|
-            result << [ triggered_scenario, request ]
+          expected_activate_args = triggered_scenarios.reduce([ [ scenario, logger ] ]) do |result, triggered_scenario|
+            result << [ triggered_scenario, logger ]
           end
 
           subject
@@ -89,7 +89,7 @@ describe HttpStub::Server::Scenario::Activator do
 
         before(:example) do
           allow(scenario_registry).to(
-            receive(:find).with(hash_including(criteria: scenario_name_not_found)).and_return(nil)
+            receive(:find).with(scenario_name_not_found, anything).and_return(nil)
           )
         end
 

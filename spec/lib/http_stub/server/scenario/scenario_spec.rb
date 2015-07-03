@@ -43,9 +43,11 @@ describe HttpStub::Server::Scenario::Scenario do
 
   end
 
-  describe "#satisfies?" do
+  describe "#matches?" do
 
-    subject { scenario.satisfies?(other_name) }
+    let(:logger) { instance_double(Logger) }
+
+    subject { scenario.matches?(other_name, logger) }
 
     describe "when the scenario's name exactly matches the provided name" do
 

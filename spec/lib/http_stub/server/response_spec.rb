@@ -1,39 +1,73 @@
 describe HttpStub::Server::Response do
 
-  describe "::SUCCESS" do
-
-    let(:response) { HttpStub::Server::Response::SUCCESS }
+  shared_examples_for "a success response" do
 
     it "has a status of 200" do
-      expect(response.status).to eql(200)
+      expect(subject.status).to eql(200)
     end
 
     it "has a body containing OK to visually indicate success to those interacting via a browser" do
-      expect(response.body).to match(/OK/)
+      expect(subject.body).to match(/OK/)
     end
 
   end
 
-  describe "::ERROR" do
+  describe "::success" do
 
-    let(:response) { HttpStub::Server::Response::ERROR }
+    subject { HttpStub::Server::Response::success }
 
-    it "has a status of 404" do
-      expect(response.status).to eql(404)
+    it_behaves_like "a success response"
+
+    context "when headers are provided" do
+
+      let(:headers) { { "response_header_key" => "response header value" } }
+
+      subject { HttpStub::Server::Response::success(headers) }
+
+      it "established the headers" do
+        expect(subject.headers).to eql(headers)
+      end
+
     end
 
-    it "has a body containing ERROR to visually indicate the error to those interacting via a browser" do
-      expect(response.body).to match(/ERROR/)
+  end
+
+  describe "::SUCCESS" do
+
+    subject { HttpStub::Server::Response::SUCCESS }
+
+    it_behaves_like "a success response"
+
+  end
+
+  describe "::NOT_FOUND" do
+
+    subject { HttpStub::Server::Response::NOT_FOUND }
+
+    it "has a status of 404" do
+      expect(subject.status).to eql(404)
+    end
+
+    it "has a body containing NOT FOUND to visually indicate the response to those interacting via a browser" do
+      expect(subject.body).to match(/NOT FOUND/)
     end
 
   end
 
   describe "::EMPTY" do
 
-    let(:response) { HttpStub::Server::Response::EMPTY }
+    subject { HttpStub::Server::Response::EMPTY }
+
+    it "has a status of 200" do
+      expect(subject.status).to eql(200)
+    end
+
+    it "has no body" do
+      expect(subject.body).to be(nil)
+    end
 
     it "is empty" do
-      expect(response.empty?).to be(true)
+      expect(subject).to be_empty
     end
 
   end

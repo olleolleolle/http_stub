@@ -8,19 +8,19 @@ module HttpStub
           @registry = registry
         end
 
-        def register(request)
-          stub = HttpStub::Server::Stub.create(HttpStub::Server::Stub::RequestParser.parse(request))
-          @registry.add(stub, request)
-          HttpStub::Server::Response::SUCCESS
+        def register(request, logger)
+          stub = HttpStub::Server::Stub.create(HttpStub::Server::Stub::Parser.parse(request))
+          @registry.add(stub, logger)
+          HttpStub::Server::Response.success("location" => stub.stub_uri)
         end
 
-        def replay(request)
-          stub = @registry.find_for(request)
+        def replay(request, logger)
+          stub = @registry.find(request, logger)
           stub ? stub.response : HttpStub::Server::Response::EMPTY
         end
 
-        def clear(request)
-          @registry.clear(request)
+        def clear(logger)
+          @registry.clear(logger)
         end
 
       end

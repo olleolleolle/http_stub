@@ -1,5 +1,4 @@
 describe HttpStub::Server::Application, "when the server is running" do
-  include Rack::Utils
   include_context "server integration"
 
   let(:response_document) { Nokogiri::HTML(response.body) }
@@ -153,7 +152,7 @@ describe HttpStub::Server::Application, "when the server is running" do
 
       it "returns a response whose body contains the response body of a stub returning a file" do
         file_link = response_document.css("a.file").first
-        expect(file_link['href']).to match(/^file:\/\/[^']+\.pdf$/)
+        expect(file_link["href"]).to match(/^file:\/\/[^']+\.pdf$/)
       end
 
       it "returns a response whose body contains the response body of each stub trigger" do
@@ -178,30 +177,6 @@ describe HttpStub::Server::Application, "when the server is running" do
 
     end
 
-    describe "GET /stubs/scenarios" do
-
-      let(:response) { HTTParty.get("#{server_uri}/stubs/scenarios") }
-
-      it "returns a response whose body contains links to each scenario in alphabetical order" do
-        expected_scenario_links = %w{ nested_scenario scenario }.map do |scenario_name_prefix|
-          (1..3).map { |i| "/#{scenario_name_prefix}_#{i}" }
-        end.flatten
-
-        scenario_links = response_document.css("a.scenario").map { |link| link['href'] }
-
-        expect(scenario_links).to eql(expected_scenario_links)
-      end
-
-      it "returns a response whose body contains links to the scenarios triggered by each scenario" do
-        response_document.css("a.triggered_scenario").each_with_index do |link, i|
-          expect(link['href']).to eql("/nested_scenario_#{i + 1}")
-        end
-      end
-
-      include_context "the response contains HTML describing the configurers stubs"
-
-    end
-
     describe "GET /stubs" do
 
       describe "when multiple stubs are configured" do
@@ -213,6 +188,30 @@ describe HttpStub::Server::Application, "when the server is running" do
         include_context "the response contains HTML describing the configurers stubs"
 
       end
+
+    end
+
+    describe "GET /stubs/scenarios" do
+
+      let(:response) { HTTParty.get("#{server_uri}/stubs/scenarios") }
+
+      it "returns a response whose body contains links to each scenario in alphabetical order" do
+        expected_scenario_links = %w{ nested_scenario scenario }.map do |scenario_name_prefix|
+          (1..3).map { |i| "/#{scenario_name_prefix}_#{i}" }
+        end.flatten
+
+        scenario_links = response_document.css("a.scenario").map { |link| link["href"] }
+
+        expect(scenario_links).to eql(expected_scenario_links)
+      end
+
+      it "returns a response whose body contains links to the scenarios triggered by each scenario" do
+        response_document.css("a.triggered_scenario").each_with_index do |link, i|
+          expect(link["href"]).to eql("/nested_scenario_#{i + 1}")
+        end
+      end
+
+      include_context "the response contains HTML describing the configurers stubs"
 
     end
 

@@ -28,8 +28,10 @@ describe HttpStub::Server::Stub::Stub do
       }
     }
   end
+  let(:stub_id)      { SecureRandom.uuid }
   let(:stub_payload) do
     {
+      "id" =>         stub_id,
       "uri" =>        "/a_path",
       "method" =>     stub_method,
       "headers" =>    request_header_payload,
@@ -42,60 +44,70 @@ describe HttpStub::Server::Stub::Stub do
       "triggers" => [ trigger_payload ]
     }
   end
-  let(:stub_method)        { instance_double(HttpStub::Server::Stub::Method, match?: true) }
-  let(:uri)                { instance_double(HttpStub::Server::Stub::Uri, match?: true) }
-  let(:request_headers)    { instance_double(HttpStub::Server::Stub::RequestHeaders, match?: true) }
-  let(:request_parameters) { instance_double(HttpStub::Server::Stub::RequestParameters, match?: true) }
-  let(:request_body)       { double("HttpStub::Server::Stub::SomeRequestBody", match?: true) }
+  let(:stub_method)        { instance_double(HttpStub::Server::Stub::Match::Rule::Method, matches?: true) }
+  let(:uri)                { instance_double(HttpStub::Server::Stub::Match::Rule::Uri, matches?: true) }
+  let(:request_headers)    { instance_double(HttpStub::Server::Stub::Match::Rule::Headers, matches?: true) }
+  let(:request_parameters) { instance_double(HttpStub::Server::Stub::Match::Rule::Parameters, matches?: true) }
+  let(:request_body)       { double("HttpStub::Server::Stub::SomeRequestBody", matches?: true) }
   let(:response)           { instance_double(HttpStub::Server::Stub::Response::Base) }
   let(:triggers)           { instance_double(HttpStub::Server::Stub::Triggers) }
 
   let(:the_stub) { HttpStub::Server::Stub::Stub.new(stub_payload) }
 
   before(:example) do
-    allow(HttpStub::Server::Stub::Method).to receive(:new).and_return(stub_method)
-    allow(HttpStub::Server::Stub::Uri).to receive(:new).and_return(uri)
-    allow(HttpStub::Server::Stub::RequestHeaders).to receive(:new).and_return(request_headers)
-    allow(HttpStub::Server::Stub::RequestParameters).to receive(:new).and_return(request_parameters)
-    allow(HttpStub::Server::Stub::RequestBody).to receive(:create).and_return(request_body)
+    allow(HttpStub::Server::Stub::Match::Rule::Method).to receive(:new).and_return(stub_method)
+    allow(HttpStub::Server::Stub::Match::Rule::Uri).to receive(:new).and_return(uri)
+    allow(HttpStub::Server::Stub::Match::Rule::Headers).to receive(:new).and_return(request_headers)
+    allow(HttpStub::Server::Stub::Match::Rule::Parameters).to receive(:new).and_return(request_parameters)
+    allow(HttpStub::Server::Stub::Match::Rule::Body).to receive(:create).and_return(request_body)
     allow(HttpStub::Server::Stub::Response).to receive(:create).and_return(response)
     allow(HttpStub::Server::Stub::Triggers).to receive(:new).and_return(triggers)
   end
 
-  describe "#satisfies?" do
+  describe "#matches?" do
 
-    let(:request_method) { request_method_payload }
-    let(:request_uri)    { "/a_request_uri" }
-    let(:request)        { instance_double(Rack::Request, :request_method => request_method_payload) }
+    let(:logger)         { instance_double(Logger) }
 
-    subject { the_stub.satisfies?(request) }
+    context "when a request is provided" do
 
-    describe "when the request uri matches" do
+      let(:request_method) { request_method_payload }
+      let(:request_uri)    { "/a_request_uri" }
+      let(:request)        { instance_double(HttpStub::Server::Request, method: request_method_payload) }
 
-      before(:example) { allow(uri).to receive(:match?).with(request).and_return(true) }
+      subject { the_stub.matches?(request, logger) }
 
-      describe "and the request method matches" do
+      describe "when the request uri matches" do
 
-        describe "and a header match is configured" do
+        before(:example) { allow(uri).to receive(:matches?).with(request, logger).and_return(true) }
 
-          describe "that matches" do
+        describe "and the request method matches" do
 
-            before(:example) { allow(request_headers).to receive(:match?).with(request).and_return(true) }
+          describe "and a header match is configured" do
 
-            describe "and a parameter match is configured" do
+            describe "that matches" do
 
-              describe "that matches" do
+              before(:example) { allow(request_headers).to receive(:matches?).with(request, logger).and_return(true) }
 
-                before(:example) { allow(request_parameters).to receive(:match?).with(request).and_return(true) }
+              describe "and a parameter match is configured" do
 
-                describe "and a body match is configured" do
+                describe "that matches" do
 
-                  describe "that matches" do
+                  before(:example) do
+                    allow(request_parameters).to receive(:matches?).with(request, logger).and_return(true)
+                  end
 
-                    before(:example) { allow(request_body).to receive(:match?).with(request).and_return(true) }
+                  describe "and a body match is configured" do
 
-                    it "returns true" do
-                      expect(subject).to be(true)
+                    describe "that matches" do
+
+                      before(:example) do
+                        allow(request_body).to receive(:matches?).with(request, logger).and_return(true)
+                      end
+
+                      it "returns true" do
+                        expect(subject).to be(true)
+                      end
+
                     end
 
                   end
@@ -112,56 +124,91 @@ describe HttpStub::Server::Stub::Stub do
 
       end
 
-    end
 
-    describe "when the request uri does not match" do
+      describe "when the request uri does not match" do
 
-      before(:example) { allow(uri).to receive(:match?).with(request).and_return(false) }
+        before(:example) { allow(uri).to receive(:matches?).with(request, logger).and_return(false) }
 
-      it "returns false" do
-        expect(subject).to be(false)
+        it "returns false" do
+          expect(subject).to be(false)
+        end
+
+      end
+
+      describe "when the request method does not match" do
+
+        before(:example) { allow(stub_method).to receive(:matches?).with(request, logger).and_return(false) }
+
+        it "returns false" do
+          expect(subject).to be(false)
+        end
+
+      end
+
+      describe "when the headers do not match" do
+
+        before(:example) { allow(request_headers).to receive(:matches?).with(request, logger).and_return(false) }
+
+        it "returns false" do
+          expect(subject).to be(false)
+        end
+
+      end
+
+      describe "when the parameters do not match" do
+
+        before(:example) { allow(request_parameters).to receive(:matches?).with(request, logger).and_return(false) }
+
+        it "returns false" do
+          expect(subject).to be(false)
+        end
+
+      end
+
+      describe "when the bodies do not match" do
+
+        before(:example) { allow(request_body).to receive(:matches?).with(request, logger).and_return(false) }
+
+        it "returns false" do
+          expect(subject).to be(false)
+        end
+
       end
 
     end
 
-    describe "when the request method does not match" do
+    context "when an id is provided" do
 
-      before(:example) { allow(stub_method).to receive(:match?).with(request).and_return(false) }
+      subject { the_stub.matches?(id, logger) }
 
-      it "returns false" do
-        expect(subject).to be(false)
+      context "and the id matches the stubs id" do
+
+        let(:id) { stub_id }
+
+        it "returns true" do
+          expect(subject).to be(true)
+        end
+
+      end
+
+      context "and the id does not match the stubs id" do
+
+        let(:id) { "does-not-match" }
+
+        it "returns false" do
+          expect(subject).to be(false)
+        end
+
       end
 
     end
 
-    describe "when the headers do not match" do
+  end
 
-      before(:example) { allow(request_headers).to receive(:match?).with(request).and_return(false) }
+  describe "#uri" do
 
-      it "returns false" do
-        expect(subject).to be(false)
-      end
-
-    end
-
-    describe "when the parameters do not match" do
-
-      before(:example) { allow(request_parameters).to receive(:match?).with(request).and_return(false) }
-
-      it "returns false" do
-        expect(subject).to be(false)
-      end
-
-    end
-
-    describe "when the bodies do not match" do
-
-      before(:example) { allow(request_body).to receive(:match?).with(request).and_return(false) }
-
-      it "returns false" do
-        expect(subject).to be(false)
-      end
-
+    it "returns the uri model encapsulating the uri provided in the request body" do
+      expect(the_stub.uri).to eql(uri)
     end
 
   end
@@ -170,14 +217,6 @@ describe HttpStub::Server::Stub::Stub do
 
     it "returns the method model encapsulating the method provided in the request body" do
       expect(the_stub.method).to eql(stub_method)
-    end
-
-  end
-
-  describe "#uri" do
-
-    it "returns the rui model encapsulating the uri provided in the request body" do
-      expect(the_stub.uri).to eql(uri)
     end
 
   end
@@ -218,6 +257,26 @@ describe HttpStub::Server::Stub::Stub do
 
     it "returns the triggers model encapsulating the triggers provided in the request body" do
       expect(the_stub.triggers).to eql(triggers)
+    end
+
+  end
+
+  describe "#stub_uri" do
+
+    context "when an id is provided in the payload" do
+
+      it "returns a relative uri to the stub that includes the id" do
+        expect(the_stub.stub_uri).to eql("/stubs/#{stub_id}")
+      end
+
+    end
+
+    context "when an id is not provided in the payload" do
+
+      it "returns a relative uri to the stub that includes a generated id" do
+        expect(the_stub.stub_uri).to match(/\/stubs\/[a-zA-Z0-9-]+$/)
+      end
+
     end
 
   end

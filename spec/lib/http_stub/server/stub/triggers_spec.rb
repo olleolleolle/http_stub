@@ -21,12 +21,12 @@ describe HttpStub::Server::Stub::Triggers do
   describe "#add_to" do
 
     let(:registry) { instance_double(HttpStub::Server::Stub::Registry) }
-    let(:request)  { instance_double(Rack::Request) }
+    let(:logger)   { instance_double(Logger) }
 
     it "adds each stub to the provided registry" do
-      stubs_for_triggers.each { |stub_for_trigger| expect(registry).to receive(:add).with(stub_for_trigger, request) }
+      stubs_for_triggers.each { |stub_for_trigger| expect(registry).to receive(:add).with(stub_for_trigger, logger) }
 
-      stub_triggers.add_to(registry, request)
+      stub_triggers.add_to(registry, logger)
     end
 
   end

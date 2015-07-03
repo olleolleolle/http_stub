@@ -1,77 +1,137 @@
 describe HttpStub::Server::Stub::Registry do
 
-  let(:registry)      { instance_double(HttpStub::Server::Registry) }
+  let(:match_registry)           { instance_double(HttpStub::Server::Registry) }
+  let(:underlying_stub_registry) { instance_double(HttpStub::Server::Registry) }
 
-  let(:stub_registry) { HttpStub::Server::Stub::Registry.new }
+  let(:logger)                   { instance_double(Logger) }
 
-  before(:example) { allow(HttpStub::Server::Registry).to receive(:new).and_return(registry) }
+  let(:stub_registry) { HttpStub::Server::Stub::Registry.new(match_registry) }
+
+  before(:example) { allow(HttpStub::Server::Registry).to receive(:new).and_return(underlying_stub_registry) }
 
   describe "#add" do
 
-    let(:stub)    { instance_double(HttpStub::Server::Stub::Stub) }
-    let(:request) { instance_double(Rack::Request) }
+    let(:stub) { instance_double(HttpStub::Server::Stub::Stub) }
+
+    subject { stub_registry.add(stub, logger) }
 
     it "delegates to an underlying simple registry" do
-      expect(registry).to receive(:add).with(stub, request)
+      expect(underlying_stub_registry).to receive(:add).with(stub, logger)
 
-      stub_registry.add(stub, request)
+      subject
     end
 
   end
 
   describe "#concat" do
 
-    let(:stubs)   { (1..3).map { instance_double(HttpStub::Server::Stub::Stub) } }
-    let(:request) { instance_double(Rack::Request) }
+    let(:stubs)  { (1..3).map { instance_double(HttpStub::Server::Stub::Stub) } }
+
+    subject { stub_registry.concat(stubs, logger) }
 
     it "delegates to an underlying simple registry" do
-      expect(registry).to receive(:concat).with(stubs, request)
-
-      stub_registry.concat(stubs, request)
-    end
-
-  end
-
-  describe "#find_for" do
-
-    let(:request) { instance_double(Rack::Request) }
-
-    subject { stub_registry.find_for(request) }
-
-    it "delegates to an underlying simple registry to find based on the request" do
-      expect(registry).to receive(:find).with(criteria: request, request: request)
+      expect(underlying_stub_registry).to receive(:concat).with(stubs, logger)
 
       subject
     end
 
-    context "when a stub is found" do
+  end
 
-      let(:triggers) { instance_double(HttpStub::Server::Stub::Triggers) }
-      let(:stub)     { instance_double(HttpStub::Server::Stub::Stub, triggers: triggers) }
+  describe "#find" do
 
-      before(:example) { allow(registry).to receive(:find).and_return(stub) }
+    let(:triggers) { instance_double(HttpStub::Server::Stub::Triggers, add_to: nil) }
+    let(:stub)     { instance_double(HttpStub::Server::Stub::Stub, triggers: triggers) }
 
-      it "should add the stubs triggers to the registry" do
-        expect(triggers).to receive(:add_to).with(stub_registry, request)
+    subject { stub_registry.find(criteria, logger) }
+
+    shared_examples_for "an approach to finding a stub in the registry" do
+
+      it "delegates to an underlying simple registry to find based on the criteria" do
+        expect(underlying_stub_registry).to receive(:find).with(criteria, logger)
 
         subject
       end
 
-      it "returns the stub found in the underlying registry" do
-        allow(triggers).to receive(:add_to)
+      context "when a stub is found" do
 
-        expect(subject).to eql(stub)
+        before(:example) { allow(underlying_stub_registry).to receive(:find).and_return(stub) }
+
+        it "returns the stub found in the underlying stub registry" do
+          expect(subject).to eql(stub)
+        end
+
+      end
+
+      context "when a stub is not found" do
+
+        before(:example) { allow(underlying_stub_registry).to receive(:find).and_return(nil) }
+
+        it "returns the result from the underlying registry" do
+          expect(subject).to eql(nil)
+        end
+
       end
 
     end
 
-    context "when a stub is not found" do
+    context "when a request is provided" do
 
-      before(:example) { allow(registry).to receive(:find).and_return(nil) }
+      let(:request)  { HttpStub::Server::RequestFixture.create }
+      let(:criteria) { request }
 
-      it "returns the result from the underlying registry" do
-        expect(subject).to eql(nil)
+      before(:example) { allow(match_registry).to receive(:add) }
+
+      it_behaves_like "an approach to finding a stub in the registry"
+
+      context "when a stub is found" do
+
+        let(:stub_match) { instance_double(HttpStub::Server::Stub::Match::Match) }
+
+        before(:example) do
+          allow(underlying_stub_registry).to receive(:find).and_return(stub)
+          allow(HttpStub::Server::Stub::Match::Match).to receive(:new).and_return(stub_match)
+        end
+
+        it "creates a match containing the stub and request" do
+          expect(HttpStub::Server::Stub::Match::Match).to receive(:new).with(stub, request)
+
+          subject
+        end
+
+        it "adds the match to the match registry" do
+          expect(match_registry).to receive(:add).with(stub_match, logger)
+
+          subject
+        end
+
+        it "adds the stubs triggers to the underlying stub registry" do
+          expect(triggers).to receive(:add_to).with(stub_registry, logger)
+
+          subject
+        end
+
       end
+
+      context "when a stub is not found" do
+
+        before(:example) { allow(underlying_stub_registry).to receive(:find).and_return(nil) }
+
+        it "does not add a match to the match registry" do
+          expect(match_registry).to_not receive(:add)
+
+          subject
+        end
+
+      end
+
+    end
+
+    context "when an id is provided" do
+
+      let(:id)       { SecureRandom.uuid }
+      let(:criteria) { id }
+
+      it_behaves_like "an approach to finding a stub in the registry"
 
     end
 
@@ -86,12 +146,12 @@ describe HttpStub::Server::Stub::Registry do
       let(:last_stub_remembered) { instance_double(HttpStub::Server::Stub::Stub) }
 
       before(:example) do
-        allow(registry).to receive(:last).and_return(last_stub_remembered)
+        allow(underlying_stub_registry).to receive(:last).and_return(last_stub_remembered)
         stub_registry.remember
       end
 
       it "causes the underlying registry to rollback to the last stub added before the state was remembered" do
-        expect(registry).to receive(:rollback_to).with(last_stub_remembered)
+        expect(underlying_stub_registry).to receive(:rollback_to).with(last_stub_remembered)
 
         subject
       end
@@ -101,7 +161,7 @@ describe HttpStub::Server::Stub::Registry do
     context "when the state of the registry has not been remembered" do
 
       it "does not rollback the underlying registry" do
-        expect(registry).to_not receive(:rollback_to)
+        expect(underlying_stub_registry).to_not receive(:rollback_to)
 
         subject
       end
@@ -117,13 +177,13 @@ describe HttpStub::Server::Stub::Registry do
     subject { stub_registry.all }
 
     it "delegates to an underlying simple registry" do
-      expect(registry).to receive(:all)
+      expect(underlying_stub_registry).to receive(:all)
 
       subject
     end
 
     it "returns the result from the underlying registry" do
-      allow(registry).to receive(:all).and_return(stubs)
+      allow(underlying_stub_registry).to receive(:all).and_return(stubs)
 
       expect(subject).to eql(stubs)
     end
@@ -132,12 +192,23 @@ describe HttpStub::Server::Stub::Registry do
 
   describe "#clear" do
 
-    let(:request) { instance_double(Rack::Request) }
+    subject { stub_registry.clear(logger) }
 
-    it "delegates to an underlying simple registry" do
-      expect(registry).to receive(:clear).with(request)
+    before(:example) do
+      allow(underlying_stub_registry).to receive(:clear)
+      allow(match_registry).to receive(:clear)
+    end
 
-      stub_registry.clear(request)
+    it "clears the underlying simple registry" do
+      expect(underlying_stub_registry).to receive(:clear).with(logger)
+
+      subject
+    end
+
+    it "clears the match registry" do
+      expect(match_registry).to receive(:clear).with(logger)
+
+      subject
     end
 
   end
