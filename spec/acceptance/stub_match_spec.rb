@@ -9,7 +9,9 @@ describe "Stub match acceptance" do
 
     let(:uri)            { "/some/uri" }
     let(:request_method) { :get }
-    let(:headers)        { (1..3).map { |i| [ "header_#{i}", "header value #{i}" ] }.to_h }
+    let(:headers)        do
+      (1..3).reduce({}) { |result, i| result.tap { result["header_#{i}"] = "header value #{i}" } }
+    end
     let(:parameters)     { {} }
     let(:body)           { nil }
 
@@ -34,7 +36,9 @@ describe "Stub match acceptance" do
 
       context "when the request contains parameters" do
 
-        let(:parameters) { (1..3).map { |i| [ "parameter_#{i}", "parameter value #{i}" ] }.to_h }
+        let(:parameters) do
+          (1..3).reduce({}) { |result, i| result.tap { result["parameter_#{i}"] = "parameter value #{i}" } }
+        end
 
         it "returns a response body that contain the parameters" do
           parameters.each do |expected_parameter_key, expected_parameter_value|
