@@ -1,31 +1,15 @@
 %table
   %tr
-    %td URI:
-    %td=h(the_stub.uri)
+    %td Request:
+    %td=partial :request, locals: { request: the_stub }
   %tr
-    %td Method:
-    %td=the_stub.method
-  %tr
-    %td Headers:
-    %td=h(the_stub.headers)
-  %tr
-    %td Parameters:
-    %td=h(the_stub.parameters)
-  %tr
-    %td Body:
-    %td=h(the_stub.body)
-  %tr
-    %td Response Status:
-    %td=the_stub.response.status
-  %tr
-    %td Response Headers:
-    %td=h(the_stub.response.headers)
-  %tr
-    %td Response Body:
-    %td=partial "stub_#{the_stub.response.type}_response".to_sym, locals: { response: the_stub.response }
-  %tr
-    %td Response Delay:
-    %td=h(the_stub.response.delay_in_seconds)
+    %td Response:
+    %td
+      %table
+        =partial :response, locals: { response: the_stub.response }
+        %tr
+          %td Delay:
+          %td=h(the_stub.response.delay_in_seconds)
   %tr
     %td Triggers:
     %td

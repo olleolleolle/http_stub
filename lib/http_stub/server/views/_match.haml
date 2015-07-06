@@ -1,19 +1,12 @@
-%table
+%table{ class: :match }
   %tr
-    %td URI:
-    %td=h(match.request.uri)
+    %td Request:
+    %td= partial :request, locals: { request: match.request }
   %tr
-    %td Method:
-    %td=match.request.method
-  %tr
-    %td Headers:
-    %td=h(match.request.headers)
-  %tr
-    %td Parameters:
-    %td=h(match.request.parameters)
-  %tr
-    %td Body:
-    %td=h(match.request.body)
+    %td Response:
+    %td
+      %table{ class: :response }
+        = partial :response, locals: { response: match.stub.response }
   %tr
     %td Matched Stub:
     %td

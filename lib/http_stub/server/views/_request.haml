@@ -1,0 +1,16 @@
+%table
+  %tr
+    %td URI:
+    %td=h(request.uri)
+  %tr
+    %td Method:
+    %td=request.method
+  %tr
+    %td Headers:
+    %td=h(request.headers)
+  %tr
+    %td Parameters:
+    %td=h(request.parameters)
+  %tr
+    %td Body:
+    %td=h(request.body)

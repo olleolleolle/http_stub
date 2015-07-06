@@ -83,6 +83,10 @@ module HttpStub
         sass :application
       end
 
+      get "/favicon.ico" do
+        send_file File.expand_path("../views/favicon.ico", __FILE__)
+      end
+
       any_request_type(//) do
         response = @request_pipeline.process(@http_stub_request, logger)
         @response_pipeline.process(response)
