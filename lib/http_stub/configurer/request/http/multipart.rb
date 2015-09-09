@@ -5,16 +5,19 @@ module HttpStub
 
         class Multipart
 
-          def initialize(path, model)
-            @path = path
+          def initialize(model)
             @model = model
           end
 
           def to_http_request
-            Net::HTTP::Post::Multipart.new(@path, parameters)
+            Net::HTTP::Post::Multipart.new(path, parameters)
           end
 
           private
+
+          def path
+            "/http_stub/#{@model.class.name.demodulize.pluralize.underscore}"
+          end
 
           def parameters
             { payload: @model.payload.to_json }.tap do |parameters|

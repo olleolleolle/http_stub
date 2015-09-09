@@ -266,7 +266,7 @@ describe HttpStub::Server::Stub::Stub do
     context "when an id is provided in the payload" do
 
       it "returns a relative uri to the stub that includes the id" do
-        expect(the_stub.stub_uri).to eql("/stubs/#{stub_id}")
+        expect(the_stub.stub_uri).to eql("/http_stub/stubs/#{stub_id}")
       end
 
     end
@@ -274,7 +274,7 @@ describe HttpStub::Server::Stub::Stub do
     context "when an id is not provided in the payload" do
 
       it "returns a relative uri to the stub that includes a generated id" do
-        expect(the_stub.stub_uri).to match(/\/stubs\/[a-zA-Z0-9-]+$/)
+        expect(the_stub.stub_uri).to match(/\/http_stub\/stubs\/[a-zA-Z0-9-]+$/)
       end
 
     end

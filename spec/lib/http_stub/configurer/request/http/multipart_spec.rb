@@ -1,10 +1,21 @@
 describe HttpStub::Configurer::Request::Http::Multipart do
 
-  let(:path)              { "/a/request/path" }
-  let(:payload)           { { key: "value" } }
-  let(:response_files)    { [] }
-  let(:model) { instance_double(HttpStub::Configurer::Request::Stub, payload: payload, response_files: response_files) }
-  let(:multipart_request) { HttpStub::Configurer::Request::Http::Multipart.new(path, model) }
+  class HttpStub::Configurer::Request::SomeModel
+
+    attr_reader :payload, :response_files
+
+    def initialize(args)
+      @payload        = args[:payload]
+      @response_files = args[:response_files]
+    end
+
+  end
+
+  let(:payload)        { { key: "value" } }
+  let(:response_files) { [] }
+  let(:model) { HttpStub::Configurer::Request::SomeModel.new(payload: payload, response_files: response_files) }
+
+  let(:multipart_request) { HttpStub::Configurer::Request::Http::Multipart.new(model) }
 
   describe "#to_http_request" do
 
@@ -23,8 +34,8 @@ describe HttpStub::Configurer::Request::Http::Multipart do
       expect(subject).to eql(http_multipart_request)
     end
 
-    it "creates a HTTP request with the provided path" do
-      expect(Net::HTTP::Post::Multipart).to receive(:new).with(path, anything)
+    it "creates a HTTP request with a path to the pluralized name for the model" do
+      expect(Net::HTTP::Post::Multipart).to receive(:new).with("/http_stub/some_models", anything)
 
       subject
     end

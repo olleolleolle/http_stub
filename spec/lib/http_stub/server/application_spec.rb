@@ -31,7 +31,7 @@ describe HttpStub::Server::Application do
     let(:registration_response) { instance_double(HttpStub::Server::Stub::Response::Base) }
 
     subject do
-      post "/stubs", { uri: "/a_path", method: "a method", response: { status: 200, body: "Foo" } }.to_json
+      post "/http_stub/stubs", { uri: "/a_path", method: "a method", response: { status: 200, body: "Foo" } }.to_json
     end
 
     before(:example) { allow(stub_controller).to receive(:register).and_return(registration_response) }
@@ -54,7 +54,7 @@ describe HttpStub::Server::Application do
 
     let(:found_stubs) { [ HttpStub::Server::Stub::Empty::INSTANCE ] }
 
-    subject { get "/stubs" }
+    subject { get "/http_stub/stubs" }
 
     it "retrieves the stubs from the registry" do
       expect(stub_registry).to receive(:all).and_return(found_stubs)
@@ -69,7 +69,7 @@ describe HttpStub::Server::Application do
     let(:stub_id)    { SecureRandom.uuid }
     let(:found_stub) { HttpStub::Server::Stub::Empty::INSTANCE }
 
-    subject { get "/stubs/#{stub_id}" }
+    subject { get "/http_stub/stubs/#{stub_id}" }
 
     it "retrieves the stub from the registry" do
       expect(stub_registry).to receive(:find).with(stub_id, anything).and_return(found_stub)
@@ -81,7 +81,7 @@ describe HttpStub::Server::Application do
 
   context "when a request to clear the stubs is received" do
 
-    subject { delete "/stubs" }
+    subject { delete "/http_stub/stubs" }
 
     it "delegates clearing to the stub controller" do
       expect(stub_controller).to receive(:clear)
@@ -99,7 +99,7 @@ describe HttpStub::Server::Application do
 
   context "when a request to commit the stubs to memory is received" do
 
-    subject { post "/stubs/memory" }
+    subject { post "/http_stub/stubs/memory" }
 
     it "remembers the stubs in the stub registry" do
       expect(stub_registry).to receive(:remember)
@@ -117,7 +117,7 @@ describe HttpStub::Server::Application do
 
   context "when a request to recall the stubs in memory is received" do
 
-    subject { get "/stubs/memory" }
+    subject { get "/http_stub/stubs/memory" }
 
     it "recalls the stubs remembered by the stub registry" do
       expect(stub_registry).to receive(:recall)
@@ -137,7 +137,7 @@ describe HttpStub::Server::Application do
 
     let(:found_matches) { [ HttpStub::Server::Stub::Match::MatchFixture.empty ] }
 
-    subject { get "/stubs/matches" }
+    subject { get "/http_stub/stubs/matches" }
 
     it "retrieves the matches from the registry" do
       expect(match_registry).to receive(:all).and_return(found_matches)
@@ -154,7 +154,7 @@ describe HttpStub::Server::Application do
     before(:example) { allow(scenario_controller).to receive(:register).and_return(registration_response) }
 
     subject do
-      post "/stubs/scenarios",
+      post "/http_stub/scenarios",
            {
              uri: "/a_scenario_path",
              stubs: [ { uri: "/a_path", method: "a method", response: { status: 200, body: "Foo" } } ],
@@ -180,7 +180,7 @@ describe HttpStub::Server::Application do
 
     let(:found_scenarios) { [ HttpStub::Server::Scenario::ScenarioFixture.empty ] }
 
-    subject { get "/stubs/scenarios" }
+    subject { get "/http_stub/scenarios" }
 
     it "retrieves the stubs from the registry" do
       expect(scenario_registry).to receive(:all).and_return(found_scenarios)
@@ -192,7 +192,7 @@ describe HttpStub::Server::Application do
 
   context "when a request to clear the scenarios has been received" do
 
-    subject { delete "/stubs/scenarios" }
+    subject { delete "/http_stub/scenarios" }
 
     it "delegates clearing to the scenario controller" do
       expect(scenario_controller).to receive(:clear)

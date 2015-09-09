@@ -10,48 +10,48 @@ module HttpStub
 
         def stub_response(model)
           @request_processor.submit(
-            request: HttpStub::Configurer::Request::Http::Factory.stub(model),
+            request: HttpStub::Configurer::Request::Http::Factory.multipart(model),
             description: "stubbing '#{model}'"
           )
         end
 
         def define_scenario(model)
           @request_processor.submit(
-            request: HttpStub::Configurer::Request::Http::Factory.scenario(model),
+            request: HttpStub::Configurer::Request::Http::Factory.multipart(model),
             description: "registering scenario '#{model}'"
           )
         end
 
         def activate(uri)
           @request_processor.submit(
-            request: HttpStub::Configurer::Request::Http::Factory.activate(uri),
+            request: HttpStub::Configurer::Request::Http::Factory.get(uri),
             description: "activating '#{uri}'"
           )
         end
 
         def remember_stubs
           @request_processor.submit(
-            request: HttpStub::Configurer::Request::Http::Factory.post("/stubs/memory"),
+            request: HttpStub::Configurer::Request::Http::Factory.post("/http_stub/stubs/memory"),
             description: "committing stubs to memory"
           )
         end
 
         def recall_stubs
           @request_processor.submit(
-            request: HttpStub::Configurer::Request::Http::Factory.get("/stubs/memory"),
+            request: HttpStub::Configurer::Request::Http::Factory.get("/http_stub/stubs/memory"),
             description: "recalling stubs in memory"
           )
         end
 
         def clear_stubs
           @request_processor.submit(
-            request: HttpStub::Configurer::Request::Http::Factory.delete("/stubs"),
+            request: HttpStub::Configurer::Request::Http::Factory.delete("/http_stub/stubs"),
             description: "clearing stubs")
         end
 
         def clear_scenarios
           @request_processor.submit(
-            request: HttpStub::Configurer::Request::Http::Factory.delete("/stubs/scenarios"),
+            request: HttpStub::Configurer::Request::Http::Factory.delete("/http_stub/scenarios"),
             description: "clearing scenarios"
           )
         end

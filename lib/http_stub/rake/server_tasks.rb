@@ -14,7 +14,7 @@ module HttpStub
 
       def define_start_task(args)
         namespace :start do
-          desc "Starts stub #{args[:name]} in the foreground"
+          desc "Start stub #{args[:name]} in the foreground"
           task(:foreground) do
             HttpStub::Server::Application.instance_eval do
               set :environment, :test
@@ -26,7 +26,7 @@ module HttpStub
       end
 
       def define_initialize_task(args)
-        desc "Configures stub #{args[:name]}"
+        desc "Configure stub #{args[:name]}"
         task(:configure) { args[:configurer].initialize! }
       end
 

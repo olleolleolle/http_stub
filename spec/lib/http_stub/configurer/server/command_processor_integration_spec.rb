@@ -22,7 +22,7 @@ describe HttpStub::Configurer::Server::CommandProcessor do
 
       describe "and the server responds with a 200 response" do
 
-        let(:request) { create_get_request("/stubs") }
+        let(:request) { create_get_request("/http_stub/stubs") }
 
         it "executes without error" do
           expect { subject }.not_to raise_error

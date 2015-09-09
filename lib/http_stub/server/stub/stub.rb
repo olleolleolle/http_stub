@@ -15,7 +15,7 @@ module HttpStub
           @body        = HttpStub::Server::Stub::Match::Rule::Body.create(args["body"])
           @response    = HttpStub::Server::Stub::Response.create(args["response"])
           @triggers    = HttpStub::Server::Stub::Triggers.new(args["triggers"])
-          @stub_uri    = "/stubs/#{@id}"
+          @stub_uri    = "/http_stub/stubs/#{@id}"
           @description = args.to_s
         end
 

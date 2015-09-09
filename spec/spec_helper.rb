@@ -1,6 +1,8 @@
 require 'bundler'
 Bundler.require(:development)
 
+CodeClimate::TestReporter.start
+
 SimpleCov.start do
   coverage_dir "tmp/coverage"
 

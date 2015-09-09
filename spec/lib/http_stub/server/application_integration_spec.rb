@@ -9,7 +9,7 @@ describe HttpStub::Server::Application, "when the server is running" do
 
       let(:response) do
         HTTParty.post(
-          "#{server_uri}/stubs",
+          "#{server_uri}/http_stub/stubs",
           body: { uri: "/some/path", method: "get", response: { status: 200, body: "Some body" } }.to_json
         )
       end
@@ -183,7 +183,7 @@ describe HttpStub::Server::Application, "when the server is running" do
 
         before(:context) { (1..3).each { |i| HTTParty.get("#{server_uri}/scenario_#{i}") } }
 
-        let(:response) { HTTParty.get("#{server_uri}/stubs") }
+        let(:response) { HTTParty.get("#{server_uri}/http_stub/stubs") }
 
         include_context "the response contains HTML describing the configurers stubs"
 
@@ -191,9 +191,9 @@ describe HttpStub::Server::Application, "when the server is running" do
 
     end
 
-    describe "GET /stubs/scenarios" do
+    describe "GET /http_stub/scenarios" do
 
-      let(:response) { HTTParty.get("#{server_uri}/stubs/scenarios") }
+      let(:response) { HTTParty.get("#{server_uri}/http_stub/scenarios") }
 
       it "returns a response whose body contains links to each scenario in alphabetical order" do
         expected_scenario_links = %w{ nested_scenario scenario }.map do |scenario_name_prefix|

@@ -29,16 +29,16 @@ describe HttpStub::Configurer::Server::Facade do
 
     before(:example) do
       allow(request_processor).to receive(:submit)
-      allow(HttpStub::Configurer::Request::Http::Factory).to receive(:stub).and_return(request)
+      allow(HttpStub::Configurer::Request::Http::Factory).to receive(:multipart).and_return(request)
     end
 
-    it "creates a stub request with the provided model" do
-      expect(HttpStub::Configurer::Request::Http::Factory).to receive(:stub).with(model)
+    it "creates a multipart request with the provided model" do
+      expect(HttpStub::Configurer::Request::Http::Factory).to receive(:multipart).with(model)
 
       subject
     end
 
-    it "submits the stub request via the request processor" do
+    it "submits the request via the request processor" do
       expect(request_processor).to receive(:submit).with(hash_including(request: request))
 
       subject
@@ -62,16 +62,16 @@ describe HttpStub::Configurer::Server::Facade do
 
     before(:example) do
       allow(request_processor).to receive(:submit)
-      allow(HttpStub::Configurer::Request::Http::Factory).to receive(:scenario).and_return(request)
+      allow(HttpStub::Configurer::Request::Http::Factory).to receive(:multipart).and_return(request)
     end
 
-    it "creates a scenario request with the provided model" do
-      expect(HttpStub::Configurer::Request::Http::Factory).to receive(:scenario).with(model)
+    it "creates a multipart request with the provided model" do
+      expect(HttpStub::Configurer::Request::Http::Factory).to receive(:multipart).with(model)
 
       subject
     end
 
-    it "submits the scenario request via the request processor" do
+    it "submits the request via the request processor" do
       expect(request_processor).to receive(:submit).with(hash_including(request: request))
 
       subject
@@ -95,12 +95,12 @@ describe HttpStub::Configurer::Server::Facade do
     subject { facade.activate(uri) }
 
     before(:example) do
-      allow(HttpStub::Configurer::Request::Http::Factory).to receive(:activate).and_return(request)
+      allow(HttpStub::Configurer::Request::Http::Factory).to receive(:get).and_return(request)
       allow(request_processor).to receive(:submit)
     end
 
-    it "creates an activation request for the uri" do
-      expect(HttpStub::Configurer::Request::Http::Factory).to receive(:activate).with(uri).and_return(request)
+    it "creates an GET request for the uri" do
+      expect(HttpStub::Configurer::Request::Http::Factory).to receive(:get).with(uri).and_return(request)
 
       subject
     end
@@ -130,8 +130,10 @@ describe HttpStub::Configurer::Server::Facade do
       allow(request_processor).to receive(:submit)
     end
 
-    it "creates a POST request for /stubs/memory endpoint" do
-      expect(HttpStub::Configurer::Request::Http::Factory).to receive(:post).with("/stubs/memory").and_return(request)
+    it "creates a POST request for the /http_stub/stubs/memory endpoint" do
+      expect(HttpStub::Configurer::Request::Http::Factory).to(
+        receive(:post).with("/http_stub/stubs/memory").and_return(request)
+      )
 
       subject
     end
@@ -161,8 +163,10 @@ describe HttpStub::Configurer::Server::Facade do
       allow(request_processor).to receive(:submit)
     end
 
-    it "creates a GET request for /stubs/memory endpoint" do
-      expect(HttpStub::Configurer::Request::Http::Factory).to receive(:get).with("/stubs/memory").and_return(request)
+    it "creates a GET request for the /http_stub/stubs/memory endpoint" do
+      expect(HttpStub::Configurer::Request::Http::Factory).to(
+        receive(:get).with("/http_stub/stubs/memory").and_return(request)
+      )
 
       subject
     end
@@ -192,8 +196,10 @@ describe HttpStub::Configurer::Server::Facade do
       allow(request_processor).to receive(:submit)
     end
 
-    it "creates a DELETE request for the /stubs endpoint" do
-      expect(HttpStub::Configurer::Request::Http::Factory).to receive(:delete).with("/stubs").and_return(request)
+    it "creates a DELETE request for the /http_stub/stubs endpoint" do
+      expect(HttpStub::Configurer::Request::Http::Factory).to(
+        receive(:delete).with("/http_stub/stubs").and_return(request)
+      )
 
       subject
     end
@@ -223,9 +229,9 @@ describe HttpStub::Configurer::Server::Facade do
       allow(request_processor).to receive(:submit)
     end
 
-    it "creates a DELETE request for the /stubs/scenarios endpoint" do
+    it "creates a DELETE request for the /http_stub/scenarios endpoint" do
       expect(HttpStub::Configurer::Request::Http::Factory).to(
-        receive(:delete).with("/stubs/scenarios").and_return(request)
+        receive(:delete).with("/http_stub/scenarios").and_return(request)
       )
 
       subject

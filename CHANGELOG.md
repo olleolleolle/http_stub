@@ -69,8 +69,13 @@ New:
 Misc:
 * Refactor: Introduced ```HttpStub::Server::Stub::Match``` to encapsulate match logic and rules
 
-** 0.21.0 **
+** 0.20.1 **
 
 New:
 * Presentation of stubs tweaked in diagnostic pages
-* Get /stubs/matches includes response data
+* GET /stubs/matches includes response data
+
+** 0.21.0 **
+
+Breaking:
+* All administration endpoints prefixed with 'http_stub', including POSTed configuration

@@ -1,88 +1,24 @@
 describe HttpStub::Configurer::Request::Http::Factory do
 
-  describe "::stub" do
+  describe "::multipart" do
 
-    let(:model)             { instance_double(HttpStub::Configurer::Request::Stub) }
+    let(:model)             { double("HttpStub::Configurer::Request::SomeModel") }
     let(:multipart_request) { instance_double(HttpStub::Configurer::Request::Http::Multipart) }
 
-    subject { HttpStub::Configurer::Request::Http::Factory.stub(model) }
+    subject { HttpStub::Configurer::Request::Http::Factory.multipart(model) }
 
     before(:example) do
       allow(HttpStub::Configurer::Request::Http::Multipart).to receive(:new).and_return(multipart_request)
     end
 
-    it "creates a multipart request for the stubs endpoint with the provided model" do
-      expect(HttpStub::Configurer::Request::Http::Multipart).to receive(:new).with("/stubs", model)
+    it "creates a multipart request with the provided model" do
+      expect(HttpStub::Configurer::Request::Http::Multipart).to receive(:new).with(model)
 
       subject
     end
 
     it "returns the created request" do
       expect(subject).to eql(multipart_request)
-    end
-
-  end
-
-  describe "::scenario" do
-
-    let(:model)             { instance_double(HttpStub::Configurer::Request::Scenario) }
-    let(:multipart_request) { instance_double(HttpStub::Configurer::Request::Http::Multipart) }
-
-    subject { HttpStub::Configurer::Request::Http::Factory.scenario(model) }
-
-    before(:example) do
-      allow(HttpStub::Configurer::Request::Http::Multipart).to receive(:new).and_return(multipart_request)
-    end
-
-    it "creates a multipart request for the stub scenarios endpoint with the provided model" do
-      expect(HttpStub::Configurer::Request::Http::Multipart).to receive(:new).with("/stubs/scenarios", model)
-
-      subject
-    end
-
-    it "returns the created request" do
-      expect(subject).to eql(multipart_request)
-    end
-
-  end
-
-  describe "::activate" do
-
-    let(:uri)           { "some/activate/uri" }
-    let(:basic_request) { instance_double(HttpStub::Configurer::Request::Http::Basic) }
-
-    subject { HttpStub::Configurer::Request::Http::Factory.activate(uri) }
-
-    before(:example) do
-      allow(HttpStub::Configurer::Request::Http::Factory).to receive(:get).and_return(basic_request)
-    end
-
-    context "when the uri is not prefixed with '/'" do
-
-      let(:uri) { "uri/not/prefixed/with/forward/slash" }
-
-      it "creates a get request with the uri prefixed with '/'" do
-        expect(HttpStub::Configurer::Request::Http::Factory).to receive(:get).with("/#{uri}")
-
-        subject
-      end
-
-    end
-
-    context "when the uri is prefixed with '/'" do
-
-      let(:uri) { "/uri/prefixed/with/forward/slash" }
-
-      it "creates a get request with the provided uri" do
-        expect(HttpStub::Configurer::Request::Http::Factory).to receive(:get).with(uri)
-
-        subject
-      end
-
-    end
-
-    it "returns the created request" do
-      expect(subject).to eql(basic_request)
     end
 
   end
@@ -100,10 +36,28 @@ describe HttpStub::Configurer::Request::Http::Factory do
       allow(HttpStub::Configurer::Request::Http::Basic).to receive(:new).and_return(basic_request)
     end
 
-    it "creates a GET request with the provided path" do
-      expect(Net::HTTP::Get).to receive(:new).with(path)
+    context "when the path is absolute" do
 
-      subject
+      let(:path) { "/some/absolute/get/path" }
+
+      it "creates a GET request with the provided path" do
+        expect(Net::HTTP::Get).to receive(:new).with(path)
+
+        subject
+      end
+
+    end
+
+    context "when the path is relative" do
+
+      let(:path) { "some/relative/get/path" }
+
+      it "creates a GET request with the path prefixed by '/'" do
+        expect(Net::HTTP::Get).to receive(:new).with("/#{path}")
+
+        subject
+      end
+
     end
 
     it "creates a basic request wrapping the GET request" do
@@ -120,7 +74,7 @@ describe HttpStub::Configurer::Request::Http::Factory do
 
   describe "::post" do
 
-    let(:path)          { "some/post/path" }
+    let(:path)          { "/some/post/path" }
     let(:post_request)  { instance_double(Net::HTTP::Post).as_null_object }
     let(:basic_request) { instance_double(HttpStub::Configurer::Request::Http::Basic) }
 
@@ -157,7 +111,7 @@ describe HttpStub::Configurer::Request::Http::Factory do
 
   describe "::delete" do
 
-    let(:path)           { "some/get/path" }
+    let(:path)           { "/some/delete/path" }
     let(:delete_request) { instance_double(Net::HTTP::Delete) }
     let(:basic_request)  { instance_double(HttpStub::Configurer::Request::Http::Basic) }
 

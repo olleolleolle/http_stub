@@ -33,49 +33,49 @@ module HttpStub
 
       public
 
-      post "/stubs" do
+      post "/http_stub/stubs" do
         response = @stub_controller.register(@http_stub_request, logger)
         @response_pipeline.process(response)
       end
 
-      get "/stubs" do
+      get "/http_stub/stubs" do
         haml :stubs, {}, stubs: @stub_registry.all
       end
 
-      delete "/stubs" do
+      delete "/http_stub/stubs" do
         @stub_controller.clear(logger)
         halt 200, "OK"
       end
 
-      post "/stubs/memory" do
+      post "/http_stub/stubs/memory" do
         @stub_registry.remember
         halt 200, "OK"
       end
 
-      get "/stubs/memory" do
+      get "/http_stub/stubs/memory" do
         @stub_registry.recall
         halt 200, "OK"
       end
 
-      get "/stubs/matches" do
+      get "/http_stub/stubs/matches" do
         haml :matches, {}, matches: @match_registry.all
       end
 
-      post "/stubs/scenarios" do
+      post "/http_stub/scenarios" do
         response = @scenario_controller.register(@http_stub_request, logger)
         @response_pipeline.process(response)
       end
 
-      get "/stubs/scenarios" do
+      get "/http_stub/scenarios" do
         haml :scenarios, {}, scenarios: @scenario_registry.all.sort_by(&:uri)
       end
 
-      delete "/stubs/scenarios" do
+      delete "/http_stub/scenarios" do
         @scenario_controller.clear(logger)
         halt 200, "OK"
       end
 
-      get "/stubs/:id" do
+      get "/http_stub/stubs/:id" do
         haml :stub, {}, the_stub: @stub_registry.find(params[:id], logger)
       end
 

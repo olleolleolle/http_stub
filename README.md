@@ -8,6 +8,8 @@ Status
 
 [![Build Status](https://travis-ci.org/MYOB-Technology/http_stub.png)](https://travis-ci.org/MYOB-Technology/http_stub)
 [![Gem Version](https://badge.fury.io/rb/http_stub.png)](http://badge.fury.io/rb/http_stub)
+[![Code Climate](https://codeclimate.com/github/MYOB-Technology/http_stub/badges/gpa.svg)](https://codeclimate.com/github/MYOB-Technology/http_stub)
+[![Test Coverage](https://codeclimate.com/github/MYOB-Technology/http_stub/badges/coverage.svg)](https://codeclimate.com/github/MYOB-Technology/http_stub/coverage)
 [![Dependency Status](https://gemnasium.com/MYOB-Technology/http_stub.png)](https://gemnasium.com/MYOB-Technology/http_stub)
 
 Motivation
@@ -56,10 +58,10 @@ AuthenticationServiceConfigurer.initialize!
 AuthenticationServiceConfigurer.stub_server.activate!("grant_access")
 ```
 
-Navigating to the locally running stub server (e.g. ```http://localhost:8000/stubs/scenarios/```) reveals the scenarios
+Navigating to the locally running stub server (e.g. ```http://localhost:8000/http_stub/scenarios```) reveals the scenarios
 which we can activate manually by clicking the links.
 
-![http://localhost:8000/stubs/scenarios/](examples/resources/authentication_service_scenarios.png "Scenarios Diagnostic Page")
+![http://localhost:8000/http_stub/scenarios/](examples/resources/authentication_service_scenarios.png "Scenarios Diagnostic Page")
 
 ```http_stub``` can match requests against a variety of criteria, including JSON schemas, and can respond with arbitrary
 content including files.

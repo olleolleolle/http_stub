@@ -5,7 +5,7 @@ describe "Stub match acceptance" do
 
   after(:example) { configurer.clear_stubs! }
 
-  describe "GET /stubs/matches" do
+  describe "GET /http_stub/stubs/matches" do
 
     let(:request_uri)        { "/some/uri" }
     let(:request_method)     { :get }
@@ -15,7 +15,7 @@ describe "Stub match acceptance" do
     let(:request_parameters) { {} }
     let(:request_body)       { nil }
 
-    let(:response)          { HTTParty.get("#{server_uri}/stubs/matches") }
+    let(:response)          { HTTParty.get("#{server_uri}/http_stub/stubs/matches") }
     let(:response_document) { Nokogiri::HTML(response.body) }
 
     shared_context "registers a stub" do

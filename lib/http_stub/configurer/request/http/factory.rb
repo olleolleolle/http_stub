@@ -7,35 +7,28 @@ module HttpStub
 
           class << self
 
-            def stub(model)
-              HttpStub::Configurer::Request::Http::Multipart.new("/stubs", model)
-            end
-
-            def scenario(model)
-              HttpStub::Configurer::Request::Http::Multipart.new("/stubs/scenarios", model)
-            end
-
-            alias_method :stub_activator, :scenario
-
-            def activate(uri)
-              get(uri.start_with?("/") ? uri : "/#{uri}")
+            def multipart(model)
+              HttpStub::Configurer::Request::Http::Multipart.new(model)
             end
 
             def get(path)
-              to_basic_request(Net::HTTP::Get.new(path))
+              create_basic_request(:get, path.start_with?("/") ? path : "/#{path}")
             end
 
             def post(path)
-              to_basic_request(Net::HTTP::Post.new(path).tap { |request| request.body = "" })
+              create_basic_request(:post, path) { |http_request| http_request.body = "" }
             end
 
             def delete(path)
-              to_basic_request(Net::HTTP::Delete.new(path))
+              create_basic_request(:delete, path)
             end
 
             private
 
-            def to_basic_request(http_request)
+            def create_basic_request(request_method, path, &block)
+              http_request_class = Net::HTTP.const_get(request_method.to_s.capitalize)
+              http_request = http_request_class.new(path)
+              block.call(http_request) if block_given?
               HttpStub::Configurer::Request::Http::Basic.new(http_request)
             end
 

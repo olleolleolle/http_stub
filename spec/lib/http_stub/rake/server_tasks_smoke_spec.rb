@@ -19,7 +19,7 @@ describe HttpStub::Rake::ServerTasks do
         after(:example) { wait_until_server_has_stopped }
 
         it "starts a stub server that responds to stub requests" do
-          request = Net::HTTP::Post.new("/stubs")
+          request = Net::HTTP::Post.new("/http_stub/stubs")
           request.body = { "uri" => "/", "response" => { "status" => 302, "body" => "Some Body" } }.to_json
 
           response = Net::HTTP.new("localhost", port).start { |http| http.request(request) }
