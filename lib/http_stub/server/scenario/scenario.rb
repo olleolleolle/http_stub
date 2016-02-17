@@ -21,6 +21,10 @@ module HttpStub
           "/#{@name}"
         end
 
+        def detail_uri
+          "/http_stub/scenario" + uri
+        end
+
         def triggered_scenarios
           @triggered_scenario_names.reduce([]) { |result, name| result << [ name, "/#{name}" ] }
         end
