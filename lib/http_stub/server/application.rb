@@ -75,6 +75,10 @@ module HttpStub
         halt 200, "OK"
       end
 
+      get "/http_stub/scenario/:name" do
+        haml :scenario, {}, scenario: @scenario_registry.find(params[:name], logger)
+      end
+
       get "/http_stub/stubs/:id" do
         haml :stub, {}, the_stub: @stub_registry.find(params[:id], logger)
       end
