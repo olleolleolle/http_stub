@@ -22,7 +22,7 @@ module HttpStub
         end
 
         def detail_uri
-          "/http_stub/scenario" + uri
+          "/http_stub/scenarios" + uri
         end
 
         def triggered_scenarios
