@@ -89,6 +89,14 @@ describe HttpStub::Server::Scenario::Scenario do
 
   end
 
+  describe "#detail_uri" do
+
+    it "returns the scenario's name with '/' prefixed" do
+      expect(scenario.detail_uri).to eql("/http_stub/scenario/#{name}")
+    end
+
+  end
+
   describe "#stubs" do
 
     it "returns the HttpStub::Server::Stub's constructed from the scenario's arguments" do
