@@ -61,6 +61,10 @@ module HttpStub
         haml :matches, {}, matches: @match_registry.all
       end
 
+      get "/http_stub/scenarios/:name" do
+        haml :scenario, {}, scenario: @scenario_registry.find(params[:name], logger)
+      end
+
       post "/http_stub/scenarios" do
         response = @scenario_controller.register(@http_stub_request, logger)
         @response_pipeline.process(response)
@@ -73,10 +77,6 @@ module HttpStub
       delete "/http_stub/scenarios" do
         @scenario_controller.clear(logger)
         halt 200, "OK"
-      end
-
-      get "/http_stub/scenario/:name" do
-        haml :scenario, {}, scenario: @scenario_registry.find(params[:name], logger)
       end
 
       get "/http_stub/stubs/:id" do

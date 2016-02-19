@@ -208,6 +208,22 @@ describe HttpStub::Server::Application do
 
   end
 
+  context "when a request to view a scenario's details has been received" do
+
+    let(:scenario_name)   { 'empty' }
+    let(:found_scenario)  { HttpStub::Server::Scenario::ScenarioFixture.empty }
+
+    subject { get "/http_stub/scenarios/#{scenario_name}" }
+
+    it "retrieves the scenario from the registry" do
+      allow(scenario_registry).to receive(:find).with(scenario_name, anything).and_return(found_scenario)
+      expect(scenario_registry).to receive(:find).with(scenario_name, anything)
+
+      subject
+    end
+
+  end
+
   context "when another type of request is received" do
 
     let(:request_pipeline_response) { instance_double(HttpStub::Server::Stub::Response::Base) }
