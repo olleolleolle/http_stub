@@ -2,7 +2,8 @@
 %table{ class: :scenarios }
   - scenarios.each do |scenario|
     %tr
+      %td= scenario.name
       %td
-        %a{ href: scenario.uri, class: :scenario }= scenario.name
+        %a{ href: scenario.uri, class: :scenario } Activate
       %td
         %a{ href: scenario.detail_uri, class: :scenario } View Detail
