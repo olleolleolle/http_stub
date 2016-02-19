@@ -191,7 +191,7 @@ describe HttpStub::Server::Application, "when the server is running" do
 
       it "returns a response whose body contains links to each scenario in alphabetical order" do
         expected_scenario_links = %w{ nested_scenario scenario }.map do |scenario_name_prefix|
-          (1..3).map { |i| ["/#{scenario_name_prefix}_#{i}", "/http_stub/scenario/#{scenario_name_prefix}_#{i}"] }
+          (1..3).map { |i| ["/#{scenario_name_prefix}_#{i}", "/http_stub/scenarios/#{scenario_name_prefix}_#{i}"] }
         end.flatten
 
         scenario_links = response_document.css("a.scenario").map { |link| link["href"] }

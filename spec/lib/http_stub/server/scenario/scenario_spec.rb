@@ -92,7 +92,7 @@ describe HttpStub::Server::Scenario::Scenario do
   describe "#detail_uri" do
 
     it "returns the scenario's name with '/' prefixed" do
-      expect(scenario.detail_uri).to eql("/http_stub/scenario/#{name}")
+      expect(scenario.detail_uri).to eql("/http_stub/scenarios/#{name}")
     end
 
   end
