@@ -34,6 +34,7 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "travis-lint",               "~> 2.0"
   spec.add_development_dependency "metric_fu",                 "~> 4.12"
+  spec.add_development_dependency "unparser",                  "0.2.4"   # Locked for Ruby 1.9.3 and 2.0
   spec.add_development_dependency "rspec",                     "~> 3.4"
   spec.add_development_dependency "simplecov",                 "~> 0.11"
   spec.add_development_dependency "rack-test",                 "~> 0.6"
