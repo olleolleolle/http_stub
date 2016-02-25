@@ -3,6 +3,8 @@ module HttpStub
 
     class Application < Sinatra::Base
 
+      set :root, File.dirname(__FILE__)
+
       register Sinatra::Partial
 
       enable :dump_errors, :logging, :partial_underscores
@@ -92,10 +94,6 @@ module HttpStub
 
       get "/application.css" do
         sass :application
-      end
-
-      get "/favicon.ico" do
-        send_file File.expand_path("../views/favicon.ico", __FILE__)
       end
 
       any_request_type(//) do
