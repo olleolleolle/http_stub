@@ -11,6 +11,6 @@
   %tr
     %td Triggered Scenario's:
     %td
-      - scenario.triggered_scenarios.each do |triggered_scenario_name, triggered_scenario_uri|
-        %a{ href: triggered_scenario_uri, class: :triggered_scenario }= triggered_scenario_name
+      - scenario.triggered_scenarios.each do |triggered_scenario|
+        %a{ href: triggered_scenario.uri, class: :triggered_scenario }= triggered_scenario.name
   %br

@@ -13,9 +13,9 @@ module HttpStub
 
         def find(criteria, logger)
           stub = @stub_registry.find(criteria, logger)
-          if stub && criteria.is_a?(HttpStub::Server::Request)
+          if criteria.is_a?(HttpStub::Server::Request)
             @match_registry.add(HttpStub::Server::Stub::Match::Match.new(stub, criteria), logger)
-            stub.triggers.add_to(self, logger)
+            stub.triggers.add_to(self, logger) if stub
           end
           stub
         end

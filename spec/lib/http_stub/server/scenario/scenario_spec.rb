@@ -1,21 +1,30 @@
 describe HttpStub::Server::Scenario::Scenario do
 
-  let(:name)                     { "some_scenario_name" }
-  let(:number_of_stubs)          { 3 }
-  let(:stubs)                    { (1..number_of_stubs).map { instance_double(HttpStub::Server::Stub::Stub) } }
-  let(:triggered_scenario_names) { (1..3).map { |i| "triggered/scenario/name/#{i}" } }
+  let(:name)            { "Some scenario name" }
+  let(:number_of_stubs) { 3 }
+  let(:stubs)           { (1..number_of_stubs).map { instance_double(HttpStub::Server::Stub::Stub) } }
+
+  let(:number_of_triggered_scenario_names) { 3 }
+  let(:triggered_scenario_names)           do
+    (1..number_of_triggered_scenario_names).map { |i| "Triggered Scenario Name #{i}" }
+  end
+  let(:triggered_scenarios)                do
+    (1..number_of_triggered_scenario_names).map { instance_double(HttpStub::Server::Scenario::Trigger) }
+  end
+
   let(:args) do
-    HttpStub::ScenarioFixture.new.with_name!(name).
+    HttpStub::ScenarioFixture.new.
+      with_name!(name).
       with_stubs!(number_of_stubs).
       with_triggered_scenario_names!(triggered_scenario_names).
       server_payload
   end
 
-  let(:scenario) { HttpStub::Server::Scenario::Scenario.new(args) }
-
-  before(:example) { allow(HttpStub::Server::Stub).to receive(:create).and_return(*stubs) }
+  let(:scenario) { described_class.new(args) }
 
   describe "#constructor" do
+
+    subject { scenario }
 
     context "when many stub payloads are provided" do
 
@@ -24,7 +33,7 @@ describe HttpStub::Server::Scenario::Scenario do
       it "creates an underlying stub for each stub payload provided" do
         args["stubs"].each { |stub_args| expect(HttpStub::Server::Stub).to receive(:create).with(stub_args) }
 
-        scenario
+        subject
       end
 
     end
@@ -33,10 +42,36 @@ describe HttpStub::Server::Scenario::Scenario do
 
       let(:number_of_stubs) { 1 }
 
-      it "creates an underlying stub for each stub payload provided" do
+      it "creates an underlying stub for the stub payload provided" do
         expect(HttpStub::Server::Stub).to receive(:create).with(args["stubs"].first)
 
-        scenario
+        subject
+      end
+
+    end
+
+    context "when many triggered scenario names are provided" do
+
+      let(:number_of_triggered_scenario_names) { 3 }
+
+      it "creates a scenario trigger for each trigger name provided" do
+        triggered_scenario_names.each do |scenario_name|
+          expect(HttpStub::Server::Scenario::Trigger).to receive(:new).with(scenario_name)
+        end
+
+        subject
+      end
+
+    end
+
+    context "when no triggered scenario names are provided" do
+
+      let(:number_of_triggered_scenario_names) { 0 }
+
+      it "does not create a scenario trigger" do
+        expect(HttpStub::Server::Scenario::Trigger).to_not receive(:new)
+
+        subject
       end
 
     end
@@ -49,7 +84,7 @@ describe HttpStub::Server::Scenario::Scenario do
 
     subject { scenario.matches?(other_name, logger) }
 
-    describe "when the scenario's name exactly matches the provided name" do
+    describe "when the scenarios name exactly matches the provided name" do
 
       let(:other_name) { name }
 
@@ -59,9 +94,9 @@ describe HttpStub::Server::Scenario::Scenario do
 
     end
 
-    describe "when the scenario's name is a substring of the provided name" do
+    describe "when the scenarios name is a substring of the provided name" do
 
-      let(:other_name) { "#{name}_with_additional_context" }
+      let(:other_name) { "#{name} With Additional Context" }
 
       it "returns false" do
         expect(subject).to be(false)
@@ -69,9 +104,9 @@ describe HttpStub::Server::Scenario::Scenario do
 
     end
 
-    describe "when the scenario's name is completely different to the provided name" do
+    describe "when the scenarios name is completely different to the provided name" do
 
-      let(:other_name) { "completely_different_scenario_name" }
+      let(:other_name) { "Completely Different Scenario Name" }
 
       it "returns false" do
         expect(subject).to be(false)
@@ -83,13 +118,19 @@ describe HttpStub::Server::Scenario::Scenario do
 
   describe "#uri" do
 
-    it "returns the scenario's name with '/' prefixed" do
-      expect(scenario.uri).to eql("/#{name}")
+    subject { scenario.uri }
+
+    it "returns the calculated uri of the scenario" do
+      allow(HttpStub::Server::Scenario::Uri).to receive(:create).and_return("/some/scenario/uri")
+
+      expect(subject).to eql("/some/scenario/uri")
     end
 
   end
 
   describe "#stubs" do
+
+    before(:example) { allow(HttpStub::Server::Stub).to receive(:create).and_return(*stubs) }
 
     it "returns the HttpStub::Server::Stub's constructed from the scenario's arguments" do
       expect(scenario.stubs).to eql(stubs)
@@ -97,20 +138,12 @@ describe HttpStub::Server::Scenario::Scenario do
 
   end
 
-  describe "#triggered_scenario_names" do
-
-    it "returns the value provided in the payload" do
-      expect(scenario.triggered_scenario_names).to eql(triggered_scenario_names)
-    end
-
-  end
-
   describe "#triggered_scenarios" do
 
-    it "returns an array containing the triggered scenario names and uris" do
-      expected_details = triggered_scenario_names.reduce([]) { |result, name| result << [name, "/#{name}"] }
+    before(:example) { allow(HttpStub::Server::Scenario::Trigger).to receive(:new).and_return(*triggered_scenarios) }
 
-      expect(scenario.triggered_scenarios).to eql(expected_details)
+    it "returns the triggered scenarios constructed from the scenario's arguments" do
+      expect(scenario.triggered_scenarios).to eql(triggered_scenarios)
     end
 
   end

@@ -3,7 +3,7 @@ module HttpStub
   class ScenarioFixture
 
     def initialize
-      @name                     = "some/scenario/name"
+      @name                     = "Some Scenario Name"
       @stub_fixtures            = []
       @triggered_scenario_names = []
     end
@@ -16,8 +16,8 @@ module HttpStub
       self.tap { @stub_fixtures.concat((1..number).map { HttpStub::StubFixture.new }) }
     end
 
-    def with_triggered_scenario_names!(uris)
-      self.tap { @triggered_scenario_names.concat(uris) }
+    def with_triggered_scenario_names!(names)
+      self.tap { @triggered_scenario_names.concat(names) }
     end
 
     def server_payload

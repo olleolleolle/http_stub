@@ -5,7 +5,7 @@ module HttpStub
       include HttpStub::Configurer
 
       (1..3).each do |scenario_number|
-        stub_server.add_scenario!("scenario_#{scenario_number}") do |scenario|
+        stub_server.add_scenario!("Scenario #{scenario_number}") do |scenario|
           (1..3).each do |i|
             scenario.add_stub! do |stub|
               stub.match_requests(uri: "/scenario_stub_path_#{i}", method: :get)
@@ -15,12 +15,12 @@ module HttpStub
         end
       end
 
-      stub_server.add_scenario!("scenario_activating_another_scenario") do |scenario|
+      stub_server.add_scenario!("Scenario that activates another scenario") do |scenario|
         scenario.add_stub! do |stub|
           stub.match_requests(uri: "/scenario_stub_path", method: :get)
           stub.respond_with(status: 200, body: "Scenario stub body")
         end
-        scenario.activate!((1..3).map { |i| "scenario_#{i}" })
+        scenario.activate!((1..3).map { |i| "Scenario #{i}" })
       end
 
     end

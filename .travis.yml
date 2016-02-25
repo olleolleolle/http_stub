@@ -4,10 +4,11 @@ rvm:
 - 2.0
 - 2.1
 - 2.2
+- 2.3.0
 notifications:
   email:
     on_success: change
     on_failure: always
   hipchat:
     rooms:
-      secure: HgDg3i2gg4wup8mm7bahDL581vItSssPJUme/1K6NxwtuS1zdrTIrPoarG/PMWzNqLKUgPNnZpwFQ+N5ZCRFTuYlUU0DV47biBduToxncJzcL8+GaC+nOU05b4N3rF8KL+jidrPU9eAGUPLkTNxxXyhZEcBVl8pV3DfSv1JhsUM=
+      secure: HYAfCphh5/ABOeSgueuwEiYoAaSxcA9AighsEilDL3K2FYpVIoq/VOXwmIjQDAF7sRl6bYHJUSHGJU3dLTEyqvk1ZaW6T+sy2UlgJHVzT5k8cJ2J5dCHCHmbd6bxPg1LX3oCTH2LLspIzZpeExfcG/ELWyfzfdoTSbluuHuFfZc=

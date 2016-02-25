@@ -89,18 +89,28 @@ describe HttpStub::Configurer::Server::Facade do
 
   describe "#activate" do
 
-    let(:uri)     { "/some/activation/uri" }
-    let(:request) { instance_double(HttpStub::Configurer::Request::Http::Basic) }
+    let(:scenario_name) { "some/scenario/name" }
+    let(:request)       { instance_double(HttpStub::Configurer::Request::Http::Basic) }
 
-    subject { facade.activate(uri) }
+    subject { facade.activate(scenario_name) }
 
     before(:example) do
       allow(HttpStub::Configurer::Request::Http::Factory).to receive(:get).and_return(request)
       allow(request_processor).to receive(:submit)
     end
 
-    it "creates an GET request for the uri" do
-      expect(HttpStub::Configurer::Request::Http::Factory).to receive(:get).with(uri).and_return(request)
+    it "creates an GET request for a scenario" do
+      expect(HttpStub::Configurer::Request::Http::Factory).to(
+        receive(:get).with("/http_stub/scenarios", anything).and_return(request)
+      )
+
+      subject
+    end
+
+    it "creates a GET request with the scenario name as the name parameter" do
+      expect(HttpStub::Configurer::Request::Http::Factory).to(
+        receive(:get).with(anything, hash_including(:name => scenario_name)).and_return(request)
+      )
 
       subject
     end
@@ -111,8 +121,8 @@ describe HttpStub::Configurer::Server::Facade do
       subject
     end
 
-    it "describes the activation request via the provided uri" do
-      expect(request_processor).to receive(:submit).with(hash_including(description: "activating '#{uri}'"))
+    it "describes the activation request using the provided scenario name" do
+      expect(request_processor).to receive(:submit).with(hash_including(description: "activating '#{scenario_name}'"))
 
       subject
     end

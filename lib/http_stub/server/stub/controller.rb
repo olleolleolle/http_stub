@@ -16,7 +16,7 @@ module HttpStub
 
         def replay(request, logger)
           stub = @registry.find(request, logger)
-          stub ? stub.response : HttpStub::Server::Response::EMPTY
+          stub ? stub.response : HttpStub::Server::Response::NOT_FOUND
         end
 
         def clear(logger)

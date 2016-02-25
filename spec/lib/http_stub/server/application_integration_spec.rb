@@ -181,7 +181,7 @@ describe HttpStub::Server::Application, "when the server is running" do
 
       describe "when multiple stubs are configured" do
 
-        before(:context) { (1..3).each { |i| HTTParty.get("#{server_uri}/scenario_#{i}") } }
+        before(:context) { (1..3).each { |i| HTTParty.get("#{server_uri}/http_stub/scenarios?name=Scenario+#{i}") } }
 
         let(:response) { HTTParty.get("#{server_uri}/http_stub/stubs") }
 
@@ -195,19 +195,19 @@ describe HttpStub::Server::Application, "when the server is running" do
 
       let(:response) { HTTParty.get("#{server_uri}/http_stub/scenarios") }
 
-      it "returns a response whose body contains links to each scenario in alphabetical order" do
-        expected_scenario_links = %w{ nested_scenario scenario }.map do |scenario_name_prefix|
-          (1..3).map { |i| "/#{scenario_name_prefix}_#{i}" }
+      it "returns a response whose body contains activation links to each scenario in alphabetical order" do
+        expected_activation_links = %w{ Nested+scenario Scenario }.map do |scenario_name_prefix|
+          (1..3).map { |i| "/http_stub/scenarios?name=#{scenario_name_prefix}+#{i}" }
         end.flatten
 
         scenario_links = response_document.css("a.scenario").map { |link| link["href"] }
 
-        expect(scenario_links).to eql(expected_scenario_links)
+        expect(scenario_links).to eql(expected_activation_links)
       end
 
-      it "returns a response whose body contains links to the scenarios triggered by each scenario" do
+      it "returns a response whose body contains activation to the scenarios triggered by each scenario" do
         response_document.css("a.triggered_scenario").each_with_index do |link, i|
-          expect(link["href"]).to eql("/nested_scenario_#{i + 1}")
+          expect(link["href"]).to eql("/http_stub/scenarios?name=Nested+scenario+#{i + 1}")
         end
       end
 

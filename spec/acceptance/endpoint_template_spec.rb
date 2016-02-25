@@ -26,7 +26,7 @@ describe "Endpoint Template acceptance" do
 
       context "that customises the request matching rules" do
 
-        let(:scenario_name) { "custom_request" }
+        let(:scenario_name) { "Custom request" }
 
         let(:response) { issue_request("custom_scenario_uri") }
 
@@ -39,7 +39,7 @@ describe "Endpoint Template acceptance" do
 
       context "that customises the response" do
 
-        let(:scenario_name) { "custom_response" }
+        let(:scenario_name) { "Custom response" }
 
         let(:response) { issue_request("template_uri") }
 

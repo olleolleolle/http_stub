@@ -13,8 +13,8 @@ module HttpStub
         triggered_stubs = (1..3).map do |trigger_number|
           stub_server.build_stub do |stub|
             stub_identifier = "#{scenario_number}_trigger_#{trigger_number}"
-            stub.match_requests(uri:
-              "/path_#{scenario_number}_trigger_#{trigger_number}",
+            stub.match_requests(
+              uri:        "/path_#{scenario_number}_trigger_#{trigger_number}",
               method:     :get,
               headers:    { "request_header_#{stub_identifier}" => "request_header_value_#{stub_identifier}" },
               parameters: { "parameter_#{stub_identifier}" => "parameter_value_#{stub_identifier}" },
@@ -36,15 +36,15 @@ module HttpStub
           end
         end
 
-        stub_server.add_scenario_with_one_stub!("nested_scenario_#{scenario_number}") do
+        stub_server.add_scenario_with_one_stub!("Nested scenario #{scenario_number}") do
           match_requests(uri: "/nested_scenario_stub_path_#{scenario_number}")
           respond_with(body: "Body of nested scenario stub #{scenario_number}")
         end
 
-        stub_server.add_scenario!("scenario_#{scenario_number}") do |scenario|
+        stub_server.add_scenario!("Scenario #{scenario_number}") do |scenario|
           scenario.add_stub! do |stub|
-            stub.match_requests(uri:
-              "/path_#{scenario_number}",
+            stub.match_requests(
+              uri:        "/path_#{scenario_number}",
               method:     :get,
               headers:    { "request_header_#{scenario_number}" => "request_header_value_#{scenario_number}" },
               parameters: { "parameter_#{scenario_number}" => "parameter_value_#{scenario_number}" },
@@ -64,7 +64,7 @@ module HttpStub
             )
             triggered_stubs.each { |triggered_stub| stub.trigger(triggered_stub) }
           end
-          scenario.activate!("nested_scenario_#{scenario_number}")
+          scenario.activate!("Nested scenario #{scenario_number}")
         end
       end
 

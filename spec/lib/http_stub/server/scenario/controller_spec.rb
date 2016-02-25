@@ -48,15 +48,17 @@ describe HttpStub::Server::Scenario::Controller do
 
   describe "#activate" do
 
-    subject { controller.activate(request, logger) }
+    let(:scenario_name) { "Some Scenario Name" }
 
-    it "finds a scenario whose name matches the request path omitting the '/' prefix" do
-      expect(scenario_registry).to receive(:find).with("some/request/path", logger)
+    subject { controller.activate(scenario_name, logger) }
+
+    it "finds a scenario whose name matches the provided name" do
+      expect(scenario_registry).to receive(:find).with(scenario_name, logger)
 
       subject
     end
 
-    describe "when a scenario is found that matches the request" do
+    describe "when a scenario is found" do
 
       before(:example) { allow(scenario_registry).to receive(:find).and_return(scenario) }
 
@@ -72,7 +74,7 @@ describe HttpStub::Server::Scenario::Controller do
 
     end
 
-    describe "when no stub activator is activated by the request" do
+    describe "when no scenario is found" do
 
       before(:example) { allow(scenario_registry).to receive(:find).and_return(nil) }
 
@@ -82,8 +84,8 @@ describe HttpStub::Server::Scenario::Controller do
         subject
       end
 
-      it "returns an empty response" do
-        expect(subject).to eql(HttpStub::Server::Response::EMPTY)
+      it "returns a not found response" do
+        expect(subject).to eql(HttpStub::Server::Response::NOT_FOUND)
       end
 
     end

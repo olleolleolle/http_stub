@@ -15,13 +15,13 @@ module HttpStub
           HttpStub::Server::Response::SUCCESS
         end
 
-        def activate(request, logger)
-          scenario = @scenario_registry.find(request.uri.gsub(/^\//, ""), logger)
+        def activate(name, logger)
+          scenario = @scenario_registry.find(name, logger)
           if scenario
             @scenario_activator.activate(scenario, logger)
             HttpStub::Server::Response::SUCCESS
           else
-            HttpStub::Server::Response::EMPTY
+            HttpStub::Server::Response::NOT_FOUND
           end
         end
 

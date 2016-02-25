@@ -20,7 +20,7 @@ module HttpStub
         respond_with(body: { file: { path: FILE_PATH, name: File.basename(FILE_PATH) } })
       end
 
-      stub_server.add_scenario_with_one_stub!("scenario_with_file") do
+      stub_server.add_scenario_with_one_stub!("Scenario with file") do
         match_requests(uri: "/activated_response_with_file", method: :get)
         respond_with(
           status: 200,

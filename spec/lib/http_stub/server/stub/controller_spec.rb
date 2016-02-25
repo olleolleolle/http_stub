@@ -72,8 +72,8 @@ describe HttpStub::Server::Stub::Controller do
 
       before(:example) { allow(registry).to receive(:find).with(request, logger).and_return(nil) }
 
-      it "returns an empty response" do
-        expect(subject).to eql(HttpStub::Server::Response::EMPTY)
+      it "returns a not found response" do
+        expect(subject).to eql(HttpStub::Server::Response::NOT_FOUND)
       end
 
     end

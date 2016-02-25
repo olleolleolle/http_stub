@@ -1,8 +1,8 @@
 describe HttpStub::Configurer::Request::Scenario do
 
-  let(:name)                     { "some/scenario/name" }
+  let(:name)                     { "Some scenario name" }
   let(:stubs)                    { (1..3).map { instance_double(HttpStub::Configurer::Request::Stub) } }
-  let(:triggered_scenario_names) { (1..3).map { |i| "triggered/scenario/name/#{i}" } }
+  let(:triggered_scenario_names) { (1..3).map { |i| "Triggered scenario name #{i}" } }
 
   let(:scenario) do
     HttpStub::Configurer::Request::Scenario.new(

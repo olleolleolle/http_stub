@@ -11,7 +11,6 @@ describe HttpStub::Server::Application do
   let(:stub_controller)     { instance_double(HttpStub::Server::Stub::Controller).as_null_object }
   let(:scenario_controller) { instance_double(HttpStub::Server::Scenario::Controller).as_null_object }
 
-  let(:request_pipeline)  { instance_double(HttpStub::Server::RequestPipeline, process: nil) }
   let(:response_pipeline) { instance_double(HttpStub::Server::ResponsePipeline, process: nil) }
 
   let(:app) { HttpStub::Server::Application.new! }
@@ -22,7 +21,6 @@ describe HttpStub::Server::Application do
     allow(HttpStub::Server::Stub::Registry).to receive(:new).and_return(stub_registry)
     allow(HttpStub::Server::Stub::Controller).to receive(:new).and_return(stub_controller)
     allow(HttpStub::Server::Scenario::Controller).to receive(:new).and_return(scenario_controller)
-    allow(HttpStub::Server::RequestPipeline).to receive(:new).and_return(request_pipeline)
     allow(HttpStub::Server::ResponsePipeline).to receive(:new).and_return(response_pipeline)
   end
 
@@ -168,11 +166,48 @@ describe HttpStub::Server::Application do
       subject
     end
 
-    it "processes the scenarion controllers response via the response pipeline" do
+    it "processes the scenario controllers response via the response pipeline" do
       expect(response_pipeline).to receive(:process).with(registration_response)
 
       subject
     end
+
+  end
+
+  shared_examples_for "a scenario activation request" do
+
+    let(:scenario_name)       { "Some scenario name" }
+    let(:activation_response) { instance_double(HttpStub::Server::Stub::Response::Base) }
+
+    before(:example) { allow(scenario_controller).to receive(:activate).and_return(activation_response) }
+
+    it "activates the scenario via the scenario controller" do
+      expect(scenario_controller).to receive(:activate).with(scenario_name, anything).and_return(activation_response)
+
+      subject
+    end
+
+    it "processes the scenario controllers response via the response pipeline" do
+      expect(response_pipeline).to receive(:process).with(activation_response)
+
+      subject
+    end
+
+  end
+
+  context "when a scenario activation request is received with a name parameter" do
+
+    subject { get "/http_stub/scenarios", :name => scenario_name }
+
+    it_behaves_like "a scenario activation request"
+
+  end
+
+  context "when a deprecated scenario activation request is received with the name encoded in the url" do
+
+    subject { get "/http_stub/scenarios/#{URI.encode_www_form_component(scenario_name)}" }
+
+    it_behaves_like "a scenario activation request"
 
   end
 
@@ -210,22 +245,20 @@ describe HttpStub::Server::Application do
 
   context "when another type of request is received" do
 
-    let(:request_pipeline_response) { instance_double(HttpStub::Server::Stub::Response::Base) }
+    let(:stub_response) { instance_double(HttpStub::Server::Stub::Response::Base) }
 
     subject { get "/a_path" }
 
-    before(:example) { allow(request_pipeline).to receive(:process).and_return(request_pipeline_response) }
+    before(:example) { allow(stub_controller).to receive(:replay).and_return(stub_response) }
 
-    it "determines the response via the request pipeline" do
-      expect(request_pipeline).to(
-        receive(:process).with(an_instance_of(HttpStub::Server::Request), anything)
-      )
+    it "attempts to replay a stub response via the stub controller" do
+      expect(stub_controller).to receive(:replay).with(an_instance_of(HttpStub::Server::Request), anything)
 
       subject
     end
 
     it "processes the response via the response pipeline" do
-      expect(response_pipeline).to receive(:process).with(request_pipeline_response)
+      expect(response_pipeline).to receive(:process).with(stub_response)
 
       subject
     end

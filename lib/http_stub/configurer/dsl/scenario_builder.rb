@@ -7,10 +7,10 @@ module HttpStub
         include HttpStub::Configurer::DSL::ScenarioActivator
 
         def initialize(default_stub_builder, name)
-          @default_stub_builder      = default_stub_builder
-          @name                      = name
-          @stub_builders             = []
-          @triggered_scenario_names  = []
+          @default_stub_builder     = default_stub_builder
+          @name                     = name
+          @stub_builders            = []
+          @triggered_scenario_names = []
         end
 
         def add_stub!(builder=nil, &block)

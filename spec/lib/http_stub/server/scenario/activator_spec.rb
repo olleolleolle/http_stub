@@ -3,9 +3,14 @@ describe HttpStub::Server::Scenario::Activator do
   let(:logger)                   { instance_double(Logger) }
   let(:stubs)                    { (1..3).map { instance_double(HttpStub::Server::Stub::Stub) } }
   let(:triggered_scenario_names) { [] }
+  let(:scenario_triggers)        do
+    triggered_scenario_names.map do |scenario_name|
+      instance_double(HttpStub::Server::Scenario::Trigger, name: scenario_name)
+    end
+  end
   let(:scenario)                 do
     instance_double(
-      HttpStub::Server::Scenario::Scenario, stubs: stubs, triggered_scenario_names: triggered_scenario_names
+      HttpStub::Server::Scenario::Scenario, stubs: stubs, triggered_scenarios: scenario_triggers
     )
   end
   let(:scenario_registry)        { instance_double(HttpStub::Server::Registry).as_null_object }
@@ -26,10 +31,10 @@ describe HttpStub::Server::Scenario::Activator do
 
     context "when the scenario contains triggered scenarios" do
 
-      let(:triggered_scenario_names) { (1..3).map { |i| "triggered_scenario_name/#{i}" } }
+      let(:triggered_scenario_names) { (1..3).map { |i| "Triggered scenario name #{i}" } }
       let(:triggered_scenarios) do
         triggered_scenario_names.map do
-          instance_double(HttpStub::Server::Scenario::Scenario, stubs: [], triggered_scenario_names: [])
+          instance_double(HttpStub::Server::Scenario::Scenario, stubs: [], triggered_scenarios: [])
         end
       end
 

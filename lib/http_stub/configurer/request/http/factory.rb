@@ -11,8 +11,10 @@ module HttpStub
               HttpStub::Configurer::Request::Http::Multipart.new(model)
             end
 
-            def get(path)
-              create_basic_request(:get, path.start_with?("/") ? path : "/#{path}")
+            def get(path, parameters={})
+              complete_path = path.start_with?("/") ? path : "/#{path}"
+              complete_path += "?#{URI.encode_www_form(parameters)}" unless parameters.empty?
+              create_basic_request(:get, complete_path)
             end
 
             def post(path)

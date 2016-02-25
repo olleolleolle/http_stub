@@ -79,18 +79,18 @@ describe HttpStub::Server::Stub::Registry do
       let(:request)  { HttpStub::Server::RequestFixture.create }
       let(:criteria) { request }
 
-      before(:example) { allow(match_registry).to receive(:add) }
+      let(:stub_match) { instance_double(HttpStub::Server::Stub::Match::Match) }
+
+      before(:example) do
+        allow(HttpStub::Server::Stub::Match::Match).to receive(:new).and_return(stub_match)
+        allow(match_registry).to receive(:add)
+      end
 
       it_behaves_like "an approach to finding a stub in the registry"
 
       context "when a stub is found" do
 
-        let(:stub_match) { instance_double(HttpStub::Server::Stub::Match::Match) }
-
-        before(:example) do
-          allow(underlying_stub_registry).to receive(:find).and_return(stub)
-          allow(HttpStub::Server::Stub::Match::Match).to receive(:new).and_return(stub_match)
-        end
+        before(:example) { allow(underlying_stub_registry).to receive(:find).and_return(stub) }
 
         it "creates a match containing the stub and request" do
           expect(HttpStub::Server::Stub::Match::Match).to receive(:new).with(stub, request)
@@ -116,8 +116,14 @@ describe HttpStub::Server::Stub::Registry do
 
         before(:example) { allow(underlying_stub_registry).to receive(:find).and_return(nil) }
 
-        it "does not add a match to the match registry" do
-          expect(match_registry).to_not receive(:add)
+        it "creates a match with a nil stub" do
+          expect(HttpStub::Server::Stub::Match::Match).to receive(:new).with(nil, request)
+
+          subject
+        end
+
+        it "adds the match to the match registry" do
+          expect(match_registry).to receive(:add).with(stub_match, logger)
 
           subject
         end
@@ -131,7 +137,15 @@ describe HttpStub::Server::Stub::Registry do
       let(:id)       { SecureRandom.uuid }
       let(:criteria) { id }
 
+      before(:example) { allow(underlying_stub_registry).to receive(:find).and_return(nil) }
+
       it_behaves_like "an approach to finding a stub in the registry"
+
+      it "does not add a match to the match registry" do
+        expect(match_registry).to_not receive(:add)
+
+        subject
+      end
 
     end
 

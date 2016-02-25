@@ -14,8 +14,6 @@ module HttpStub
         @scenario_registry   = HttpStub::Server::Registry.new("scenario")
         @stub_controller     = HttpStub::Server::Stub::Controller.new(@stub_registry)
         @scenario_controller = HttpStub::Server::Scenario::Controller.new(@scenario_registry, @stub_registry)
-        @request_pipeline    =
-          HttpStub::Server::RequestPipeline.new(@stub_controller, @scenario_controller, @match_registry)
       end
 
       private
@@ -24,6 +22,11 @@ module HttpStub
 
       def self.any_request_type(path, opts={}, &block)
         SUPPORTED_REQUEST_TYPES.each { |type| self.send(type, path, opts, &block) }
+      end
+
+      def activate_scenario(name)
+        response = @scenario_controller.activate(name, logger)
+        @response_pipeline.process(response)
       end
 
       before do
@@ -61,9 +64,21 @@ module HttpStub
         haml :matches, {}, matches: @match_registry.all
       end
 
+      get "/http_stub/stubs/:id" do
+        haml :stub, {}, the_stub: @stub_registry.find(params[:id], logger)
+      end
+
       post "/http_stub/scenarios" do
         response = @scenario_controller.register(@http_stub_request, logger)
         @response_pipeline.process(response)
+      end
+
+      get "/http_stub/scenarios" do
+        params[:name] ? activate_scenario(params[:name]) : pass
+      end
+
+      get "/http_stub/scenarios/:name" do
+        activate_scenario(URI.decode_www_form_component(params[:name]))
       end
 
       get "/http_stub/scenarios" do
@@ -75,10 +90,6 @@ module HttpStub
         halt 200, "OK"
       end
 
-      get "/http_stub/stubs/:id" do
-        haml :stub, {}, the_stub: @stub_registry.find(params[:id], logger)
-      end
-
       get "/application.css" do
         sass :application
       end
@@ -88,7 +99,7 @@ module HttpStub
       end
 
       any_request_type(//) do
-        response = @request_pipeline.process(@http_stub_request, logger)
+        response = @stub_controller.replay(@http_stub_request, logger)
         @response_pipeline.process(response)
       end
 
