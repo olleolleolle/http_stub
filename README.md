@@ -20,8 +20,42 @@ Need to simulate a HTTP service with which your application integrates?  Enter `
 ```http_stub``` is similar in motivation to the ```fakeweb``` gem, although ```http_stub``` provides a separately 
 running HTTP process whose responses can be faked / stubbed.
 
-```http_stub``` appears to be very similar in purpose to the ```HTTParrot``` and ```rack-stubs``` gems, although these
- appear to be inactive.
+Alternatives and Comparisons
+----------------------------
+
+### [Pact](https://github.com/realestate-com-au/pact)
+Facilitates consumer driven contracts by allowing consumers to define a contract that is shared and verified by producers.
+
+In comparison ```http_stub```:
+* Simulates a provider via an external process that allows on-the-fly changes to responses to aid exploratory testing and demonstrations
+* Is flexible in matching requests to responses through the use of match clauses such as regular expressions and mandatory omissions as well as JSON schema matching
+
+It's important to note that ```http_stub``` presently does not aid producers in verifying consumer expectations.
+At best, ```http_stub``` allows consumers to share actual requests and responses with producers through its administrative screens.
+
+### [VCR](https://github.com/vcr/vcr)
+Records requests and responses onto 'cassettes'.  Replays responses in-process by mocking HTTP libraries in use.
+
+In comparison ```http_stub```:
+* Relies on an external HTTP server and does not effect HTTP libraries in use
+* Facilitates TDD/BDD style testing by not relying on real integrations being recorded and pre-existing
+* Can make it easier to write and alter requests and responses by not having to alter or re-record cassettes and recordings
+
+### [http-stub-server](https://github.com/Sensis/http-stub-server)
+Implemented in Java, with Java and Ruby clients.
+
+In comparison ```http_stub```:
+* Has the concept of scenarios that can facilitate on-the-fly changes to responses that aid automated testing, exploratory testing and demonstrations
+* Supports a wider range of matching rules and can match requests against JSON schemas
+* Supports multipart file responses
+* Has administration pages to interrogate the state of the stub, observe requests and responses made, and activate scenarios on-the-fly
+* Has a more elegant Ruby DSL
+
+### [HTTParrot](https://github.com/abrandoned/httparrot)
+Similar in spirit but has limited functionality and has been discontinued.
+
+### [Rack Stubs](https://github.com/featurist/rack-stubs)
+Similar in spirit but has limited functionality and has been discontinued.
 
 Design
 ------
