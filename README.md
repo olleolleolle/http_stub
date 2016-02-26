@@ -79,8 +79,8 @@ class AuthenticationServiceConfigurer
 
   login_template = stub_server.endpoint_template { match_requests(uri: "/login", method: :post) }
 
-  login_template.add_scenario!("grant_access", status: 200)
-  login_template.add_scenario!("deny_access",  status: 401)
+  login_template.add_scenario!("Grant Access", status: 200)
+  login_template.add_scenario!("Deny Access",  status: 401)
   
 end
 ```
@@ -89,7 +89,7 @@ Now we can initialize the service and activate the scenarios as needed.
 
 ```ruby
 AuthenticationServiceConfigurer.initialize!
-AuthenticationServiceConfigurer.stub_server.activate!("grant_access")
+AuthenticationServiceConfigurer.stub_server.activate!("Grant Access")
 ```
 
 Navigating to the locally running stub server (e.g. ```http://localhost:8000/http_stub/scenarios```) reveals the scenarios
