@@ -1,13 +1,9 @@
-- scenarios.each do |scenario|
-  = partial :scenario, locals: { scenario: scenario }
-  %br
-%form{ id: :activate_scenario_form, action: "scenarios/activate", method: "POST" }
-  %input{ id: :activated_scenario_name, name: :name, type: :hidden, value: "" }
-:javascript
-  $(window).load( function() {
-    $("a.scenario_name, a.triggered_scenario_name").on("click", function(event) {
-      event.preventDefault();
-      $("#activated_scenario_name").val($(event.target).text());
-      $("#activate_scenario_form").submit();
-    });
-  });
+%h1 Scenarios
+%table{ class: :scenarios }
+  - scenarios.each do |scenario|
+    %tr
+      %td{ class: :scenario_name }= scenario.name
+      %td
+        %a{ href: scenario.links.activate, class: :activate_scenario } Activate
+      %td
+        %a{ href: scenario.links.detail, class: :view_scenario } View Detail

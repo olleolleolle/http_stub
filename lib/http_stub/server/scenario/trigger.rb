@@ -4,11 +4,11 @@ module HttpStub
 
       class Trigger
 
-        attr_reader :name, :uri
+        attr_reader :name, :links
 
         def initialize(name)
-          @name = name
-          @uri  = HttpStub::Server::Scenario::Uri.create
+          @name  = name
+          @links = HttpStub::Server::Scenario::Links.new(name)
         end
 
       end

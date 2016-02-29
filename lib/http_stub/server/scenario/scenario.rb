@@ -4,21 +4,18 @@ module HttpStub
 
       class Scenario
 
-        attr_reader :name, :stubs, :triggered_scenarios
+        attr_reader :name, :links, :stubs, :triggered_scenarios
 
         def initialize(args)
           @args                = args
           @name                = args["name"]
+          @links               = HttpStub::Server::Scenario::Links.new(@name)
           @stubs               = create_stubs(args["stubs"])
           @triggered_scenarios = create_triggers(args["triggered_scenario_names"])
         end
 
         def matches?(name, _logger)
           @name == name
-        end
-
-        def uri
-          HttpStub::Server::Scenario::Uri.create
         end
 
         def to_s
