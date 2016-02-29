@@ -16,11 +16,6 @@ task :clobber do
   puts "Clobbered"
 end
 
-desc "Complexity analysis"
-task :metrics do
-  print `metric_fu --no-open`
-end
-
 desc "Exercises specifications"
 ::RSpec::Core::RakeTask.new(:spec)
 
@@ -64,6 +59,6 @@ example_configurer.stub_server.host = "localhost"
 example_configurer.stub_server.port = 8002
 HttpStub::Rake::ServerDaemonTasks.new(name: :example_server_daemon, configurer: example_configurer)
 
-task :default => %w{ clobber metrics coverage }
+task :default => %w{ clobber coverage }
 
-task :pre_commit => %w{ clobber metrics coverage:show validate }
+task :pre_commit => %w{ clobber coverage:show validate }

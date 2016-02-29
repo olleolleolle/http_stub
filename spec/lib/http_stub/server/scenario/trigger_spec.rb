@@ -14,22 +14,21 @@ describe HttpStub::Server::Scenario::Trigger do
 
   end
 
-  describe "#uri" do
+  describe "#links" do
 
-    let(:created_uri) { "/some/scenario/uri" }
+    subject { trigger.links }
 
-    subject { trigger.uri }
-
-    before(:example) { allow(HttpStub::Server::Scenario::Uri).to receive(:create).and_return(created_uri) }
-
-    it "creates a uri" do
-      expect(HttpStub::Server::Scenario::Uri).to receive(:create)
+    it "creates links based on the scenario's name" do
+      expect(HttpStub::Server::Scenario::Links).to receive(:new).with(name)
 
       subject
     end
 
-    it "returns the created uri" do
-      expect(subject).to eql(created_uri)
+    it "returns the created links" do
+      links = instance_double(HttpStub::Server::Scenario::Links)
+      allow(HttpStub::Server::Scenario::Links).to receive(:new).and_return(links)
+
+      expect(subject).to eql(links)
     end
 
   end

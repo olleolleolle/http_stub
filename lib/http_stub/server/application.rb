@@ -26,11 +26,6 @@ module HttpStub
         SUPPORTED_REQUEST_TYPES.each { |type| self.send(type, path, opts, &block) }
       end
 
-      def activate_scenario(name)
-        response = @scenario_controller.activate(name, logger)
-        @response_pipeline.process(response)
-      end
-
       before do
         @response_pipeline = HttpStub::Server::ResponsePipeline.new(self)
         @http_stub_request = HttpStub::Server::Request.new(request)
@@ -79,16 +74,18 @@ module HttpStub
         @response_pipeline.process(response)
       end
 
-      post "/http_stub/scenarios/activate" do
-        activate_scenario(params[:name])
-      end
-
-      get "/http_stub/scenarios/:name" do
-        activate_scenario(URI.decode_www_form_component(params[:name]))
+      get "/http_stub/scenarios" do
+        pass unless params[:name]
+        haml :scenario, {}, scenario: @scenario_registry.find(URI.decode_www_form_component(params[:name]), logger)
       end
 
       get "/http_stub/scenarios" do
         haml :scenarios, {}, scenarios: @scenario_registry.all.sort_by(&:name)
+      end
+
+      post "/http_stub/scenarios/activate" do
+        response = @scenario_controller.activate(params[:name], logger)
+        @response_pipeline.process(response)
       end
 
       delete "/http_stub/scenarios" do

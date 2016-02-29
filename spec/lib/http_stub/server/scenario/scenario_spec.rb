@@ -116,14 +116,23 @@ describe HttpStub::Server::Scenario::Scenario do
 
   end
 
-  describe "#uri" do
+  describe "#links" do
 
-    subject { scenario.uri }
+    subject { scenario.links }
 
-    it "returns the calculated uri of the scenario" do
-      allow(HttpStub::Server::Scenario::Uri).to receive(:create).and_return("/some/scenario/uri")
+    before(:example) { allow(HttpStub::Server::Scenario::Links).to receive(:new) }
 
-      expect(subject).to eql("/some/scenario/uri")
+    it "create links for the scenario name" do
+      expect(HttpStub::Server::Scenario::Links).to receive(:new).with(name)
+
+      subject
+    end
+
+    it "returns the created links" do
+      links = instance_double(HttpStub::Server::Scenario::Links)
+      allow(HttpStub::Server::Scenario::Links).to receive(:new).and_return(links)
+
+      expect(subject).to eql(links)
     end
 
   end
