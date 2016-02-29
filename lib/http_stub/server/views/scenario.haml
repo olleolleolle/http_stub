@@ -2,7 +2,7 @@
   %tr
     %td Name:
     %td
-      %a{ href: scenario.links.activate, class: :scenario_activator }= scenario.name
+      %a{ href: scenario.links.activate, class: :activate_scenario, data: { name: scenario.name } }= scenario.name
   %tr
     %td Stubs:
     %td
@@ -14,3 +14,4 @@
       - scenario.triggered_scenarios.each do |triggered_scenario|
         %a{ href: triggered_scenario.links.detail, class: :triggered_scenario_detail }= triggered_scenario.name
   %br
+= partial :activate_scenario

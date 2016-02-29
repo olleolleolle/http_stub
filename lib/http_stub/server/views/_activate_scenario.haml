@@ -2,9 +2,9 @@
   %input{ id: :activated_scenario_name, name: :name, type: :hidden, value: "" }
 :javascript
   $(window).load( function() {
-    $("a.scenario_name, a.triggered_scenario_name").on("click", function(event) {
+    $("a.activate_scenario").on("click", function(event) {
       event.preventDefault();
-      $("#activated_scenario_name").val($(event.target).text());
+      $("#activated_scenario_name").val($(event.target).data("name"));
       $("#activate_scenario_form").submit();
     });
   });
