@@ -3,7 +3,33 @@ describe HttpStub::Server::Application, "when the server is running" do
 
   let(:response_document) { Nokogiri::HTML(response.body) }
 
-  describe "POST /stubs" do
+  describe "GET /http_stub" do
+
+    let(:response) { HTTParty.get("#{server_uri}/http_stub") }
+
+    it "returns a 200 response code" do
+      expect(response.code).to eql(200)
+    end
+
+    it "returns a response whose body links to the stubs list" do
+      expect(link_for("stubs")).to eql("/http_stub/stubs")
+    end
+
+    it "returns a response whose body links to the scenarios list" do
+      expect(link_for("scenarios")).to eql("/http_stub/scenarios")
+    end
+
+    it "returns a response whose body links to the matches list" do
+      expect(link_for("stub_matches")).to eql("/http_stub/stubs/matches")
+    end
+
+    def link_for(id)
+      response_document.at_css("a##{id}")["href"]
+    end
+
+  end
+
+  describe "POST /http_stub/stubs" do
 
     context "when provided with the minimum data required" do
 
@@ -177,7 +203,7 @@ describe HttpStub::Server::Application, "when the server is running" do
 
     end
 
-    describe "GET /stubs" do
+    describe "GET /http_stub/stubs" do
 
       describe "when multiple stubs are configured" do
 

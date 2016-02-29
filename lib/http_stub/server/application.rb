@@ -38,6 +38,10 @@ module HttpStub
 
       public
 
+      get "/http_stub" do
+        haml :index, {}
+      end
+
       post "/http_stub/stubs" do
         response = @stub_controller.register(@http_stub_request, logger)
         @response_pipeline.process(response)
