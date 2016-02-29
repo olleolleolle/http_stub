@@ -1,8 +1,12 @@
 ** 0.22.0 **
 
 Breaking:
-* Scenario names, and consequently natural language descriptions, preferred over ID
-* Scenario activation is achieved via a POST to 'http_stub/scenarios/activate' with the scenario name as a parameter
+* Scenario names preferred over ID, natural language preferred
+* POST http_stub/scenarios/activate with scenario name parameter activates scenario
+* Scenario list page contains summary information, with links to activate and view details
+
+New:
+* GET /http_stub/scenarios?name retrieves details of scenario with matching name
 
 ** 0.21.0 **
 
