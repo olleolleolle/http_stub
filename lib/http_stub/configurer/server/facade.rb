@@ -6,8 +6,10 @@ module HttpStub
 
         private
 
-        STUB_MEMORY_URI    = "/http_stub/stubs/memory".freeze
-        SCENARIOS_BASE_URI = "/http_stub/scenarios".freeze
+        STUBS_BASE_URI          = "/http_stub/stubs".freeze
+        STUB_MEMORY_URI         = "#{STUBS_BASE_URI}/memory".freeze
+        SCENARIOS_BASE_URI      = "/http_stub/scenarios".freeze
+        SCENARIO_ACTIVATION_URI = "#{SCENARIOS_BASE_URI}/activate".freeze
 
         public
 
@@ -30,8 +32,9 @@ module HttpStub
         end
 
         def activate(scenario_name)
+          request = HttpStub::Configurer::Request::Http::Factory.post(SCENARIO_ACTIVATION_URI, :name => scenario_name)
           @request_processor.submit(
-            request:     HttpStub::Configurer::Request::Http::Factory.get(SCENARIOS_BASE_URI, :name => scenario_name),
+            request:     request,
             description: "activating '#{scenario_name}'"
           )
         end
@@ -52,7 +55,7 @@ module HttpStub
 
         def clear_stubs
           @request_processor.submit(
-            request:     HttpStub::Configurer::Request::Http::Factory.delete("/http_stub/stubs"),
+            request:     HttpStub::Configurer::Request::Http::Factory.delete(STUBS_BASE_URI),
             description: "clearing stubs")
         end
 

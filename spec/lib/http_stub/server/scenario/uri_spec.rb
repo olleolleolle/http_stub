@@ -6,8 +6,8 @@ describe HttpStub::Server::Scenario::Uri do
 
     subject { described_class.create(name) }
 
-    it "returns a uri starting with '/http_stub/scenarios'" do
-      expect(subject).to start_with("/http_stub/scenarios")
+    it "returns a uri starting with '/http_stub/scenarios/activate'" do
+      expect(subject).to start_with("/http_stub/scenarios/activate")
     end
 
     it "returns a uri ending with a name parameter" do

@@ -2,7 +2,7 @@
 
 Breaking:
 * Scenario names, and consequently natural language descriptions, preferred over ID
-* Scenario activation is achieved via GET 'http_stub/scenarios?name=<URL encoded name>'
+* Scenario activation is achieved via a POST to 'http_stub/scenarios/activate' with the scenario name as a parameter
 
 ** 0.21.0 **
 

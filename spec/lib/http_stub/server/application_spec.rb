@@ -197,7 +197,7 @@ describe HttpStub::Server::Application do
 
   context "when a scenario activation request is received with a name parameter" do
 
-    subject { get "/http_stub/scenarios", :name => scenario_name }
+    subject { post "/http_stub/scenarios/activate", :name => scenario_name }
 
     it_behaves_like "a scenario activation request"
 

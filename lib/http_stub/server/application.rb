@@ -75,8 +75,8 @@ module HttpStub
         @response_pipeline.process(response)
       end
 
-      get "/http_stub/scenarios" do
-        params[:name] ? activate_scenario(params[:name]) : pass
+      post "/http_stub/scenarios/activate" do
+        activate_scenario(params[:name])
       end
 
       get "/http_stub/scenarios/:name" do
@@ -84,7 +84,7 @@ module HttpStub
       end
 
       get "/http_stub/scenarios" do
-        haml :scenarios, {}, scenarios: @scenario_registry.all.sort_by(&:uri)
+        haml :scenarios, {}, scenarios: @scenario_registry.all.sort_by(&:name)
       end
 
       delete "/http_stub/scenarios" do

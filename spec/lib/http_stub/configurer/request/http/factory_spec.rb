@@ -26,11 +26,10 @@ describe HttpStub::Configurer::Request::Http::Factory do
   describe "::get" do
 
     let(:path)          { "/some/get/path" }
-    let(:parameters)    { {} }
     let(:get_request)   { instance_double(Net::HTTP::Get) }
     let(:basic_request) { instance_double(HttpStub::Configurer::Request::Http::Basic) }
 
-    subject { HttpStub::Configurer::Request::Http::Factory.get(path, parameters) }
+    subject { HttpStub::Configurer::Request::Http::Factory.get(path) }
 
     before(:example) do
       allow(Net::HTTP::Get).to receive(:new).and_return(get_request)
@@ -55,56 +54,6 @@ describe HttpStub::Configurer::Request::Http::Factory do
 
       it "creates a GET request with the path prefixed by '/'" do
         expect(Net::HTTP::Get).to receive(:new).with("/#{path}")
-
-        subject
-      end
-
-    end
-
-    context "when no parameters are provided" do
-
-      subject { HttpStub::Configurer::Request::Http::Factory.get(path) }
-
-      it "creates a GET request with the provided path" do
-        expect(Net::HTTP::Get).to receive(:new).with(path)
-
-        subject
-      end
-
-    end
-
-    context "when parameters are provided" do
-
-      let(:parameters) { (1..3).each_with_object({}) { |i, result| result["key#{i}"] = "value#{i}" } }
-
-      it "creates a GET request for a URL starting with the provided path" do
-        expect(Net::HTTP::Get).to receive(:new).with(a_string_starting_with(path))
-
-        subject
-      end
-
-      it "creates a GET request for a URL containing the parameters" do
-        expected_parameters = parameters.map { |key, value| "#{key}=#{value}" }.join("&")
-        expect(Net::HTTP::Get).to receive(:new).with(a_string_ending_with("?#{expected_parameters}"))
-
-        subject
-      end
-
-    end
-
-    context "when parameters are provided containing values that require url encoding" do
-
-      let(:parameters) do
-        {
-          "key=1" => "value=1",
-          "key&2" => "value&2",
-          "key?3" => "value?3"
-        }
-      end
-
-      it "creates a GET request for a URL containing the encoded parameters" do
-        expected_parameters = "key%3D1=value%3D1&key%262=value%262&key%3F3=value%3F3"
-        expect(Net::HTTP::Get).to receive(:new).with(a_string_ending_with("?#{expected_parameters}"))
 
         subject
       end
@@ -142,10 +91,30 @@ describe HttpStub::Configurer::Request::Http::Factory do
       subject
     end
 
-    it "establishes an empty body in the POST request" do
-      expect(post_request).to receive(:body=).with("")
+    context "when parameters are provided" do
 
-      subject
+      let(:parameters) { (1..3).each_with_object({}) { |i, result| result["key#{i}"] = "value#{i}" } }
+
+      subject { HttpStub::Configurer::Request::Http::Factory.post(path, parameters) }
+
+      it "establishes the provided parameters as the form data in the POST request" do
+        expect(post_request).to receive(:set_form_data).with(parameters)
+
+        subject
+      end
+
+    end
+
+    context "when no parameters are provided" do
+
+      subject { HttpStub::Configurer::Request::Http::Factory.post(path) }
+
+      it "establishes empty form data in the POST request" do
+        expect(post_request).to receive(:set_form_data).with({})
+
+        subject
+      end
+
     end
 
     it "creates a basic request wrapping the POST request" do

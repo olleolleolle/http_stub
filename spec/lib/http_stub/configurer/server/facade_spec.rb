@@ -95,21 +95,21 @@ describe HttpStub::Configurer::Server::Facade do
     subject { facade.activate(scenario_name) }
 
     before(:example) do
-      allow(HttpStub::Configurer::Request::Http::Factory).to receive(:get).and_return(request)
+      allow(HttpStub::Configurer::Request::Http::Factory).to receive(:post).and_return(request)
       allow(request_processor).to receive(:submit)
     end
 
-    it "creates an GET request for a scenario" do
+    it "creates an POST request to activate a scenario" do
       expect(HttpStub::Configurer::Request::Http::Factory).to(
-        receive(:get).with("/http_stub/scenarios", anything).and_return(request)
+        receive(:post).with("/http_stub/scenarios/activate", anything).and_return(request)
       )
 
       subject
     end
 
-    it "creates a GET request with the scenario name as the name parameter" do
+    it "creates a POST request with the scenario name as a parameter" do
       expect(HttpStub::Configurer::Request::Http::Factory).to(
-        receive(:get).with(anything, hash_including(:name => scenario_name)).and_return(request)
+        receive(:post).with(anything, hash_including(:name => scenario_name)).and_return(request)
       )
 
       subject
