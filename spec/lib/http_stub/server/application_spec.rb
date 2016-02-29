@@ -8,8 +8,8 @@ describe HttpStub::Server::Application do
   let(:stub_registry)     { instance_double(HttpStub::Server::Stub::Registry).as_null_object }
   let(:scenario_registry) { instance_double(HttpStub::Server::Registry).as_null_object }
 
-  let(:stub_controller)     { instance_double(HttpStub::Server::Stub::Controller).as_null_object }
-  let(:scenario_controller) { instance_double(HttpStub::Server::Scenario::Controller).as_null_object }
+  let(:stub_controller)     { instance_double(HttpStub::Server::Stub::Controller) }
+  let(:scenario_controller) { instance_double(HttpStub::Server::Scenario::Controller) }
 
   let(:response_pipeline) { instance_double(HttpStub::Server::ResponsePipeline, process: nil) }
 
@@ -22,6 +22,18 @@ describe HttpStub::Server::Application do
     allow(HttpStub::Server::Stub::Controller).to receive(:new).and_return(stub_controller)
     allow(HttpStub::Server::Scenario::Controller).to receive(:new).and_return(scenario_controller)
     allow(HttpStub::Server::ResponsePipeline).to receive(:new).and_return(response_pipeline)
+  end
+
+  context "when the diagnostics landing page is retrieved" do
+
+    subject { get "/http_stub" }
+
+    it "responds without error" do
+      subject
+
+      expect(response.status).to eql(200)
+    end
+
   end
 
   context "when a stub registration request is received" do
@@ -80,6 +92,8 @@ describe HttpStub::Server::Application do
   context "when a request to clear the stubs is received" do
 
     subject { delete "/http_stub/stubs" }
+
+    before(:example) { allow(stub_controller).to receive(:clear) }
 
     it "delegates clearing to the stub controller" do
       expect(stub_controller).to receive(:clear)
@@ -229,6 +243,8 @@ describe HttpStub::Server::Application do
 
     subject { delete "/http_stub/scenarios" }
 
+    before(:example) { allow(scenario_controller).to receive(:clear) }
+
     it "delegates clearing to the scenario controller" do
       expect(scenario_controller).to receive(:clear)
 
@@ -236,6 +252,18 @@ describe HttpStub::Server::Application do
     end
 
     it "responds with a 200 status code" do
+      subject
+
+      expect(response.status).to eql(200)
+    end
+
+  end
+
+  context "when a request for the diagnostic pages stylesheet has been received" do
+
+    subject { get "/application.css" }
+
+    it "responds without error" do
       subject
 
       expect(response.status).to eql(200)
