@@ -209,30 +209,12 @@ describe HttpStub::Server::Application, "when the server is running" do
         expect(scenario_names).to eql(expected_scenario_names)
       end
 
-      it "returns a response whose body contains activation links to each scenario" do
-        expected_activation_links = %w{ Nested+scenario Scenario }.map do |scenario_name_prefix|
-          (1..3).map { |i| "/http_stub/scenarios/activate?name=#{scenario_name_prefix}+#{i}" }
-        end.flatten
-
-        activation_links = response_document.css("a.scenario_name").map { |link| link["href"] }
-
-        expect(activation_links).to eql(expected_activation_links)
-      end
-
       it "returns a response whose body contains the name of the scenarios triggered by each scenario" do
         expected_scenario_names = (1..3).map { |i| "Nested scenario #{i}" }
 
         scenario_names = response_document.css("a.triggered_scenario_name").map { |link| link.text }
 
         expect(scenario_names).to eql(expected_scenario_names)
-      end
-
-      it "returns a response whose body contains activation links to the triggered scenarios" do
-        expected_activation_links = (1..3).map { |i| "/http_stub/scenarios/activate?name=Nested+scenario+#{i}" }
-
-        activation_links = response_document.css("a.triggered_scenario_name").map { |link| link["href"] }
-
-        expect(activation_links).to eql(expected_activation_links)
       end
 
       include_context "the response contains HTML describing the configurers stubs"

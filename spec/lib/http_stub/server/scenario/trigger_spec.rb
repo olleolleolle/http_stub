@@ -22,8 +22,8 @@ describe HttpStub::Server::Scenario::Trigger do
 
     before(:example) { allow(HttpStub::Server::Scenario::Uri).to receive(:create).and_return(created_uri) }
 
-    it "creates a uri based on the name of the scenario" do
-      expect(HttpStub::Server::Scenario::Uri).to receive(:create).with(name)
+    it "creates a uri" do
+      expect(HttpStub::Server::Scenario::Uri).to receive(:create)
 
       subject
     end

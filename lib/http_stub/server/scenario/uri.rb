@@ -4,8 +4,8 @@ module HttpStub
 
       class Uri
 
-        def self.create(name)
-          "/http_stub/scenarios/activate?#{ URI.encode_www_form(:name => name) }"
+        def self.create
+          "/http_stub/scenarios/activate"
         end
 
       end

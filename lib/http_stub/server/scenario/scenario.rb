@@ -18,7 +18,7 @@ module HttpStub
         end
 
         def uri
-          HttpStub::Server::Scenario::Uri.create(@name)
+          HttpStub::Server::Scenario::Uri.create
         end
 
         def to_s

@@ -8,7 +8,7 @@ module HttpStub
 
         def initialize(name)
           @name = name
-          @uri  = HttpStub::Server::Scenario::Uri.create(name)
+          @uri  = HttpStub::Server::Scenario::Uri.create
         end
 
       end
