@@ -1,17 +1,12 @@
-%table{ class: :scenario }
-  %tr
-    %td Name:
-    %td
-      %a{ href: scenario.links.activate, class: :activate_scenario, data: { name: scenario.name } }= scenario.name
-  %tr
-    %td Stubs:
-    %td
-      - scenario.stubs.each do |the_stub|
-        = partial :stub, locals: { the_stub: the_stub }
-  %tr
-    %td Triggered Scenarios:
-    %td
-      - scenario.triggered_scenarios.each do |triggered_scenario|
-        %a{ href: triggered_scenario.links.detail, class: :triggered_scenario_detail }= triggered_scenario.name
-  %br
+%header
+  %h1= scenario.name
+%section
+  %a{ href: scenario.links.activate, class: [:scenario, :link, :activate_scenario], data: { name: scenario.name } } Activate
+  %h2 Stubs
+  - scenario.stubs.each do |the_stub|
+    = partial :stub, locals: { the_stub: the_stub }
+  - if scenario.triggered_scenarios.present?
+    %h2 Triggered Scenarios
+    - scenario.triggered_scenarios.each do |triggered_scenario|
+      %a{ href: triggered_scenario.links.detail, class: :triggered_scenario_detail }= triggered_scenario.name
 = partial :activate_scenario

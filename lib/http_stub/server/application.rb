@@ -69,6 +69,11 @@ module HttpStub
         haml :stub, {}, the_stub: @stub_registry.find(params[:id], logger)
       end
 
+      get "/http_stub/scenarios/:name" do
+        binding.pry
+        haml :scenario, {}, scenario: @scenario_registry.find(params[:name], logger)
+      end
+
       post "/http_stub/scenarios" do
         response = @scenario_controller.register(@http_stub_request, logger)
         @response_pipeline.process(response)
@@ -106,6 +111,14 @@ module HttpStub
 
         def h(text)
           Rack::Utils.escape_html(text)
+        end
+
+        def pretty_text(text)
+          begin
+            text ? JSON.pretty_generate(JSON.parse(text)) : ""
+          rescue JSON::ParserError => e
+            ""
+          end
         end
 
       end

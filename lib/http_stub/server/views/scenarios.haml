@@ -1,10 +1,12 @@
-%h1 Scenarios
-%table{ class: :scenarios }
-  - scenarios.each do |scenario|
-    %tr
-      %td{ class: :scenario_name }= scenario.name
-      %td
-        %a{ href: scenario.links.activate, class: :activate_scenario, data: { name: scenario.name } } Activate
-      %td
-        %a{ href: scenario.links.detail, class: :view_scenario } View Detail
+%header
+  %h1 Scenarios
+%section
+  %table{ class: :scenarios }
+    - scenarios.each do |scenario|
+      %tr
+        %td{ class: :scenario_name}= scenario.name
+        %td
+          %a{ href: scenario.links.activate, class: [:scenario, :link, :activate_scenario], data: { name: scenario.name } } Activate
+        %td
+          %a{ href: scenario.links.detail, class: [:scenario, :link, :view_scenario] } View Detail
 = partial :activate_scenario
