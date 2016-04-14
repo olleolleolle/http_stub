@@ -1,12 +1,14 @@
 ** 0.22.0 **
 
 Breaking:
-* Scenario names preferred over ID, natural language preferred
 * POST http_stub/scenarios/activate with scenario name parameter activates scenario
-* Scenario list page contains summary information, with links to activate and view details
 
 New:
 * GET /http_stub/scenarios?name retrieves details of scenario with matching name
+* Scenario list page contains summary information, with links to activate and view details
+
+Misc:
+* Refactor: Scenario names preferred over ID, natural language preferred
 
 ** 0.21.0 **
 
