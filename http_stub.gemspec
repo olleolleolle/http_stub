@@ -21,10 +21,10 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = ">= 1.9.3"
 
-  spec.add_runtime_dependency "rake", "~> 10.4"
+  spec.add_runtime_dependency "rake", "~> 11.1"
 
   spec.add_dependency "sinatra",             "~> 1.4"
-  spec.add_dependency "sinatra-partial",     "~> 0.4"
+  spec.add_dependency "sinatra-partial",     "~> 1.0"
   spec.add_dependency "multipart-post",      "~> 2.0"
   spec.add_dependency "http_server_manager", "~> 0.4"
   spec.add_dependency "json-schema",         "~> 2.6"
