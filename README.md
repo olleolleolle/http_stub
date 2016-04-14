@@ -28,11 +28,10 @@ Facilitates consumer driven contracts by allowing consumers to define a contract
 
 In comparison ```http_stub```:
 * Supports on-the-fly changes to responses to aid exploratory testing and demonstrations.
-* Supports specification based contracts.  Incoming requests can be matched not only by specific 'examples' with fixed values, but also through the use of clauses such as regular expressions and json schmea definitions.
+* Supports specification based contracts in addition to example based contracts.  Incoming requests can be matched through the use of clauses such as regular expressions and JSON schema definitions.
 * See comparison with ```http-stub-server``` for more highlights.
 
-```http_stub``` can be used for Consumer & Producer contract verification.
-For more information, see our recommendations for [Consumer & Producer Contract Testing](https://github.com/MYOB-Technology/http_stub/wiki/Consumer-&-Producer-Contract-Testing).
+```http_stub``` can be used for Consumer & Producer contract verification.  For more information, see our recommendations for [Consumer & Producer Contract Testing](https://github.com/MYOB-Technology/http_stub/wiki/Consumer-&-Producer-Contract-Testing).
 
 ### [VCR](https://github.com/vcr/vcr)
 Records requests and responses onto 'cassettes'.  Replays responses in-process by mocking HTTP libraries in use.
@@ -40,7 +39,7 @@ Records requests and responses onto 'cassettes'.  Replays responses in-process b
 In comparison ```http_stub```:
 * Relies on an external HTTP server and does not effect HTTP libraries in use.
 * Facilitates TDD/BDD style testing by not relying on real integrations being recorded and pre-existing.
-* Can make it easier to write and alter requests and responses by not having to alter or re-record cassettes and recordings.
+* Can make it easier to write and alter requests and responses by not having to alter or re-record cassettes / recordings.
 
 ### [http-stub-server](https://github.com/Sensis/http-stub-server)
 Similiar in spirit, implemented in Java and comes with Java and Ruby clients.
@@ -50,7 +49,7 @@ In comparison ```http_stub```:
 * Supports a wider range of matching rules and can match requests against JSON schemas.
 * Supports multi-part file responses.
 * Allows a match to trigger the registration of other ```stubs``` to simulate state changes in the provider.
-* Has diagnostic pages to interrogate the state of the stub, observe requests and responses made, and activate scenarios on-the-fly.
+* Has diagnostic pages to interrogate the state of the stub, trace requests to responses, and activate scenarios on-the-fly.
 * Has an elegant Ruby DSL that aids in keeping requests and responses DRY.
 
 ### [HTTParrot](https://github.com/abrandoned/httparrot)
