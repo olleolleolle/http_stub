@@ -27,12 +27,12 @@ Alternatives and Comparisons
 Facilitates consumer driven contracts by allowing consumers to define a contract that is shared with and verified by producers.
 
 In comparison ```http_stub```:
-* On-the-fly changes to responses are possible to aid exploratory testing and demonstrations.
-* Supports specification based contracts.  Incoming requests can be matched to responses through the use of clauses such as regular expressions and json schmea definitions.
+* Supports on-the-fly changes to responses to aid exploratory testing and demonstrations.
+* Supports specification based contracts.  Incoming requests can be matched not only by specific 'examples' with fixed values, but also through the use of clauses such as regular expressions and json schmea definitions.
 * See comparison with ```http-stub-server``` for more highlights.
 
 ```http_stub``` can be used for Consumer & Producer contract verification.
-For more information, see our recommendations for [Consumer & Producer Contract Testing](wiki/Consumer-&-Producer-Contract-Testing).
+For more information, see our recommendations for [Consumer & Producer Contract Testing](https://github.com/MYOB-Technology/http_stub/wiki/Consumer-&-Producer-Contract-Testing).
 
 ### [VCR](https://github.com/vcr/vcr)
 Records requests and responses onto 'cassettes'.  Replays responses in-process by mocking HTTP libraries in use.
