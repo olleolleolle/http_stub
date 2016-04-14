@@ -24,15 +24,15 @@ Alternatives and Comparisons
 ----------------------------
 
 ### [Pact](https://github.com/realestate-com-au/pact)
-Facilitates consumer driven contracts by allowing consumers to define a contract that is shared and verified by producers.
+Facilitates consumer driven contracts by allowing consumers to define a contract that is shared with and verified by producers.
 
 In comparison ```http_stub```:
-* Simulates a provider via an external process.  On-the-fly changes to responses are possible to aid exploratory testing and demonstrations.
-* Is flexible in matching requests to responses through the use of match clauses, such as regular expressions and mandatory omissions.  Requests can also be matched against JSON schemas.
+* On-the-fly changes to responses are possible to aid exploratory testing and demonstrations.
+* Supports specification based contracts.  Incoming requests can be matched to responses through the use of clauses such as regular expressions and json schmea definitions.
 * See comparison with ```http-stub-server``` for more highlights.
 
-It's important to note that ```http_stub``` presently does not aid producers in verifying consumer expectations.
-At best, ```http_stub``` allows consumers to share actual requests and responses with producers through its diagnostic screens.
+```http_stub``` can be used for Consumer & Producer contract verification.
+For more information, see our recommendations for [Consumer & Producer Contract Testing](wiki/Consumer-&-Producer-Contract-Testing).
 
 ### [VCR](https://github.com/vcr/vcr)
 Records requests and responses onto 'cassettes'.  Replays responses in-process by mocking HTTP libraries in use.
