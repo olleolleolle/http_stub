@@ -56,9 +56,11 @@ describe HttpStub::Server::Stub::Controller do
 
     subject { controller.replay(request, logger) }
 
-    describe "when a stub has been registered that should be replayed for the request" do
+    before(:example) { allow(registry).to receive(:match).with(request, logger).and_return(matched_stub) }
 
-      before(:example) { allow(registry).to receive(:find).with(request, logger).and_return(the_stub) }
+    describe "when a stub has been registered that matches the request" do
+
+      let(:matched_stub) { the_stub }
 
       it "returns the stubs response" do
         expect(the_stub).to receive(:response).and_return(response)
@@ -68,9 +70,9 @@ describe HttpStub::Server::Stub::Controller do
 
     end
 
-    describe "when no stub should be replayed for the request" do
+    describe "when no stub matches the request" do
 
-      before(:example) { allow(registry).to receive(:find).with(request, logger).and_return(nil) }
+      let(:matched_stub) { nil }
 
       it "returns a not found response" do
         expect(subject).to eql(HttpStub::Server::Response::NOT_FOUND)

@@ -3,10 +3,10 @@ module HttpStub
     module Stub
       module Match
 
-        class MatchFixture
+        class ResultFixture
 
           def self.empty
-            HttpStub::Server::Stub::Match::Match.new(nil, HttpStub::Server::RequestFixture.create)
+            HttpStub::Server::Stub::Match::Result.new(HttpStub::Server::RequestFixture.create, nil)
           end
 
         end

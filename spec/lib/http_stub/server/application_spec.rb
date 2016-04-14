@@ -4,9 +4,9 @@ describe HttpStub::Server::Application do
   let(:response)      { last_response }
   let(:response_body) { response.body.to_s }
 
-  let(:match_registry)    { instance_double(HttpStub::Server::Stub::Registry) }
-  let(:stub_registry)     { instance_double(HttpStub::Server::Stub::Registry) }
-  let(:scenario_registry) { instance_double(HttpStub::Server::Registry) }
+  let(:match_result_registry) { instance_double(HttpStub::Server::Registry) }
+  let(:stub_registry)         { instance_double(HttpStub::Server::Stub::Registry) }
+  let(:scenario_registry)     { instance_double(HttpStub::Server::Registry) }
 
   let(:stub_controller)     { instance_double(HttpStub::Server::Stub::Controller) }
   let(:scenario_controller) { instance_double(HttpStub::Server::Scenario::Controller) }
@@ -16,7 +16,7 @@ describe HttpStub::Server::Application do
   let(:app) { HttpStub::Server::Application.new! }
 
   before(:example) do
-    allow(HttpStub::Server::Registry).to receive(:new).with("match").and_return(match_registry)
+    allow(HttpStub::Server::Registry).to receive(:new).with("match result").and_return(match_result_registry)
     allow(HttpStub::Server::Registry).to receive(:new).with("scenario").and_return(scenario_registry)
     allow(HttpStub::Server::Stub::Registry).to receive(:new).and_return(stub_registry)
     allow(HttpStub::Server::Stub::Controller).to receive(:new).and_return(stub_controller)
@@ -151,12 +151,12 @@ describe HttpStub::Server::Application do
 
   context "when a request to list the matches is received" do
 
-    let(:found_matches) { [ HttpStub::Server::Stub::Match::MatchFixture.empty ] }
+    let(:found_match_results) { [ HttpStub::Server::Stub::Match::ResultFixture.empty ] }
 
     subject { get "/http_stub/stubs/matches" }
 
-    it "retrieves the matches from the registry" do
-      expect(match_registry).to receive(:all).and_return(found_matches)
+    it "retrieves the match results from the registry" do
+      expect(match_result_registry).to receive(:all).and_return(found_match_results)
 
       subject
     end

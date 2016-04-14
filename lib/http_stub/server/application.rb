@@ -11,11 +11,11 @@ module HttpStub
 
       def initialize
         super()
-        @match_registry      = HttpStub::Server::Registry.new("match")
-        @stub_registry       = HttpStub::Server::Stub::Registry.new(@match_registry)
-        @scenario_registry   = HttpStub::Server::Registry.new("scenario")
-        @stub_controller     = HttpStub::Server::Stub::Controller.new(@stub_registry)
-        @scenario_controller = HttpStub::Server::Scenario::Controller.new(@scenario_registry, @stub_registry)
+        @match_result_registry = HttpStub::Server::Registry.new("match result")
+        @stub_registry         = HttpStub::Server::Stub::Registry.new(@match_result_registry)
+        @scenario_registry     = HttpStub::Server::Registry.new("scenario")
+        @stub_controller       = HttpStub::Server::Stub::Controller.new(@stub_registry)
+        @scenario_controller   = HttpStub::Server::Scenario::Controller.new(@scenario_registry, @stub_registry)
       end
 
       private
@@ -62,7 +62,7 @@ module HttpStub
       end
 
       get "/http_stub/stubs/matches" do
-        haml :matches, {}, matches: @match_registry.all
+        haml :match_results, {}, match_results: @match_result_registry.all
       end
 
       get "/http_stub/stubs/:id" do

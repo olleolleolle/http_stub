@@ -5,7 +5,7 @@ module HttpStub
 
       def initialize(model_name)
         @model_name = model_name
-        @models = []
+        @models     = []
       end
 
       def add(model, logger)

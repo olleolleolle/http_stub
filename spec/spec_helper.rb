@@ -46,7 +46,7 @@ end
 
 require_relative 'support/http_stub/server/request_fixture'
 require_relative 'support/http_stub/server/scenario/scenario_fixture'
-require_relative 'support/http_stub/server/stub/match/match_fixture'
+require_relative 'support/http_stub/server/stub/match/result_fixture'
 require_relative 'support/http_stub/stub_fixture'
 require_relative 'support/http_stub/scenario_fixture'
 require_relative 'support/http_stub/empty_configurer'

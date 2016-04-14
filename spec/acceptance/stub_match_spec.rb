@@ -41,7 +41,7 @@ describe "Stub match acceptance" do
 
     end
 
-    shared_context "behaviours of a request that is recorded in the stub match log" do
+    shared_context "issues requests of various types" do
 
       it "returns a response body that contains the uri of the request" do
         expect(response.body).to match(/#{escape_html(request_uri)}/)
@@ -107,7 +107,11 @@ describe "Stub match acceptance" do
         issue_request
       end
 
-      include_context "behaviours of a request that is recorded in the stub match log"
+      include_context "issues requests of various types"
+
+      it "returns a response body that indicates the request matched a stub" do
+        expect(response.body).to include("Match")
+      end
 
       it "returns a response body that contains stub response status" do
         expect(response.body).to match(/#{escape_html(stub_response_status)}/)
@@ -138,7 +142,11 @@ describe "Stub match acceptance" do
 
       before(:example) { issue_request }
 
-      it_behaves_like "behaviours of a request that is recorded in the stub match log"
+      include_context "issues requests of various types"
+
+      it "returns a response body that indicates the request did not match a stub" do
+        expect(response.body).to include("Miss")
+      end
 
     end
 
@@ -148,19 +156,19 @@ describe "Stub match acceptance" do
 
       before(:example) { register_stub }
 
-      it "should not be recorded in the stub request log" do
+      it "returns a response body that does not include the stub configuration request" do
         expect(response.body).to_not match(/#{request_uri}/)
       end
 
     end
 
-    context "when a request has been made configuring a scenarios" do
+    context "when a request has been made configuring a scenario" do
 
       include_context "registers a stub"
 
       before(:example) { register_scenario }
 
-      it "should not be recorded in the stub request log" do
+      it "returns a response body that does not include the scenario configuration request" do
         expect(response.body).to_not match(/#{request_uri}/)
       end
 

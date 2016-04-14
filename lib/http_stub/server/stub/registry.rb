@@ -4,20 +4,18 @@ module HttpStub
 
       class Registry
 
-        delegate :add, :concat, :all, to: :@stub_registry
+        delegate :add, :concat, :find, :all, to: :@stub_registry
 
-        def initialize(match_registry)
-          @match_registry = match_registry
-          @stub_registry  = HttpStub::Server::Registry.new("stub")
+        def initialize(match_result_registry)
+          @match_result_registry = match_result_registry
+          @stub_registry         = HttpStub::Server::Registry.new("stub")
         end
 
-        def find(criteria, logger)
-          stub = @stub_registry.find(criteria, logger)
-          if criteria.is_a?(HttpStub::Server::Request)
-            @match_registry.add(HttpStub::Server::Stub::Match::Match.new(stub, criteria), logger)
-            stub.triggers.add_to(self, logger) if stub
+        def match(request, logger)
+          @stub_registry.find(request, logger).tap do |matched_stub|
+            @match_result_registry.add(HttpStub::Server::Stub::Match::Result.new(request, matched_stub), logger)
+            matched_stub.triggers.add_to(self, logger) if matched_stub
           end
-          stub
         end
 
         def remember
@@ -29,7 +27,7 @@ module HttpStub
         end
 
         def clear(logger)
-          [ @match_registry, @stub_registry ].each { |registry| registry.clear(logger) }
+          [ @match_result_registry, @stub_registry ].each { |registry| registry.clear(logger) }
         end
 
       end

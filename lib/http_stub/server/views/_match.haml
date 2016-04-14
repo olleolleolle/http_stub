@@ -1,5 +1,8 @@
 %table{ class: :match }
   %tr
+    %td Type:
+    %td Match
+  %tr
     %td Request:
     %td= partial :request, locals: { request: match.request }
   %tr
@@ -8,6 +11,6 @@
       %table{ class: :response }
         = partial :response, locals: { response: match.stub.response }
   %tr
-    %td Matched Stub:
+    %td Stub:
     %td
-      %a{ href: match.stub.stub_uri, class: :stub } Match
+      %a{ href: match.stub.stub_uri, class: :stub } Stub
