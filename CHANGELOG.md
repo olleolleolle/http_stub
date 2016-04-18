@@ -6,7 +6,7 @@ Fix:
 ** 0.22.1 **
 
 New:
-* GET /stubs/matches explicitly list stub matches and misses
+* GET /stubs/matches explicitly lists stub matches and misses
 
 ** 0.22.0 **
 
