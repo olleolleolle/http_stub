@@ -3,7 +3,7 @@ shared_context "server integration" do
 
   before(:context) do
     @pid = Process.spawn("rake example_server:start:foreground --trace")
-    ::Wait.until!("http stub server started") { Net::HTTP.get_response(server_host, "/", server_port) }
+    ::Wait.until!(description: "http stub server started") { Net::HTTP.get_response(server_host, "/", server_port) }
   end
 
   after(:context) { Process.kill(9, @pid) }

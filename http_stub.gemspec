@@ -39,6 +39,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "json",                      "~> 1.8"
   spec.add_development_dependency "nokogiri",                  "~> 1.6"
   spec.add_development_dependency "httparty",                  "~> 0.13"
-  spec.add_development_dependency "wait_until",                "~> 0.1"
+  spec.add_development_dependency "wait_until",                "~> 0.3"
   spec.add_development_dependency "codeclimate-test-reporter", "~> 0.4"
 end

@@ -28,7 +28,7 @@ describe HttpStub::Rake::ServerTasks do
         end
 
         def wait_until_server_has_started
-          ::Wait.until!("http stub server #{task_args[:name]} started") do
+          ::Wait.until!(description: "http stub server #{task_args[:name]} started") do
             Net::HTTP.get_response("localhost", "/", port)
           end
         end
