@@ -1,13 +1,13 @@
 PATH
   remote: .
   specs:
-    http_stub (0.22.1)
+    http_stub (0.22.2)
       activesupport (~> 4.2)
       haml (~> 4.0)
       http_server_manager (~> 0.4)
       json-schema (~> 2.6)
       multipart-post (~> 2.0)
-      rake (~> 11.1)
+      rake (>= 10.4)
       sass (~> 3.4)
       sinatra (~> 1.4)
       sinatra-partial (~> 1.0)
