@@ -1,0 +1,5 @@
+%header
+  %h1 Matches
+%section
+  - matches.each do |match|
+    = partial :match, locals: { match: match }
