@@ -8,8 +8,7 @@
   %tr
     %td.title Body:
     %td
-      %pre
-        %code=partial "#{response.type}_response".to_sym, locals: { response: response }
+      %pre=partial "#{response.type}_response".to_sym, locals: { response: response }
   %tr
     %td.title Delay:
     %td=h(response.delay_in_seconds)

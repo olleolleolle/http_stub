@@ -1,4 +1,6 @@
-%h1 Stubs
-- stubs.each do |the_stub|
-  = partial :stub, locals: { the_stub: the_stub }
-  %br
+%header
+  %h1 Stubs
+%section
+  - stubs.each do |the_stub|
+    = partial :stub, locals: { the_stub: the_stub }
+    .header-rule

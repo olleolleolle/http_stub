@@ -4,9 +4,9 @@
   %table{ class: :scenarios }
     - scenarios.each do |scenario|
       %tr
-        %td{ class: :scenario_name}= scenario.name
-        %td
+        %td{ class: [:scenario_name, :header-rule] }= scenario.name
+        %td{ class: :header-rule }
           %a{ href: scenario.links.activate, class: [:scenario, :link, :activate_scenario], data: { name: scenario.name } } Activate
-        %td
+        %td{ class: :header-rule }
           %a{ href: scenario.links.detail, class: [:scenario, :link, :view_scenario] } View Detail
 = partial :activate_scenario
