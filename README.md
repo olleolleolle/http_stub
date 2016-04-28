@@ -31,7 +31,8 @@ In comparison ```http_stub```:
 * Supports specification based contracts in addition to example based contracts.  Incoming requests can be matched through the use of clauses such as regular expressions and JSON schema definitions.
 * See comparison with ```http-stub-server``` for more highlights.
 
-```http_stub``` can be used for Consumer & Producer contract verification.  For more information, see our [Consumer & Producer Contract Testing Recommendations](https://github.com/MYOB-Technology/http_stub/wiki/Consumer-&-Producer-Contract-Testing-Recommendations).
+```http_stub``` can be used for Consumer & Producer contract verification.
+For more information, see the dedicated [Slide Deck](https://docs.google.com/presentation/d/18iikw5rXuHNt7TxmAuiak9kFXR3wmObMMB1jlqrrwbQ/edit?usp=sharing) & [Wiki Page](https://github.com/MYOB-Technology/http_stub/wiki/Contract-Based-Testing-Recommendations).
 
 ### [VCR](https://github.com/vcr/vcr)
 Records requests and responses onto 'cassettes'.  Replays responses in-process by mocking HTTP libraries in use.
