@@ -1,6 +1,7 @@
 describe HttpStub::Server::ApplicationHelpers do
 
-  let(:instance) { Object.include(described_class).new }
+
+  let(:instance) { Class.new.send(:include, described_class).new }
 
   describe '::h' do
     let(:text) { '<tag>Some text</tag>' }
