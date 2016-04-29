@@ -9,7 +9,7 @@
       - scenario.stubs.each do |the_stub|
         = partial :stub, locals: { the_stub: the_stub }
   %tr
-    %td Triggered Scenario's:
+    %td Triggered Scenarios:
     %td
       - scenario.triggered_scenarios.each do |triggered_scenario|
         %a{ href: triggered_scenario.links.detail, class: :triggered_scenario_detail }= triggered_scenario.name

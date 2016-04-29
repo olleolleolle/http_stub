@@ -1,7 +1,7 @@
 describe "Scenario acceptance" do
   include_context "configurer integration"
 
-  context "when a configurer that contains scenario's is initialized" do
+  context "when a configurer that contains scenarios is initialized" do
 
     let(:configurer)  { HttpStub::Examples::ConfigurerWithTrivialScenarios.new }
 

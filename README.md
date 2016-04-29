@@ -134,7 +134,7 @@ The server has an admin UI accessible on ```http://localhost:8000/http_stub```:
 
 ![http://localhost:8000/http_stub/](examples/resources/admin_ui_homepage.png "Admin UI Homepage")
 
-The scenario list allows activation of scenario's on the fly:
+The scenario list allows activation of scenarios on the fly:
 
 ![http://localhost:8000/http_stub/scenarios/](examples/resources/admin_ui_scenarios.png "Admin UI Scenarios")
 

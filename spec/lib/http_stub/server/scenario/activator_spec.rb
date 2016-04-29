@@ -56,7 +56,7 @@ describe HttpStub::Server::Scenario::Activator do
         subject
       end
 
-      context "when the triggered scenario's are found" do
+      context "when the triggered scenarios are found" do
 
         class HttpStub::Server::Scenario::ActivatorRetainingActivateArgs < HttpStub::Server::Scenario::Activator
 
@@ -76,7 +76,7 @@ describe HttpStub::Server::Scenario::Activator do
 
         let(:activator_class) { HttpStub::Server::Scenario::ActivatorRetainingActivateArgs }
 
-        it "activates the scenario's" do
+        it "activates the scenarios" do
           expected_activate_args = triggered_scenarios.reduce([ [ scenario, logger ] ]) do |result, triggered_scenario|
             result << [ triggered_scenario, logger ]
           end
