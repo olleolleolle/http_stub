@@ -69,10 +69,6 @@ module HttpStub
         haml :stub, {}, the_stub: @stub_registry.find(params[:id], logger)
       end
 
-      get "/http_stub/scenarios/:name" do
-        haml :scenario, {}, scenario: @scenario_registry.find(params[:name], logger)
-      end
-
       post "/http_stub/scenarios" do
         response = @scenario_controller.register(@http_stub_request, logger)
         @response_pipeline.process(response)
