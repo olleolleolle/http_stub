@@ -70,13 +70,16 @@ Design
 Usage
 -----
 
-To simulate common respones from an authentication service, let's stub a service which will respond to a login request
-by either granting or denying access:
+## Step 1: Define The Server Configuration ##
+
+To simulate a response from an authentication service, let's stub the service and respond to it's login endpoint by
+either granting or denying access:
 
 ```ruby
 class AuthenticationServiceConfigurer
   include HttpStub::Configurer
 
+  stub_server.host = "localhost"
   stub_server.port = 8000
 
   login_template = stub_server.endpoint_template { match_requests(uri: "/login", method: :post) }
@@ -87,17 +90,54 @@ class AuthenticationServiceConfigurer
 end
 ```
 
-Now we can initialize the service and activate the scenarios as needed.
+## Step 2: Start The Server ##
+
+Define tasks to manage the servers lifecycle:
 
 ```ruby
-AuthenticationServiceConfigurer.initialize!
-AuthenticationServiceConfigurer.stub_server.activate!("Grant Access")
+  require 'http_stub/rake/task_generators'
+
+  HttpStub::Rake::ServerDaemonTasks.new(name: :authentication_service, configurer: AuthenticationServiceConfigurer)
 ```
 
-Navigating to the locally running stub server (e.g. ```http://localhost:8000/http_stub/scenarios```) reveals the scenarios
-which we can activate manually by clicking the links.
+Then start the server:
 
-![http://localhost:8000/http_stub/scenarios/](examples/resources/authentication_service_scenarios.png "Scenarios Diagnostic Page")
+```
+some_host:some_path some_user$ rake authentication_service:start
+authentication_service started on localhost:8000
+authentication_service initialized
+```
+
+## Step 3: Activate Scenarios On-The-Fly ##
+
+Now we can activate the scenarios as needed.
+
+### Activating Scenarios Via Code ###
+
+Within automated tests, you'll often need to activate a scenario:
+
+```ruby
+  before(:context) { AuthenticationServiceConfigurer.stub_server.has_started! }
+
+  context "when access is granted" do
+
+    before(:example) { AuthenticationServiceConfigurer.stub_server.activate!("Grant Access") }
+
+    ...
+
+  end
+```
+
+### Activating Scenarios Via The Admin UI ###
+
+The server has an admin UI accessible on ```http://localhost:8000/http_stub```:
+![http://localhost:8000/http_stub/](examples/resources/admin_ui_homepage.png "Admin UI Homepage")
+
+The scenario list allows activation of scenario's on the fly:
+![http://localhost:8000/http_stub/scenarios/](examples/resources/admin_ui_scenarios.png "Admin UI Scenarios")
+
+More Information
+----------------
 
 ```http_stub``` can match requests against a variety of criteria, including JSON schemas, and can respond with arbitrary
 content including files.
