@@ -1,5 +1,6 @@
 describe HttpStub::Server::Application, "when the server is running" do
   include_context "server integration"
+  include HtmlEncodingHelper
 
   let(:response_document) { Nokogiri::HTML(response.body) }
 
@@ -179,11 +180,11 @@ describe HttpStub::Server::Application, "when the server is running" do
         end
 
         it "returns a response whose body contains the response body of stub returning JSON" do
-          expect(response.body).to match(/#{escape_html({ "key" => "JSON body" }.to_json)}/)
+          expect(response.body).to match(/#{encode_whitespace(JSON.pretty_generate({ key: "JSON body" }))}/)
         end
 
         it "returns a response whose body contains the response body of stub returning HTML" do
-          expect(response.body).to match(/#{escape_html("<html><body>HTML body</body></html>")}/)
+          expect(response.body).to match(/#{encode_whitespace("<html><body>HTML body</body></html>")}/)
         end
 
         it "returns a response whose body contains the response body of a stub returning a file" do
@@ -340,11 +341,11 @@ describe HttpStub::Server::Application, "when the server is running" do
           end
 
           it "returns a response whose body supports JSON responses" do
-            expect(response.body).to match(/#{escape_html({ "key" => "JSON body" }.to_json)}/)
+            expect(response.body).to match(/#{encode_whitespace(JSON.pretty_generate({ "key" => "JSON body" }))}/)
           end if stub_number == 1
 
           it "returns a response whose body supports HTML responses" do
-            expect(response.body).to match(/#{escape_html("<html><body>HTML body</body></html>")}/)
+            expect(response.body).to match(/#{encode_whitespace("<html><body>HTML body</body></html>")}/)
           end if stub_number == 2
 
           it "returns a response whose body supports file responses" do
