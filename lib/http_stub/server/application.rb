@@ -4,6 +4,7 @@ module HttpStub
     class Application < Sinatra::Base
 
       set :root, File.dirname(__FILE__)
+      disable :protection
 
       register Sinatra::Partial
 
