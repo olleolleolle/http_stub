@@ -6,7 +6,7 @@ Gem::Specification.new do |spec|
   spec.name              = "http_stub"
   spec.version           = HttpStub::VERSION
   spec.platform          = Gem::Platform::RUBY
-  spec.authors           = ["Matthew Ueckerman", "Russell Van Bert"]
+  spec.authors           = %w{ dueckes rvanbert rypac andykingking campezzi }
   spec.summary           = "A HTTP Server replaying configured stub responses"
   spec.description       = "fakeweb for a HTTP server, informing it to stub / fake responses"
   spec.email             = "matthew.ueckerman@myob.com"
