@@ -1,6 +1,6 @@
 describe HttpStub::Server::ApplicationHelpers do
 
-  let(:helpers) { Class.new.include(described_class).new }
+  let(:helpers) { Class.new.extend(described_class) }
 
   describe "::h" do
 
