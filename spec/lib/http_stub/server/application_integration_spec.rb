@@ -1,6 +1,5 @@
 describe HttpStub::Server::Application, "when the server is running" do
   include_context "server integration"
-  include HtmlEncodingHelper
 
   let(:response_document) { Nokogiri::HTML(response.body) }
 

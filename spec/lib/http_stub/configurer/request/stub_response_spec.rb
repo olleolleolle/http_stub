@@ -45,8 +45,32 @@ describe HttpStub::Configurer::Request::StubResponse do
 
     end
 
-    it "has an entry for the response body argument" do
-      expect(subject).to include(body: fixture.body)
+    context "when a response body argument is provided" do
+
+      before(:example) do
+        fixture.body = "some body"
+        fixture.json = nil
+      end
+
+      it "has a response body entry that contains the body argument" do
+        expect(subject).to include(body: fixture.body)
+      end
+
+    end
+
+    context "when a response json argument is provided" do
+
+      let(:json_object) { { some_key: "some value" } }
+
+      before(:example) do
+        fixture.body = nil
+        fixture.json = json_object
+      end
+
+      it "has a response body entry that contains the json argument converted to JSON" do
+        expect(subject).to include(body: json_object.to_json)
+      end
+
     end
 
     context "when a delay option is provided" do

@@ -102,11 +102,7 @@ module HttpStub
         @response_pipeline.process(response)
       end
 
-      helpers do
-
-        include HttpStub::Server::ApplicationHelpers
-
-      end
+      helpers { include HttpStub::Server::ApplicationHelpers }
 
     end
 

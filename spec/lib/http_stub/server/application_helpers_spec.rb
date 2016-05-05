@@ -1,31 +1,53 @@
 describe HttpStub::Server::ApplicationHelpers do
 
+  let(:helpers) { Class.new.include(described_class).new }
 
-  let(:instance) { Class.new.send(:include, described_class).new }
+  describe "::h" do
 
-  describe '::h' do
-    let(:text) { '<tag>Some text</tag>' }
-    subject do
-      instance.h(text)
+    let(:text) { "<tag>Some text</tag>" }
+
+    subject { helpers.h(text) }
+
+    it "should escape the provided HTML" do
+      expect(subject).to eq("&lt;tag&gt;Some text&lt;&#x2F;tag&gt;")
     end
 
-    it 'should escape the provided HTML' do
-      expect(subject).to eq('&lt;tag&gt;Some text&lt;&#x2F;tag&gt;')
-    end
   end
 
-  describe '::pretty_text' do
-    it 'should return empty string if no text provided' do
-      expect(instance.pretty_text(nil)).to eq("")
+  describe "::pp" do
+
+    subject { helpers.pp(text) }
+
+    context "when the text is JSON" do
+
+      let(:text) { "{\"key\":\"value\"}" }
+
+      it "returns a pretty JSON string" do
+        expect(subject).to eql("{\n  \"key\": \"value\"\n}")
+      end
+
     end
 
-    it 'should return the string if the string is not JSON' do
-      expect(instance.pretty_text("some text")).to eq("some text")
+    context "when the text is not JSON" do
+
+      let(:text) { "some text" }
+
+      it "returns the string unchanged" do
+        expect(subject).to eql(text)
+      end
+
     end
 
-    it 'should return a pretty JSON string if the text is JSON' do
-      expect(instance.pretty_text('{"key":"value"}')).to eq("{\n  \"key\": \"value\"\n}")
+    context "when the text is nil" do
+
+      let(:text) { nil }
+
+      it "returns an empty string" do
+        expect(subject).to eql("")
+      end
+
     end
+
   end
 
 end

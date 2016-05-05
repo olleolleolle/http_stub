@@ -1,3 +1,12 @@
+** 0.22.3 **
+
+New:
+* ```stub.respond_with(json: { key: "value" })``` supported
+
+Misc:
+* Administration page formatting improvements
+
+
 ** 0.22.2 **
 
 Fix:

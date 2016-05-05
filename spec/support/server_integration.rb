@@ -1,5 +1,6 @@
 shared_context "server integration" do
   include Rack::Utils
+  include HtmlHelpers
 
   before(:context) do
     @pid = Process.spawn("rake example_server:start:foreground --trace")
