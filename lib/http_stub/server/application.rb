@@ -7,7 +7,8 @@ module HttpStub
 
       register Sinatra::Partial
 
-      enable :dump_errors, :logging, :partial_underscores
+      enable  :dump_errors, :logging, :partial_underscores
+      disable :protection
 
       def initialize
         super()

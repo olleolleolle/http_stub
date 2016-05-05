@@ -1,5 +1,9 @@
 ** 0.22.3 **
 
+Breaking:
+* Disabled security measures provided by `Sinatra` and `Rack::Protection` (e.g. `JsonCsrf`, `HttpOrigin`, `RemoteToken`)
+  * Stubs can emulate a desired behaviour in stubbed responses
+
 New:
 * ```stub.respond_with(json: { key: "value" })``` supported
 
