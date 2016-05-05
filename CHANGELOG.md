@@ -1,3 +1,9 @@
+** 0.22.3 **
+
+Breaking:
+* Stub servers no longer use the default protection provided by `Sinatra` and `Rack::Protection` (i.e. `JsonCsrf`, `HttpOrigin`, `RemoteToken`, etc).
+  * If the stubbed server uses those security features, they should be emulated by the `Configurer` when matching incoming requests.
+
 ** 0.22.2 **
 
 Fix:

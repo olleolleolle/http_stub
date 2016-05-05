@@ -24,6 +24,10 @@ describe HttpStub::Server::Application do
     allow(HttpStub::Server::ResponsePipeline).to receive(:new).and_return(response_pipeline)
   end
 
+  it "disables all standard security features provided by Rack::Protection" do
+    expect(app.settings.protection).to eq false
+  end
+
   context "when the diagnostics landing page is retrieved" do
 
     subject { get "/http_stub" }
