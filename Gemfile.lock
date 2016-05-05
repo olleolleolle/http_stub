@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    http_stub (0.22.2)
+    http_stub (0.22.3)
       activesupport (~> 4.2)
       haml (~> 4.0)
       http_server_manager (~> 0.4)
@@ -91,7 +91,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  codeclimate-test-reporter (~> 0.4)
+  codeclimate-test-reporter (~> 0.5)
   http_stub!
   httparty (~> 0.13)
   json (~> 1.8)

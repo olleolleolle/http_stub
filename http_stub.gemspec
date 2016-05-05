@@ -32,7 +32,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "haml",                "~> 4.0"
   spec.add_dependency "sass",                "~> 3.4"
 
-  spec.add_development_dependency "travis-lint",               "~> 2.0"
   spec.add_development_dependency "rspec",                     "~> 3.4"
   spec.add_development_dependency "simplecov",                 "~> 0.11"
   spec.add_development_dependency "rack-test",                 "~> 0.6"
@@ -40,5 +39,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "nokogiri",                  "~> 1.6"
   spec.add_development_dependency "httparty",                  "~> 0.13"
   spec.add_development_dependency "wait_until",                "~> 0.3"
-  spec.add_development_dependency "codeclimate-test-reporter", "~> 0.4"
+  spec.add_development_dependency "travis-lint",               "~> 2.0"
+  spec.add_development_dependency "codeclimate-test-reporter", "~> 0.5"
 end
