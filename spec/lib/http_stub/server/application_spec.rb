@@ -298,4 +298,8 @@ describe HttpStub::Server::Application do
 
   end
 
+  it "disables all standard HTTP security measures to allow stubs full control of responses" do
+    expect(app.settings.protection).to eql(false)
+  end
+
 end
