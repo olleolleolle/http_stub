@@ -22,21 +22,21 @@ module HttpStub
         end
 
         def configure_some_scenario
-          stub_server.add_scenario_with_one_stub!("some_scenario") do |stub|
+          stub_server.add_scenario_with_one_stub!("Some scenario") do |stub|
             stub.match_requests(uri: "/registered_in_configure_scenario_method", method: :get)
             stub.respond_with(body: "configure scenario response")
           end
 
-          stub_server.activate!("some_scenario")
+          stub_server.activate!("Some scenario")
         end
 
         def configure_some_scenarios
-          stub_server.add_scenario_with_one_stub!("some_scenarios") do |stub|
+          stub_server.add_scenario_with_one_stub!("Some scenarios") do |stub|
             stub.match_requests(uri: "/registered_in_configure_scenarios_method", method: :get)
             stub.respond_with(body: "configure scenarios response")
           end
 
-          stub_server.activate!("some_scenarios")
+          stub_server.activate!("Some scenarios")
         end
 
       end

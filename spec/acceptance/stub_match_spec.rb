@@ -173,7 +173,7 @@ describe "Stub match acceptance" do
       end
 
       def register_scenario
-        stub_server.add_scenario_with_one_stub!("some_scenario", build_stub)
+        stub_server.add_scenario_with_one_stub!("Some scenario", build_stub)
       end
 
     end

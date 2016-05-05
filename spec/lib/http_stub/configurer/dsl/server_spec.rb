@@ -182,7 +182,7 @@ describe HttpStub::Configurer::DSL::Server do
 
   describe "#add_scenario_with_one_stub!" do
 
-    let(:scenario_name)  { "some_scenario_name" }
+    let(:scenario_name)  { "Some scenario name" }
     let(:block_verifier) { double("BlockVerifier") }
     let(:block)          { lambda { block_verifier.verify } }
 

@@ -225,7 +225,7 @@ describe HttpStub::Configurer::DSL::EndpointTemplate do
 
   describe "#add_scenario!" do
 
-    let(:name)         { "some_scenario_name" }
+    let(:name)         { "Some scenario name" }
     let(:stub_builder) { instance_double(HttpStub::Configurer::DSL::StubBuilder).as_null_object }
 
     before(:example) { allow(server).to receive(:add_scenario_with_one_stub!).and_yield(stub_builder) }

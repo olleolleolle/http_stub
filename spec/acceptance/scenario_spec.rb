@@ -32,7 +32,7 @@ describe "Scenario acceptance" do
 
       context "containing triggered scenarios" do
 
-        before(:example) { configurer.activate!("Scenario that activates another scenario") }
+        before(:example) { configurer.activate!("Activates another scenario") }
 
         (1..3).each do |stub_number|
 

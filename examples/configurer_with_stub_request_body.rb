@@ -4,17 +4,17 @@ module HttpStub
     class ConfigurerWithStubRequestBody
       include HttpStub::Configurer
 
-      stub_server.add_scenario_with_one_stub!("match_body_exactly_scenario") do
+      stub_server.add_scenario_with_one_stub!("Match body exactly") do
         match_requests(uri: "/match_body_exactly", method: :post, body: "Exactly matches")
         respond_with(status: 204)
       end
 
-      stub_server.add_scenario_with_one_stub!("match_body_regex_scenario") do
+      stub_server.add_scenario_with_one_stub!("Match body regex") do
         match_requests(uri: "/match_body_regex", method: :post, body: /matches/)
         respond_with(status: 204)
       end
 
-      stub_server.add_scenario_with_one_stub!("match_body_json_schema_scenario") do |stub|
+      stub_server.add_scenario_with_one_stub!("Match body JSON schema") do |stub|
         stub.match_requests(uri:
           "/match_body_json_schema", method: :post,
           body: stub.schema(:json, { type: :object,

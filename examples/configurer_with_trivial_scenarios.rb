@@ -15,7 +15,7 @@ module HttpStub
         end
       end
 
-      stub_server.add_scenario!("Scenario that activates another scenario") do |scenario|
+      stub_server.add_scenario!("Activates another scenario") do |scenario|
         scenario.add_stub! do |stub|
           stub.match_requests(uri: "/scenario_stub_path", method: :get)
           stub.respond_with(status: 200, body: "Scenario stub body")

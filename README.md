@@ -76,17 +76,17 @@ To simulate a response from an authentication service, let's stub the service an
 either granting or denying access:
 
 ```ruby
-class AuthenticationServiceConfigurer
-  include HttpStub::Configurer
+module AuthenticationService
 
-  stub_server.host = "localhost"
-  stub_server.port = 8000
+  class Configurer
+    include HttpStub::Configurer
 
-  login_template = stub_server.endpoint_template { match_requests(uri: "/login", method: :post) }
+    login_template = stub_server.endpoint_template { match_requests(uri: "/login", method: :post) }
 
-  login_template.add_scenario!("Grant Access", status: 200)
-  login_template.add_scenario!("Deny Access",  status: 401)
-  
+    login_template.add_scenario!("Grant access", status: 200)
+    login_template.add_scenario!("Deny access",  status: 401)
+  end
+
 end
 ```
 
@@ -97,7 +97,11 @@ Define tasks to manage the servers lifecycle:
 ```ruby
   require 'http_stub/rake/task_generators'
 
-  HttpStub::Rake::ServerDaemonTasks.new(name: :authentication_service, configurer: AuthenticationServiceConfigurer)
+  configurer = AuthenticationService::Configurer
+  configurer.stub_server.host = "localhost"
+  configurer.stub_server.port = 8000
+
+  HttpStub::Rake::ServerDaemonTasks.new(name: :authentication_service, configurer: configurer)
 ```
 
 Then start the server:
@@ -121,7 +125,7 @@ Within automated tests, you'll often need to activate a scenario:
 
   context "when access is granted" do
 
-    before(:example) { AuthenticationServiceConfigurer.stub_server.activate!("Grant Access") }
+    before(:example) { AuthenticationServiceConfigurer.stub_server.activate!("Grant access") }
 
     ...
 

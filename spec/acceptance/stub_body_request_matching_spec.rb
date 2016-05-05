@@ -9,7 +9,7 @@ describe "Scenario acceptance" do
 
     context "against an exact match" do
 
-      before(:example) { stub_server.activate!("match_body_exactly_scenario") }
+      before(:example) { stub_server.activate!("Match body exactly") }
 
       context "and a request is made with a request body" do
 
@@ -53,7 +53,7 @@ describe "Scenario acceptance" do
 
     context "against a regular expression" do
 
-      before(:example) { stub_server.activate!("match_body_regex_scenario") }
+      before(:example) { stub_server.activate!("Match body regex") }
 
       context "and a request is made with a request body" do
 
@@ -97,7 +97,7 @@ describe "Scenario acceptance" do
 
     context "against a JSON schema" do
 
-      before(:example) { stub_server.activate!("match_body_json_schema_scenario") }
+      before(:example) { stub_server.activate!("Match body JSON schema") }
 
       context "and a request is made with a request body" do
 
