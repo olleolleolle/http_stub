@@ -6,7 +6,6 @@ New:
 Misc:
 * Administration page formatting improvements
 
-
 ** 0.22.2 **
 
 Fix:
