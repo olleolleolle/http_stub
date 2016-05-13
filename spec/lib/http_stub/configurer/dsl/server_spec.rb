@@ -9,6 +9,15 @@ describe HttpStub::Configurer::DSL::Server do
     allow(HttpStub::Configurer::DSL::StubBuilder).to receive(:new).with(no_args).and_return(default_stub_builder)
   end
 
+  shared_context "a server with host and port configured" do
+
+    before(:example) do
+      server.host = "some_host"
+      server.port =  8888
+    end
+
+  end
+
   it "produces stub builders" do
     expect(server).to be_a(HttpStub::Configurer::DSL::StubBuilderProducer)
   end
@@ -21,9 +30,43 @@ describe HttpStub::Configurer::DSL::Server do
 
     subject { server.base_uri }
 
-    before(:example) do
-      server.host = "some_host"
-      server.port =  8888
+    include_context "a server with host and port configured"
+
+    it "returns a uri that combines any established host and port" do
+      expect(subject).to include("some_host:8888")
+    end
+
+    it "returns a uri accessed via http" do
+      expect(subject).to match(/^http:\/\//)
+    end
+
+  end
+
+  describe "#external_base_uri" do
+
+    subject { server.external_base_uri }
+
+    include_context "a server with host and port configured"
+
+    context "when an external base URI environment variable is established" do
+
+      let(:external_base_uri) { "http://some/external/base/uri" }
+
+      before(:example) { ENV["STUB_EXTERNAL_BASE_URI"] = external_base_uri }
+      after(:example)  { ENV["STUB_EXTERNAL_BASE_URI"] = nil }
+
+      it "returns the environment variable" do
+        expect(subject).to eql(external_base_uri)
+      end
+
+    end
+
+    context "when an external base URI environment variable is not established" do
+
+      it "returns the base URI" do
+        expect(subject).to eql(server.base_uri)
+      end
+
     end
 
     it "returns a uri that combines any established host and port" do

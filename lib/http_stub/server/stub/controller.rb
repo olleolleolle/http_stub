@@ -14,7 +14,7 @@ module HttpStub
           HttpStub::Server::Response.success("location" => stub.stub_uri)
         end
 
-        def replay(request, logger)
+        def match(request, logger)
           stub = @registry.match(request, logger)
           stub ? stub.response : HttpStub::Server::Response::NOT_FOUND
         end

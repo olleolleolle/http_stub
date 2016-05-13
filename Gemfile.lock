@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    http_stub (0.22.3)
+    http_stub (0.22.4)
       activesupport (~> 4.2)
       haml (~> 4.0)
       http_server_manager (~> 0.4)
@@ -80,7 +80,7 @@ GEM
     sys-proctree (0.0.8)
       sys-proctable (>= 0.9.8)
     thread_safe (0.3.5)
-    tilt (2.0.2)
+    tilt (2.0.3)
     travis-lint (2.0.0)
       json
     tzinfo (1.2.2)
@@ -103,4 +103,4 @@ DEPENDENCIES
   wait_until (~> 0.3)
 
 BUNDLED WITH
-   1.11.2
+   1.12.3

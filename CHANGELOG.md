@@ -1,3 +1,9 @@
+** 0.22.4 **
+
+New:
+* ```stub_server.external_base_uri``` facilitates links to a stub running in a Docker container
+  * Set the external base URI via the environment variable ```STUB_EXTERNAL_BASE_URI```
+
 ** 0.22.3 **
 
 Breaking:

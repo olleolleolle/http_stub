@@ -17,6 +17,10 @@ module HttpStub
           "http://#{host}:#{port}"
         end
 
+        def external_base_uri
+          ENV["STUB_EXTERNAL_BASE_URI"] || base_uri
+        end
+
         def request_defaults=(args)
           @default_stub_builder.match_requests(args)
         end

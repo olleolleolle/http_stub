@@ -52,9 +52,9 @@ describe HttpStub::Server::Stub::Controller do
 
   end
 
-  describe "#replay" do
+  describe "#match" do
 
-    subject { controller.replay(request, logger) }
+    subject { controller.match(request, logger) }
 
     before(:example) { allow(registry).to receive(:match).with(request, logger).and_return(matched_stub) }
 

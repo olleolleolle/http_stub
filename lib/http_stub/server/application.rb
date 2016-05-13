@@ -99,7 +99,7 @@ module HttpStub
       end
 
       any_request_type(//) do
-        response = @stub_controller.replay(@http_stub_request, logger)
+        response = @stub_controller.match(@http_stub_request, logger)
         @response_pipeline.process(response)
       end
 

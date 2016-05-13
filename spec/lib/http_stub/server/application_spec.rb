@@ -282,10 +282,10 @@ describe HttpStub::Server::Application do
 
     subject { get "/a_path" }
 
-    before(:example) { allow(stub_controller).to receive(:replay).and_return(stub_response) }
+    before(:example) { allow(stub_controller).to receive(:match).and_return(stub_response) }
 
-    it "attempts to replay a stub response via the stub controller" do
-      expect(stub_controller).to receive(:replay).with(an_instance_of(HttpStub::Server::Request), anything)
+    it "attempts to match the request to a stub response via the stub controller" do
+      expect(stub_controller).to receive(:match).with(an_instance_of(HttpStub::Server::Request), anything)
 
       subject
     end
