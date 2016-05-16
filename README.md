@@ -53,11 +53,8 @@ In comparison ```http_stub```:
 * Has diagnostic pages to interrogate the state of the stub, trace requests to responses, and activate scenarios on-the-fly.
 * Has an elegant Ruby DSL that aids in keeping requests and responses DRY.
 
-### [HTTParrot](https://github.com/abrandoned/httparrot)
-Similar in spirit, implemented in Ruby, but has limited functionality and has been discontinued.
-
-### [Rack Stubs](https://github.com/featurist/rack-stubs)
-Similar in spirit, implemented as Rack Middleware, but has limited functionality and has been discontinued.
+### [HTTParrot](https://github.com/abrandoned/httparrot), [Rack Stubs](https://github.com/featurist/rack-stubs), [mock_server](https://github.com/unixcharles/mock_server)
+These are similar in spirit, implemented in Ruby, but have limited functionality and have been discontinued.
 
 Design
 ------
