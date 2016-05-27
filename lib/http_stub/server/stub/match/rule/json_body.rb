@@ -23,11 +23,9 @@ module HttpStub
             private
 
             def validate_against_schema(request)
-              begin
-                JSON::Validator.fully_validate(@schema_definition, request.body, validate_schema: true, json: true)
-              rescue Exception => exc
-                [ exc.message ]
-              end
+              JSON::Validator.fully_validate(@schema_definition, request.body, validate_schema: true, json: true)
+            rescue StandardError => err
+              [ err.message ]
             end
 
           end

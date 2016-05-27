@@ -11,7 +11,7 @@ module HttpStub
             end
 
             def matches?(request, _logger)
-              @method.blank? || @method.downcase == request.method.downcase
+              @method.blank? || @method.casecmp(request.method) == 0
             end
 
             def to_s

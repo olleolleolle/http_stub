@@ -2,13 +2,10 @@ describe HttpStub::Server::Stub::Response::Base do
 
   let(:status)           { 202 }
   let(:headers)          { nil }
-  let(:body)             { "A response body" }
   let(:delay_in_seconds) { 18 }
-  let(:args) do
-    { "status" => status, "headers" => headers, "body" => body, "delay_in_seconds" => delay_in_seconds }
-  end
+  let(:args)             { { "status" => status, "headers" => headers, "delay_in_seconds" => delay_in_seconds } }
 
-  let(:testable_response_class) { Class.new(HttpStub::Server::Stub::Response::Base) }
+  let(:testable_response_class) { Class.new(described_class) }
 
   let(:response) { testable_response_class.new(args) }
 
@@ -38,20 +35,12 @@ describe HttpStub::Server::Stub::Response::Base do
 
     context "when the status is not provided in the arguments" do
 
-      let(:args) { { "body" => body, "delay_in_seconds" => delay_in_seconds } }
+      let(:args) { { "headers" => headers } }
 
       it "defaults to 200" do
         expect(response.status).to eql(200)
       end
 
-    end
-
-  end
-
-  describe "#body" do
-
-    it "returns the value provided in the arguments" do
-      expect(response.body).to eql("A response body")
     end
 
   end
@@ -82,7 +71,7 @@ describe HttpStub::Server::Stub::Response::Base do
 
     context "when a value is not provided in the arguments" do
 
-      let(:args) { { "status" => status, "body" => body } }
+      let(:args) { { "status" => status } }
 
       it "defaults to 0" do
         expect(response.delay_in_seconds).to eql(0)
@@ -96,14 +85,8 @@ describe HttpStub::Server::Stub::Response::Base do
 
     let(:response_header_hash) { response.headers.to_hash }
 
-    it "is a readable hash" do
-      expect(response.headers).to be_a(HttpStub::Server::FormattedHash)
-    end
-
-    it "formats the hash with a ':' key value delimiter" do
-      expect(HttpStub::Server::FormattedHash).to receive(:new).with(anything, ":")
-
-      response.headers
+    it "is interpolateable headers" do
+      expect(response.headers).to be_a(HttpStub::Server::Stub::Response::Attribute::Headers)
     end
 
     context "when default headers have been added" do
@@ -199,36 +182,6 @@ describe HttpStub::Server::Stub::Response::Base do
 
     it "returns the name of the concrete base instance underscored" do
       expect(response.type).to eql("testable_base_class")
-    end
-
-  end
-
-  describe "#empty?" do
-
-    context "when the response is EMPTY" do
-
-      let(:response) { HttpStub::Server::Response::EMPTY }
-
-      it "returns true" do
-        expect(response).to be_empty
-      end
-
-    end
-
-    context "when the response is not EMPTY" do
-
-      it "returns false" do
-        expect(response).not_to be_empty
-      end
-
-    end
-
-  end
-
-  describe "#to_s" do
-
-    it "returns the string representation of the provided arguments" do
-      expect(response.to_s).to eql(args.to_s)
     end
 
   end

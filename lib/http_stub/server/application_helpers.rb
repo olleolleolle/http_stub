@@ -8,11 +8,9 @@ module HttpStub
       end
 
       def pp(text)
-        begin
-          text ? JSON.pretty_generate(JSON.parse(text)) : ""
-        rescue JSON::ParserError
-          text
-        end
+        text ? JSON.pretty_generate(JSON.parse(text)) : ""
+      rescue JSON::ParserError
+        text
       end
 
     end

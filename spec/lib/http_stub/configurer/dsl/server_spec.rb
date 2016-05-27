@@ -204,9 +204,7 @@ describe HttpStub::Configurer::DSL::Server do
     end
 
     it "yields the created builder to the provided block" do
-      expect(block).to receive(:call).with(scenario_builder)
-
-      subject
+      expect { |block| server.add_scenario!(scenario_name, &block) }.to yield_with_args(scenario_builder)
     end
 
     it "builds the scenario request" do
@@ -335,9 +333,7 @@ describe HttpStub::Configurer::DSL::Server do
     end
 
     it "yields the created builder to the provided block" do
-      expect(block).to receive(:call).with(stub_activator_builder)
-
-      subject
+      expect { |block| server.add_activator!(&block) }.to yield_with_args(stub_activator_builder)
     end
 
     it "builds a scenario request" do

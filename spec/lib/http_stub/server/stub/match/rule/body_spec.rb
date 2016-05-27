@@ -99,8 +99,8 @@ describe HttpStub::Server::Stub::Match::Rule::Body do
 
       let(:stubbed_body) { "" }
 
-      it "returns a truthy request matcher" do
-        expect(subject).to eql(HttpStub::Server::Stub::Match::TruthyMatcher)
+      it "returns a truthy match rule" do
+        expect(subject).to eql(HttpStub::Server::Stub::Match::Rule::Truthy)
       end
 
     end
@@ -109,8 +109,8 @@ describe HttpStub::Server::Stub::Match::Rule::Body do
 
       let(:stubbed_body) { nil }
 
-      it "returns a truthy request matcher" do
-        expect(subject).to eql(HttpStub::Server::Stub::Match::TruthyMatcher)
+      it "returns a truthy match rule" do
+        expect(subject).to eql(HttpStub::Server::Stub::Match::Rule::Truthy)
       end
 
     end

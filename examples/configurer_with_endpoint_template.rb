@@ -4,9 +4,8 @@ module HttpStub
     class ConfigurerWithEndpointTemplate
       include HttpStub::Configurer
 
-      template = stub_server.endpoint_template do |template|
-        template.match_requests(uri: "/template_uri")
-        template.respond_with(status: 200, body: "template body")
+      template = stub_server.endpoint_template do
+        match_requests(uri: "/template_uri").respond_with(status: 200, body: "template body")
       end
 
       template.add_stub! { match_requests(uri: "/custom_stub_uri").respond_with(status: 201, body: "custom stub body") }

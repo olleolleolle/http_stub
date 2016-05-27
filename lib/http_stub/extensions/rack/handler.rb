@@ -15,7 +15,7 @@ module HttpStub
 
           def get_with_run_check(server)
             handler = get_without_run_check(server)
-            raise NameError.new("#{server} Rack handler is invalid") unless handler.respond_to?(:run)
+            raise NameError, "#{server} Rack handler is invalid" unless handler.respond_to?(:run)
             handler
           end
 

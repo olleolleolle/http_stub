@@ -21,8 +21,10 @@ module HttpStub
           { schema: { type: type, definition: definition } }
         end
 
-        def respond_with(args)
-          self.tap { @response.deep_merge!(args) }
+        def respond_with(args={}, &_block)
+          resolved_args = args
+          resolved_args = yield HttpStub::Configurer::DSL::RequestReferencer.new if block_given?
+          self.tap { @response.deep_merge!(resolved_args) }
         end
 
         def trigger(stub_builder_or_builders)
@@ -33,7 +35,7 @@ module HttpStub
         end
 
         def invoke(&block)
-          block.arity == 0 ? self.instance_eval(&block) : block.call(self)
+          block.arity == 0 ? self.instance_eval(&block) : (yield self)
         end
 
         def merge!(stub_builder)

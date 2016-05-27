@@ -4,14 +4,12 @@ module HttpStub
 
       class Facade
 
-        private
-
         STUBS_BASE_URI          = "/http_stub/stubs".freeze
         STUB_MEMORY_URI         = "#{STUBS_BASE_URI}/memory".freeze
         SCENARIOS_BASE_URI      = "/http_stub/scenarios".freeze
         SCENARIO_ACTIVATION_URI = "#{SCENARIOS_BASE_URI}/activate".freeze
 
-        public
+        private_constant :STUBS_BASE_URI, :STUB_MEMORY_URI, :SCENARIOS_BASE_URI, :SCENARIO_ACTIVATION_URI
 
         def initialize(configurer)
           @request_processor = HttpStub::Configurer::Server::RequestProcessor.new(configurer)
@@ -32,7 +30,7 @@ module HttpStub
         end
 
         def activate(scenario_name)
-          request = HttpStub::Configurer::Request::Http::Factory.post(SCENARIO_ACTIVATION_URI, :name => scenario_name)
+          request = HttpStub::Configurer::Request::Http::Factory.post(SCENARIO_ACTIVATION_URI, name: scenario_name)
           @request_processor.submit(
             request:     request,
             description: "activating '#{scenario_name}'"

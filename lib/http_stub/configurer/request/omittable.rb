@@ -12,11 +12,9 @@ module HttpStub
 
           private
 
-          def format_hash(value)
-            value.reduce({}) do |result, entry|
-              key, value  = entry
+          def format_hash(hash)
+            hash.each_with_object({}) do |(key, value), result|
               result[key] = value == :omitted ? "control:omitted" : value
-              result
             end
           end
 

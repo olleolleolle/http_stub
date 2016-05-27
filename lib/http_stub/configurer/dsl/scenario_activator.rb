@@ -4,8 +4,8 @@ module HttpStub
 
       module ScenarioActivator
 
-        def activate!(*uri)
-          activate_all!(uri.flatten)
+        def activate!(*names)
+          activate_all!(names.flatten)
         end
 
       end

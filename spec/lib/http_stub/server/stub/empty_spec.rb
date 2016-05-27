@@ -53,6 +53,16 @@ describe HttpStub::Server::Stub::Empty do
 
   end
 
+  describe "#response_for" do
+
+    let(:request) { instance_double(HttpStub::Server::Request) }
+
+    it "returns unchanged empty stub" do
+      expect(empty_stub.response_for(request)).to eql(empty_stub)
+    end
+
+  end
+
   describe "#to_s" do
 
     it "returns an empty string" do

@@ -1,64 +1,53 @@
 describe HttpStub::Server::Stub::Match::Rule::Headers do
 
-  let(:request)         { instance_double(HttpStub::Server::Request) }
+  let(:stub_headers) { { "stub_key" => "value" } }
 
-  let(:stubbed_headers) { { "stub_key" => "value" } }
+  let(:headers) { described_class.new(stub_headers) }
 
-  let(:request_headers) { described_class.new(stubbed_headers) }
+  it "is a hash with indifferent and insensitive access" do
+    expect(headers).to be_a(HttpStub::Extensions::Core::Hash::IndifferentAndInsensitiveAccess)
+  end
 
-  describe "when stubbed headers are provided" do
+  context "when the stub header names contain hypens" do
 
-    it "creates a regexpable representation of the stubbed headers whose keys are downcased and underscored" do
-      downcased_and_underscored_hash = { "another_stub_key" => "value" }
-      expect(stubbed_headers).to receive(:downcase_and_underscore_keys).and_return(downcased_and_underscored_hash)
-      expect(HttpStub::Server::Stub::Match::HashWithStringValueMatchers).to(
-        receive(:new).with(downcased_and_underscored_hash)
-      )
+    let(:stub_headers) { (1..3).each_with_object({}) { |i, result| result["stub-key-#{i}"] = "value-#{i}" } }
 
-      request_headers
+    it "underscores the names to accommodate for Rack Header manipulation" do
+      expect(headers.keys).to eql(stub_headers.keys.map(&:underscore))
+    end
+
+    it "leaves the values unchanged" do
+      expect(headers.values).to eql(stub_headers.values)
     end
 
   end
 
-  describe "when the stubbed headers are nil" do
+  context "when no headers are provided" do
 
-    let(:stubbed_headers) { nil }
+    let(:stub_headers) { nil }
 
-    it "creates a regexpable representation of an empty hash" do
-      expect(HttpStub::Server::Stub::Match::HashWithStringValueMatchers).to receive(:new).with({})
-
-      request_headers
+    it "is empty" do
+      expect(headers.empty?).to be(true)
     end
 
   end
 
   describe "#matches?" do
 
-    let(:request_header_hash)        { { "header_key" => "header value" } }
-    let(:regexpable_stubbed_headers) do
-      double(HttpStub::Server::Stub::Match::HashWithStringValueMatchers).as_null_object
-    end
-    let(:logger)                     { double(Logger) }
+    let(:request_headers) { instance_double(HttpStub::Server::Request::Headers) }
+    let(:request)         { instance_double(HttpStub::Server::Request::Request, headers: request_headers) }
+    let(:logger)          { double(Logger) }
 
-    subject { request_headers.matches?(request, logger) }
+    subject { headers.matches?(request, logger) }
 
-    before(:example) do
-      allow(request).to receive(:headers).and_return(request_header_hash)
-      allow(HttpStub::Server::Stub::Match::HashWithStringValueMatchers).to(
-        receive(:new).and_return(regexpable_stubbed_headers)
-      )
-    end
-
-    it "downcases and underscore the keys in the request header hash" do
-      expect(request_header_hash).to receive(:downcase_and_underscore_keys)
+    it "determines if the stub header and request header hashes match" do
+      expect(HttpStub::Server::Stub::Match::HashMatcher).to receive(:match?).with(headers, request_headers)
 
       subject
     end
 
-    it "delegates to the regexpable representation of the stubbed headers to determine a match" do
-      downcased_and_underscored_hash = { "another_request_key" => "value" }
-      allow(request_header_hash).to receive(:downcase_and_underscore_keys).and_return(downcased_and_underscored_hash)
-      expect(regexpable_stubbed_headers).to receive(:matches?).with(downcased_and_underscored_hash).and_return(true)
+    it "returns the result of the match" do
+      allow(HttpStub::Server::Stub::Match::HashMatcher).to receive(:match?).and_return(true)
 
       expect(subject).to eql(true)
     end
@@ -67,22 +56,42 @@ describe HttpStub::Server::Stub::Match::Rule::Headers do
 
   describe "#to_s" do
 
-    let(:readable_hash) { instance_double(HttpStub::Server::FormattedHash, to_s: "readable header hash string") }
+    subject { headers.to_s }
 
-    subject { request_headers.to_s }
+    describe "when multiple headers are provided" do
 
-    before(:example) do
-      allow(HttpStub::Server::FormattedHash).to receive(:new).with(stubbed_headers, anything).and_return(readable_hash)
+      let(:stub_headers) { (1..3).each_with_object({}) { |i, result| result["key#{i}"] = "value#{i}" } }
+
+      it "returns a string with each header name and value separated by ':'" do
+        result = subject
+
+        stub_headers.each { |name, value| expect(result).to match(/#{name}:#{value}/) }
+      end
+
+      it "separates each header with comma for readability" do
+        expect(subject).to match(/key\d.value\d, key\d.value\d, key\d.value\d/)
+      end
+
     end
 
-    it "returns the string representation of the readable header hash" do
-      expect(subject).to eql("readable header hash string")
+    describe "when empty headers are provided" do
+
+      let(:stub_headers) { {} }
+
+      it "returns an empty string" do
+        expect(subject).to eql("")
+      end
+
     end
 
-    it "formats the headers with a ':' key value delimiter" do
-      expect(HttpStub::Server::FormattedHash).to receive(:new).with(stubbed_headers, ":")
+    describe "when nil headers are provided" do
 
-      subject
+      let(:stub_headers) { nil }
+
+      it "returns an empty string" do
+        expect(subject).to eql("")
+      end
+
     end
 
   end

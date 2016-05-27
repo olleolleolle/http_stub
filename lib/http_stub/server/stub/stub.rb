@@ -23,6 +23,10 @@ module HttpStub
           criteria.is_a?(String) ? matches_by_id?(criteria) : matches_by_rules?(criteria, logger)
         end
 
+        def response_for(request)
+          @response.with_values_from(request)
+        end
+
         def to_s
           @description
         end

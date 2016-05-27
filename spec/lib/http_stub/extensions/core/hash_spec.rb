@@ -1,16 +1,10 @@
 describe HttpStub::Extensions::Core::Hash do
 
-  describe "#downcase_and_underscore_keys" do
+  describe "#underscore_keys" do
+
+    subject { hash.underscore_keys }
 
     describe "when the hash contains keys which are strings" do
-
-      let(:hash) do
-        { "lower" => 1, "UPPER" => 2, "MiXeDcAsE" => 3 }
-      end
-
-      it "downcases the string keys" do
-        expect(hash.downcase_and_underscore_keys).to eql({ "lower" => 1, "upper" => 2, "mixedcase" => 3 })
-      end
 
       describe "and keys contain underscores and hyphens" do
 
@@ -19,9 +13,7 @@ describe HttpStub::Extensions::Core::Hash do
         end
 
         it "downcases the string keys" do
-          expect(hash.downcase_and_underscore_keys).to eql({ "has_underscore" => 1,
-                                                         "has_hypen" => 2,
-                                                         "has_underscore_and_hypen" => 3 })
+          expect(subject).to eql({ "has_underscore" => 1, "has_hypen" => 2, "has_underscore_and_hypen" => 3 })
         end
 
       end
@@ -34,120 +26,8 @@ describe HttpStub::Extensions::Core::Hash do
         { 1 => 2, :symbol => 3, nil => 4 }
       end
 
-      it "does not alter a hash" do
-        expect(hash.downcase_and_underscore_keys).to eql({ 1 => 2, :symbol => 3, nil => 4 })
-      end
-
-    end
-
-  end
-
-  describe "#has_hash?" do
-
-    describe "when many elements are provided" do
-
-      let(:hash_parameter) { { "key1" => "value1", "key2" => "value2", "key3" => "value3" } }
-
-      describe "and the hash contains only those elements" do
-
-        let(:hash) { hash_parameter }
-
-        it "returns true" do
-          expect(hash.has_hash?(hash_parameter)).to be(true)
-        end
-
-      end
-
-      describe "and the hash contains more than those elements" do
-
-        let(:hash) { hash_parameter.merge("key4" => "value4") }
-
-        it "returns true" do
-          expect(hash.has_hash?(hash_parameter)).to be(true)
-        end
-
-      end
-
-      describe "and the hash contains keys that match but values that do not match" do
-
-        let(:hash) { { "key1" => "value1", "key2" => "nonMatchingValue", "key3" => "value3" } }
-
-        it "returns false" do
-          expect(hash.has_hash?(hash_parameter)).to be(false)
-        end
-
-      end
-
-      describe "and the hash contains less than those elements" do
-
-        let(:hash) { { "key1" => "value1", "key3" => "value3" } }
-
-        it "returns false" do
-          expect(hash.has_hash?(hash_parameter)).to be(false)
-        end
-
-      end
-
-      describe "and the hash contains no elements" do
-
-        let(:hash) { {} }
-
-        it "returns false" do
-          expect(hash.has_hash?(hash_parameter)).to be(false)
-        end
-
-      end
-
-    end
-
-    describe "when no elements are provided" do
-
-      let(:hash_parameter) { {} }
-
-      describe "and the hash contains no element" do
-
-        let(:hash) { {} }
-
-        it "returns true" do
-          expect(hash.has_hash?(hash_parameter)).to be(true)
-        end
-
-      end
-
-      describe "when the hash contains elements" do
-
-        let(:hash) { { "key" => "value" } }
-
-        it "returns true" do
-          expect(hash.has_hash?(hash_parameter)).to be(true)
-        end
-
-      end
-
-    end
-
-    describe "when a nil hash is provided" do
-
-      let(:hash_parameter) { nil }
-
-      describe "and the hash contains no elements" do
-
-        let(:hash) { {} }
-
-        it "returns true" do
-          expect(hash.has_hash?(hash_parameter)).to be(true)
-        end
-
-      end
-
-      describe "when the hash contains elements" do
-
-        let(:hash) { { "key" => "value" } }
-
-        it "returns true" do
-          expect(hash.has_hash?(hash_parameter)).to be(true)
-        end
-
+      it "does not alter the hash" do
+        expect(subject).to eql({ 1 => 2, :symbol => 3, nil => 4 })
       end
 
     end
@@ -157,18 +37,20 @@ describe HttpStub::Extensions::Core::Hash do
   describe "#with_indifferent_and_insensitive_access" do
 
     let(:hash)                             { { key: "value" } }
-    let(:indifferent_and_insensitive_hash) { instance_double(HttpStub::HashWithIndifferentAndInsensitiveAccess) }
+    let(:indifferent_and_insensitive_hash) do
+      instance_double(HttpStub::Extensions::Core::Hash::WithIndifferentAndInsensitiveAccess)
+    end
 
     subject { hash.with_indifferent_and_insensitive_access }
 
     before(:example) do
-      allow(HttpStub::HashWithIndifferentAndInsensitiveAccess).to(
+      allow(HttpStub::Extensions::Core::Hash::WithIndifferentAndInsensitiveAccess).to(
         receive(:new).and_return(indifferent_and_insensitive_hash)
       )
     end
 
     it "creates a hash with indifferent and insensitive access containing the current hash" do
-      expect(HttpStub::HashWithIndifferentAndInsensitiveAccess).to receive(:new).with(hash)
+      expect(HttpStub::Extensions::Core::Hash::WithIndifferentAndInsensitiveAccess).to receive(:new).with(hash)
 
       subject
     end

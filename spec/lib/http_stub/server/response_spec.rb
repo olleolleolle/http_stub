@@ -14,7 +14,7 @@ describe HttpStub::Server::Response do
 
   describe "::success" do
 
-    subject { HttpStub::Server::Response::success }
+    subject { described_class.success }
 
     it_behaves_like "a success response"
 
@@ -63,11 +63,7 @@ describe HttpStub::Server::Response do
     end
 
     it "has no body" do
-      expect(subject.body).to be(nil)
-    end
-
-    it "is empty" do
-      expect(subject).to be_empty
+      expect(subject.body.provided?).to be(false)
     end
 
   end

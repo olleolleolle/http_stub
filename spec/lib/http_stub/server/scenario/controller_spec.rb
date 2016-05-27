@@ -1,7 +1,7 @@
 describe HttpStub::Server::Scenario::Controller do
 
   let(:request_uri)       { "/some/request/path" }
-  let(:request)           { instance_double(HttpStub::Server::Request, uri: request_uri) }
+  let(:request)           { instance_double(HttpStub::Server::Request::Request, uri: request_uri) }
   let(:logger)            { instance_double(Logger) }
   let(:payload)           { HttpStub::ScenarioFixture.new.server_payload }
   let(:stubs)             { (1..3).map { instance_double(HttpStub::Server::Stub::Stub) } }

@@ -11,8 +11,12 @@ module HttpStub
 
           def initialize(args)
             @file = args["body"][:tempfile]
-            @uri = "file://#{@file.path}"
-            super(args.merge("body" => ""))
+            @uri  = "file://#{@file.path}"
+            super
+          end
+
+          def with_values_from(request)
+            self.class.new(@original_args.merge("headers" => @headers.with_values_from(request)))
           end
 
           def serve_on(server)

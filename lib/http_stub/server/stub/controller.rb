@@ -16,7 +16,7 @@ module HttpStub
 
         def match(request, logger)
           stub = @registry.match(request, logger)
-          stub ? stub.response : HttpStub::Server::Response::NOT_FOUND
+          stub ? stub.response_for(request) : HttpStub::Server::Response::NOT_FOUND
         end
 
         def clear(logger)

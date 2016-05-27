@@ -1,0 +1,68 @@
+AllCops:
+  Exclude:
+    - Rakefile
+    - spec/**/*
+    - vendor/**/*
+  TargetRubyVersion: 1.9
+
+# double quotes preferred, except in require
+Style/StringLiterals:
+  Enabled: false
+Style/StringLiteralsInInterpolation:
+  EnforcedStyle: double_quotes
+
+# appropriate hash formatting varies wildly
+Style/MultilineMethodCallBraceLayout:
+  Enabled: false
+Style/AlignHash:
+  Enabled: false
+
+# tolerate names that are not predicates
+Style/PredicateName:
+  NameWhitelist:
+    - has_started!
+
+# aids readability
+Style/RedundantSelf:
+  Enabled: false
+Style/ExtraSpacing:
+  Enabled: false
+Style/SpaceInsideBrackets:
+  Enabled: false
+Style/SpaceAroundEqualsInParameterDefault:
+  Enabled: false
+Style/SingleLineBlockParams:
+  Enabled: false
+Style/DoubleNegation:
+  Enabled: false
+Style/Alias:
+  Enabled: false
+Style/EmptyLinesAroundClassBody:
+  Enabled: false
+Style/EmptyLinesAroundModuleBody:
+  Enabled: false
+Style/IndentAssignment:
+  Enabled: false
+
+# sufficient length for modern screens
+Metrics/LineLength:
+  Max: 120
+
+# {} distinguishes delimiters from method calls
+Style/PercentLiteralDelimiters:
+  PreferredDelimiters:
+    '%w': '{}'
+
+# self-documentation preferred
+Style/Documentation:
+  Enabled: false
+
+# conditionals should contain statements
+Style/EmptyElse:
+  EnforcedStyle: empty
+
+# rare situations where readability is preferred over metrics aspirations
+Metrics/AbcSize:
+  Exclude:
+    - lib/http_stub/server/stub/response/base.rb
+    - lib/http_stub/server/stub/stub.rb

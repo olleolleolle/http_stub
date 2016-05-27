@@ -4,21 +4,14 @@ module HttpStub
 
       module Hash
 
-        def downcase_and_underscore_keys
-          self.reduce({}) do |result, element|
-            result[element[0].is_a?(::String) ? element[0].downcase.gsub(/-/, '_') : element[0]] = element[1]
-            result
-          end
-        end
-
-        def has_hash?(other_hash)
-          other_hash.nil? || other_hash.reduce(true) do |result, element|
-            result && (self[element[0]] == element[1])
+        def underscore_keys
+          self.each_with_object({}) do |element, result|
+            result[element[0].is_a?(::String) ? element[0].tr("-", "_") : element[0]] = element[1]
           end
         end
 
         def with_indifferent_and_insensitive_access
-          HttpStub::HashWithIndifferentAndInsensitiveAccess.new(self)
+          HttpStub::Extensions::Core::Hash::WithIndifferentAndInsensitiveAccess.new(self)
         end
 
       end

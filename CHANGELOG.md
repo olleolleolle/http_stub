@@ -1,3 +1,12 @@
+** 0.23.0 **
+
+New:
+* Stub response headers and body can contain request header and parameter values
+  * e.g. `stub.respond_with { |request| { headers: { location: request.parameter[:redirect_uri] } }`
+
+Misc:
+* Introduced [RuboCop](https://github.com/bbatsov/rubocop) source code analysis
+
 ** 0.22.4 **
 
 New:
@@ -11,7 +20,7 @@ Breaking:
   * Stubs can emulate a desired behaviour in stubbed responses
 
 New:
-* ```stub.respond_with(json: { key: "value" })``` supported
+* `stub.respond_with(json: { key: "value" })` supported
 
 Misc:
 * Administration page formatting improvements
@@ -19,7 +28,7 @@ Misc:
 ** 0.22.2 **
 
 Fix:
-* Tolerates ```rake``` >= 10.4
+* Tolerates `rake` >= 10.4
 
 ** 0.22.1 **
 
@@ -55,10 +64,10 @@ New:
 * GET /stubs/matches lists stub match history
 * DELETE /stubs also clears matches
 * GET /stubs/:id displays a stub
-* ```add_stub!``` returns POST /stubs response when configurer has been initialized
+* `add_stub!` returns POST /stubs response when configurer has been initialized
 
 Misc:
-* Refactor: Introduced ```HttpStub::Server::Stub::Match``` to encapsulate match logic and rules
+* Refactor: Introduced `HttpStub::Server::Stub::Match` to encapsulate match logic and rules
 
 ** 0.19.2 **
 
@@ -68,7 +77,7 @@ Misc:
 ** 0.19.1 **
 
 New:
-* ```add_scenario_with_one_stub!``` supports builder as an argument.
+* `add_scenario_with_one_stub!` supports builder as an argument.
 
 ** 0.19.0 **
 
@@ -76,8 +85,8 @@ New:
 * Server request defaults support.
 
 Breaking:
-* ```match_requests``` no longer accepts uri as first argument.  It must be provided in the argument hash, e.g. ```stub.match_requests(uri: "/some/uri")```
-* ```add_scenario_with_one_stub!``` preferred over ```add_one_stub_scenario!```
+* ```match_requests` no longer accepts uri as first argument.  It must be provided in the argument hash, e.g. `stub.match_requests(uri: "/some/uri")`
+* `add_scenario_with_one_stub!` preferred over `add_one_stub_scenario!`
 
 ** 0.18.2 **
 
@@ -92,9 +101,9 @@ New:
 ** 0.18.0 **
 
 New:
-* ```stub_server.endpoint_template``` scenario creation support
-* ```stub_server.add_one_stub_scenario!``` simplifies DSL
-* ```HttpStub::Configurer::Part``` aids composing large Configurers
+* `stub_server.endpoint_template` scenario creation support
+* `stub_server.add_one_stub_scenario!` simplifies DSL
+* `HttpStub::Configurer::Part` aids composing large Configurers
 
 ** 0.17.0 **
 
@@ -102,7 +111,7 @@ New:
 * request body matching via exact match, regex match and JSON schema validation match.
 
 Breaking:
-* ```Configurer``` host, port and base_uri related methods must now be accessed via the ```stub_server```.
+* `Configurer` host, port and base_uri related methods must now be accessed via the `stub_server`.
 
 ** 0.16.0 **
 
@@ -113,7 +122,7 @@ Deprecated:
 * stub activators
 
 Breaking:
-* Activator paths replaced by activator names.  Calls to ```stub_activator`` and ```activate!``` must no longer have '/' prefix.
+* Activator paths replaced by activator names.  Calls to `stub_activator` and `activate!` must no longer have '/' prefix.
 
 ** 0.12.0 **
 

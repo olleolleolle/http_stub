@@ -6,14 +6,16 @@ describe HttpStub::Server::Stub::Parser do
 
     let(:parameters) { {} }
     let(:body_hash)  { {} }
-    let(:request)    { instance_double(HttpStub::Server::Request, parameters: parameters, body: body_hash.to_json) }
+    let(:request)    do
+      instance_double(HttpStub::Server::Request::Request, parameters: parameters, body: body_hash.to_json)
+    end
 
     subject { parser.parse(request) }
 
     context "when the request contains a payload parameter" do
 
-      let(:payload) { HttpStub::StubFixture.new.server_payload }
-      let(:parameters)  { { "payload" => payload.to_json } }
+      let(:payload)    { HttpStub::StubFixture.new.server_payload }
+      let(:parameters) { { "payload" => payload.to_json } }
 
       it "consolidates any files into the payload" do
         expect(HttpStub::Server::Stub::PayloadFileConsolidator).to receive(:consolidate!).with(payload, request)

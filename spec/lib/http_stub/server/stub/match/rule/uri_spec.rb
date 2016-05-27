@@ -1,44 +1,35 @@
 describe HttpStub::Server::Stub::Match::Rule::Uri do
 
-  let(:raw_uri)       { "/some/uri" }
-  let(:value_matcher) { instance_double(HttpStub::Server::Stub::Match::StringValueMatcher).as_null_object }
+  let(:stub_uri) { "/some/uri" }
 
-  let(:uri) { described_class.new(raw_uri) }
-
-  before(:example) do
-    allow(HttpStub::Server::Stub::Match::StringValueMatcher).to receive(:new).and_return(value_matcher)
-  end
-
-  describe "constructor" do
-
-    it "creates a value matcher for the provided uri" do
-      expect(HttpStub::Server::Stub::Match::StringValueMatcher).to receive(:new).with(raw_uri)
-
-      uri
-    end
-
-  end
+  let(:uri) { described_class.new(stub_uri) }
 
   describe "#matches?" do
 
     let(:request_uri) { "/some/uri" }
-    let(:request)     { instance_double(HttpStub::Server::Request, uri: request_uri) }
+    let(:request)     { instance_double(HttpStub::Server::Request::Request, uri: request_uri) }
     let(:logger)      { instance_double(Logger) }
 
-    it "delegates to the value matcher representation of the provided uri" do
-      expect(value_matcher).to receive(:matches?).with(request_uri).and_return(true)
+    subject { uri.matches?(request, logger) }
 
-      expect(uri.matches?(request, logger)).to be(true)
+    it "determines if the stub uri and request uri strings match" do
+      expect(HttpStub::Server::Stub::Match::StringValueMatcher).to receive(:match?).with(stub_uri, request_uri)
+
+      subject
+    end
+
+    it "returns the result of the match" do
+      allow(HttpStub::Server::Stub::Match::StringValueMatcher).to receive(:match?).and_return(true)
+
+      expect(subject).to eql(true)
     end
 
   end
 
   describe "#to_s" do
 
-    it "delegates to the value matcher representation of the provided uri" do
-      expect(value_matcher).to receive(:to_s).and_return("some value matcher string")
-
-      expect(uri.to_s).to eql("some value matcher string")
+    it "returns the stub uri" do
+      expect(uri.to_s).to eql(stub_uri)
     end
 
   end

@@ -1,6 +1,6 @@
 describe HttpStub::Server::Stub::Controller do
 
-  let(:request)  { instance_double(HttpStub::Server::Request) }
+  let(:request)  { instance_double(HttpStub::Server::Request::Request) }
   let(:logger)   { instance_double(Logger) }
   let(:payload)  { HttpStub::StubFixture.new.server_payload }
   let(:response) { instance_double(HttpStub::Server::Stub::Response::Base) }
@@ -62,10 +62,17 @@ describe HttpStub::Server::Stub::Controller do
 
       let(:matched_stub) { the_stub }
 
-      it "returns the stubs response" do
-        expect(the_stub).to receive(:response).and_return(response)
+      it "calculates the stubs response based on the request" do
+        expect(the_stub).to receive(:response_for).with(request)
 
-        expect(subject).to eql(response)
+        subject
+      end
+
+      it "returns the calculated response" do
+        calculated_response = instance_double(HttpStub::Server::Stub::Response::Base)
+        allow(the_stub).to receive(:response_for).and_return(calculated_response)
+
+        expect(subject).to eql(calculated_response)
       end
 
     end

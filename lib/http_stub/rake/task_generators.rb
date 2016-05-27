@@ -1,5 +1,5 @@
 require ::File.expand_path('../../../http_stub', __FILE__)
-require 'rake/tasklib' unless defined? (::Rake::TaskLib)
+require 'rake/tasklib' unless defined? ::Rake::TaskLib
 
 require 'http_server_manager/rake/task_generators'
 

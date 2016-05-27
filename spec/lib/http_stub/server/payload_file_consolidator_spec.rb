@@ -5,7 +5,7 @@ describe HttpStub::Server::Stub::PayloadFileConsolidator do
   describe "::consolidate!" do
 
     let(:parameters) { {} }
-    let(:request)    { instance_double(HttpStub::Server::Request, parameters: parameters) }
+    let(:request)    { instance_double(HttpStub::Server::Request::Request, parameters: parameters) }
 
     subject { consolidator.consolidate!(payload, request) }
 

@@ -1,5 +1,5 @@
 # -*- encoding: utf-8 -*-
-$:.push ::File.expand_path("../lib", __FILE__)
+$LOAD_PATH.push ::File.expand_path("../lib", __FILE__)
 require "http_stub/version"
 
 Gem::Specification.new do |spec|
@@ -32,13 +32,14 @@ Gem::Specification.new do |spec|
   spec.add_dependency "haml",                "~> 4.0"
   spec.add_dependency "sass",                "~> 3.4"
 
+  spec.add_development_dependency "rubocop",                   "~> 0.40"
   spec.add_development_dependency "rspec",                     "~> 3.4"
-  spec.add_development_dependency "simplecov",                 "~> 0.11"
   spec.add_development_dependency "rack-test",                 "~> 0.6"
   spec.add_development_dependency "json",                      "~> 1.8"
-  spec.add_development_dependency "nokogiri",                  "~> 1.6"
   spec.add_development_dependency "httparty",                  "~> 0.13"
+  spec.add_development_dependency "nokogiri",                  "~> 1.6"
   spec.add_development_dependency "wait_until",                "~> 0.3"
+  spec.add_development_dependency "simplecov",                 "~> 0.11"
   spec.add_development_dependency "travis-lint",               "~> 2.0"
   spec.add_development_dependency "codeclimate-test-reporter", "~> 0.5"
 end

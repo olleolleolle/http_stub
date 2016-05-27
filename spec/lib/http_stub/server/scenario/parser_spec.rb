@@ -6,7 +6,9 @@ describe HttpStub::Server::Scenario::Parser do
 
     let(:parameters) { {} }
     let(:body_hash)  { {} }
-    let(:request)    { instance_double(HttpStub::Server::Request, parameters: parameters, body: body_hash.to_json) }
+    let(:request)    do
+      instance_double(HttpStub::Server::Request::Request, parameters: parameters, body: body_hash.to_json)
+    end
 
     subject { parser.parse(request) }
 

@@ -4,13 +4,8 @@ describe HttpStub::Server::Stub::Response::File do
   let(:headers)        { {} }
   let(:file_name)      { "sample.txt" }
   let(:temp_file_path) { "#{HttpStub::Spec::RESOURCES_DIR}/#{file_name}" }
-  let(:args) do
-    {
-      "status" => status,
-      "headers" => headers,
-      "body" => { filename: file_name, tempfile: File.new(temp_file_path) }
-    }
-  end
+  let(:body)           { { filename: file_name, tempfile: File.new(temp_file_path) } }
+  let(:args)           { { "status" => status, "headers" => headers, "body" => body } }
 
   let(:response_file) { HttpStub::Server::Stub::Response::File.new(args) }
 
@@ -28,6 +23,52 @@ describe HttpStub::Server::Stub::Response::File do
 
     it "concludes with the path to the temp file provided" do
       expect(subject).to end_with(temp_file_path)
+    end
+
+  end
+
+  describe "#with_values_from" do
+
+    let(:request)              { instance_double(HttpStub::Server::Request::Request) }
+    let(:interpolated_headers) { { interpolated_header_name: "some interpolated header value" } }
+    let(:response_headers)     do
+      instance_double(HttpStub::Server::Stub::Response::Attribute::Headers, with_values_from: interpolated_headers)
+    end
+
+    subject { response_file.with_values_from(request) }
+
+    before(:example) do
+      allow(HttpStub::Server::Stub::Response::Attribute::Headers).to receive(:new).and_return(response_headers)
+      ensure_response_file_is_created!
+    end
+
+    it "interpolates headers with values from the request" do
+      expect(response_headers).to receive(:with_values_from).with(request)
+
+      subject
+    end
+
+    it "creates a new response file with the interpolated headers" do
+      expect(described_class).to receive(:new).with(hash_including("headers" => interpolated_headers))
+
+      subject
+    end
+
+    it "creates a new response file with other arguments preserved" do
+      expect(described_class).to receive(:new).with(hash_including("status" => status, "body" => body))
+
+      subject
+    end
+
+    it "returns the created file response" do
+      new_file_response = instance_double(described_class)
+      expect(described_class).to receive(:new).and_return(new_file_response)
+
+      expect(subject).to eql(new_file_response)
+    end
+
+    def ensure_response_file_is_created!
+      response_file
     end
 
   end

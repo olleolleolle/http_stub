@@ -5,11 +5,9 @@ module HttpStub
 
         class OmittedValueMatcher
 
-          private
-
           OMITTED_CONTROL_VALUE = "control:omitted".freeze
 
-          public
+          private_constant :OMITTED_CONTROL_VALUE
 
           def self.match?(stub_value, actual_value)
             stub_value == OMITTED_CONTROL_VALUE && actual_value.nil?

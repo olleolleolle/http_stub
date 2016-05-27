@@ -285,7 +285,7 @@ describe HttpStub::Server::Application do
     before(:example) { allow(stub_controller).to receive(:match).and_return(stub_response) }
 
     it "attempts to match the request to a stub response via the stub controller" do
-      expect(stub_controller).to receive(:match).with(an_instance_of(HttpStub::Server::Request), anything)
+      expect(stub_controller).to receive(:match).with(an_instance_of(HttpStub::Server::Request::Request), anything)
 
       subject
     end

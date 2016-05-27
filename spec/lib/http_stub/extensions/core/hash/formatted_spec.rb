@@ -1,13 +1,11 @@
-describe HttpStub::Server::FormattedHash do
+describe HttpStub::Extensions::Core::Hash::Formatted do
+
+  let(:testable_class) { Class.new(::Hash).tap { |hash_class| hash_class.include(described_class) } }
 
   let(:underlying_hash)     { {} }
   let(:key_value_delimiter) { "=" }
 
-  let(:formatted_hash) { described_class.new(underlying_hash, key_value_delimiter) }
-
-  it "is a Hash" do
-    expect(formatted_hash).to be_a(Hash)
-  end
+  let(:formatted_hash) { testable_class.new(underlying_hash, key_value_delimiter) }
 
   describe "#to_s" do
 

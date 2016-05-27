@@ -7,15 +7,15 @@ module HttpStub
           class Uri
 
             def initialize(uri)
-              @uri = HttpStub::Server::Stub::Match::StringValueMatcher.new(uri)
+              @uri = uri
             end
 
             def matches?(request, _logger)
-              @uri.matches?(request.uri)
+              HttpStub::Server::Stub::Match::StringValueMatcher.match?(@uri, request.uri)
             end
 
             def to_s
-              @uri.to_s
+              @uri
             end
 
           end

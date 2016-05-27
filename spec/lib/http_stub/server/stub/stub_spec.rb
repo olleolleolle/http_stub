@@ -49,7 +49,8 @@ describe HttpStub::Server::Stub::Stub do
   let(:request_headers)    { instance_double(HttpStub::Server::Stub::Match::Rule::Headers, matches?: true) }
   let(:request_parameters) { instance_double(HttpStub::Server::Stub::Match::Rule::Parameters, matches?: true) }
   let(:request_body)       { double("HttpStub::Server::Stub::SomeRequestBody", matches?: true) }
-  let(:response)           { instance_double(HttpStub::Server::Stub::Response::Base) }
+  let(:response_types)     { [ HttpStub::Server::Stub::Response::Text, HttpStub::Server::Stub::Response::File ] }
+  let(:response)           { instance_double(response_types.sample) }
   let(:triggers)           { instance_double(HttpStub::Server::Stub::Triggers) }
 
   let(:the_stub) { HttpStub::Server::Stub::Stub.new(stub_payload) }
@@ -66,13 +67,12 @@ describe HttpStub::Server::Stub::Stub do
 
   describe "#matches?" do
 
-    let(:logger)         { instance_double(Logger) }
+    let(:logger) { instance_double(Logger) }
 
     context "when a request is provided" do
 
       let(:request_method) { request_method_payload }
-      let(:request_uri)    { "/a_request_uri" }
-      let(:request)        { instance_double(HttpStub::Server::Request, method: request_method_payload) }
+      let(:request)        { instance_double(HttpStub::Server::Request::Request, method: request_method_payload) }
 
       subject { the_stub.matches?(request, logger) }
 
@@ -201,6 +201,27 @@ describe HttpStub::Server::Stub::Stub do
 
       end
 
+    end
+
+  end
+
+  describe "#repsonse_for" do
+
+    let(:request) { instance_double(HttpStub::Server::Request::Request) }
+
+    subject { the_stub.response_for(request) }
+
+    it "replaces values in the response with those from the request" do
+      expect(response).to receive(:with_values_from).with(request)
+
+      subject
+    end
+
+    it "returns the response with replaced values" do
+      response_with_replaced_values = instance_double(response_types.sample)
+      allow(response).to receive(:with_values_from).and_return(response_with_replaced_values)
+
+      expect(subject).to eql(response_with_replaced_values)
     end
 
   end

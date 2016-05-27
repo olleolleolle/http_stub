@@ -6,18 +6,16 @@ module HttpStub
 
           class Body
 
-            private
-
             SCHEMA_PROPERTIES = %w{ type definition }.freeze
 
-            public
+            private_constant :SCHEMA_PROPERTIES
 
             class << self
 
               def create(body)
                 matcher = create_schema_body(body["schema"]) if body.is_a?(Hash) && body["schema"]
                 matcher ||= HttpStub::Server::Stub::Match::Rule::SimpleBody.new(body) if body.present?
-                matcher || HttpStub::Server::Stub::Match::TruthyMatcher
+                matcher || HttpStub::Server::Stub::Match::Rule::Truthy
               end
 
               private

@@ -1,10 +1,14 @@
-describe HttpStub::HashWithIndifferentAndInsensitiveAccess do
+describe HttpStub::Extensions::Core::Hash::IndifferentAndInsensitiveAccess do
 
-  let(:enhanced_hash) { HttpStub::HashWithIndifferentAndInsensitiveAccess.new(original_hash) }
+  let(:testable_class) { Class.new(::Hash).tap { |hash_class| hash_class.include(described_class) } }
+
+  let(:indifferent_and_insensitive_access_hash) { testable_class.new }
+
+  before(:example) { indifferent_and_insensitive_access_hash.merge!(original_hash) }
 
   describe "#[]" do
 
-    subject { enhanced_hash[key] }
+    subject { indifferent_and_insensitive_access_hash[key] }
 
     context "when the original hash contains symbol keys" do
 
@@ -90,7 +94,7 @@ describe HttpStub::HashWithIndifferentAndInsensitiveAccess do
 
     end
 
-    context "when the original hash string keys" do
+    context "when the original hash contains string keys" do
 
       let(:original_hash) { { "key" => "value", "another_key" => "another value" } }
 

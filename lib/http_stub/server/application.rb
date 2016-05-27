@@ -3,12 +3,21 @@ module HttpStub
 
     class Application < Sinatra::Base
 
+      SUPPORTED_REQUEST_TYPES = [ :get, :post, :put, :delete, :patch, :options ].freeze
+
+      private_constant :SUPPORTED_REQUEST_TYPES
+
       set :root, File.dirname(__FILE__)
 
       register Sinatra::Partial
 
       enable  :dump_errors, :logging, :partial_underscores
       disable :protection
+
+      def self.any_request_type(path, opts={}, &block)
+        SUPPORTED_REQUEST_TYPES.each { |type| self.send(type, path, opts, &block) }
+      end
+      private_class_method :any_request_type
 
       def initialize
         super()
@@ -19,20 +28,10 @@ module HttpStub
         @scenario_controller   = HttpStub::Server::Scenario::Controller.new(@scenario_registry, @stub_registry)
       end
 
-      private
-
-      SUPPORTED_REQUEST_TYPES = [ :get, :post, :put, :delete, :patch, :options ].freeze
-
-      def self.any_request_type(path, opts={}, &block)
-        SUPPORTED_REQUEST_TYPES.each { |type| self.send(type, path, opts, &block) }
-      end
-
       before do
         @response_pipeline = HttpStub::Server::ResponsePipeline.new(self)
-        @http_stub_request = HttpStub::Server::Request.new(request)
+        @http_stub_request = HttpStub::Server::Request.create(request)
       end
-
-      public
 
       get "/http_stub" do
         haml :index, {}

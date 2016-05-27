@@ -38,9 +38,9 @@ module HttpStub
           @server_facade.stub_response(resolved_builder.build)
         end
 
-        def add_scenario!(name, &block)
+        def add_scenario!(name, &_block)
           builder = HttpStub::Configurer::DSL::ScenarioBuilder.new(@default_stub_builder, name)
-          block.call(builder)
+          yield builder
           @server_facade.define_scenario(builder.build)
         end
 
@@ -54,9 +54,9 @@ module HttpStub
           HttpStub::Configurer::DSL::EndpointTemplate.new(self).tap { |template| template.invoke(&block) }
         end
 
-        def add_activator!(&block)
+        def add_activator!(&_block)
           builder = HttpStub::Configurer::DSL::StubActivatorBuilder.new(@default_stub_builder)
-          block.call(builder)
+          yield builder
           @server_facade.define_scenario(builder.build)
         end
 

@@ -4,22 +4,16 @@ module HttpStub
       module Match
         module Rule
 
-          class Headers
+          class Headers < ::Hash
+            include HttpStub::Extensions::Core::Hash::IndifferentAndInsensitiveAccess
+            include HttpStub::Extensions::Core::Hash::Formatted
 
             def initialize(headers)
-              original_headers   = headers || {}
-              @formatted_headers = HttpStub::Server::FormattedHash.new(original_headers, ":")
-              @matchable_headers = HttpStub::Server::Stub::Match::HashWithStringValueMatchers.new(
-                original_headers.downcase_and_underscore_keys
-              )
+              super((headers || {}).underscore_keys, ":")
             end
 
             def matches?(request, _logger)
-              @matchable_headers.matches?(request.headers.downcase_and_underscore_keys)
-            end
-
-            def to_s
-              @formatted_headers.to_s
+              HttpStub::Server::Stub::Match::HashMatcher.match?(self, request.headers)
             end
 
           end

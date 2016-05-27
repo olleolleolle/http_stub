@@ -6,11 +6,9 @@ module HttpStub
 
         class << self
 
-          private
-
           FORMATTERS = { Regexp => :format_regexp, Hash => :format_hash }.freeze
 
-          public
+          private_constant :FORMATTERS
 
           def format(value)
             formatter = FORMATTERS.find { |formatter_entry| value.is_a?(formatter_entry[0]) }
@@ -20,14 +18,11 @@ module HttpStub
           private
 
           def format_regexp(regexp)
-            "regexp:#{regexp.source.gsub(/\\\//, "/")}"
+            "regexp:#{regexp.source.gsub(%r{\\\/}, "/")}"
           end
 
           def format_hash(hash)
-            hash.reduce({}) do |result, entry|
-              result[entry[0]] = format(entry[1])
-              result
-            end
+            hash.each_with_object({}) { |entry, result| result[entry[0]] = format(entry[1]) }
           end
 
         end

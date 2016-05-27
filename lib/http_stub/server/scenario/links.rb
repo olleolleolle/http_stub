@@ -9,7 +9,7 @@ module HttpStub
         end
 
         def detail
-          "/http_stub/scenarios?#{URI.encode_www_form(:name => @name)}"
+          "/http_stub/scenarios?#{URI.encode_www_form(name: @name)}"
         end
 
         def activate

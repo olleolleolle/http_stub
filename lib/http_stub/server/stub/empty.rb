@@ -21,6 +21,10 @@ module HttpStub
           false
         end
 
+        def response_for(_request)
+          self
+        end
+
         def to_s
           ""
         end

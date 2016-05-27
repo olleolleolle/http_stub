@@ -1,13 +1,13 @@
 describe HttpStub::Server::Stub::Match::Rule::JsonBody do
 
-  let(:stubbed_schema_definition) { { "type" => "object", "properties" => { "some_property" => "some_type" } } }
+  let(:stub_schema_definition) { { "type" => "object", "properties" => { "some_property" => "some_type" } } }
 
-  let(:json_body) { described_class.new(stubbed_schema_definition) }
+  let(:json_body) { described_class.new(stub_schema_definition) }
 
   describe "#matches?" do
 
     let(:request_body) { { "some_json_property" => "some_json_value" }.to_json }
-    let(:request)      { instance_double(HttpStub::Server::Request, body: request_body) }
+    let(:request)      { instance_double(HttpStub::Server::Request::Request, body: request_body) }
     let(:logger)       { instance_double(Logger, info: nil) }
 
     let(:validation_errors) { [] }
@@ -17,7 +17,7 @@ describe HttpStub::Server::Stub::Match::Rule::JsonBody do
     before(:example) { allow(JSON::Validator).to receive(:fully_validate).and_return(validation_errors) }
 
     it "validates the request body using the stubbed schema definition" do
-      expect(JSON::Validator).to receive(:fully_validate).with(stubbed_schema_definition, request_body, anything)
+      expect(JSON::Validator).to receive(:fully_validate).with(stub_schema_definition, request_body, anything)
 
       subject
     end
@@ -93,7 +93,7 @@ describe HttpStub::Server::Stub::Match::Rule::JsonBody do
     subject { json_body.to_s }
 
     it "returns the JSON representation of the schema definition" do
-      expect(subject).to eql(stubbed_schema_definition.to_json)
+      expect(subject).to eql(stub_schema_definition.to_json)
     end
 
   end

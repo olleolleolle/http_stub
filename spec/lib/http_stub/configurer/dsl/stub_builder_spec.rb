@@ -6,10 +6,8 @@ describe HttpStub::Configurer::DSL::StubBuilder do
 
   shared_context "triggers one stub" do
 
-    let(:trigger_stub) { instance_double(HttpStub::Configurer::Request::Stub) }
-    let(:trigger_builder) do
-      instance_double(HttpStub::Configurer::DSL::StubBuilder, build: trigger_stub)
-    end
+    let(:trigger_stub)    { instance_double(HttpStub::Configurer::Request::Stub) }
+    let(:trigger_builder) { instance_double(HttpStub::Configurer::DSL::StubBuilder, build: trigger_stub) }
 
     before(:example) { builder.trigger(trigger_builder) }
 
@@ -17,7 +15,7 @@ describe HttpStub::Configurer::DSL::StubBuilder do
 
   shared_context "triggers many stubs" do
 
-    let(:trigger_stubs) { (1..3).map { instance_double(HttpStub::Configurer::Request::Stub) } }
+    let(:trigger_stubs)    { (1..3).map { instance_double(HttpStub::Configurer::Request::Stub) } }
     let(:trigger_builders) do
       trigger_stubs.map { |stub| instance_double(HttpStub::Configurer::DSL::StubBuilder, build: stub) }
     end
@@ -103,10 +101,38 @@ describe HttpStub::Configurer::DSL::StubBuilder do
 
   describe "#respond_with" do
 
-    subject { builder.respond_with(status: 201) }
+    context "when a block is provided referencing the matching request" do
 
-    it "returns the builder to support method chaining" do
-      expect(subject).to eql(builder)
+      let(:request_referencer) { instance_double(HttpStub::Configurer::DSL::RequestReferencer) }
+
+      subject { builder.respond_with { |request| { headers: request.headers[:some_header] } } }
+
+      it "includes the hash returned from the evaluated block in the response hash" do
+        subject
+
+        expect(builder.response).to include(headers: a_string_matching(/^control/))
+      end
+
+      it "returns the builder to support method chaining" do
+        expect(subject).to eql(builder)
+      end
+
+    end
+
+    context "when a block is not provided" do
+
+      subject { builder.respond_with(status: 201) }
+
+      it "includes the proivded hash in the response hash" do
+        subject
+
+        expect(builder.response).to include(status: 201)
+      end
+
+      it "returns the builder to support method chaining" do
+        expect(subject).to eql(builder)
+      end
+
     end
 
   end

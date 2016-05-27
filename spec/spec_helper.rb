@@ -29,6 +29,7 @@ require_relative '../examples/configurer_with_file_responses'
 require_relative '../examples/configurer_with_stub_request_body'
 require_relative '../examples/configurer_with_parts'
 require_relative '../examples/configurer_with_endpoint_template'
+require_relative '../examples/configurer_with_request_references'
 require_relative '../examples/authentication_service/configurer'
 
 HttpStub::Server::Daemon.log_dir = ::File.expand_path('../../tmp/log', __FILE__)

@@ -2,13 +2,11 @@ describe HttpStub::Server::Stub::Match::StringValueMatcher do
 
   let(:stub_value) { "some stub value" }
 
-  let(:string_value_matcher) { HttpStub::Server::Stub::Match::StringValueMatcher.new(stub_value) }
-
-  describe "#matches?" do
+  describe "::match?" do
 
     let(:actual_value) { "some actual value" }
 
-    subject { string_value_matcher.matches?(actual_value) }
+    subject { described_class.match?(stub_value, actual_value) }
 
     shared_examples_for "a StringValueMatcher that matches an expected stub value" do
 
@@ -122,14 +120,6 @@ describe HttpStub::Server::Stub::Match::StringValueMatcher do
         expect(subject).to be(false)
       end
 
-    end
-
-  end
-
-  describe "#to_s" do
-
-    it "returns the stub value provided" do
-      expect(string_value_matcher.to_s).to eql(stub_value)
     end
 
   end

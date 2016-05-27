@@ -6,7 +6,7 @@ module HttpStub
       class << self
 
         def create
-          HttpStub::Server::Request.new(create_rack_request)
+          HttpStub::Server::Request.create(create_rack_request)
         end
 
         private

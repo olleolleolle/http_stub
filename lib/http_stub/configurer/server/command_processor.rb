@@ -9,13 +9,11 @@ module HttpStub
         end
 
         def process(command)
-          begin
-            response = Net::HTTP.start(host, port) { |http| http.request(command.http_request) }
-            raise "#{error_message_prefix(command)}: #{response.code} #{response.message}" unless response.code == "200"
-            response
-          rescue Exception => exc
-            raise "#{error_message_prefix(command)}: #{exc}"
-          end
+          response = Net::HTTP.start(host, port) { |http| http.request(command.http_request) }
+          raise "#{error_message_prefix(command)}: #{response.code} #{response.message}" unless response.code == "200"
+          response
+        rescue StandardError => err
+          raise "#{error_message_prefix(command)}: #{err}"
         end
 
         private

@@ -25,10 +25,10 @@ module HttpStub
 
             private
 
-            def create_basic_request(request_method, path, &block)
+            def create_basic_request(request_method, path, &_block)
               http_request_class = Net::HTTP.const_get(request_method.to_s.capitalize)
               http_request = http_request_class.new(path)
-              block.call(http_request) if block_given?
+              yield http_request if block_given?
               HttpStub::Configurer::Request::Http::Basic.new(http_request)
             end
 

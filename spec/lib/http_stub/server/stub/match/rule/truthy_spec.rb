@@ -1,6 +1,4 @@
-describe HttpStub::Server::Stub::Match::TruthyMatcher do
-
-  let(:truthy_matcher) { described_class }
+describe HttpStub::Server::Stub::Match::Rule::Truthy do
 
   describe "::matches?" do
 
@@ -8,7 +6,7 @@ describe HttpStub::Server::Stub::Match::TruthyMatcher do
     let(:logger)  { instance_double(Logger) }
 
     it "returns true" do
-      expect(truthy_matcher.matches?(request, logger)).to be(true)
+      expect(described_class.matches?(request, logger)).to be(true)
     end
 
   end
@@ -16,7 +14,7 @@ describe HttpStub::Server::Stub::Match::TruthyMatcher do
   describe "::to_s" do
 
     it "returns an empty string" do
-      expect(truthy_matcher.to_s).to eql("")
+      expect(described_class.to_s).to eql("")
     end
 
   end

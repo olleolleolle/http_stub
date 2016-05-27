@@ -26,8 +26,8 @@ module HttpStub
 
         private
 
-        def activate_all!(uris)
-          @triggered_scenario_names.concat(uris)
+        def activate_all!(names)
+          @triggered_scenario_names.concat(names)
         end
 
       end

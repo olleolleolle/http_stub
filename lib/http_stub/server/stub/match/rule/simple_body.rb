@@ -7,15 +7,15 @@ module HttpStub
           class SimpleBody
 
             def initialize(body)
-              @body = HttpStub::Server::Stub::Match::StringValueMatcher.new(body)
+              @body = body
             end
 
             def matches?(request, _logger)
-              @body.matches?(request.body)
+              HttpStub::Server::Stub::Match::StringValueMatcher.match?(@body, request.body)
             end
 
             def to_s
-              @body.to_s
+              @body
             end
 
           end

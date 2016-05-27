@@ -4,12 +4,10 @@ module HttpStub
 
       class ControllableValue
 
-        private
-
         CONTROL_FORMATTERS = [ HttpStub::Configurer::Request::Regexpable,
                                HttpStub::Configurer::Request::Omittable ].freeze
 
-        public
+        private_constant :CONTROL_FORMATTERS
 
         def self.format(value)
           CONTROL_FORMATTERS.reduce(value) { |result, formatter| formatter.format(result) }
