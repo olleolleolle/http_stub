@@ -34,6 +34,7 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "rubocop",                   "~> 0.40"
   spec.add_development_dependency "rspec",                     "~> 3.4"
+  spec.add_development_dependency "coderay",                   "~> 1.1"
   spec.add_development_dependency "rack-test",                 "~> 0.6"
   spec.add_development_dependency "json",                      "~> 1.8"
   spec.add_development_dependency "httparty",                  "~> 0.13"
