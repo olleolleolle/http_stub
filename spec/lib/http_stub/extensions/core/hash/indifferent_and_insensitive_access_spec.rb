@@ -1,6 +1,6 @@
 describe HttpStub::Extensions::Core::Hash::IndifferentAndInsensitiveAccess do
 
-  let(:testable_class) { Class.new(::Hash).tap { |hash_class| hash_class.include(described_class) } }
+  let(:testable_class) { Class.new(::Hash).tap { |hash_class| hash_class.send(:include, described_class) } }
 
   let(:indifferent_and_insensitive_access_hash) { testable_class.new }
 

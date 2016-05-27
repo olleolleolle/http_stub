@@ -1,6 +1,6 @@
 describe HttpStub::Extensions::Core::Hash::Formatted do
 
-  let(:testable_class) { Class.new(::Hash).tap { |hash_class| hash_class.include(described_class) } }
+  let(:testable_class) { Class.new(::Hash).tap { |hash_class| hash_class.send(:include, described_class) } }
 
   let(:underlying_hash)     { {} }
   let(:key_value_delimiter) { "=" }
