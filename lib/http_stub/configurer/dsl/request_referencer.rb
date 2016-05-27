@@ -5,11 +5,11 @@ module HttpStub
       class RequestReferencer
 
         def initialize
-          @parameter_referencer = HttpStub::Configurer::DSL::RequestAttributeReferencer.new(:params)
+          @parameter_referencer = HttpStub::Configurer::DSL::RequestAttributeReferencer.new(:parameters)
           @header_referencer    = HttpStub::Configurer::DSL::RequestAttributeReferencer.new(:headers)
         end
 
-        def params
+        def parameters
           @parameter_referencer
         end
 

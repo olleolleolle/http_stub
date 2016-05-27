@@ -10,7 +10,7 @@ describe HttpStub::Server::Stub::Response::Attribute::Interpolator::Parameters d
     context "when the value has parameter references" do
 
       let(:value) do
-        "control:request.params[name1] some plain text control:request.headers[name1] control:request.params[name2]"
+        "control:request.parameters[name1] some text control:request.headers[name1] control:request.parameters[name2]"
       end
 
       context "and the parameters are present in the request" do
@@ -21,7 +21,7 @@ describe HttpStub::Server::Stub::Response::Attribute::Interpolator::Parameters d
         end
 
         it "returns the value with the parameter references interpolated" do
-          expect(subject).to eql("value1 some plain text control:request.headers[name1] value2")
+          expect(subject).to eql("value1 some text control:request.headers[name1] value2")
         end
 
       end
@@ -31,7 +31,7 @@ describe HttpStub::Server::Stub::Response::Attribute::Interpolator::Parameters d
         before(:example) { allow(request_parameters).to receive(:[]).and_return(nil) }
 
         it "returns the value with the parameter references removed" do
-          expect(subject).to eql(" some plain text control:request.headers[name1] ")
+          expect(subject).to eql(" some text control:request.headers[name1] ")
         end
 
       end

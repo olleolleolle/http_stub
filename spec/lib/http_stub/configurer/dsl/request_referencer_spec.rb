@@ -4,14 +4,14 @@ describe HttpStub::Configurer::DSL::RequestReferencer do
 
   before(:example) { allow(HttpStub::Configurer::DSL::RequestAttributeReferencer).to receive(:new) }
 
-  describe "#params" do
+  describe "#parameters" do
 
-    subject { request_referencer.params }
+    subject { request_referencer.parameters }
 
     it "returns an attribute request referencer for parameters" do
       parameter_referencer = instance_double(HttpStub::Configurer::DSL::RequestAttributeReferencer)
       allow(HttpStub::Configurer::DSL::RequestAttributeReferencer).to(
-        receive(:new).with(:params).and_return(parameter_referencer)
+        receive(:new).with(:parameters).and_return(parameter_referencer)
       )
 
       expect(subject).to eql(parameter_referencer)

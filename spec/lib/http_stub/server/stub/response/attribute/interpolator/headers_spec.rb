@@ -10,7 +10,7 @@ describe HttpStub::Server::Stub::Response::Attribute::Interpolator::Headers do
     context "when the value has header references" do
 
       let(:value) do
-        "control:request.headers[name1] some plain text control:request.params[name1] control:request.headers[name2]"
+        "control:request.headers[name1] some text control:request.parameters[name1] control:request.headers[name2]"
       end
 
       context "and the headers are present in the request" do
@@ -21,7 +21,7 @@ describe HttpStub::Server::Stub::Response::Attribute::Interpolator::Headers do
         end
 
         it "returns the value with the header references interpolated" do
-          expect(subject).to eql("value1 some plain text control:request.params[name1] value2")
+          expect(subject).to eql("value1 some text control:request.parameters[name1] value2")
         end
 
       end
@@ -31,7 +31,7 @@ describe HttpStub::Server::Stub::Response::Attribute::Interpolator::Headers do
         before(:example) { allow(request_headers).to receive(:[]).and_return(nil) }
 
         it "returns the value with the header references removed" do
-          expect(subject).to eql(" some plain text control:request.params[name1] ")
+          expect(subject).to eql(" some text control:request.parameters[name1] ")
         end
 
       end
@@ -40,7 +40,7 @@ describe HttpStub::Server::Stub::Response::Attribute::Interpolator::Headers do
 
     context "when the value does not have header references" do
 
-      let(:value) { "some value without header references control:request.params[name1]" }
+      let(:value) { "some value without header references control:request.parameters[name1]" }
 
       it "returns the value unchanged" do
         expect(subject).to eql(value)

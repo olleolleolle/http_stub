@@ -13,10 +13,10 @@ module HttpStub
           {
             status:  200,
             headers: { header_referencing_header:    request.headers[:header_name],
-                       header_referencing_parameter: request.params[:parameter_name] },
+                       header_referencing_parameter: request.parameters[:parameter_name] },
             body:    <<-BODY
               header_name = #{request.headers[:header_name]}
-              parameter_name = #{request.params[:parameter_name]}
+              parameter_name = #{request.parameters[:parameter_name]}
             BODY
           }
         end
