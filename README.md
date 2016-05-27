@@ -144,7 +144,7 @@ More Information
 ----------------
 
 ```http_stub``` can match requests against a variety of criteria, including JSON schemas, and can respond with arbitrary
-content including files.
+content including files and the matching requests headers and parameters.
 
 See the [wiki](https://github.com/MYOB-Technology/http_stub/wiki) for more usage details and examples.
 
