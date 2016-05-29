@@ -4,23 +4,26 @@ module HttpStub
 
       class Controller
 
-        def initialize(registry)
-          @registry = registry
+        def initialize(stub_registry, match_result_registry)
+          @stub_registry         = stub_registry
+          @match_result_registry = match_result_registry
         end
 
         def register(request, logger)
           stub = HttpStub::Server::Stub.create(HttpStub::Server::Stub::Parser.parse(request))
-          @registry.add(stub, logger)
+          @stub_registry.add(stub, logger)
           HttpStub::Server::Response.success("location" => stub.stub_uri)
         end
 
         def match(request, logger)
-          stub = @registry.match(request, logger)
-          stub ? stub.response_for(request) : HttpStub::Server::Response::NOT_FOUND
+          stub = @stub_registry.match(request, logger)
+          response = stub ? stub.response_for(request) : HttpStub::Server::Response::NOT_FOUND
+          @match_result_registry.add(HttpStub::Server::Stub::Match::Result.new(request, response, stub), logger)
+          response
         end
 
         def clear(logger)
-          @registry.clear(logger)
+          [ @stub_registry, @match_result_registry ].each { |registry| registry.clear(logger) }
         end
 
       end

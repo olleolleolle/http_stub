@@ -2,7 +2,7 @@
   %h3 Request
   = partial :request, locals: { request: the_stub }
   %h3 Response
-  =partial :response, locals: { response: the_stub.response }
+  = partial :response, locals: { response: the_stub.response }
   %h3 Triggers
   - the_stub.triggers.each do |trigger|
     = partial :stub, locals: { the_stub: trigger }

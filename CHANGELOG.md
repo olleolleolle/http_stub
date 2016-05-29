@@ -1,3 +1,8 @@
+** 0.23.1 **
+
+New:
+* GET /stubs/matches displays the calculated response for stubs whose response has request references
+
 ** 0.23.0 **
 
 New:

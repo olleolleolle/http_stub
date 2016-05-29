@@ -1,9 +1,8 @@
 describe HttpStub::Server::Stub::Registry, "integrating with real stubs" do
 
-  let(:request_match_registry) { HttpStub::Server::Registry.new("request match") }
-  let(:logger)                 { instance_double(Logger, info: nil) }
+  let(:logger) { instance_double(Logger, info: nil) }
 
-  let(:stub_registry) { HttpStub::Server::Stub::Registry.new(request_match_registry) }
+  let(:stub_registry) { HttpStub::Server::Stub::Registry.new }
 
   describe "#recall" do
 

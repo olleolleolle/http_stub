@@ -2,6 +2,6 @@
   %h3 Request
   = partial :request, locals: { request: match.request }
   %h3 Response
-  =partial :response, locals: { response: match.stub.response }
+  = partial :response, locals: { response: match.response }
   %h3 Matched Stub
   %a{ href: match.stub.stub_uri, class: [:stub, :link] } Match

@@ -21,10 +21,10 @@ module HttpStub
 
       def initialize
         super()
-        @match_result_registry = HttpStub::Server::Registry.new("match result")
-        @stub_registry         = HttpStub::Server::Stub::Registry.new(@match_result_registry)
+        @stub_registry         = HttpStub::Server::Stub::Registry.new
         @scenario_registry     = HttpStub::Server::Registry.new("scenario")
-        @stub_controller       = HttpStub::Server::Stub::Controller.new(@stub_registry)
+        @match_result_registry = HttpStub::Server::Registry.new("match result")
+        @stub_controller       = HttpStub::Server::Stub::Controller.new(@stub_registry, @match_result_registry)
         @scenario_controller   = HttpStub::Server::Scenario::Controller.new(@scenario_registry, @stub_registry)
       end
 

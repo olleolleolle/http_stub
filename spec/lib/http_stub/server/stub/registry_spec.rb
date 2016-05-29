@@ -1,11 +1,10 @@
 describe HttpStub::Server::Stub::Registry do
 
-  let(:match_result_registry)    { instance_double(HttpStub::Server::Registry) }
   let(:underlying_stub_registry) { instance_double(HttpStub::Server::Registry) }
 
   let(:logger) { instance_double(Logger) }
 
-  let(:stub_registry) { HttpStub::Server::Stub::Registry.new(match_result_registry) }
+  let(:stub_registry) { HttpStub::Server::Stub::Registry.new }
 
   before(:example) { allow(HttpStub::Server::Registry).to receive(:new).and_return(underlying_stub_registry) }
 
@@ -58,15 +57,10 @@ describe HttpStub::Server::Stub::Registry do
     let(:triggers)     { instance_double(HttpStub::Server::Stub::Triggers, add_to: nil) }
     let(:stub)         { instance_double(HttpStub::Server::Stub::Stub, triggers: triggers) }
     let(:found_stub)   { nil }
-    let(:match_result) { instance_double(HttpStub::Server::Stub::Match::Result) }
 
     subject { stub_registry.match(request, logger) }
 
-    before(:example) do
-      allow(underlying_stub_registry).to receive(:find).and_return(found_stub)
-      allow(HttpStub::Server::Stub::Match::Result).to receive(:new).and_return(match_result)
-      allow(match_result_registry).to receive(:add)
-    end
+    before(:example) { allow(underlying_stub_registry).to receive(:find).and_return(found_stub) }
 
     it "finds a matching stub in the underlying simple registry based on the request" do
       expect(underlying_stub_registry).to receive(:find).with(request, logger)
@@ -77,18 +71,6 @@ describe HttpStub::Server::Stub::Registry do
     context "when a stub is found" do
 
       let(:found_stub) { stub }
-
-      it "creates a match containing the request and the stub" do
-        expect(HttpStub::Server::Stub::Match::Result).to receive(:new).with(request, stub)
-
-        subject
-      end
-
-      it "adds the match result to the match result registry" do
-        expect(match_result_registry).to receive(:add).with(match_result, logger)
-
-        subject
-      end
 
       it "adds the stubs triggers to the underlying stub registry" do
         expect(triggers).to receive(:add_to).with(stub_registry, logger)
@@ -106,19 +88,7 @@ describe HttpStub::Server::Stub::Registry do
 
       let(:found_stub) { nil }
 
-      it "creates a match result with a nil stub" do
-        expect(HttpStub::Server::Stub::Match::Result).to receive(:new).with(request, nil)
-
-        subject
-      end
-
-      it "adds the match result to the match result registry" do
-        expect(match_result_registry).to receive(:add).with(match_result, logger)
-
-        subject
-      end
-
-      it "returns the result from the underlying registry" do
+      it "returns nil" do
         expect(subject).to eql(nil)
       end
 
@@ -183,19 +153,8 @@ describe HttpStub::Server::Stub::Registry do
 
     subject { stub_registry.clear(logger) }
 
-    before(:example) do
-      allow(underlying_stub_registry).to receive(:clear)
-      allow(match_result_registry).to receive(:clear)
-    end
-
-    it "clears the underlying simple registry" do
+    it "delegates to the underlying simple registry" do
       expect(underlying_stub_registry).to receive(:clear).with(logger)
-
-      subject
-    end
-
-    it "clears the match result registry" do
-      expect(match_result_registry).to receive(:clear).with(logger)
 
       subject
     end

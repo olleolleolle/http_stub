@@ -5,11 +5,12 @@ module HttpStub
 
         class Result
 
-          attr_reader :request, :stub
+          attr_reader :request, :response, :stub
 
-          def initialize(request, stub)
-            @request = request
-            @stub    = stub
+          def initialize(request, response, stub)
+            @request  = request
+            @response = response
+            @stub     = stub
           end
 
         end
