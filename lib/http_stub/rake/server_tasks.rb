@@ -15,19 +15,23 @@ module HttpStub
       def define_start_task(args)
         namespace :start do
           desc "Start stub #{args[:name]} in the foreground"
-          task(:foreground) do
-            HttpStub::Server::Application.instance_eval do
-              set :environment, :test
-              set :port, args[:configurer] ? args[:configurer].stub_server.port : args[:port]
-              run!
-            end
-          end
+          task(:foreground) { run_application(args) }
         end
       end
 
       def define_initialize_task(args)
         desc "Configure stub #{args[:name]}"
         task(:configure) { args[:configurer].initialize! }
+      end
+
+      def run_application(args)
+        HttpStub::Server::Application::Application.instance_eval do
+          set :environment, :test
+          set :port, args[:configurer] ? args[:configurer].stub_server.port : args[:port]
+          enable :cross_origin_support if args[:configurer] &&
+                                          args[:configurer].stub_server.enabled?(:cross_origin_support)
+          run!
+        end
       end
 
     end

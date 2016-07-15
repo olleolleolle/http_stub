@@ -1,7 +1,7 @@
 %form{ id: :activate_scenario_form, action: "scenarios/activate", method: "POST" }
   %input{ id: :activated_scenario_name, name: :name, type: :hidden, value: "" }
 :javascript
-  $(window).load( function() {
+  $(window).load(function() {
     $("a.activate_scenario").on("click", function(event) {
       event.preventDefault();
       $("#activated_scenario_name").val($(event.target).data("name"));

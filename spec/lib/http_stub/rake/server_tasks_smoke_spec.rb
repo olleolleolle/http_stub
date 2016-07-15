@@ -34,7 +34,7 @@ describe HttpStub::Rake::ServerTasks do
         end
 
         def wait_until_server_has_stopped
-          HttpStub::Server::Application.stop!
+          HttpStub::Server::Application::Application.stop!
         end
 
       end

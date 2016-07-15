@@ -1,16 +1,17 @@
 language: ruby
 rvm:
-- 1.9.3
-- 2.0
-- 2.1
-- 2.2
-- 2.3.1
+  - 1.9.3
+  - 2.0
+  - 2.1
+  - 2.2
+  - 2.3.1
+addons:
+  firefox: latest
 before_install:
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
   - gem install bundler
 notifications:
   email:
     on_success: change
     on_failure: always
-  hipchat:
-    rooms:
-      secure: HYAfCphh5/ABOeSgueuwEiYoAaSxcA9AighsEilDL3K2FYpVIoq/VOXwmIjQDAF7sRl6bYHJUSHGJU3dLTEyqvk1ZaW6T+sy2UlgJHVzT5k8cJ2J5dCHCHmbd6bxPg1LX3oCTH2LLspIzZpeExfcG/ELWyfzfdoTSbluuHuFfZc=

@@ -1,3 +1,8 @@
+** 0.24.0 **
+
+New:
+* Cross-origin resource sharing support via `stub_server.enable :cross_origin_support`
+
 ** 0.23.1 **
 
 New:

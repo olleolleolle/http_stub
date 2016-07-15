@@ -1,0 +1,33 @@
+<html>
+<head>
+<script type="application/javascript">
+
+  function activateScenario() {
+    var request = new XMLHttpRequest();
+    request.open("POST", "http://localhost:8001/http_stub/scenarios/activate", false);
+    request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+    var result = "Failed";
+    try {
+      request.send(encodeURI("name=" + document.getElementById("scenario_name").value));
+      if (request.status == 200) {
+        result = "Succeeded";
+      }
+    } catch(error) {
+      //Intentionally blank
+    }
+
+    document.getElementById("response_indicator").innerHTML = result;
+  }
+
+</script>
+</head>
+<body>
+<label for="scenario_name">Scenario Name: </label><input id="scenario_name" type="text" />
+<br/>
+<button id="activate_scenario" onclick="activateScenario()">Activate</button>
+<br/>
+<hr/>
+<label>Cross-Origin Request Response:</label><span id="response_indicator">&nbsp;</span>
+</body>
+</html>

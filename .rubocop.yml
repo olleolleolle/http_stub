@@ -29,6 +29,8 @@ Style/ExtraSpacing:
   Enabled: false
 Style/SpaceInsideBrackets:
   Enabled: false
+Style/SpaceInsidePercentLiteralDelimiters:
+  Enabled: false
 Style/SpaceAroundEqualsInParameterDefault:
   Enabled: false
 Style/SingleLineBlockParams:

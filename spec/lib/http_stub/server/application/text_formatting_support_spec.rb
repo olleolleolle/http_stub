@@ -1,12 +1,12 @@
-describe HttpStub::Server::ApplicationHelpers do
+describe HttpStub::Server::Application::TextFormattingSupport do
 
-  let(:helpers) { Class.new.extend(described_class) }
+  let(:text_formatting_support) { Class.new.extend(described_class) }
 
   describe "::h" do
 
     let(:text) { "<tag>Some text</tag>" }
 
-    subject { helpers.h(text) }
+    subject { text_formatting_support.h(text) }
 
     it "should escape the provided HTML" do
       expect(subject).to eq("&lt;tag&gt;Some text&lt;&#x2F;tag&gt;")
@@ -16,7 +16,7 @@ describe HttpStub::Server::ApplicationHelpers do
 
   describe "::pp" do
 
-    subject { helpers.pp(text) }
+    subject { text_formatting_support.pp(text) }
 
     context "when the text is JSON" do
 

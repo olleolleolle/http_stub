@@ -1,4 +1,4 @@
-describe HttpStub::Server::Application do
+describe HttpStub::Server::Application::Application do
   include Rack::Test::Methods
 
   let(:response)      { last_response }
@@ -11,9 +11,9 @@ describe HttpStub::Server::Application do
   let(:stub_controller)     { instance_double(HttpStub::Server::Stub::Controller) }
   let(:scenario_controller) { instance_double(HttpStub::Server::Scenario::Controller) }
 
-  let(:response_pipeline) { instance_double(HttpStub::Server::ResponsePipeline, process: nil) }
+  let(:response_pipeline) { instance_double(HttpStub::Server::Application::ResponsePipeline, process: nil) }
 
-  let(:app) { HttpStub::Server::Application.new! }
+  let(:app) { HttpStub::Server::Application::Application.new! }
 
   before(:example) do
     allow(HttpStub::Server::Registry).to receive(:new).with("match result").and_return(match_result_registry)
@@ -21,7 +21,7 @@ describe HttpStub::Server::Application do
     allow(HttpStub::Server::Stub::Registry).to receive(:new).and_return(stub_registry)
     allow(HttpStub::Server::Stub::Controller).to receive(:new).and_return(stub_controller)
     allow(HttpStub::Server::Scenario::Controller).to receive(:new).and_return(scenario_controller)
-    allow(HttpStub::Server::ResponsePipeline).to receive(:new).and_return(response_pipeline)
+    allow(HttpStub::Server::Application::ResponsePipeline).to receive(:new).and_return(response_pipeline)
   end
 
   context "when the diagnostics landing page is retrieved" do
@@ -300,6 +300,10 @@ describe HttpStub::Server::Application do
 
   it "disables all standard HTTP security measures to allow stubs full control of responses" do
     expect(app.settings.protection).to eql(false)
+  end
+
+  it "disables cross origin support by default" do
+    expect(app.settings.cross_origin_support).to eql(false)
   end
 
 end

@@ -19,8 +19,8 @@ module HttpStub
             self.class.new(@original_args.merge("headers" => @headers.with_values_from(request)))
           end
 
-          def serve_on(server)
-            server.send_file(@file.path, send_options)
+          def serve_on(application)
+            application.send_file(@file.path, send_options)
           end
 
           private

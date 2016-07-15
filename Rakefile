@@ -7,6 +7,7 @@ require 'rspec/core/rake_task'
 
 require_relative 'lib/http_stub/rake/task_generators'
 require_relative 'examples/configurer_with_exhaustive_scenarios'
+require_relative 'examples/configurer_with_cross_origin_support'
 
 directory "pkg"
 
@@ -57,6 +58,11 @@ HttpStub::Server::Daemon.log_dir = ::File.expand_path('../tmp/log', __FILE__)
 HttpStub::Server::Daemon.pid_dir = ::File.expand_path('../tmp/pids', __FILE__)
 
 HttpStub::Rake::ServerTasks.new(name: :example_server, port: 8001)
+
+cross_origin_configurer = HttpStub::Examples::ConfigurerWithCrossOriginSupport
+cross_origin_configurer.stub_server.host = "localhost"
+cross_origin_configurer.stub_server.port = 8001
+HttpStub::Rake::ServerDaemonTasks.new(name: :cross_origin_stub, configurer: cross_origin_configurer)
 
 example_configurer = HttpStub::Examples::ConfigurerWithExhaustiveScenarios
 example_configurer.stub_server.host = "localhost"

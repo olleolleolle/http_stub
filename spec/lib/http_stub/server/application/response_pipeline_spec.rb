@@ -1,8 +1,8 @@
-describe HttpStub::Server::ResponsePipeline do
+describe HttpStub::Server::Application::ResponsePipeline do
 
-  let(:server)            { instance_double(HttpStub::Server) }
+  let(:application) { instance_double(Sinatra::Base) }
 
-  let(:response_pipeline) { HttpStub::Server::ResponsePipeline.new(server) }
+  let(:response_pipeline) { described_class.new(application) }
 
   describe "#process" do
 
@@ -18,8 +18,8 @@ describe HttpStub::Server::ResponsePipeline do
       subject
     end
 
-    it "serves the response via the server" do
-      expect(response).to receive(:serve_on).with(server)
+    it "serves the response via the application" do
+      expect(response).to receive(:serve_on).with(application)
 
       subject
     end

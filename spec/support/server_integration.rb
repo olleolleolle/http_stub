@@ -3,11 +3,17 @@ shared_context "server integration" do
   include HtmlHelpers
 
   before(:context) do
-    @pid = Process.spawn("rake example_server:start:foreground --trace")
-    ::Wait.until!(description: "http stub server started") { Net::HTTP.get_response(server_host, "/", server_port) }
+    @server_pid = Process.spawn("rake #{server_name}:start:foreground --trace")
+    ::Wait.until!(description: "http stub server #{server_name} started") do
+      Net::HTTP.get_response(server_host, "/", server_port)
+    end
   end
 
-  after(:context) { Process.kill(9, @pid) }
+  after(:context) { Process.kill(9, @server_pid) }
+
+  def server_name
+    "example_server"
+  end
 
   def server_host
     "localhost"

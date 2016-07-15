@@ -11,6 +11,7 @@ module HttpStub
         def initialize(server_facade)
           @server_facade        = server_facade
           @default_stub_builder = HttpStub::Configurer::DSL::StubBuilder.new
+          @enabled_features     = []
         end
 
         def base_uri
@@ -19,6 +20,14 @@ module HttpStub
 
         def external_base_uri
           ENV["STUB_EXTERNAL_BASE_URI"] || base_uri
+        end
+
+        def enable(*features)
+          @enabled_features = features
+        end
+
+        def enabled?(feature)
+          @enabled_features.include?(feature)
         end
 
         def request_defaults=(args)

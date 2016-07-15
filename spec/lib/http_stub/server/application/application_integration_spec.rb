@@ -1,4 +1,4 @@
-describe HttpStub::Server::Application, "when the server is running" do
+describe HttpStub::Server::Application::Application, "when the server is running" do
   include_context "server integration"
 
   let(:response_document) { Nokogiri::HTML(response.body) }

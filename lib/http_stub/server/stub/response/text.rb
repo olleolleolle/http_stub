@@ -19,8 +19,8 @@ module HttpStub
                                                 "body"    => @body.with_values_from(request)))
           end
 
-          def serve_on(server)
-            server.halt(@status, @headers.to_hash, @body)
+          def serve_on(application)
+            application.halt(@status, @headers.to_hash, @body)
           end
 
         end
