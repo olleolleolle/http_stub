@@ -17,7 +17,6 @@ describe HttpStub::Configurer::Server::CommandProcessor do
     subject { command_processor.process(command) }
 
     context "when the server is running" do
-
       include_context "server integration"
 
       describe "and the server responds with a 200 response" do
@@ -51,6 +50,8 @@ describe HttpStub::Configurer::Server::CommandProcessor do
     end
 
     context "when the server is unavailable" do
+
+      subject { command_processor.process(command, open_timeout: 1) }
 
       let(:request) { create_get_request("/does/not/exist") }
 

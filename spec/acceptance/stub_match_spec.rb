@@ -75,7 +75,6 @@ describe "Stub match acceptance" do
       end
 
       context "when the request contains parameters" do
-
         include_context "issues requests with parameters"
 
         it "returns a response body that contains the parameters" do

@@ -7,7 +7,7 @@ module HttpStub
         attr_reader :description
 
         def initialize(args)
-          @request = args[:request]
+          @request     = args[:request]
           @description = args[:description]
         end
 

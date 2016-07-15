@@ -217,7 +217,6 @@ describe HttpStub::Configurer::DSL::StubBuilder do
       end
 
       context "and a builder that is completely configured is provided" do
-
         include_context "a completely configured provided builder"
 
         it "replaces the uri" do
@@ -344,7 +343,6 @@ describe HttpStub::Configurer::DSL::StubBuilder do
     end
 
     context "when the builder has not been previously configured" do
-
       include_context "a completely configured provided builder"
 
       it "assumes the provided uri" do
@@ -443,7 +441,6 @@ describe HttpStub::Configurer::DSL::StubBuilder do
       describe "creates a stub payload with triggers that" do
 
         context "when a trigger is added" do
-
           include_context "triggers one stub"
 
           it "contain the provided trigger builder" do
@@ -455,7 +452,6 @@ describe HttpStub::Configurer::DSL::StubBuilder do
         end
 
         context "when many triggers are added" do
-
           include_context "triggers many stubs"
 
           it "contain the provided trigger builders" do

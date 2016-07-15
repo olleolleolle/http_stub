@@ -8,8 +8,8 @@ module HttpStub
           @configurer = configurer
         end
 
-        def process(command)
-          response = Net::HTTP.start(host, port) { |http| http.request(command.http_request) }
+        def process(command, http_options={})
+          response = Net::HTTP.start(host, port, http_options) { |http| http.request(command.http_request) }
           raise "#{error_message_prefix(command)}: #{response.code} #{response.message}" unless response.code == "200"
           response
         rescue StandardError => err

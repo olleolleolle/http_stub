@@ -134,7 +134,6 @@ describe HttpStub::Configurer::Request::Stub do
     end
 
     context "when many triggers are provided" do
-
       include_context "triggers many stubs"
 
       it "builds the request object for each trigger" do
@@ -182,7 +181,6 @@ describe HttpStub::Configurer::Request::Stub do
       end
 
       context "when a trigger is added" do
-
         include_context "triggers one stub"
 
         it "has a triggers entry containing the stub trigger payload" do
@@ -192,7 +190,6 @@ describe HttpStub::Configurer::Request::Stub do
       end
 
       context "when many triggers are added" do
-
         include_context "triggers many stubs"
 
         it "has a triggers entry containing the stub trigger payloads" do
@@ -224,7 +221,6 @@ describe HttpStub::Configurer::Request::Stub do
       before(:example) { allow(stub_response).to receive(:file).and_return(response_file) }
 
       context "and the triggers contain files" do
-
         include_context "triggers many stubs"
 
         let(:triggers_files) do
@@ -238,7 +234,6 @@ describe HttpStub::Configurer::Request::Stub do
       end
 
       context "and the triggers contain no files" do
-
         include_context "triggers many stubs"
 
         let(:triggers_files) { trigger_payloads.map { (1..3).map { [] } } }
@@ -256,7 +251,6 @@ describe HttpStub::Configurer::Request::Stub do
       before(:example) { allow(stub_response).to receive(:file).and_return(nil) }
 
       context "and the triggers contain files" do
-
         include_context "triggers many stubs"
 
         let(:triggers_files) do
@@ -270,7 +264,6 @@ describe HttpStub::Configurer::Request::Stub do
       end
 
       context "and no triggers contain a file" do
-
         include_context "triggers many stubs"
 
         let(:triggers_files) { trigger_payloads.map { (1..3).map { [] } } }

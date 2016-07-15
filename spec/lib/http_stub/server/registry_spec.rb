@@ -69,7 +69,6 @@ describe HttpStub::Server::Registry do
     subject { registry.find(criteria, logger) }
 
     describe "when multiple models have been registered" do
-
       include_context "register multiple models"
 
       it "determines if the models satisfy the provided criteria" do
@@ -139,7 +138,6 @@ describe HttpStub::Server::Registry do
   describe "#last" do
 
     context "when multiple models have been registered" do
-
       include_context "register multiple models"
 
       it "returns the last added model" do
@@ -165,7 +163,6 @@ describe HttpStub::Server::Registry do
   describe "#all" do
 
     context "when multiple models have been registered" do
-
       include_context "register multiple models"
 
       it "returns the registered models in the order they were added" do
@@ -189,7 +186,6 @@ describe HttpStub::Server::Registry do
     subject { registry.rollback_to(model) }
 
     context "when models have been added" do
-
       include_context "register multiple models"
 
       context "and the rollback is to one of those models" do
@@ -243,7 +239,6 @@ describe HttpStub::Server::Registry do
     end
 
     context "when models have been added" do
-
       include_context "register multiple models"
 
       it "releases all knowledge of the models" do
