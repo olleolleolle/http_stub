@@ -35,6 +35,9 @@ describe HttpStub::Rake::ServerTasks do
 
         def wait_until_server_has_stopped
           HttpStub::Server::Application::Application.stop!
+          ::Wait.until_true!(description: "http stub server #{task_args[:name]} stopped") do
+            Net::HTTP.get_response("localhost", "/", port) && false rescue true
+          end
         end
 
       end
@@ -45,9 +48,9 @@ describe HttpStub::Rake::ServerTasks do
 
   context "when a configurer is provided" do
 
-    let(:port) { 8004 }
+    let(:port)       { 8004 }
     let(:configurer) do
-      configurer = Class.new.tap do |configurer|
+      Class.new.tap do |configurer|
         configurer.send(:include, HttpStub::Configurer)
         configurer.stub_server.host = "localhost"
         configurer.stub_server.port = port
