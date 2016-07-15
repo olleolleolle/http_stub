@@ -29,14 +29,14 @@ describe HttpStub::Rake::ServerTasks do
 
         def wait_until_server_has_started
           ::Wait.until!(description: "http stub server #{task_args[:name]} started") do
-            Net::HTTP.get_response("localhost", "/", port)
+            HTTParty.get("http://localhost:#{port}")
           end
         end
 
         def wait_until_server_has_stopped
           HttpStub::Server::Application::Application.stop!
           ::Wait.until_true!(description: "http stub server #{task_args[:name]} stopped") do
-            Net::HTTP.get_response("localhost", "/", port) && false rescue true
+            HTTParty.get("http://localhost:#{port}", timeout: 1) && false rescue true
           end
         end
 
