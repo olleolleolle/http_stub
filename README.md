@@ -50,6 +50,7 @@ In comparison ```http_stub```:
 * Supports a wider range of matching rules and can match requests against JSON schemas.
 * Supports references to request headers and parameters in responses.
 * Supports multi-part file responses.
+* Allows cross-origin request support to be enabled easily.
 * Allows a match to trigger the registration of other ```stubs``` to simulate state changes in the provider.
 * Has diagnostic pages to interrogate the state of the stub, trace requests to responses, and activate scenarios on-the-fly.
 * Has an elegant Ruby DSL that aids in keeping requests and responses DRY.
