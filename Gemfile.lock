@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    http_stub (0.24.0)
+    http_stub (0.24.1)
       activesupport (~> 4.2)
       haml (~> 4.0)
       http_server_manager (~> 0.4)
@@ -32,8 +32,8 @@ GEM
     ffi (1.9.14)
     haml (4.0.7)
       tilt
-    http_server_manager (0.4.13)
-      rake (~> 11.1)
+    http_server_manager (0.4.15)
+      rake (>= 10.4)
       sys-proctree (~> 0.0)
       wait_until (~> 0.3)
     httparty (0.13.7)
@@ -98,9 +98,9 @@ GEM
       tilt (>= 1.3, < 3)
     sinatra-partial (1.0.0)
       sinatra (~> 1.4)
-    sys-proctable (1.1.1)
-    sys-proctree (0.0.8)
-      sys-proctable (>= 0.9.8)
+    sys-proctable (1.0.0)
+    sys-proctree (0.0.10)
+      sys-proctable (= 1.0.0)
     thread_safe (0.3.5)
     tilt (2.0.5)
     travis-lint (2.0.0)
@@ -118,7 +118,6 @@ DEPENDENCIES
   codeclimate-test-reporter (~> 0.6)
   http_stub!
   httparty (~> 0.13)
-  json (~> 1.8)
   nokogiri (~> 1.6)
   rack-test (~> 0.6)
   rspec (~> 3.5)

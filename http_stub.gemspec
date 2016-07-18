@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
 
   spec.require_path = "lib"
 
-  spec.required_ruby_version = ">= 1.9.3"
+  spec.required_ruby_version = ">= 2.0"
 
   spec.add_runtime_dependency "rake", ">= 10.4"
 
@@ -36,7 +36,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec",                     "~> 3.5"
   spec.add_development_dependency "nokogiri",                  "~> 1.6"
   spec.add_development_dependency "httparty",                  "~> 0.13"
-  spec.add_development_dependency "json",                      "~> 1.8"
   spec.add_development_dependency "rack-test",                 "~> 0.6"
   spec.add_development_dependency "wait_until",                "~> 0.3"
   spec.add_development_dependency "selenium-webdriver",        "~> 2.53"

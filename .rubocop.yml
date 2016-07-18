@@ -3,7 +3,7 @@ AllCops:
     - Rakefile
     - spec/**/*
     - vendor/**/*
-  TargetRubyVersion: 1.9
+  TargetRubyVersion: 2.0
 
 # double quotes preferred, except in require
 Style/StringLiterals:
