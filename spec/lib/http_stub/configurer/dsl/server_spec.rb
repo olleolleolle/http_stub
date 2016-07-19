@@ -79,6 +79,64 @@ describe HttpStub::Configurer::DSL::Server do
 
   end
 
+  describe "#enable" do
+
+    context "when a feature is provided" do
+
+      let(:feature) { :some_feature }
+
+      subject { server.enable(feature) }
+
+      it "enables the feature" do
+        subject
+
+        expect(server.enabled?(feature)).to be(true)
+      end
+
+    end
+
+    context "when features are provided" do
+
+      let(:features) { (1..3).map { |i| "feature_#{i}".to_sym } }
+
+      subject { server.enable(*features) }
+
+      it "enables the features" do
+        subject
+
+        features.each { |feature| expect(server.enabled?(feature)).to be(true) }
+      end
+
+    end
+
+  end
+
+  describe "#enabled?" do
+
+    let(:feature) { :some_feature }
+
+    subject { server.enabled?(feature) }
+
+    context "when a feature is enabled" do
+
+      before(:example) { server.enable(feature) }
+
+      it "returns false" do
+        expect(subject).to be(true)
+      end
+
+    end
+
+    context "when a feature is not enabled" do
+
+      it "returns false" do
+        expect(subject).to be(false)
+      end
+
+    end
+
+  end
+
   describe "#request_defaults=" do
 
     let(:args) { { request_rule_key: "request rule value" } }

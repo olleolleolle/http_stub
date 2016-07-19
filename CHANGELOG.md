@@ -1,3 +1,13 @@
+** 0.24.2 **
+
+Fix:
+* Honours cross-origin pre-flight requests
+
+** 0.24.1 **
+
+Breaking:
+* Dropped Ruby 1.9.3 support (encouraged by `json` gem)
+
 ** 0.24.0 **
 
 New:

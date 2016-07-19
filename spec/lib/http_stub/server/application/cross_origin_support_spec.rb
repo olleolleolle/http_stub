@@ -1,9 +1,18 @@
 describe HttpStub::Server::Application::CrossOriginSupport do
   include Rack::Test::Methods
 
-  let(:header_names)    { (1..3).map { |i| "HEADER_#{i}" } }
-  let(:request_headers) do
-    header_names.each_with_object({}) { |name, result| result["HTTP_#{name}"] = "#{name} value" }
+  let(:application_header_names) { (1..3).map { |i| "APPLICATION_HEADER_#{i}" } }
+  let(:application_headers)      do
+    application_header_names.each_with_object({}) { |name, result| result["HTTP_#{name}"] = "#{name} value" }
+  end
+
+  let(:access_control_request_method)       { "PATCH" }
+  let(:access_control_request_header_names) { (1..3).map { |i| "ACCESS_CONTROL_HEADER_#{i}" } }
+  let(:access_control_request_headers)      do
+    {
+      "ACCESS_CONTROL_REQUEST_METHOD"  => access_control_request_method,
+      "ACCESS_CONTROL_REQUEST_HEADERS" => access_control_request_header_names.join(",")
+    }
   end
 
   let(:response) { last_response }
@@ -31,15 +40,13 @@ describe HttpStub::Server::Application::CrossOriginSupport do
       it "responds with an access control method header allowing the method of the current request" do
         subject
 
-        expect(response.headers["Access-Control-Allow-Methods"]).to eql(request_method)
+        expect(response.headers["Access-Control-Allow-Methods"]).to eql(allowed_request_methods)
       end
 
       it "responds with an access control headers header allowing the headers of the current request" do
         subject
 
-        header_names.each do |expected_header_name|
-          expect(response.headers["Access-Control-Allow-Headers"]).to include(expected_header_name)
-        end
+        expect(response.headers["Access-Control-Allow-Headers"]).to include(allowed_request_headers)
       end
 
     end
@@ -50,7 +57,10 @@ describe HttpStub::Server::Application::CrossOriginSupport do
 
       context "and a non-OPTIONS request is issued" do
 
-        let(:request_method) { "GET" }
+        let(:request_headers) { application_headers }
+
+        let(:allowed_request_methods) { "GET" }
+        let(:allowed_request_headers) { application_header_names.join(",") }
 
         subject { get "/some_resource", {}, request_headers }
 
@@ -58,10 +68,12 @@ describe HttpStub::Server::Application::CrossOriginSupport do
 
       end
 
+      context "and a pre-flight OPTIONS request is issued" do
 
-      context "and an OPTIONS request is issued" do
+        let(:request_headers) { access_control_request_headers }
 
-        let(:request_method) { "OPTIONS" }
+        let(:allowed_request_methods) { access_control_request_method }
+        let(:allowed_request_headers) { access_control_request_header_names.join(",") }
 
         subject { options "/some_resource", {}, request_headers }
 
@@ -79,25 +91,23 @@ describe HttpStub::Server::Application::CrossOriginSupport do
 
     context "and cross origin support is disabled" do
 
-      before(:example) do
-        app_class.disable :cross_origin_support
-      end
+      before(:example) { app_class.disable :cross_origin_support }
 
       context "and a non-OPTIONS request is issued" do
 
-        subject { get "/some_resource", {}, request_headers }
+        subject { get "/some_resource", {}, application_headers }
 
         it "does not add access control headers" do
           subject
 
-          header_names.each { |header_name| expect(header_name).to_not match(/^Access-Control/) }
+          response.headers.keys.each { |header_name| expect(header_name).to_not include("Access-Control") }
         end
 
       end
 
       context "and an OPTIONS request is issued" do
 
-        subject { options "/some_resource" }
+        subject { options "/some_resource", {}, access_control_request_headers }
 
         it "returns a not found response" do
           subject

@@ -4,8 +4,6 @@ describe "Cross origin support acceptance" do
 
   let(:cross_origin_page) { CrossOriginServer::IndexPage.new(browser) }
 
-  let(:headers) { (1..3).each_with_object({}) { |i, result| result["HEADER_#{i}"] = "header value #{i}" } }
-
   context "when a stub server with cross origin support is initialized" do
     include_context "configurer integration"
 
@@ -34,7 +32,11 @@ describe "Cross origin support acceptance" do
 
       context "and a matching request is made" do
 
-        let(:response) { HTTParty.get("#{server_uri}/some_path", headers: headers) }
+        let(:application_headers) do
+          (1..3).each_with_object({}) { |i, result| result["APPLICATION_HEADER_#{i}"] = "header value #{i}" }
+        end
+
+        let(:response) { HTTParty.get("#{server_uri}/some_path", headers: application_headers) }
 
         before(:example) { cross_origin_page.wait_for_response_indicator("Succeeded") }
 
@@ -43,7 +45,7 @@ describe "Cross origin support acceptance" do
         end
 
         it "responds with cross origin support headers" do
-          expect_response_to_contain_cross_origin_headers("GET")
+          expect_response_to_contain_cross_origin_support(method: "GET", header_names: application_headers.keys)
         end
 
       end
@@ -54,13 +56,23 @@ describe "Cross origin support acceptance" do
 
       before(:example) { configurer.activate!("Options scenario") }
 
-      context "and a matching request is made" do
+      context "and a matching pre-flight request is made" do
 
-        let(:response) { HTTParty.options("#{server_uri}/some_path", headers: headers) }
+        let(:access_control_request_method)       { "PUT" }
+        let(:access_control_request_header_names) { (1..3).map { |i| "ACCESS_CONTROL_HEADER_#{i}" } }
+        let(:access_control_request_headers) do
+          {
+            "Access-Control-Request-Method"  => access_control_request_method,
+            "Access-Control-Request-Headers" => access_control_request_header_names.join(",")
+          }
+        end
 
-        it "ignores the stub and replays a cross origin options response" do
+        let(:response) { HTTParty.options("#{server_uri}/some_path", headers: access_control_request_headers) }
+
+        it "ignores the stub and replays the cross origin response" do
           expect(response.code).to eql(200)
-          expect_response_to_contain_cross_origin_headers("OPTIONS")
+          expect_response_to_contain_cross_origin_support(method:       access_control_request_method,
+                                                          header_names: access_control_request_header_names)
         end
 
       end
@@ -115,10 +127,10 @@ describe "Cross origin support acceptance" do
 
   end
 
-  def expect_response_to_contain_cross_origin_headers(method_name)
+  def expect_response_to_contain_cross_origin_support(expectations)
     expect(response.headers["access-control-allow-origin"]).to eql("*")
-    expect(response.headers["access-Control-allow-methods"]).to eql(method_name)
-    headers.keys.each do |expected_header_name|
+    expect(response.headers["access-control-allow-methods"]).to eql(expectations[:method])
+    expectations[:header_names].each do |expected_header_name|
       expect(response.headers["access-control-allow-headers"]).to include(expected_header_name)
     end
 
