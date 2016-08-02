@@ -1,3 +1,12 @@
+** 0.24.3 **
+
+Fix:
+* File responses honour `If-Modified-Since` header
+
+Breaking:
+* Response status is no longer configurable when responding with files.  A 200 status is the standard response.
+  A 304 status will be returned if an appropriate `if_modified_since` header is issued.
+
 ** 0.24.2 **
 
 Fix:

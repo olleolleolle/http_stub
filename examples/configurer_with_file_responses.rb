@@ -9,9 +9,8 @@ module HttpStub
       stub_server.add_stub! do
         match_requests(uri: "/stub_response_with_file", method: :get)
         respond_with(
-          status: 200,
           headers: { "content-type" => "application/pdf" },
-          body: { file: { path: FILE_PATH, name: File.basename(FILE_PATH) } }
+          body:    { file: { path: FILE_PATH, name: File.basename(FILE_PATH) } }
         )
       end
 
@@ -23,9 +22,8 @@ module HttpStub
       stub_server.add_scenario_with_one_stub!("Scenario with file") do
         match_requests(uri: "/activated_response_with_file", method: :get)
         respond_with(
-          status: 200,
           headers: { "content-type" => "application/pdf" },
-          body: { file: { path: FILE_PATH, name: File.basename(FILE_PATH) } }
+          body:    { file: { path: FILE_PATH, name: File.basename(FILE_PATH) } }
         )
       end
 

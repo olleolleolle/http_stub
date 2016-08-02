@@ -237,11 +237,11 @@ describe "Stub basics acceptance" do
 
       context "and a request that matches is made" do
 
-        context "that matches a stub with a custom content-type" do
+        context "matching a stub with a custom content-type" do
 
-          let(:response) { HTTParty.get("#{server_uri}/stub_response_with_file") }
+          let(:response) { issue_request }
 
-          it "responds with the configured status code" do
+          it "responds with a status code of 200" do
             expect(response.code).to eql(200)
           end
 
@@ -253,9 +253,34 @@ describe "Stub basics acceptance" do
             expect_response_to_contain_file(HttpStub::Examples::ConfigurerWithFileResponses::FILE_PATH)
           end
 
+          context "and a subsequent request is made that requests the file if it has been modified" do
+
+            let(:first_response)          { issue_request }
+            let(:file_last_modified_time) { first_response.headers["Last-Modified"] }
+
+            let(:second_response) { issue_request("if_modified_since" => file_last_modified_time) }
+
+            it "responds with a status code of 304 to indicate the file is unchanged" do
+              expect(second_response.code).to eql(304)
+            end
+
+            it "responds with no content type" do
+              expect(second_response.content_type).to be(nil)
+            end
+
+            it "responds with an empty body" do
+              expect(second_response.body).to be(nil)
+            end
+
+          end
+
+          def issue_request(headers={})
+            HTTParty.get("#{server_uri}/stub_response_with_file", headers: headers)
+          end
+
         end
 
-        context "that matches a stub with no content-type" do
+        context "matching a stub with no content-type" do
 
           let(:response) { HTTParty.get("#{server_uri}/stub_response_with_file_and_no_content_type") }
 

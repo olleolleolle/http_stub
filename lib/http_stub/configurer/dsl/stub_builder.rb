@@ -35,7 +35,7 @@ module HttpStub
         end
 
         def invoke(&block)
-          block.arity == 0 ? self.instance_eval(&block) : (yield self)
+          block.arity.zero? ? self.instance_eval(&block) : (yield self)
         end
 
         def merge!(stub_builder)

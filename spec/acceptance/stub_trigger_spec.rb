@@ -61,9 +61,8 @@ describe "Stub trigger acceptance" do
         stub_server.build_stub do |stub|
           stub.match_requests(uri: "/triggered_stub_pdf_file", method: :get)
           stub.respond_with(
-            status: 201,
             headers: { "content-type" => "application/pdf" },
-            body: { file: { path: pdf_file_path, name: ::File.basename(pdf_file_path) } }
+            body:    { file: { path: pdf_file_path, name: ::File.basename(pdf_file_path) } }
           )
         end
       end
@@ -72,7 +71,7 @@ describe "Stub trigger acceptance" do
       let(:text_trigger) do
         stub_server.build_stub do |stub|
           stub.match_requests(uri: "/triggered_stub_text", method: :get)
-          stub.respond_with(status: 202, body: "Sample trigger stub body")
+          stub.respond_with(status: 201, body: "Sample trigger stub body")
         end
       end
 
@@ -81,9 +80,8 @@ describe "Stub trigger acceptance" do
         stub_server.build_stub do |stub|
           stub.match_requests(uri: "/triggered_stub_txt_file", method: :get)
           stub.respond_with(
-            status: 203,
             headers: { "content-type" => "text/plain" },
-            body: { file: { path: txt_file_path, name: ::File.basename(txt_file_path) } }
+            body:    { file: { path: txt_file_path, name: ::File.basename(txt_file_path) } }
           )
         end
       end
@@ -107,7 +105,7 @@ describe "Stub trigger acceptance" do
           let(:response) { HTTParty.get("#{server_uri}/triggered_stub_pdf_file") }
 
           it "replays the triggered response" do
-            expect(response.code).to eql(201)
+            expect(response.code).to eql(200)
             expect_response_to_contain_file(pdf_file_path)
           end
 
@@ -118,7 +116,7 @@ describe "Stub trigger acceptance" do
           let(:response) { HTTParty.get("#{server_uri}/triggered_stub_text") }
 
           it "replays the triggered response" do
-            expect(response.code).to eql(202)
+            expect(response.code).to eql(201)
             expect(response.body).to eql(text_body)
           end
 
@@ -129,7 +127,7 @@ describe "Stub trigger acceptance" do
           let(:response) { HTTParty.get("#{server_uri}/triggered_stub_txt_file") }
 
           it "replays the triggered response" do
-            expect(response.code).to eql(203)
+            expect(response.code).to eql(200)
             expect(response.parsed_response).to eql(::File.read(txt_file_path))
           end
 

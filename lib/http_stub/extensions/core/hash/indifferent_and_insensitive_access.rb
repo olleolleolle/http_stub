@@ -12,7 +12,7 @@ module HttpStub
           private
 
           def indifferent_and_insensitive_find(key)
-            entry = self.find { |entry_key, _entry_value| entry_key.to_s.casecmp(key.to_s) == 0 }
+            entry = self.find { |entry_key, _entry_value| entry_key.to_s.casecmp(key.to_s).zero? }
             entry ? entry[1] : nil
           end
 

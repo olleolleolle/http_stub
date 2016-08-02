@@ -26,7 +26,7 @@ module HttpStub
           private
 
           def send_options
-            { status: @status, type: @headers["content-type"] }.tap do |options|
+            { type: @headers["content-type"] }.tap do |options|
               options[:last_modified] = @headers["last-modified"]       if @headers["last-modified"]
               options[:disposition]   = @headers["content-disposition"] if @headers["content-disposition"]
             end

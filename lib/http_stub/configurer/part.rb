@@ -10,7 +10,11 @@ module HttpStub
       end
 
       def method_missing(name, *args, &block)
-        @configurer.send(name, *args, &block)
+        @configurer.respond_to?(name, true) ? @configurer.send(name, *args, &block) : super
+      end
+
+      def respond_to_missing?(name, include_private = false)
+        @configurer.respond_to?(name, include_private)
       end
 
     end

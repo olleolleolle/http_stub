@@ -32,10 +32,10 @@ Gem::Specification.new do |spec|
   spec.add_dependency "haml",                "~> 4.0"
   spec.add_dependency "sass",                "~> 3.4"
 
-  spec.add_development_dependency "rubocop",                   "~> 0.41"
+  spec.add_development_dependency "rubocop",                   "~> 0.42"
   spec.add_development_dependency "rspec",                     "~> 3.5"
   spec.add_development_dependency "nokogiri",                  "~> 1.6"
-  spec.add_development_dependency "httparty",                  "~> 0.13"
+  spec.add_development_dependency "httparty",                  "~> 0.14"
   spec.add_development_dependency "rack-test",                 "~> 0.6"
   spec.add_development_dependency "wait_until",                "~> 0.3"
   spec.add_development_dependency "selenium-webdriver",        "~> 2.53"

@@ -1,11 +1,11 @@
 describe HttpStub::Server::Stub::Response::File do
 
-  let(:status)         { 321 }
-  let(:headers)        { {} }
-  let(:file_name)      { "sample.txt" }
-  let(:temp_file_path) { "#{HttpStub::Spec::RESOURCES_DIR}/#{file_name}" }
-  let(:body)           { { filename: file_name, tempfile: File.new(temp_file_path) } }
-  let(:args)           { { "status" => status, "headers" => headers, "body" => body } }
+  let(:headers)         { {} }
+  let(:file_name)       { "sample.txt" }
+  let(:temp_file_path)  { "#{HttpStub::Spec::RESOURCES_DIR}/#{file_name}" }
+  let(:body)            { { filename: file_name, tempfile: File.new(temp_file_path) } }
+  let(:additional_args) { {} }
+  let(:args)            { { "headers" => headers, "body" => body }.merge(additional_args) }
 
   let(:response_file) { HttpStub::Server::Stub::Response::File.new(args) }
 
@@ -55,7 +55,7 @@ describe HttpStub::Server::Stub::Response::File do
     end
 
     it "creates a new response file with other arguments preserved" do
-      expect(described_class).to receive(:new).with(hash_including("status" => status, "body" => body))
+      expect(described_class).to receive(:new).with(hash_including("body" => body))
 
       subject
     end
@@ -75,7 +75,9 @@ describe HttpStub::Server::Stub::Response::File do
 
   describe "#serve_on" do
 
-    let(:server) { instance_double(Sinatra::Base) }
+    let(:status)          { 321 }
+    let(:additional_args) { { "status" => status } }
+    let(:server)          { instance_double(Sinatra::Base) }
 
     subject { response_file.serve_on(server) }
 
@@ -85,8 +87,8 @@ describe HttpStub::Server::Stub::Response::File do
       subject
     end
 
-    it "sends the file with the responses status" do
-      expect(server).to receive(:send_file).with(anything, hash_including(status: status))
+    it "sends the file without any provided response status to ensure that 304 responses are honoured" do
+      expect(server).to receive(:send_file).with(anything, hash_excluding(:status))
 
       subject
     end

@@ -8,7 +8,7 @@ describe HttpStub::Configurer::Part do
     Class.new.tap { |part_class| part_class.send(:include, HttpStub::Configurer::Part) }
   end
 
-  let(:part)       { part_class.new }
+  let(:part) { part_class.new }
 
   describe "#configure" do
 
@@ -61,6 +61,40 @@ describe HttpStub::Configurer::Part do
       let(:configure_method_names) { (1..3).map { |i| "configure_resource_#{i}_scenario".to_sym } }
 
       include_context "expect configure entity methods to be automatically invoke"
+
+    end
+
+  end
+
+  context "when configured" do
+
+    before(:example) { part.configure(configurer) }
+
+    describe "other methods on the part" do
+
+      context "when defined in the configurer" do
+
+        it "are defined on the part" do
+          expect(part.respond_to?(:stub_server)).to be(true)
+        end
+
+        it "are delegated to the configurer" do
+          expect(part.stub_server).to eql(configurer.stub_server)
+        end
+
+      end
+
+      context "when not defined in the configurer" do
+
+        it "are not defined on the part" do
+          expect(part.respond_to?(:not_in_configurer)).to be(false)
+        end
+
+        it "raise an error on the part when invoked" do
+          expect { part.not_in_configurer }.to raise_error(/#{part_class}/)
+        end
+
+      end
 
     end
 
