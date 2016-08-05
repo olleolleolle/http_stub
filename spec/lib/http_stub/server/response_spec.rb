@@ -7,7 +7,7 @@ describe HttpStub::Server::Response do
     end
 
     it "has a body containing OK to visually indicate success to those interacting via a browser" do
-      expect(subject.body).to match(/OK/)
+      expect(subject.body).to match(/{"result": "OK"}/)
     end
 
   end
@@ -49,7 +49,7 @@ describe HttpStub::Server::Response do
     end
 
     it "has a body containing NOT FOUND to visually indicate the response to those interacting via a browser" do
-      expect(subject.body).to match(/NOT FOUND/)
+      expect(subject.body).to match(/{"result": "NOT FOUND"}/)
     end
 
   end
