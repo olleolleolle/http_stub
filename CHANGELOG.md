@@ -4,8 +4,12 @@ New:
 * `GET /http_stub/stubs/matches/last?method=<HTTP method>&uri=<URI part>` retrieves the last match for an endpoint
 
 Misc:
-* Administration pages list matches and misses separately
-* Refactor: Stubs contain match rules
+* Administration pages:
+  * Matches and misses are listed separately
+  * Scenarios are activated in-page
+* Refactor:
+  * Stubs contain match rules
+  * Stub payload is passed through a chain of modifiers
 
 ** 0.24.3 **
 
