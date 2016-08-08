@@ -3,14 +3,14 @@ describe HttpStub::Server::Stub::Controller do
   let(:request)  { instance_double(HttpStub::Server::Request::Request) }
   let(:logger)   { instance_double(Logger) }
   let(:payload)  { HttpStub::StubFixture.new.server_payload }
-  let(:response) { instance_double(HttpStub::Server::Stub::Response::Base) }
   let(:stub_uri) { "/some/stub/uri" }
-  let(:the_stub) { instance_double(HttpStub::Server::Stub::Stub, response: response, stub_uri: stub_uri) }
+  let(:the_stub) { instance_double(HttpStub::Server::Stub::Stub, uri: stub_uri) }
 
-  let(:stub_registry)         { instance_double(HttpStub::Server::Stub::Registry).as_null_object }
-  let(:match_result_registry) { instance_double(HttpStub::Server::Registry).as_null_object }
+  let(:stub_registry)  { instance_double(HttpStub::Server::Stub::Registry).as_null_object }
+  let(:match_registry) { instance_double(HttpStub::Server::Registry).as_null_object }
+  let(:miss_registry)  { instance_double(HttpStub::Server::Registry).as_null_object }
 
-  let(:controller) { HttpStub::Server::Stub::Controller.new(stub_registry, match_result_registry) }
+  let(:controller) { HttpStub::Server::Stub::Controller.new(stub_registry, match_registry, miss_registry) }
 
   before(:example) do
     allow(HttpStub::Server::Stub::Parser).to receive(:parse).and_return(payload)
@@ -39,15 +39,15 @@ describe HttpStub::Server::Stub::Controller do
       subject
     end
 
-    it "creates a success response with a location header containing the stubs uri" do
-      expect(HttpStub::Server::Response).to receive(:success).with("location" => stub_uri)
+    it "creates an ok response with a location header containing the stubs uri" do
+      expect(HttpStub::Server::Response).to receive(:ok).with("headers" => { "location" => stub_uri })
 
       subject
     end
 
-    it "returns the success response" do
+    it "returns the ok response" do
       response = double("HttpStub::Server::Response")
-      allow(HttpStub::Server::Response).to receive(:success).and_return(response)
+      allow(HttpStub::Server::Response).to receive(:ok).and_return(response)
 
       expect(subject).to eql(response)
     end
@@ -63,12 +63,13 @@ describe HttpStub::Server::Stub::Controller do
     before(:example) do
       allow(stub_registry).to receive(:match).with(request, logger).and_return(matched_stub)
       allow(the_stub).to receive(:response_for).and_return(calculated_stub_response)
-      allow(match_result_registry).to receive(:add)
     end
 
     describe "when a stub has been registered that matches the request" do
 
       let(:matched_stub) { the_stub }
+
+      before(:example) { allow(match_registry).to receive(:add) }
 
       it "calculates the stubs response based on the request" do
         expect(the_stub).to receive(:response_for).with(request)
@@ -76,16 +77,22 @@ describe HttpStub::Server::Stub::Controller do
         subject
       end
 
-      it "determines the match result for the request, calculated response and stub" do
-        expect(HttpStub::Server::Stub::Match::Result).to receive(:new).with(request, calculated_stub_response, the_stub)
+      it "creates a match for the request, calculated response and stub" do
+        expect(HttpStub::Server::Stub::Match::Match).to receive(:new).with(request, calculated_stub_response, the_stub)
 
         subject
       end
 
-      it "adds the match result to the match result registry" do
-        expect(match_result_registry).to(
-          receive(:add).with(an_instance_of(HttpStub::Server::Stub::Match::Result), logger)
-        )
+      it "adds the match to the match registry" do
+        match = instance_double(HttpStub::Server::Stub::Match::Match)
+        allow(HttpStub::Server::Stub::Match::Match).to receive(:new).and_return(match)
+        expect(match_registry).to receive(:add).with(match, logger)
+
+        subject
+      end
+
+      it "does not add to the miss registry" do
+        expect(miss_registry).to_not receive(:add)
 
         subject
       end
@@ -100,22 +107,28 @@ describe HttpStub::Server::Stub::Controller do
 
       let(:matched_stub) { nil }
 
+      before(:example) { allow(miss_registry).to receive(:add) }
+
       it "returns a not found response" do
         expect(subject).to eql(HttpStub::Server::Response::NOT_FOUND)
       end
 
-      it "creates a match result for request with the not found response and no stub" do
-        expect(HttpStub::Server::Stub::Match::Result).to(
-          receive(:new).with(request, HttpStub::Server::Response::NOT_FOUND, nil)
-        )
+      it "creates a miss for the request" do
+        expect(HttpStub::Server::Stub::Match::Miss).to receive(:new).with(request)
 
         subject
       end
 
-      it "adds the match result to the match result registry" do
-        expect(match_result_registry).to(
-          receive(:add).with(an_instance_of(HttpStub::Server::Stub::Match::Result), logger)
-        )
+      it "adds the miss to the miss registry" do
+        miss = instance_double(HttpStub::Server::Stub::Match::Miss)
+        allow(HttpStub::Server::Stub::Match::Miss).to receive(:new).and_return(miss)
+        expect(miss_registry).to receive(:add).with(miss, logger)
+
+        subject
+      end
+
+      it "does not add to the match registry" do
+        expect(match_registry).to_not receive(:add)
 
         subject
       end
@@ -134,8 +147,14 @@ describe HttpStub::Server::Stub::Controller do
       subject
     end
 
-    it "clears the match result registry" do
-      expect(match_result_registry).to receive(:clear).with(logger)
+    it "clears the match registry" do
+      expect(match_registry).to receive(:clear).with(logger)
+
+      subject
+    end
+
+    it "clears the miss registry" do
+      expect(miss_registry).to receive(:clear).with(logger)
 
       subject
     end

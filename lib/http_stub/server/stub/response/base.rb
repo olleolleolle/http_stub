@@ -34,7 +34,7 @@ module HttpStub
           attr_reader :status, :headers, :delay_in_seconds
 
           def initialize(args={})
-            @original_args = args
+            @original_args    = args
             resolved_args     = self.class.merge_defaults(args)
             @status           = resolved_args["status"]
             @headers          = HttpStub::Server::Stub::Response::Attribute::Headers.new(resolved_args["headers"])
@@ -43,6 +43,10 @@ module HttpStub
 
           def type
             self.class.name.demodulize.underscore
+          end
+
+          def to_hash
+            { status: @status, headers: @headers, delay_in_seconds: @delay_in_seconds }
           end
 
         end

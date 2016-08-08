@@ -186,4 +186,26 @@ describe HttpStub::Server::Stub::Response::Base do
 
   end
 
+  describe "#to_hash" do
+
+    subject { response.to_hash }
+
+    describe "supporting creating a JSON representation of the response" do
+
+      it "contains the responses status" do
+        expect(subject).to include(status: response.status)
+      end
+
+      it "contains the responses headers" do
+        expect(subject).to include(headers: response.headers)
+      end
+
+      it "contains the responses delay in seconds" do
+        expect(subject).to include(delay_in_seconds: response.delay_in_seconds)
+      end
+
+    end
+
+  end
+
 end

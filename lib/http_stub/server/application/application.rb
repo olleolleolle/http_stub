@@ -23,11 +23,14 @@ module HttpStub
 
         def initialize
           super()
-          @stub_registry         = HttpStub::Server::Stub::Registry.new
           @scenario_registry     = HttpStub::Server::Registry.new("scenario")
-          @match_result_registry = HttpStub::Server::Registry.new("match result")
-          @stub_controller       = HttpStub::Server::Stub::Controller.new(@stub_registry, @match_result_registry)
+          @stub_registry         = HttpStub::Server::Stub::Registry.new
+          @stub_match_registry   = HttpStub::Server::Registry.new("stub match")
+          @stub_miss_registry    = HttpStub::Server::Registry.new("stub miss")
           @scenario_controller   = HttpStub::Server::Scenario::Controller.new(@scenario_registry, @stub_registry)
+          @stub_controller       =
+            HttpStub::Server::Stub::Controller.new(@stub_registry, @stub_match_registry, @stub_miss_registry)
+          @stub_match_controller = HttpStub::Server::Stub::Match::Controller.new(@stub_match_registry)
         end
 
         before do
@@ -66,7 +69,16 @@ module HttpStub
         end
 
         get "/http_stub/stubs/matches" do
-          haml :match_results, {}, match_results: @match_result_registry.all
+          haml :stub_matches, {}, matches: @stub_match_registry.all
+        end
+
+        get "/http_stub/stubs/matches/last" do
+          response = @stub_match_controller.find_last(@http_stub_request, logger)
+          @response_pipeline.process(response)
+        end
+
+        get "/http_stub/stubs/misses" do
+          haml :stub_misses, {}, misses: @stub_miss_registry.all
         end
 
         get "/http_stub/stubs/:id" do

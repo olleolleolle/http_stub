@@ -41,6 +41,20 @@ describe HttpStub::Server::Stub::Triggers do
 
   end
 
+  describe "#as_json" do
+
+    let(:stub_hashes) { (1..stubs_for_triggers.length).map { |i| { "stub_#{i}" => "value #{i}" } } }
+
+    before(:example) do
+      stubs_for_triggers.zip(stub_hashes).each { |stub, hash| allow(stub).to receive(:to_hash).and_return(hash) }
+    end
+
+    it "returns an array containing the hash representation of each stub" do
+      expect(stub_triggers.as_json).to eql(stub_hashes)
+    end
+
+  end
+
   describe "#to_s" do
 
     let(:trigger_strings) { (1..stubs_for_triggers.length).map { |i| "trigger string ##{i}" } }

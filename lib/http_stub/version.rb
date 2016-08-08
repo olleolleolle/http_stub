@@ -1,3 +1,3 @@
 module HttpStub
-  VERSION = "0.24.3".freeze
+  VERSION = "0.25.0".freeze
 end

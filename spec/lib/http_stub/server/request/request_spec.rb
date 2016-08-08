@@ -1,12 +1,14 @@
 describe HttpStub::Server::Request::Request do
 
+  let(:rack_base_url)       { "http://base_url:8888" }
   let(:rack_path_info)      { "/rack/path/info" }
   let(:rack_request_method) { "some method" }
   let(:rack_env)            { { "some_env_name" => "some env value" } }
   let(:rack_parameters)     { { "some_parameter_name" => "some parameter value" } }
   let(:rack_body)           { "some request body" }
   let(:rack_request)        do
-    instance_double(Rack::Request, path_info:      rack_path_info,
+    instance_double(Rack::Request, base_url:       rack_base_url,
+                                   path_info:      rack_path_info,
                                    request_method: rack_request_method,
                                    env:            rack_env,
                                    params:         rack_parameters,
@@ -14,6 +16,14 @@ describe HttpStub::Server::Request::Request do
   end
 
   let(:server_request) { described_class.new(rack_request) }
+
+  describe "#base_uri" do
+
+    it "is the rack base url" do
+      expect(server_request.base_uri).to eql(rack_base_url)
+    end
+
+  end
 
   describe "#uri" do
 
@@ -77,6 +87,36 @@ describe HttpStub::Server::Request::Request do
 
     it "is the read rack request body" do
       expect(subject).to eql(rack_body)
+    end
+
+  end
+
+  describe "#to_hash" do
+
+    subject { server_request.to_hash }
+
+    describe "supporting creating a JSON representation of the result" do
+
+      it "contains the requests uri" do
+        expect(subject).to include(uri: server_request.uri)
+      end
+
+      it "contains the requests method" do
+        expect(subject).to include(method: server_request.method)
+      end
+
+      it "contains the requests headers" do
+        expect(subject).to include(headers: server_request.headers)
+      end
+
+      it "contains the requests parameters" do
+        expect(subject).to include(parameters: server_request.parameters)
+      end
+
+      it "contains the requests body" do
+        expect(subject).to include(body: server_request.body)
+      end
+
     end
 
   end

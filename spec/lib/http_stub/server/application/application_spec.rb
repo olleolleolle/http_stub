@@ -4,23 +4,27 @@ describe HttpStub::Server::Application::Application do
   let(:response)      { last_response }
   let(:response_body) { response.body.to_s }
 
-  let(:match_result_registry) { instance_double(HttpStub::Server::Registry) }
-  let(:stub_registry)         { instance_double(HttpStub::Server::Stub::Registry) }
-  let(:scenario_registry)     { instance_double(HttpStub::Server::Registry) }
+  let(:scenario_registry)   { instance_double(HttpStub::Server::Registry) }
+  let(:stub_registry)       { instance_double(HttpStub::Server::Stub::Registry) }
+  let(:stub_match_registry) { instance_double(HttpStub::Server::Registry) }
+  let(:stub_miss_registry)  { instance_double(HttpStub::Server::Registry) }
 
-  let(:stub_controller)     { instance_double(HttpStub::Server::Stub::Controller) }
-  let(:scenario_controller) { instance_double(HttpStub::Server::Scenario::Controller) }
+  let(:scenario_controller)   { instance_double(HttpStub::Server::Scenario::Controller) }
+  let(:stub_controller)       { instance_double(HttpStub::Server::Stub::Controller) }
+  let(:stub_match_controller) { instance_double(HttpStub::Server::Stub::Match::Controller) }
 
   let(:response_pipeline) { instance_double(HttpStub::Server::Application::ResponsePipeline, process: nil) }
 
   let(:app) { HttpStub::Server::Application::Application.new! }
 
   before(:example) do
-    allow(HttpStub::Server::Registry).to receive(:new).with("match result").and_return(match_result_registry)
     allow(HttpStub::Server::Registry).to receive(:new).with("scenario").and_return(scenario_registry)
     allow(HttpStub::Server::Stub::Registry).to receive(:new).and_return(stub_registry)
-    allow(HttpStub::Server::Stub::Controller).to receive(:new).and_return(stub_controller)
+    allow(HttpStub::Server::Registry).to receive(:new).with("stub match").and_return(stub_match_registry)
+    allow(HttpStub::Server::Registry).to receive(:new).with("stub miss").and_return(stub_miss_registry)
     allow(HttpStub::Server::Scenario::Controller).to receive(:new).and_return(scenario_controller)
+    allow(HttpStub::Server::Stub::Controller).to receive(:new).and_return(stub_controller)
+    allow(HttpStub::Server::Stub::Match::Controller).to receive(:new).and_return(stub_match_controller)
     allow(HttpStub::Server::Application::ResponsePipeline).to receive(:new).and_return(response_pipeline)
   end
 
@@ -149,14 +153,54 @@ describe HttpStub::Server::Application::Application do
 
   end
 
-  context "when a request to list the matches is received" do
+  context "when a request to list the stub matches is received" do
 
-    let(:found_match_results) { [ HttpStub::Server::Stub::Match::ResultFixture.empty ] }
+    let(:found_matches) { [ HttpStub::Server::Stub::Match::MatchFixture.create ] }
 
     subject { get "/http_stub/stubs/matches" }
 
-    it "retrieves the match results from the registry" do
-      expect(match_result_registry).to receive(:all).and_return(found_match_results)
+    it "retrieves the matches from the match registry" do
+      expect(stub_match_registry).to receive(:all).and_return(found_matches)
+
+      subject
+    end
+
+  end
+
+  context "when a request to retrieve the last match for an endpoint is received" do
+
+    let(:uri)                 { "/some/matched/uri" }
+    let(:method)              { "some http method" }
+    let(:last_match_response) { instance_double(HttpStub::Server::Stub::Response::Base) }
+
+    subject { get "/http_stub/stubs/matches/last", "uri" => uri, "method" => method }
+
+    before(:example) { allow(stub_match_controller).to receive(:find_last).and_return(last_match_response) }
+
+    it "retrieves the last match from the match result registry for the provided request" do
+      expect(stub_match_controller).to(
+        receive(:find_last).with(an_instance_of(HttpStub::Server::Request::Request), anything)
+      )
+
+      subject
+    end
+
+    it "processes the match result controllers response via the response pipeline" do
+      expect(response_pipeline).to receive(:process).with(last_match_response)
+
+      subject
+    end
+
+  end
+
+  context "when a request to list the stub misses is received" do
+
+    let(:found_misses) { [ HttpStub::Server::Stub::Match::MissFixture.create ] }
+
+    subject { get "/http_stub/stubs/misses" }
+
+    it "retrieves the misses from the miss registry" do
+      expect(stub_miss_registry).to receive(:all).and_return(found_misses)
 
       subject
     end
@@ -195,7 +239,7 @@ describe HttpStub::Server::Application::Application do
   context "when a request to show a scenario is received" do
 
     let(:scenario_name)  { "Some scenario name" }
-    let(:found_scenario) { HttpStub::Server::Scenario::ScenarioFixture.empty }
+    let(:found_scenario) { HttpStub::Server::Scenario::ScenarioFixture.create }
 
     subject { get "/http_stub/scenarios?#{URI.encode_www_form(:name => scenario_name)}" }
 
@@ -209,7 +253,7 @@ describe HttpStub::Server::Application::Application do
 
   context "when a request to list the scenarios is received" do
 
-    let(:found_scenarios) { [ HttpStub::Server::Scenario::ScenarioFixture.empty ] }
+    let(:found_scenarios) { [ HttpStub::Server::Scenario::ScenarioFixture.create ] }
 
     subject { get "/http_stub/scenarios" }
 

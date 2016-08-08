@@ -6,9 +6,7 @@ module HttpStub
 
         def self.parse(request)
           JSON.parse(request.parameters["payload"]).tap do |payload|
-            payload["stubs"].each do |stub_payload|
-              HttpStub::Server::Stub::PayloadFileConsolidator.consolidate!(stub_payload, request)
-            end
+            payload["stubs"].each { |stub_payload| HttpStub::Server::Stub::Payload.modify!(stub_payload, request) }
           end
         end
 

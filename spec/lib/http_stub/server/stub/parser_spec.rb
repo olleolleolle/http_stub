@@ -17,19 +17,17 @@ describe HttpStub::Server::Stub::Parser do
       let(:payload)    { HttpStub::StubFixture.new.server_payload }
       let(:parameters) { { "payload" => payload.to_json } }
 
-      it "consolidates any files into the payload" do
-        expect(HttpStub::Server::Stub::PayloadFileConsolidator).to receive(:consolidate!).with(payload, request)
+      it "modifies the payload" do
+        expect(HttpStub::Server::Stub::Payload).to receive(:modify!).with(payload, request)
 
         subject
       end
 
-      it "returns the consolidated payload" do
-        consolidated_payload = { consolidated_payload_key: "consolidated payload value" }
-        allow(HttpStub::Server::Stub::PayloadFileConsolidator).to(
-          receive(:consolidate!).and_return(consolidated_payload)
-        )
+      it "returns the modified payload" do
+        modified_payload = { modified_payload_key: "modified payload value" }
+        allow(HttpStub::Server::Stub::Payload).to receive(:modify!).and_return(modified_payload)
 
-        expect(subject).to eql(consolidated_payload)
+        expect(subject).to eql(modified_payload)
       end
 
     end
@@ -38,17 +36,17 @@ describe HttpStub::Server::Stub::Parser do
 
       let(:body_hash) { HttpStub::StubFixture.new.server_payload }
 
-      it "consolidates any files into the body" do
-        expect(HttpStub::Server::Stub::PayloadFileConsolidator).to receive(:consolidate!).with(body_hash, request)
+      it "modifies the body" do
+        expect(HttpStub::Server::Stub::Payload).to receive(:modify!).with(body_hash, request)
 
         subject
       end
 
-      it "returns the consolidated body" do
-        consolidated_body = { consolidated_body_key: "consolidated body value" }
-        allow(HttpStub::Server::Stub::PayloadFileConsolidator).to receive(:consolidate!).and_return(consolidated_body)
+      it "returns the modified body" do
+        modified_body = { modified_body_key: "modified body value" }
+        allow(HttpStub::Server::Stub::Payload).to receive(:modify!).and_return(modified_body)
 
-        expect(subject).to eql(consolidated_body)
+        expect(subject).to eql(modified_body)
       end
 
     end

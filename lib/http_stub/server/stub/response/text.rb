@@ -23,6 +23,10 @@ module HttpStub
             application.halt(@status, @headers.to_hash, @body)
           end
 
+          def to_hash
+            super.merge(body: @body)
+          end
+
         end
 
       end

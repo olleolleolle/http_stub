@@ -4,7 +4,7 @@ module HttpStub
 
       class Triggers
 
-        delegate :each, to: :@triggers
+        delegate :each, :as_json, to: :@triggers
 
         def initialize(triggers)
           @triggers = (triggers || []).map { |trigger| HttpStub::Server::Stub.create(trigger) }

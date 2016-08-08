@@ -12,14 +12,14 @@ module HttpStub
         def register(request, logger)
           scenario = HttpStub::Server::Scenario.create(HttpStub::Server::Scenario::Parser.parse(request))
           @scenario_registry.add(scenario, logger)
-          HttpStub::Server::Response::SUCCESS
+          HttpStub::Server::Response::OK
         end
 
         def activate(name, logger)
           scenario = @scenario_registry.find(name, logger)
           if scenario
             @scenario_activator.activate(scenario, logger)
-            HttpStub::Server::Response::SUCCESS
+            HttpStub::Server::Response::OK
           else
             HttpStub::Server::Response::NOT_FOUND
           end

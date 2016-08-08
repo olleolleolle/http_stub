@@ -93,6 +93,7 @@ module HttpStub
     def server_payload
       {
         "id"         => @id,
+        "base_uri"   => "http://localhost:9876",
         "uri"        => @request.uri,
         "method"     => @request.http_method,
         "headers"    => @request.headers,

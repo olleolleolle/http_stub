@@ -40,8 +40,8 @@ describe HttpStub::Server::Scenario::Controller do
       subject
     end
 
-    it "returns a success response" do
-      expect(subject).to eql(HttpStub::Server::Response::SUCCESS)
+    it "returns an ok response" do
+      expect(subject).to eql(HttpStub::Server::Response::OK)
     end
 
   end
@@ -68,8 +68,8 @@ describe HttpStub::Server::Scenario::Controller do
         subject
       end
 
-      it "returns a success response" do
-        expect(subject).to eql(HttpStub::Server::Response::SUCCESS)
+      it "returns an ok response" do
+        expect(subject).to eql(HttpStub::Server::Response::OK)
       end
 
     end

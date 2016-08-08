@@ -1,6 +1,6 @@
 %article
-  %h3 Request
-  = partial :request, locals: { request: the_stub }
+  %h3 Match Rules
+  = partial :request, locals: { request: the_stub.match_rules }
   %h3 Response
   = partial :response, locals: { response: the_stub.response }
   %h3 Triggers

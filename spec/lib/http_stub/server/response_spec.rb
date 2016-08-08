@@ -1,6 +1,6 @@
 describe HttpStub::Server::Response do
 
-  shared_examples_for "a success response" do
+  shared_examples_for "an ok response" do
 
     it "has a status of 200" do
       expect(subject.status).to eql(200)
@@ -12,31 +12,37 @@ describe HttpStub::Server::Response do
 
   end
 
-  describe "::success" do
+  describe "::ok" do
 
-    subject { described_class.success }
+    subject { described_class.ok }
 
-    it_behaves_like "a success response"
+    it_behaves_like "an ok response"
 
-    context "when headers are provided" do
+    context "when options are provided" do
 
       let(:headers) { { "response_header_key" => "response header value" } }
+      let(:body)    { "response body" }
+      let(:opts)    { { "headers" => headers, "body" => body } }
 
-      subject { HttpStub::Server::Response::success(headers) }
+      subject { HttpStub::Server::Response::ok(opts) }
 
-      it "established the headers" do
+      it "establishes any headers provided" do
         expect(subject.headers).to eql(headers)
+      end
+
+      it "establishes any body provided" do
+        expect(subject.body).to eql(body)
       end
 
     end
 
   end
 
-  describe "::SUCCESS" do
+  describe "::OK" do
 
-    subject { HttpStub::Server::Response::SUCCESS }
+    subject { HttpStub::Server::Response::OK }
 
-    it_behaves_like "a success response"
+    it_behaves_like "an ok response"
 
   end
 

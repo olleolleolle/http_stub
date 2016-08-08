@@ -4,7 +4,7 @@ module HttpStub
 
       class ScenarioFixture
 
-        def self.empty
+        def self.create
           HttpStub::Server::Scenario::Scenario.new("name" => "empty", "stubs" => [], "triggered_scenario_names" => [])
         end
 

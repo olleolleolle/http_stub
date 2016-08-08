@@ -7,15 +7,15 @@ module HttpStub
         private
 
         def initialize
-          @uri = @method = @body = @stub_uri = ""
-          @headers = @parameters             = {}
-          @triggers                          = []
-          @response                          = HttpStub::Server::Response::EMPTY
+          @uri         = ""
+          @match_rules = HttpStub::Server::Stub::Match::Rules::EMPTY
+          @response    = HttpStub::Server::Response::EMPTY
+          @triggers    = []
         end
 
         public
 
-        attr_reader :uri, :method, :headers, :parameters, :body, :response, :triggers, :stub_uri
+        attr_reader :uri, :match_rules, :response, :triggers
 
         def matches?(_criteria, _logger)
           false
@@ -23,6 +23,10 @@ module HttpStub
 
         def response_for(_request)
           self
+        end
+
+        def to_hash
+          {}
         end
 
         def to_s

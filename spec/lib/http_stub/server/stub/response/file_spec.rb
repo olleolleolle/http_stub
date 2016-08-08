@@ -77,7 +77,8 @@ describe HttpStub::Server::Stub::Response::File do
 
     let(:status)          { 321 }
     let(:additional_args) { { "status" => status } }
-    let(:server)          { instance_double(Sinatra::Base) }
+    let(:server_response) { instance_double(Sinatra::Response, status: 200) }
+    let(:server)          { instance_double(Sinatra::Base, response: server_response) }
 
     subject { response_file.serve_on(server) }
 
@@ -91,6 +92,15 @@ describe HttpStub::Server::Stub::Response::File do
       expect(server).to receive(:send_file).with(anything, hash_excluding(:status))
 
       subject
+    end
+
+    it "updates the responses status to reflect the status evaluated by Sinatra" do
+      expect(server).to receive(:send_file).ordered
+      expect(server_response).to receive(:status).and_return(304).ordered
+
+      subject
+
+      expect(response_file.status).to eql(304)
     end
 
     context "when a content type header is specified" do
@@ -164,6 +174,24 @@ describe HttpStub::Server::Stub::Response::File do
         expect(server).to receive(:send_file).with(anything, hash_excluding(:disposition))
 
         subject
+      end
+
+    end
+
+  end
+
+  describe "#to_hash" do
+
+    subject { response_file.to_hash }
+
+    describe "supporting creating a JSON representation of the response" do
+
+      it "contains the files uri" do
+        expect(subject).to include(file_uri: response_file.uri)
+      end
+
+      it "contains the standard response attributes" do
+        expect(subject).to include(headers: response_file.headers)
       end
 
     end

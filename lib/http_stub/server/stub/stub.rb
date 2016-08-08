@@ -4,41 +4,31 @@ module HttpStub
 
       class Stub
 
-        attr_reader :uri, :method, :headers, :parameters, :body, :response, :triggers, :stub_uri
+        attr_reader :uri, :match_rules, :response, :triggers
 
         def initialize(args)
           @id          = args["id"] || SecureRandom.uuid
-          @uri         = HttpStub::Server::Stub::Match::Rule::Uri.new(args["uri"])
-          @method      = HttpStub::Server::Stub::Match::Rule::Method.new(args["method"])
-          @headers     = HttpStub::Server::Stub::Match::Rule::Headers.new(args["headers"])
-          @parameters  = HttpStub::Server::Stub::Match::Rule::Parameters.new(args["parameters"])
-          @body        = HttpStub::Server::Stub::Match::Rule::Body.create(args["body"])
+          @uri         = "#{args["base_uri"]}/http_stub/stubs/#{@id}"
+          @match_rules = HttpStub::Server::Stub::Match::Rules.new(args)
           @response    = HttpStub::Server::Stub::Response.create(args["response"])
           @triggers    = HttpStub::Server::Stub::Triggers.new(args["triggers"])
-          @stub_uri    = "/http_stub/stubs/#{@id}"
           @description = args.to_s
         end
 
         def matches?(criteria, logger)
-          criteria.is_a?(String) ? matches_by_id?(criteria) : matches_by_rules?(criteria, logger)
+          criteria.is_a?(String) ? criteria == @id : @match_rules.matches?(criteria, logger)
         end
 
         def response_for(request)
           @response.with_values_from(request)
         end
 
+        def to_hash
+          { id: @id, uri: @uri, match_rules: @match_rules, response: @response, triggers: @triggers }
+        end
+
         def to_s
           @description
-        end
-
-        private
-
-        def matches_by_id?(criteria)
-          criteria == @id
-        end
-
-        def matches_by_rules?(request, logger)
-          [ @uri, @method, @headers, @parameters, @body ].all? { |matcher| matcher.matches?(request, logger) }
         end
 
       end

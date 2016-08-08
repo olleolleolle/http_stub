@@ -1,13 +1,15 @@
-describe HttpStub::Server::Stub::PayloadFileConsolidator do
+describe HttpStub::Server::Stub::Payload::ResponseBodyModifier do
 
-  let(:consolidator) { described_class }
+  let(:modifier) { described_class }
 
-  describe "::consolidate!" do
+  describe "::modify!" do
 
     let(:parameters) { {} }
     let(:request)    { instance_double(HttpStub::Server::Request::Request, parameters: parameters) }
 
-    subject { consolidator.consolidate!(payload, request) }
+    let!(:original_payload) { payload.clone }
+
+    subject { modifier.modify!(payload, request) }
 
     context "when the payload contains a response file and has a corresponding file parameter" do
 
@@ -15,10 +17,12 @@ describe HttpStub::Server::Stub::PayloadFileConsolidator do
       let(:payload)         { payload_fixture.server_payload }
       let(:parameters)      { { "response_file_#{payload_fixture.id}" => payload_fixture.file_parameter } }
 
-      it "returns the payload with a response body that contains the file parameter value" do
+      it "modifies the payload to have a response body that contains the file parameter value" do
         expected_payload = payload.clone.tap { |hash| hash["response"]["body"] = payload_fixture.file_parameter }
 
-        expect(subject).to eql(expected_payload)
+        subject
+
+        expect(payload).to eql(expected_payload)
       end
 
     end
@@ -32,8 +36,10 @@ describe HttpStub::Server::Stub::PayloadFileConsolidator do
 
         let(:trigger_fixtures) { (1..3).map { HttpStub::StubFixture.new.with_text_response! } }
 
-        it "returns the payload unchanged" do
-          expect(subject).to eql(payload)
+        it "leaves the payload unchanged" do
+          subject
+
+          expect(payload).to eql(original_payload)
         end
 
       end
@@ -47,13 +53,15 @@ describe HttpStub::Server::Stub::PayloadFileConsolidator do
           end
         end
 
-        it "returns the payload with the trigger response bodies replaced by the files" do
-          expected_payload = payload_fixture.server_payload
+        it "modifies the payload to have trigger response bodies replaced by the files" do
+          expected_payload = payload.clone
           expected_payload["triggers"].zip(trigger_fixtures.map(&:file_parameter)).each do |trigger, file_param|
             trigger["response"]["body"] = file_param
           end
 
-          expect(subject).to eql(expected_payload)
+          subject
+
+          expect(payload).to eql(expected_payload)
         end
 
       end
@@ -64,10 +72,10 @@ describe HttpStub::Server::Stub::PayloadFileConsolidator do
 
       let(:payload) { HttpStub::StubFixture.new.server_payload }
 
-      it "returns an unchanged payload" do
-        original_payload = payload.clone
+      it "leaves the payload unchanged" do
+        subject
 
-        expect(subject).to eql(original_payload)
+        expect(payload).to eql(original_payload)
       end
 
     end

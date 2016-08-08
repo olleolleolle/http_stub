@@ -2,26 +2,18 @@ describe HttpStub::Server::Stub::Empty do
 
   let(:empty_stub) { HttpStub::Server::Stub::Empty::INSTANCE }
 
-  %w{ uri method stub_uri body }.each do |empty_string_attribute|
+  describe "#uri" do
 
-    describe "##{empty_string_attribute}" do
-
-      it "is an empty string" do
-        expect(empty_stub.send(empty_string_attribute.to_sym)).to eql("")
-      end
-
+    it "is an empty string" do
+      expect(empty_stub.uri).to eql("")
     end
 
   end
 
-  %w{ headers parameters }.each do |empty_hash_attribute|
+  describe "#match_rules" do
 
-    describe "##{empty_hash_attribute}" do
-
-      it "is an empty hash" do
-        expect(empty_stub.send(empty_hash_attribute.to_sym)).to eql({})
-      end
-
+    it "is empty" do
+      expect(empty_stub.match_rules).to eql(HttpStub::Server::Stub::Match::Rules::EMPTY)
     end
 
   end
@@ -59,6 +51,14 @@ describe HttpStub::Server::Stub::Empty do
 
     it "returns unchanged empty stub" do
       expect(empty_stub.response_for(request)).to eql(empty_stub)
+    end
+
+  end
+
+  describe "#to_hash" do
+
+    it "returns an empty hash" do
+      expect(empty_stub.to_hash).to eql({})
     end
 
   end

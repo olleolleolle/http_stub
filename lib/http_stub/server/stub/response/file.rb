@@ -21,6 +21,11 @@ module HttpStub
 
           def serve_on(application)
             application.send_file(@file.path, send_options)
+            @status = application.response.status
+          end
+
+          def to_hash
+            super.merge(file_uri: @uri)
           end
 
           private

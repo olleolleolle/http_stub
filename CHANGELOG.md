@@ -1,3 +1,12 @@
+** 0.25.0 **
+
+New:
+* `GET /http_stub/stubs/matches/last?method=<HTTP method>&uri=<URI part>` retrieves the last match for an endpoint
+
+Misc:
+* Administration pages list matches and misses separately
+* Refactor: Stubs contain match rules
+
 ** 0.24.3 **
 
 Fix:
@@ -25,7 +34,7 @@ New:
 ** 0.23.1 **
 
 New:
-* GET /stubs/matches displays the calculated response for stubs whose response has request references
+* `GET /http_stub/stubs/matches` displays the calculated response for stubs whose response has request references
 
 ** 0.23.0 **
 
@@ -57,20 +66,20 @@ Misc:
 ** 0.22.2 **
 
 Fix:
-* Tolerates `rake` >= 10.4
+* Tolerates `rake >= 10.4`
 
 ** 0.22.1 **
 
 New:
-* GET /stubs/matches explicitly lists stub matches and misses
+* `GET /http_stub/stubs/matches` explicitly lists stub matches and misses
 
 ** 0.22.0 **
 
 Breaking:
-* POST http_stub/scenarios/activate with scenario name parameter activates scenario
+* `POST /http_stub/scenarios/activate` with scenario name parameter activates scenario
 
 New:
-* GET /http_stub/scenarios?name retrieves details of scenario with matching name
+* `GET /http_stub/scenarios?name=<scenario name>` retrieves details of scenario with matching name
 * Scenario list page contains summary information, with links to activate and view details
 
 Misc:
@@ -85,14 +94,14 @@ Breaking:
 
 New:
 * Presentation of stubs tweaked in diagnostic pages
-* GET /stubs/matches includes response data
+* `GET /stubs/matches` includes response data
 
 ** 0.20.0 **
 
 New:
-* GET /stubs/matches lists stub match history
-* DELETE /stubs also clears matches
-* GET /stubs/:id displays a stub
+* `GET /stubs/matches` lists stub match history
+* `DELETE /stubs` also clears matches
+* `GET /stubs/:id` displays a stub
 * `add_stub!` returns POST /stubs response when configurer has been initialized
 
 Misc:

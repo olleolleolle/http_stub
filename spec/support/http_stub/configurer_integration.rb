@@ -1,8 +1,9 @@
 shared_context "configurer integration" do
   include_context "server integration"
 
-  let(:configurer)  { HttpStub::EmptyConfigurer }
-  let(:stub_server) { configurer.stub_server }
+  let(:configurer)       { HttpStub::EmptyConfigurer }
+  let(:stub_server)      { configurer.stub_server }
+  let(:stub_registrator) { HttpStub::StubRegistrator.new(stub_server) }
 
   before(:example) do
     stub_server.host = server_host

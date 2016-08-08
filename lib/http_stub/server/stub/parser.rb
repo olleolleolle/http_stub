@@ -5,7 +5,7 @@ module HttpStub
       class Parser
 
         def self.parse(request)
-          HttpStub::Server::Stub::PayloadFileConsolidator.consolidate!(
+          HttpStub::Server::Stub::Payload.modify!(
             JSON.parse(request.parameters["payload"] || request.body), request
           )
         end
