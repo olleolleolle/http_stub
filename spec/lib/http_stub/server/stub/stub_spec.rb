@@ -108,7 +108,7 @@ describe HttpStub::Server::Stub::Stub do
 
   end
 
-  describe "#repsonse_for" do
+  describe "#response_for" do
 
     let(:request) { instance_double(HttpStub::Server::Request::Request) }
 

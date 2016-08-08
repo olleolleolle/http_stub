@@ -1,10 +1,23 @@
-%form{ id: :activate_scenario_form, action: "scenarios/activate", method: "POST" }
-  %input{ id: :activated_scenario_name, name: :name, type: :hidden, value: "" }
 :javascript
   $(window).load(function() {
     $("a.activate_scenario").on("click", function(event) {
       event.preventDefault();
-      $("#activated_scenario_name").val($(event.target).data("name"));
-      $("#activate_scenario_form").submit();
+      var button = $(event.target)
+      button.prop("disabled", true);
+      $.post(
+        "scenarios/activate", { name: button.data("name") }, null, "html"
+      ).done(
+        function() {
+          button.html("Activated").css("color", "green");
+          setTimeout(function() { button.html("Activate").css("color", "inherit"); }, 3000);
+        }
+      ).fail(
+        function() {
+          button.html("Failed").css("color", "red");
+          setTimeout(function() { button.html("Activate").css("color", "inherit"); }, 3000);
+        }
+      ).always(
+        function() { button.prop("disabled", false); }
+      );
     });
   });
