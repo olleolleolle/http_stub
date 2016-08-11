@@ -12,7 +12,7 @@ describe "JSON configuration" do
             attr_reader :data
 
             def initialize(name)
-              @data = { "#{name}": "#{name} value" }
+              @data = { "#{name}" => "#{name} value" }
             end
 
             def to_json(*args)

@@ -25,7 +25,7 @@ desc "Exercises specifications"
 ::RSpec::Core::RakeTask.new(:spec)
 
 desc "Exercises specifications with coverage analysis"
-task :coverage => "coverage:generate"
+task coverage: "coverage:generate"
 
 namespace :coverage do
 
