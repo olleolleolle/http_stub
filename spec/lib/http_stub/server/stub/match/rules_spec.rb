@@ -214,32 +214,28 @@ describe HttpStub::Server::Stub::Match::Rules do
 
   end
 
-  describe "#to_hash" do
+  describe "#to_json" do
 
-    subject { match_rules.to_hash }
+    subject { match_rules.to_json }
 
-    describe "supporting creating a JSON representation of the stub" do
+    it "contains the rules uri" do
+      expect(subject).to include_in_json(uri: match_rules.uri)
+    end
 
-      it "contains the rules uri" do
-        expect(subject).to include(uri: match_rules.uri)
-      end
+    it "contains the rules method" do
+      expect(subject).to include_in_json(method: match_rules.method)
+    end
 
-      it "contains the rules method" do
-        expect(subject).to include(method: match_rules.method)
-      end
+    it "contains the rules headers" do
+      expect(subject).to include_in_json(headers: match_rules.headers)
+    end
 
-      it "contains the rules headers" do
-        expect(subject).to include(headers: match_rules.headers)
-      end
+    it "contains the rules parameters" do
+      expect(subject).to include_in_json(parameters: match_rules.parameters)
+    end
 
-      it "contains the rules parameters" do
-        expect(subject).to include(parameters: match_rules.parameters)
-      end
-
-      it "contains the rules body" do
-        expect(subject).to include(body: match_rules.body)
-      end
-
+    it "contains the rules body" do
+      expect(subject).to include_in_json(body: match_rules.body)
     end
 
   end

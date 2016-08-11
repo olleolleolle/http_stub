@@ -184,16 +184,12 @@ describe HttpStub::Server::Stub::Response::File do
 
     subject { response_file.to_hash }
 
-    describe "supporting creating a JSON representation of the response" do
+    it "contains the files uri" do
+      expect(subject).to include(file_uri: response_file.uri)
+    end
 
-      it "contains the files uri" do
-        expect(subject).to include(file_uri: response_file.uri)
-      end
-
-      it "contains the standard response attributes" do
-        expect(subject).to include(headers: response_file.headers)
-      end
-
+    it "contains the standard response elements" do
+      expect(subject).to include(headers: response_file.headers)
     end
 
   end

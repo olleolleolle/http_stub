@@ -49,6 +49,10 @@ module HttpStub
             { status: @status, headers: @headers, delay_in_seconds: @delay_in_seconds }
           end
 
+          def to_json(*args)
+            self.to_hash.to_json(*args)
+          end
+
         end
 
       end

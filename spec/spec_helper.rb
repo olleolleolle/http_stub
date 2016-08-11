@@ -33,6 +33,7 @@ module HttpStub
 
 end
 
+require_relative 'support/include_in_json'
 require_relative 'support/cross_origin_server/integration'
 require_relative 'support/cross_origin_server/index_page'
 require_relative 'support/http_stub/server/request_fixture'

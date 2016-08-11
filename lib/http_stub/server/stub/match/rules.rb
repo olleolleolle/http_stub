@@ -21,8 +21,8 @@ module HttpStub
             [ @uri, @method, @headers, @parameters, @body ].all? { |matcher| matcher.matches?(request, logger) }
           end
 
-          def to_hash
-            { uri: @uri, method: @method, headers: @headers, parameters: @parameters, body: @body }
+          def to_json(*args)
+            { uri: @uri, method: @method, headers: @headers, parameters: @parameters, body: @body }.to_json(*args)
           end
 
         end

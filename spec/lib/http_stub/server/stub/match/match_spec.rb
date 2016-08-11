@@ -121,24 +121,20 @@ describe HttpStub::Server::Stub::Match::Match do
 
   end
 
-  describe "#to_hash" do
+  describe "#to_json" do
 
-    subject { match.to_hash }
+    subject { match.to_json }
 
-    describe "supporting creating a JSON representation of the result" do
+    it "contains the matching request" do
+      expect(subject).to include_in_json(request: request)
+    end
 
-      it "contains the matching request" do
-        expect(subject).to include(request: request)
-      end
+    it "contains the served response" do
+      expect(subject).to include_in_json(response: response)
+    end
 
-      it "contains the served response" do
-        expect(subject).to include(response: response)
-      end
-
-      it "contains the matched stub" do
-        expect(subject).to include(stub: stub)
-      end
-
+    it "contains the matched stub" do
+      expect(subject).to include_in_json(stub: stub)
     end
 
   end

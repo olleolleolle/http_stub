@@ -84,7 +84,15 @@ describe "Stub matches last acceptance" do
       end
 
       it "returns JSON containing the uri of the matched stub" do
-        expect(json_response).to include("stub" => hash_including("uri" => stub_registrator.stub_uri))
+        expect_match_stub_to_include("uri" => stub_registrator.stub_uri)
+      end
+
+      it "returns JSON containing the request match rules of the matched stub" do
+        expect_match_stub_to_include("match_rules" => hash_including("uri" => stub_registrator.request_uri))
+      end
+
+      it "returns JSON containing the configured response of the matched stub" do
+        expect_match_stub_to_include("response" => hash_including("status" => stub_registrator.stub_response_status))
       end
 
     end
@@ -163,6 +171,10 @@ describe "Stub matches last acceptance" do
 
     def expect_match_response_to_include(hash)
       expect(json_response).to(include("response" => hash_including(hash)))
+    end
+
+    def expect_match_stub_to_include(hash)
+      expect(json_response).to(include("stub" => hash_including(hash)))
     end
 
   end

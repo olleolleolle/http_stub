@@ -1,3 +1,8 @@
+** 0.25.1 **
+
+Fix:
+* Removed `active_support/json/encoding` dependency as it can inadvertently impact JSON defined in `Configurer`s
+
 ** 0.25.0 **
 
 New:

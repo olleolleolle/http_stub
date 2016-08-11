@@ -23,8 +23,8 @@ module HttpStub
           @response.with_values_from(request)
         end
 
-        def to_hash
-          { id: @id, uri: @uri, match_rules: @match_rules, response: @response, triggers: @triggers }
+        def to_json(*args)
+          { id: @id, uri: @uri, match_rules: @match_rules, response: @response, triggers: @triggers }.to_json(*args)
         end
 
         def to_s

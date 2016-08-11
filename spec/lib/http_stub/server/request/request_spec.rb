@@ -91,32 +91,28 @@ describe HttpStub::Server::Request::Request do
 
   end
 
-  describe "#to_hash" do
+  describe "#to_json" do
 
-    subject { server_request.to_hash }
+    subject { server_request.to_json }
 
-    describe "supporting creating a JSON representation of the result" do
+    it "contains the requests uri" do
+      expect(subject).to include_in_json(uri: server_request.uri)
+    end
 
-      it "contains the requests uri" do
-        expect(subject).to include(uri: server_request.uri)
-      end
+    it "contains the requests method" do
+      expect(subject).to include_in_json(method: server_request.method)
+    end
 
-      it "contains the requests method" do
-        expect(subject).to include(method: server_request.method)
-      end
+    it "contains the requests headers" do
+      expect(subject).to include_in_json(headers: server_request.headers)
+    end
 
-      it "contains the requests headers" do
-        expect(subject).to include(headers: server_request.headers)
-      end
+    it "contains the requests parameters" do
+      expect(subject).to include_in_json(parameters: server_request.parameters)
+    end
 
-      it "contains the requests parameters" do
-        expect(subject).to include(parameters: server_request.parameters)
-      end
-
-      it "contains the requests body" do
-        expect(subject).to include(body: server_request.body)
-      end
-
+    it "contains the requests body" do
+      expect(subject).to include_in_json(body: server_request.body)
     end
 
   end

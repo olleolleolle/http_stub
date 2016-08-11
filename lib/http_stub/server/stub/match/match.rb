@@ -17,8 +17,8 @@ module HttpStub
             @request.uri.include?(criteria[:uri]) && @request.method.casecmp(criteria[:method]).zero?
           end
 
-          def to_hash
-            { request: @request, response: @response, stub: @stub }
+          def to_json(*args)
+            { request: @request, response: @response, stub: @stub }.to_json(*args)
           end
 
         end

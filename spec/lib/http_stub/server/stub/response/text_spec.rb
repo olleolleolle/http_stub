@@ -169,16 +169,12 @@ describe HttpStub::Server::Stub::Response::Text do
 
     subject { response_text.to_hash }
 
-    describe "supporting creating a JSON representation of the response" do
+    it "contains the responses body" do
+      expect(subject).to include(body: response_text.body)
+    end
 
-      it "contains the responses body" do
-        expect(subject).to include(body: response_text.body)
-      end
-
-      it "contains the standard response attributes" do
-        expect(subject).to include(headers: response_text.headers)
-      end
-
+    it "contains the standard response elements" do
+      expect(subject).to include(headers: response_text.headers)
     end
 
   end

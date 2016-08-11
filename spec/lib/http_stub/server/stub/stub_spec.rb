@@ -175,32 +175,28 @@ describe HttpStub::Server::Stub::Stub do
 
   end
 
-  describe "#to_hash" do
+  describe "#to_json" do
 
-    subject { the_stub.to_hash }
+    subject { the_stub.to_json }
 
-    describe "supporting creating a JSON representation of the stub" do
+    it "contains the stubs id" do
+      expect(subject).to include_in_json(id: stub_id)
+    end
 
-      it "contains the stubs id" do
-        expect(subject).to include(id: stub_id)
-      end
+    it "contains the stubs uri" do
+      expect(subject).to include_in_json(uri: the_stub.uri)
+    end
 
-      it "contains the stubs uri" do
-        expect(subject).to include(uri: the_stub.uri)
-      end
+    it "contains the stubs match rules" do
+      expect(subject).to include_in_json(match_rules: the_stub.match_rules)
+    end
 
-      it "contains the stubs match rules" do
-        expect(subject).to include(match_rules: the_stub.match_rules)
-      end
+    it "contains the stubs response" do
+      expect(subject).to include_in_json(response: the_stub.response)
+    end
 
-      it "contains the stubs response" do
-        expect(subject).to include(response: the_stub.response)
-      end
-
-      it "contains the stubs triggers" do
-        expect(subject).to include(triggers: the_stub.triggers)
-      end
-
+    it "contains the stubs triggers" do
+      expect(subject).to include_in_json(triggers: the_stub.triggers)
     end
 
   end

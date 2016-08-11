@@ -16,7 +16,6 @@ require 'active_support/core_ext/string/inflections'
 require 'active_support/core_ext/hash/slice'
 require 'active_support/core_ext/hash/deep_merge'
 require 'active_support/core_ext/hash/indifferent_access'
-require 'active_support/json/encoding'
 
 require_relative 'http_stub/extensions/core/hash/formatted'
 require_relative 'http_stub/extensions/core/hash/indifferent_and_insensitive_access'
