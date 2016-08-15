@@ -149,6 +149,10 @@ content including files and the matching requests headers and parameters.
 
 See the [wiki](https://github.com/MYOB-Technology/http_stub/wiki) for more usage details and examples.
 
+For those using [Docker](https://www.docker.com),
+[http_stub_docker](https://github.com/MYOB-Technology/http_stub_docker) provides Rake tasks that simplify creating,
+validating and distributing Docker containers for stubs. 
+
 Installation
 ------------
 
