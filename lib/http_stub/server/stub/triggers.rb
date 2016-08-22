@@ -4,22 +4,24 @@ module HttpStub
 
       class Triggers
 
-        delegate :each, to: :@triggers
+        attr_reader :scenario_names
+        attr_reader :stubs
 
-        def initialize(triggers)
-          @triggers = (triggers || []).map { |trigger| HttpStub::Server::Stub.create(trigger) }
+        def initialize(args={})
+          resolved_args = { "scenario_names" => [], "stubs" => [] }.merge(args || {})
+          @scenario_names = resolved_args["scenario_names"]
+          @stubs          = resolved_args["stubs"].map { |stub_args| HttpStub::Server::Stub.create(stub_args) }
+          @description    = resolved_args.to_s
         end
 
-        def add_to(registry, logger)
-          @triggers.each { |trigger| registry.add(trigger, logger) }
-        end
+        EMPTY = HttpStub::Server::Stub::Triggers.new.freeze
 
         def to_json(*args)
-          @triggers.to_json(*args)
+          { scenario_names: @scenario_names, stubs: @stubs }.to_json(*args)
         end
 
         def to_s
-          @triggers.reduce("") { |result, trigger| "#{result}\n#{trigger}" }
+          @description
         end
 
       end

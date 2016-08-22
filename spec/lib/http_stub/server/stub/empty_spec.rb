@@ -20,8 +20,8 @@ describe HttpStub::Server::Stub::Empty do
 
   describe "#triggers" do
 
-    it "is an empty array" do
-      expect(empty_stub.triggers).to eql([])
+    it "is empty" do
+      expect(empty_stub.triggers).to eql(HttpStub::Server::Stub::Triggers::EMPTY)
     end
 
   end

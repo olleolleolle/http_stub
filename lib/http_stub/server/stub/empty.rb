@@ -10,7 +10,7 @@ module HttpStub
           @uri         = ""
           @match_rules = HttpStub::Server::Stub::Match::Rules::EMPTY
           @response    = HttpStub::Server::Response::EMPTY
-          @triggers    = []
+          @triggers    = HttpStub::Server::Stub::Triggers::EMPTY
         end
 
         public

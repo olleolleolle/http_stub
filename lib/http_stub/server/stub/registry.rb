@@ -10,11 +10,7 @@ module HttpStub
           @stub_registry = HttpStub::Server::Registry.new("stub")
         end
 
-        def match(request, logger)
-          @stub_registry.find(request, logger).tap do |matched_stub|
-            matched_stub.triggers.add_to(self, logger) if matched_stub
-          end
-        end
+        alias_method :match, :find
 
         def remember
           @remembered_stub = @stub_registry.last

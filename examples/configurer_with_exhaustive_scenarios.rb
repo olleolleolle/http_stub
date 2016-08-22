@@ -61,7 +61,7 @@ module HttpStub
               body:             response_body,
               delay_in_seconds: 8 * scenario_number
             )
-            triggered_stubs.each { |triggered_stub| stub.trigger(triggered_stub) }
+            stub.trigger(stubs: triggered_stubs)
           end
           scenario.activate!("Nested scenario #{scenario_number}")
         end

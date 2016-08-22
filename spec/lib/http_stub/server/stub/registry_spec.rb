@@ -40,7 +40,11 @@ describe HttpStub::Server::Stub::Registry do
 
     let(:id) { SecureRandom.uuid }
 
+    let(:found_stub) { instance_double(HttpStub::Server::Stub::Stub) }
+
     subject { stub_registry.find(id, logger) }
+
+    before(:example) { allow(underlying_stub_registry).to receive(:find).and_return(found_stub) }
 
     it "delegates to an underlying simple registry" do
       expect(underlying_stub_registry).to receive(:find).with(id, logger)
@@ -48,50 +52,30 @@ describe HttpStub::Server::Stub::Registry do
       subject
     end
 
+    it "returns any found stub" do
+      expect(subject).to eql(found_stub)
+    end
+
   end
 
   describe "#match" do
 
-    let(:request)  { HttpStub::Server::RequestFixture.create }
+    let(:request) { instance_double(HttpStub::Server::Request::Request) }
 
-    let(:triggers)     { instance_double(HttpStub::Server::Stub::Triggers, add_to: nil) }
-    let(:stub)         { instance_double(HttpStub::Server::Stub::Stub, triggers: triggers) }
-    let(:found_stub)   { nil }
+    let(:matched_stub) { instance_double(HttpStub::Server::Stub::Stub) }
 
-    subject { stub_registry.match(request, logger) }
+    subject { stub_registry.find(request, logger) }
 
-    before(:example) { allow(underlying_stub_registry).to receive(:find).and_return(found_stub) }
+    before(:example) { allow(underlying_stub_registry).to receive(:find).and_return(matched_stub) }
 
-    it "finds a matching stub in the underlying simple registry based on the request" do
+    it "finds a matching stub in an underlying simple registry" do
       expect(underlying_stub_registry).to receive(:find).with(request, logger)
 
       subject
     end
 
-    context "when a stub is found" do
-
-      let(:found_stub) { stub }
-
-      it "adds the stubs triggers to the underlying stub registry" do
-        expect(triggers).to receive(:add_to).with(stub_registry, logger)
-
-        subject
-      end
-
-      it "returns the stub found in the underlying stub registry" do
-        expect(subject).to eql(stub)
-      end
-
-    end
-
-    context "when a stub is not found" do
-
-      let(:found_stub) { nil }
-
-      it "returns nil" do
-        expect(subject).to eql(nil)
-      end
-
+    it "returns any found stub" do
+      expect(subject).to eql(matched_stub)
     end
 
   end

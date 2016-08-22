@@ -1,79 +1,138 @@
 describe HttpStub::Server::Stub::Triggers do
 
-  let(:trigger_bodies)     { (1..3).map { |i| "trigger body #{i}" } }
-  let(:stubs_for_triggers) { (1..trigger_bodies.length).map { instance_double(HttpStub::Server::Stub::Stub) } }
-  let(:stub_triggers)      { HttpStub::Server::Stub::Triggers.new(trigger_bodies) }
+  let(:scenario_names) { (1..3).map { |i| "Scenario trigger #{i}" } }
+  let(:stub_payloads)  { (1..3).map { |i| "Stub trigger payload #{i}" } }
+  let(:args)           { { "scenario_names" => scenario_names, "stubs" => stub_payloads } }
 
-  before(:example) { allow(HttpStub::Server::Stub).to receive(:create).and_return(*stubs_for_triggers) }
+  let(:stubs) { (1..stub_payloads.length).map { instance_double(HttpStub::Server::Stub::Stub) } }
+
+  let(:triggers) { described_class.new(args) }
+
+  before(:example) { allow(HttpStub::Server::Stub).to receive(:create).and_return(*stubs) }
+
+  describe "::EMPTY" do
+
+    subject { HttpStub::Server::Stub::Triggers::EMPTY }
+
+    it "returns triggers with empty scenario names" do
+      expect(subject.scenario_names).to eql([])
+    end
+
+    it "returns triggers with empty stubs" do
+      expect(subject.stubs).to eql([])
+    end
+
+  end
 
   describe "constructor" do
 
-    it "creates a stub for each provided trigger" do
-      trigger_bodies.zip(stubs_for_triggers).each do |body, stub|
-        expect(HttpStub::Server::Stub).to receive(:create).with(body).and_return(stub)
+    subject { described_class.new(args) }
+
+    context "when scenario names are provided" do
+
+      let(:args) { { "scenario_names" => scenario_names } }
+
+      it "establishes the scenario names" do
+        expect(subject.scenario_names).to eql(scenario_names)
       end
 
-      stub_triggers
     end
 
-  end
+    context "when scenario names are not provided" do
 
-  describe "#add_to" do
+      let(:args) { {} }
 
-    let(:registry) { instance_double(HttpStub::Server::Stub::Registry) }
-    let(:logger)   { instance_double(Logger) }
+      it "establishes an empty scenario name array" do
+        expect(subject.scenario_names).to eql([])
+      end
 
-    it "adds each stub to the provided registry" do
-      stubs_for_triggers.each { |stub_for_trigger| expect(registry).to receive(:add).with(stub_for_trigger, logger) }
-
-      stub_triggers.add_to(registry, logger)
     end
 
-  end
+    context "when stubs are provided" do
 
-  describe "#each" do
+      let(:args) { { "stubs" => stub_payloads } }
 
-    it "yields to the stubs for each trigger" do
-      yielded_stubs = stub_triggers.each.map.to_a
+      it "creates a stub for each provided stub payload" do
+        stub_payloads.each { |payload| expect(HttpStub::Server::Stub).to receive(:create).with(payload) }
 
-      expect(yielded_stubs).to eql(stubs_for_triggers)
+        subject
+      end
+
+      it "estalishes the created stubs" do
+        expect(subject.stubs).to eql(stubs)
+      end
+
+    end
+
+    context "when stubs are not provided" do
+
+      let(:args) { {} }
+
+      it "establishes an empty stub array" do
+        expect(subject.stubs).to eql([])
+      end
+
+    end
+
+    context "when nil args are provided" do
+
+      let(:args) { nil }
+
+      it "establishes an empty scenario name array" do
+        expect(subject.scenario_names).to eql([])
+      end
+
+      it "establishes an empty stub array" do
+        expect(subject.stubs).to eql([])
+      end
+
     end
 
   end
 
   describe "#to_json" do
 
-    let(:json_for_stubs)        { (1..stubs_for_triggers.length).map { |i| "stub #{i} json" } }
+    let(:json_for_stubs)        { stubs.each_with_index.map { |i| "stub #{i} JSON" } }
     let(:quoted_json_for_stubs) { json_for_stubs.map(&:to_json) }
 
-    subject { stub_triggers.to_json }
+    subject { triggers.to_json }
 
     before(:example) do
-      stubs_for_triggers.zip(quoted_json_for_stubs).each do |stub, json|
-        allow(stub).to receive(:to_json).and_return(json)
-      end
+      stubs.zip(quoted_json_for_stubs).each { |stub, json| allow(stub).to receive(:to_json).and_return(json) }
     end
 
-    it "returns a JSON array containing the JSON representation of each stub" do
-      expect(subject).to eql(json_for_stubs.to_json)
+    it "contains the scenario names" do
+      expect(subject).to include_in_json(scenario_names: scenario_names)
+    end
+
+    it "contains the JSON representation of each stub" do
+      expect(subject).to include_in_json(stubs: json_for_stubs)
     end
 
   end
 
   describe "#to_s" do
 
-    let(:trigger_strings) { (1..stubs_for_triggers.length).map { |i| "trigger string ##{i}" } }
+    subject { triggers.to_s }
 
-    before(:example) do
-      stubs_for_triggers.zip(trigger_strings).each do |stub_for_trigger, string|
-        allow(stub_for_trigger).to receive(:to_s).and_return(string)
+    context "when scenario names and stubs are provided" do
+
+      let(:args) { { "scenario_names" => scenario_names, "stubs" => stubs } }
+
+      it "returns a string representation of the arguments provided to the triggers" do
+        expect(subject).to eql(args.to_s)
       end
+
     end
 
-    it "should contain a string representation of each trigger" do
-      result = stub_triggers.to_s
+    context "when scenario names and stubs are not provided" do
 
-      trigger_strings.each { |trigger_string| expect(result).to include(trigger_string) }
+      let(:args) { {} }
+
+      it "returns a string indicating the scenario names and stub are empty" do
+        expect(subject).to eql({ "scenario_names" => [], "stubs" => [] }.to_s)
+      end
+
     end
 
   end

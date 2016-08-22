@@ -5,13 +5,17 @@ module HttpStub
 
         class Controller
 
-          def initialize(result_registry)
-            @result_registry = result_registry
+          def last_match(request, logger)
+            result = request.session.last_match(request.parameters.slice(:method, :uri), logger)
+            result ? HttpStub::Server::Response.ok("body" => result.to_json) : HttpStub::Server::Response::NOT_FOUND
           end
 
-          def find_last(request, logger)
-            result = @result_registry.find(request.parameters.slice(:method, :uri), logger)
-            result ? HttpStub::Server::Response.ok("body" => result.to_json) : HttpStub::Server::Response::NOT_FOUND
+          def matches(request)
+            request.session.matches
+          end
+
+          def misses(request)
+            request.session.misses
           end
 
         end

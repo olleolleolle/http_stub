@@ -4,5 +4,11 @@
   %h3 Response
   = partial :response, locals: { response: the_stub.response }
   %h3 Triggers
-  - the_stub.triggers.each do |trigger|
-    = partial :stub, locals: { the_stub: trigger }
+  - if the_stub.triggers.scenario_names.present?
+    %h4 Scenarios
+    - the_stub.triggers.scenario_names.each do |triggered_scenario_name|
+      %span= triggered_scenario_name
+  - if the_stub.triggers.stubs.present?
+    %h4 Stubs
+    - the_stub.triggers.stubs.each do |triggered_stub|
+      = partial :stub, locals: { the_stub: triggered_stub }

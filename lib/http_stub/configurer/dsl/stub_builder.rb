@@ -9,7 +9,7 @@ module HttpStub
         def initialize(default_builder=nil)
           @request  = {}
           @response = {}
-          @triggers = []
+          @triggers = { scenarios: [], stubs: [] }
           self.merge!(default_builder) if default_builder
         end
 
@@ -27,10 +27,12 @@ module HttpStub
           self.tap { @response.deep_merge!(resolved_args) }
         end
 
-        def trigger(stub_builder_or_builders)
-          resolved_builders =
-            stub_builder_or_builders.is_a?(Array) ? stub_builder_or_builders : [ stub_builder_or_builders ]
-          @triggers.concat(resolved_builders)
+        def trigger(args)
+          resolved_args = args.clone
+          resolved_args[:scenarios] ||= resolved_args[:scenario] ? [ resolved_args[:scenario] ] : []
+          resolved_args[:stubs]     ||= resolved_args[:stub] ? [ resolved_args[:stub] ] : []
+          @triggers[:scenarios].concat(resolved_args[:scenarios])
+          @triggers[:stubs].concat(resolved_args[:stubs])
           self
         end
 
@@ -45,7 +47,14 @@ module HttpStub
         end
 
         def build
-          HttpStub::Configurer::Request::Stub.new(request: @request, response: @response, triggers: @triggers)
+          HttpStub::Configurer::Request::Stub.new(
+            request:  @request,
+            response: @response,
+            triggers: {
+              scenario_names: @triggers[:scenarios],
+              stubs:          @triggers[:stubs].map(&:build)
+            }
+          )
         end
 
       end

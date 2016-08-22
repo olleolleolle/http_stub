@@ -5,16 +5,14 @@ module HttpStub
 
       class << self
 
-        def create
-          HttpStub::Server::Request.create(create_rack_request)
+        def create(rack_request=Rack::RequestFixture.create)
+          request_factory.create(rack_request)
         end
 
         private
 
-        def create_rack_request
-          Rack::Request.new("PATH_INFO"      => "/some/path/info",
-                            "REQUEST_METHOD" => "GET",
-                            "rack.input"     => StringIO.new)
+        def request_factory
+          @request_factory ||= HttpStub::Server::Request::Factory.new(HttpStub::Server::Registry.new("scenario"))
         end
 
       end

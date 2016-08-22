@@ -1,7 +1,5 @@
 describe HttpStub::Server::Stub::Payload::ResponseBodyModifier do
 
-  let(:modifier) { described_class }
-
   describe "::modify!" do
 
     let(:parameters) { {} }
@@ -9,7 +7,7 @@ describe HttpStub::Server::Stub::Payload::ResponseBodyModifier do
 
     let!(:original_payload) { payload.clone }
 
-    subject { modifier.modify!(payload, request) }
+    subject { described_class.modify!(payload, request) }
 
     context "when the payload contains a response file and has a corresponding file parameter" do
 
@@ -27,9 +25,9 @@ describe HttpStub::Server::Stub::Payload::ResponseBodyModifier do
 
     end
 
-    context "when the payload contains triggers" do
+    context "when the payload contains triggered stubs" do
 
-      let(:payload_fixture) { HttpStub::StubFixture.new.with_triggers!(trigger_fixtures) }
+      let(:payload_fixture) { HttpStub::StubFixture.new.with_triggered_stubs!(trigger_fixtures) }
       let(:payload)         { payload_fixture.server_payload }
 
       context "and the trigger payloads contain response text" do
@@ -47,6 +45,7 @@ describe HttpStub::Server::Stub::Payload::ResponseBodyModifier do
       context "and the trigger payloads contain a response file with corresponding file parameters" do
 
         let(:trigger_fixtures) { (1..3).map { HttpStub::StubFixture.new.with_file_response! } }
+        let(:file_parameters)  { trigger_fixtures.map(&:file_parameter) }
         let(:parameters) do
           trigger_fixtures.reduce({}) do |result, fixture|
             result.merge("response_file_#{fixture.id}" => fixture.file_parameter)
@@ -55,8 +54,8 @@ describe HttpStub::Server::Stub::Payload::ResponseBodyModifier do
 
         it "modifies the payload to have trigger response bodies replaced by the files" do
           expected_payload = payload.clone
-          expected_payload["triggers"].zip(trigger_fixtures.map(&:file_parameter)).each do |trigger, file_param|
-            trigger["response"]["body"] = file_param
+          expected_payload["triggers"]["stubs"].zip(file_parameters).each do |trigger, file_parameter|
+            trigger["response"]["body"] = file_parameter
           end
 
           subject
@@ -68,7 +67,7 @@ describe HttpStub::Server::Stub::Payload::ResponseBodyModifier do
 
     end
 
-    context "when the payload does not contain a response file and has no triggers" do
+    context "when the payload does not contain a response file and has no triggered stubs" do
 
       let(:payload) { HttpStub::StubFixture.new.server_payload }
 

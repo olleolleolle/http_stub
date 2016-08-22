@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    http_stub (0.25.1)
+    http_stub (0.26.0)
       activesupport (~> 4.2)
       haml (~> 4.0)
       http_server_manager (~> 0.4)
@@ -13,9 +13,9 @@ PATH
       sinatra-partial (~> 1.0)
 
 GEM
-  remote: http://rubygems.org/
+  remote: https://rubygems.org/
   specs:
-    activesupport (4.2.7)
+    activesupport (4.2.7.1)
       i18n (~> 0.7)
       json (~> 1.7, >= 1.7.7)
       minitest (~> 5.1)

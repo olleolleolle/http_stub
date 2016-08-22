@@ -24,18 +24,15 @@ module HttpStub
         def initialize
           super()
           @scenario_registry     = HttpStub::Server::Registry.new("scenario")
-          @stub_registry         = HttpStub::Server::Stub::Registry.new
-          @stub_match_registry   = HttpStub::Server::Registry.new("stub match")
-          @stub_miss_registry    = HttpStub::Server::Registry.new("stub miss")
-          @scenario_controller   = HttpStub::Server::Scenario::Controller.new(@scenario_registry, @stub_registry)
-          @stub_controller       =
-            HttpStub::Server::Stub::Controller.new(@stub_registry, @stub_match_registry, @stub_miss_registry)
-          @stub_match_controller = HttpStub::Server::Stub::Match::Controller.new(@stub_match_registry)
+          @scenario_controller   = HttpStub::Server::Scenario::Controller.new(@scenario_registry)
+          @stub_controller       = HttpStub::Server::Stub::Controller.new
+          @stub_match_controller = HttpStub::Server::Stub::Match::Controller.new
+          @request_factory       = HttpStub::Server::Request::Factory.new(@scenario_registry)
         end
 
         before do
+          @http_stub_request = @request_factory.create(request)
           @response_pipeline = HttpStub::Server::Application::ResponsePipeline.new(self)
-          @http_stub_request = HttpStub::Server::Request.create(request)
         end
 
         register HttpStub::Server::Application::CrossOriginSupport
@@ -50,39 +47,39 @@ module HttpStub
         end
 
         get "/http_stub/stubs" do
-          haml :stubs, {}, stubs: @stub_registry.all
+          haml :stubs, {}, stubs: @stub_controller.find_all(@http_stub_request)
         end
 
         delete "/http_stub/stubs" do
-          @stub_controller.clear(logger)
+          @stub_controller.clear(@http_stub_request, logger)
           halt 200, "OK"
         end
 
         post "/http_stub/stubs/memory" do
-          @stub_registry.remember
+          @stub_controller.remember_state(@http_stub_request)
           halt 200, "OK"
         end
 
         get "/http_stub/stubs/memory" do
-          @stub_registry.recall
+          @stub_controller.recall_state(@http_stub_request)
           halt 200, "OK"
         end
 
         get "/http_stub/stubs/matches" do
-          haml :stub_matches, {}, matches: @stub_match_registry.all
+          haml :stub_matches, {}, matches: @stub_match_controller.matches(@http_stub_request)
         end
 
         get "/http_stub/stubs/matches/last" do
-          response = @stub_match_controller.find_last(@http_stub_request, logger)
+          response = @stub_match_controller.last_match(@http_stub_request, logger)
           @response_pipeline.process(response)
         end
 
         get "/http_stub/stubs/misses" do
-          haml :stub_misses, {}, misses: @stub_miss_registry.all
+          haml :stub_misses, {}, misses: @stub_match_controller.misses(@http_stub_request)
         end
 
         get "/http_stub/stubs/:id" do
-          haml :stub, {}, the_stub: @stub_registry.find(params[:id], logger)
+          haml :stub, {}, the_stub: @stub_controller.find(@http_stub_request, logger)
         end
 
         post "/http_stub/scenarios" do
@@ -92,15 +89,15 @@ module HttpStub
 
         get "/http_stub/scenarios" do
           pass unless params[:name]
-          haml :scenario, {}, scenario: @scenario_registry.find(URI.decode_www_form_component(params[:name]), logger)
+          haml :scenario, {}, scenario: @scenario_controller.find(@http_stub_request, logger)
         end
 
         get "/http_stub/scenarios" do
-          haml :scenarios, {}, scenarios: @scenario_registry.all.sort_by(&:name)
+          haml :scenarios, {}, scenarios: @scenario_controller.find_all
         end
 
         post "/http_stub/scenarios/activate" do
-          response = @scenario_controller.activate(params[:name], logger)
+          response = @scenario_controller.activate(@http_stub_request, logger)
           @response_pipeline.process(response)
         end
 

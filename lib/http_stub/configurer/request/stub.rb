@@ -8,7 +8,7 @@ module HttpStub
           @id       = SecureRandom.uuid
           @request  = args[:request]
           @response = HttpStub::Configurer::Request::StubResponse.new(@id, args[:response])
-          @triggers = args[:triggers].map(&:build)
+          @triggers = HttpStub::Configurer::Request::Triggers.new(args[:triggers])
         end
 
         def payload
@@ -20,12 +20,12 @@ module HttpStub
             parameters: HttpStub::Configurer::Request::ControllableValue.format(@request[:parameters] || {}),
             body:       HttpStub::Configurer::Request::ControllableValue.format(@request[:body] || {}),
             response:   @response.payload,
-            triggers:   @triggers.map(&:payload)
+            triggers:   @triggers.payload
           }
         end
 
         def response_files
-          ([ @response.file ] + @triggers.map(&:response_files)).flatten.compact
+          ([ @response.file ] + @triggers.response_files).compact
         end
 
         def to_s

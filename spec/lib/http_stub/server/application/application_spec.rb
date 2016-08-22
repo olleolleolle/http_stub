@@ -4,27 +4,22 @@ describe HttpStub::Server::Application::Application do
   let(:response)      { last_response }
   let(:response_body) { response.body.to_s }
 
-  let(:scenario_registry)   { instance_double(HttpStub::Server::Registry) }
-  let(:stub_registry)       { instance_double(HttpStub::Server::Stub::Registry) }
-  let(:stub_match_registry) { instance_double(HttpStub::Server::Registry) }
-  let(:stub_miss_registry)  { instance_double(HttpStub::Server::Registry) }
-
   let(:scenario_controller)   { instance_double(HttpStub::Server::Scenario::Controller) }
   let(:stub_controller)       { instance_double(HttpStub::Server::Stub::Controller) }
   let(:stub_match_controller) { instance_double(HttpStub::Server::Stub::Match::Controller) }
+
+  let(:request)         { HttpStub::Server::RequestFixture.create }
+  let(:request_factory) { instance_double(HttpStub::Server::Request::Factory, create: request) }
 
   let(:response_pipeline) { instance_double(HttpStub::Server::Application::ResponsePipeline, process: nil) }
 
   let(:app) { HttpStub::Server::Application::Application.new! }
 
   before(:example) do
-    allow(HttpStub::Server::Registry).to receive(:new).with("scenario").and_return(scenario_registry)
-    allow(HttpStub::Server::Stub::Registry).to receive(:new).and_return(stub_registry)
-    allow(HttpStub::Server::Registry).to receive(:new).with("stub match").and_return(stub_match_registry)
-    allow(HttpStub::Server::Registry).to receive(:new).with("stub miss").and_return(stub_miss_registry)
     allow(HttpStub::Server::Scenario::Controller).to receive(:new).and_return(scenario_controller)
     allow(HttpStub::Server::Stub::Controller).to receive(:new).and_return(stub_controller)
     allow(HttpStub::Server::Stub::Match::Controller).to receive(:new).and_return(stub_match_controller)
+    allow(HttpStub::Server::Request::Factory).to receive(:new).and_return(request_factory)
     allow(HttpStub::Server::Application::ResponsePipeline).to receive(:new).and_return(response_pipeline)
   end
 
@@ -70,8 +65,8 @@ describe HttpStub::Server::Application::Application do
 
     subject { get "/http_stub/stubs" }
 
-    it "retrieves the stubs from the registry" do
-      expect(stub_registry).to receive(:all).and_return(found_stubs)
+    it "retrieves the stubs for the current user via the stub controller" do
+      expect(stub_controller).to receive(:find_all).with(request).and_return(found_stubs)
 
       subject
     end
@@ -85,8 +80,8 @@ describe HttpStub::Server::Application::Application do
 
     subject { get "/http_stub/stubs/#{stub_id}" }
 
-    it "retrieves the stub from the registry" do
-      expect(stub_registry).to receive(:find).with(stub_id, anything).and_return(found_stub)
+    it "retrieves the stub for the current user via the stub controller" do
+      expect(stub_controller).to receive(:find).with(request, anything).and_return(found_stub)
 
       subject
     end
@@ -99,8 +94,8 @@ describe HttpStub::Server::Application::Application do
 
     before(:example) { allow(stub_controller).to receive(:clear) }
 
-    it "delegates clearing to the stub controller" do
-      expect(stub_controller).to receive(:clear)
+    it "clears the stubs for the current user via the stub controller" do
+      expect(stub_controller).to receive(:clear).with(request, anything)
 
       subject
     end
@@ -117,10 +112,10 @@ describe HttpStub::Server::Application::Application do
 
     subject { post "/http_stub/stubs/memory" }
 
-    before(:example) { allow(stub_registry).to receive(:remember) }
+    before(:example) { allow(stub_controller).to receive(:remember_state) }
 
-    it "remembers the stubs in the stub registry" do
-      expect(stub_registry).to receive(:remember)
+    it "remembers the stubs for the current user via the stub controller" do
+      expect(stub_controller).to receive(:remember_state).with(request)
 
       subject
     end
@@ -137,10 +132,10 @@ describe HttpStub::Server::Application::Application do
 
     subject { get "/http_stub/stubs/memory" }
 
-    before(:example) { allow(stub_registry).to receive(:recall) }
+    before(:example) { allow(stub_controller).to receive(:recall_state) }
 
-    it "recalls the stubs remembered by the stub registry" do
-      expect(stub_registry).to receive(:recall)
+    it "recalls the stubs for the current user via the stub controller" do
+      expect(stub_controller).to receive(:recall_state).with(request)
 
       subject
     end
@@ -159,8 +154,8 @@ describe HttpStub::Server::Application::Application do
 
     subject { get "/http_stub/stubs/matches" }
 
-    it "retrieves the matches from the match registry" do
-      expect(stub_match_registry).to receive(:all).and_return(found_matches)
+    it "retrieves the matches for the current user via the stub match controller" do
+      expect(stub_match_controller).to receive(:matches).with(request).and_return(found_matches)
 
       subject
     end
@@ -175,12 +170,10 @@ describe HttpStub::Server::Application::Application do
 
     subject { get "/http_stub/stubs/matches/last", "uri" => uri, "method" => method }
 
-    before(:example) { allow(stub_match_controller).to receive(:find_last).and_return(last_match_response) }
+    before(:example) { allow(stub_match_controller).to receive(:last_match).and_return(last_match_response) }
 
-    it "retrieves the last match from the match result registry for the provided request" do
-      expect(stub_match_controller).to(
-        receive(:find_last).with(an_instance_of(HttpStub::Server::Request::Request), anything)
-      )
+    it "retrieves the last match for the user via the match result controller" do
+      expect(stub_match_controller).to receive(:last_match).with(request, anything)
 
       subject
     end
@@ -199,8 +192,8 @@ describe HttpStub::Server::Application::Application do
 
     subject { get "/http_stub/stubs/misses" }
 
-    it "retrieves the misses from the miss registry" do
-      expect(stub_miss_registry).to receive(:all).and_return(found_misses)
+    it "retrieves the misses for the current user via the stub match controller" do
+      expect(stub_match_controller).to receive(:misses).with(request).and_return(found_misses)
 
       subject
     end
@@ -243,8 +236,8 @@ describe HttpStub::Server::Application::Application do
 
     subject { get "/http_stub/scenarios?#{URI.encode_www_form(:name => scenario_name)}" }
 
-    it "retrieves the scenario from the scenario registry" do
-      expect(scenario_registry).to receive(:find).with(scenario_name, anything).and_return(found_scenario)
+    it "retrieves the scenario via the scenario controller" do
+      expect(scenario_controller).to receive(:find).with(request, anything).and_return(found_scenario)
 
       subject
     end
@@ -257,8 +250,8 @@ describe HttpStub::Server::Application::Application do
 
     subject { get "/http_stub/scenarios" }
 
-    it "retrieves the stubs from the registry" do
-      expect(scenario_registry).to receive(:all).and_return(found_scenarios)
+    it "retrieves the scenarios via the scenario controller" do
+      expect(scenario_controller).to receive(:find_all).and_return(found_scenarios)
 
       subject
     end
@@ -270,12 +263,12 @@ describe HttpStub::Server::Application::Application do
     let(:scenario_name)       { "Some scenario name" }
     let(:activation_response) { instance_double(HttpStub::Server::Stub::Response::Base) }
 
-    subject { post "/http_stub/scenarios/activate", :name => scenario_name }
+    subject { post "/http_stub/scenarios/activate", name: scenario_name }
 
     before(:example) { allow(scenario_controller).to receive(:activate).and_return(activation_response) }
 
     it "activates the scenario via the scenario controller" do
-      expect(scenario_controller).to receive(:activate).with(scenario_name, anything).and_return(activation_response)
+      expect(scenario_controller).to receive(:activate).with(request, anything).and_return(activation_response)
 
       subject
     end
@@ -295,7 +288,7 @@ describe HttpStub::Server::Application::Application do
     before(:example) { allow(scenario_controller).to receive(:clear) }
 
     it "delegates clearing to the scenario controller" do
-      expect(scenario_controller).to receive(:clear)
+      expect(scenario_controller).to receive(:clear).with(anything)
 
       subject
     end

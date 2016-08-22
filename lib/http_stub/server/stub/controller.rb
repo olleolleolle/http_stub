@@ -4,28 +4,38 @@ module HttpStub
 
       class Controller
 
-        def initialize(stub_registry, match_registry, miss_registry)
-          @stub_registry  = stub_registry
-          @match_registry = match_registry
-          @miss_registry  = miss_registry
-        end
-
         def register(request, logger)
           stub = HttpStub::Server::Stub.create(HttpStub::Server::Stub::Parser.parse(request))
-          @stub_registry.add(stub, logger)
+          request.session.add_stub(stub, logger)
           HttpStub::Server::Response.ok("headers" => { "location" => stub.uri })
         end
 
         def match(request, logger)
-          stub = @stub_registry.match(request, logger)
+          stub = request.session.match(request, logger)
           response = stub ? stub.response_for(request) : HttpStub::Server::Response::NOT_FOUND
-          @match_registry.add(HttpStub::Server::Stub::Match::Match.new(request, response, stub), logger) if stub
-          @miss_registry.add(HttpStub::Server::Stub::Match::Miss.new(request), logger) unless stub
+          request.session.add_match(HttpStub::Server::Stub::Match::Match.new(request, response, stub), logger) if stub
+          request.session.add_miss(HttpStub::Server::Stub::Match::Miss.new(request), logger) unless stub
           response
         end
 
-        def clear(logger)
-          [ @stub_registry, @match_registry, @miss_registry ].each { |registry| registry.clear(logger) }
+        def find(request, logger)
+          request.session.find_stub(request.parameters[:id], logger)
+        end
+
+        def find_all(request)
+          request.session.stubs
+        end
+
+        def remember_state(request)
+          request.session.remember
+        end
+
+        def recall_state(request)
+          request.session.recall
+        end
+
+        def clear(request, logger)
+          request.session.clear(logger)
         end
 
       end

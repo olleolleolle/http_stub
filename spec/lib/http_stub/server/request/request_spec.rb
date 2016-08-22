@@ -14,8 +14,9 @@ describe HttpStub::Server::Request::Request do
                                    params:         rack_parameters,
                                    body:           StringIO.new(rack_body))
   end
+  let(:session)            { instance_double(HttpStub::Server::Session) }
 
-  let(:server_request) { described_class.new(rack_request) }
+  let(:server_request) { described_class.new(rack_request, session) }
 
   describe "#base_uri" do
 
@@ -91,6 +92,16 @@ describe HttpStub::Server::Request::Request do
 
   end
 
+  describe "#session" do
+
+    subject { server_request.session }
+
+    it "is the provided session" do
+      expect(subject).to eql(session)
+    end
+
+  end
+
   describe "#to_json" do
 
     subject { server_request.to_json }
@@ -113,6 +124,10 @@ describe HttpStub::Server::Request::Request do
 
     it "contains the requests body" do
       expect(subject).to include_in_json(body: server_request.body)
+    end
+
+    it "does not contains the session" do
+      expect(subject).to_not include("session")
     end
 
   end

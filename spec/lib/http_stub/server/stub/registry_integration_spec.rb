@@ -48,7 +48,10 @@ describe HttpStub::Server::Stub::Registry, "integrating with real stubs" do
         "status" => 200 + number,
         "body" => "Body #{number}"
       },
-      "triggers" => []
+      "triggers" => {
+        "scenario_names" => [],
+        "stubs"          => []
+      }
     )
   end
 

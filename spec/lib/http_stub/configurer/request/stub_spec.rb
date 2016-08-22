@@ -1,51 +1,25 @@
 describe HttpStub::Configurer::Request::Stub do
 
   let(:fixture)          { HttpStub::StubFixture.new }
-  let(:stub_response)    { instance_double(HttpStub::Configurer::Request::StubResponse).as_null_object }
-  let(:trigger_builders) { [] }
+  let(:stub_response)    { instance_double(HttpStub::Configurer::Request::StubResponse) }
+  let(:stub_triggers)    { instance_double(HttpStub::Configurer::Request::Triggers) }
 
-  let(:stub) do
-    HttpStub::Configurer::Request::Stub.new(fixture.configurer_payload.merge(triggers: trigger_builders))
-  end
+  let(:stub) { HttpStub::Configurer::Request::Stub.new(fixture.configurer_payload) }
 
-  before(:example) { allow(HttpStub::Configurer::Request::StubResponse).to receive(:new).and_return(stub_response) }
-
-  shared_context "triggers one stub" do
-
-    let(:trigger_payload) { HttpStub::StubFixture.new.configurer_payload }
-    let(:trigger_files)   { [] }
-    let(:trigger) do
-      instance_double(HttpStub::Configurer::Request::Stub,
-                      payload: trigger_payload, response_files: trigger_files)
-    end
-    let(:trigger_builders) do
-      [ instance_double(HttpStub::Configurer::DSL::StubBuilder, build: trigger) ]
-    end
-
-  end
-
-  shared_context "triggers many stubs" do
-
-    let(:trigger_payloads) { (1..3).map { HttpStub::StubFixture.new.configurer_payload } }
-    let(:triggers_files)   { trigger_payloads.map { [] } }
-    let(:triggers) do
-      trigger_payloads.zip(triggers_files).map do |payload, files|
-        instance_double(HttpStub::Configurer::Request::Stub, payload: payload, response_files: files)
-      end
-    end
-    let(:trigger_builders) do
-      triggers.map do |trigger|
-        instance_double(HttpStub::Configurer::DSL::StubBuilder, build: trigger)
-      end
-    end
-
+  before(:example) do
+    allow(HttpStub::Configurer::Request::StubResponse).to receive(:new).and_return(stub_response)
+    allow(HttpStub::Configurer::Request::Triggers).to receive(:new).and_return(stub_triggers)
   end
 
   describe "#payload" do
 
     subject { stub.payload }
 
-    before(:example) { allow(HttpStub::Configurer::Request::ControllableValue).to receive(:format) }
+    before(:example) do
+      allow(HttpStub::Configurer::Request::ControllableValue).to receive(:format)
+      allow(stub_response).to receive(:payload)
+      allow(stub_triggers).to receive(:payload)
+    end
 
     context "when request headers" do
 
@@ -127,21 +101,18 @@ describe HttpStub::Configurer::Request::Stub do
 
     it "creates a stub response with the provided response options" do
       expect(HttpStub::Configurer::Request::StubResponse).to(
-        receive(:new).with(anything, fixture.response.symbolized).and_return(stub_response)
+        receive(:new).with(anything, fixture.configurer_payload[:response]).and_return(stub_response)
       )
 
       subject
     end
 
-    context "when many triggers are provided" do
-      include_context "triggers many stubs"
+    it "creates stub triggers with the provided triggers options" do
+      expect(HttpStub::Configurer::Request::Triggers).to(
+        receive(:new).with(fixture.configurer_payload[:triggers]).and_return(stub_triggers)
+      )
 
-      it "builds the request object for each trigger" do
-        trigger_builders.each { |trigger_builder| expect(trigger_builder).to receive(:build) }
-
-        subject
-      end
-
+      subject
     end
 
     context "builds a hash that" do
@@ -180,30 +151,10 @@ describe HttpStub::Configurer::Request::Stub do
         expect(subject).to include(response: "response payload")
       end
 
-      context "when a trigger is added" do
-        include_context "triggers one stub"
+      it "has an entry containing the triggers payload" do
+        allow(stub_triggers).to receive(:payload).and_return("triggers payload")
 
-        it "has a triggers entry containing the stub trigger payload" do
-          expect(subject).to include(triggers: [ trigger_payload ])
-        end
-
-      end
-
-      context "when many triggers are added" do
-        include_context "triggers many stubs"
-
-        it "has a triggers entry containing the stub trigger payloads" do
-          expect(subject).to include(triggers: trigger_payloads)
-        end
-
-      end
-
-      context "when no triggers are added" do
-
-        it "has a triggers entry containing an empty hash" do
-          expect(subject).to include(triggers: [])
-        end
-
+        expect(subject).to include(triggers: "triggers payload")
       end
 
     end
@@ -212,66 +163,57 @@ describe HttpStub::Configurer::Request::Stub do
 
   describe "#response_files" do
 
+    let(:stub_response_file)      { nil }
+    let(:triggers_response_files) { [] }
+
     subject { stub.response_files }
+
+    before(:example) do
+      allow(stub_response).to receive(:file).and_return(stub_response_file)
+      allow(stub_triggers).to receive(:response_files).and_return(triggers_response_files)
+    end
 
     context "when the response contains a file" do
 
-      let(:response_file) { instance_double(HttpStub::Configurer::Request::StubResponseFile) }
+      let(:stub_response_file) { instance_double(HttpStub::Configurer::Request::StubResponseFile) }
 
-      before(:example) { allow(stub_response).to receive(:file).and_return(response_file) }
+      let(:triggers_response_files) { [] }
 
-      context "and the triggers contain files" do
-        include_context "triggers many stubs"
-
-        let(:triggers_files) do
-          trigger_payloads.map { (1..3).map { instance_double(HttpStub::Configurer::Request::StubResponseFile) } }
-        end
-
-        it "returns the stub response's file and the triggers files" do
-          expect(subject).to eql(([ response_file ] + triggers_files).flatten)
-        end
-
-      end
-
-      context "and the triggers contain no files" do
-        include_context "triggers many stubs"
-
-        let(:triggers_files) { trigger_payloads.map { (1..3).map { [] } } }
-
-        it "returns the stub response's file" do
-          expect(subject).to eql([ response_file ])
-        end
-
+      it "includes the stub response's file" do
+        expect(subject).to include(stub_response_file)
       end
 
     end
 
-    context "when the response body does not contain a file" do
+    context "when the triggers contain files" do
 
-      before(:example) { allow(stub_response).to receive(:file).and_return(nil) }
-
-      context "and the triggers contain files" do
-        include_context "triggers many stubs"
-
-        let(:triggers_files) do
-          trigger_payloads.map { (1..3).map { instance_double(HttpStub::Configurer::Request::StubResponseFile) } }
-        end
-
-        it "returns the stub response's file and the triggers files" do
-          expect(subject).to eql(triggers_files.flatten)
-        end
-
+      let(:triggers_response_files) do
+        (1..3).map { instance_double(HttpStub::Configurer::Request::StubResponseFile) }
       end
 
-      context "and no triggers contain a file" do
-        include_context "triggers many stubs"
+      it "includes the triggers files" do
+        expect(subject).to include(*triggers_response_files)
+      end
 
-        let(:triggers_files) { trigger_payloads.map { (1..3).map { [] } } }
+    end
 
-        it "returns a empty array" do
-          expect(subject).to eql([])
-        end
+    context "when both the response and triggers contain files" do
 
+      let(:stub_response_file)      { instance_double(HttpStub::Configurer::Request::StubResponseFile) }
+      let(:triggers_response_files) do
+        (1..3).map { instance_double(HttpStub::Configurer::Request::StubResponseFile) }
+      end
+
+      it "is all the files" do
+        expect(subject).to eql(([ stub_response_file ] + triggers_response_files).flatten)
+      end
+
+    end
+
+    context "when neither the response or triggers contain files" do
+
+      it "returns an empty array" do
+        expect(subject).to eql([])
       end
 
     end

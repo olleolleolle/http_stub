@@ -1,3 +1,11 @@
+** 0.26.0 **
+
+New:
+* `stub.trigger` can activate Scenarios
+
+Breaking:
+* `stub.trigger` accepts a hash with optional `:scenarios`, `:scenario`, `:stubs` and `:stub` elements
+
 ** 0.25.1 **
 
 Fix:

@@ -2,7 +2,7 @@ module HttpStub
 
   class StubFixture
 
-    attr_reader :id, :request, :response
+    attr_reader :id, :request, :response, :triggers
 
     class Part
 
@@ -54,7 +54,10 @@ module HttpStub
         body:             "body #{@id}",
         delay_in_seconds: 8
       )
-      @trigger_fixtures = []
+      @triggers = {
+        scenario_names: [],
+        stub_fixtures:  []
+      }
     end
 
     def request=(options)
@@ -78,15 +81,22 @@ module HttpStub
                                      name: "payload_#{@id}_file.name" } })
     end
 
-    def with_triggers!(triggers)
-      self.tap { @trigger_fixtures.concat(triggers) }
+    def with_triggered_scenarios!(scenario_names)
+      self.tap { @triggers[:scenario_names].concat(scenario_names) }
+    end
+
+    def with_triggered_stubs!(stubs)
+      self.tap { @triggers[:stub_fixtures].concat(stubs) }
     end
 
     def configurer_payload
       {
         request:  @request.symbolized,
         response: @response.symbolized,
-        triggers: @trigger_fixtures.map(&:configurer_payload)
+        triggers: {
+          scenario_names: @triggers[:scenario_names],
+          stubs:          @triggers[:stub_fixtures].map(&:configurer_payload)
+        }
       }
     end
 
@@ -99,7 +109,10 @@ module HttpStub
         "headers"    => @request.headers,
         "parameters" => @request.parameters,
         "response"   => @response.stringified,
-        "triggers"   => @trigger_fixtures.map(&:server_payload)
+        "triggers"   => {
+          "scenario_names" => @triggers[:scenario_names],
+          "stubs"          => @triggers[:stub_fixtures].map(&:server_payload)
+        }
       }
     end
 

@@ -4,9 +4,8 @@ module HttpStub
 
       class Controller
 
-        def initialize(scenario_registry, stub_registry)
-          @scenario_registry  = scenario_registry
-          @scenario_activator = HttpStub::Server::Scenario::Activator.new(scenario_registry, stub_registry)
+        def initialize(scenario_registry)
+          @scenario_registry = scenario_registry
         end
 
         def register(request, logger)
@@ -15,14 +14,19 @@ module HttpStub
           HttpStub::Server::Response::OK
         end
 
-        def activate(name, logger)
-          scenario = @scenario_registry.find(name, logger)
-          if scenario
-            @scenario_activator.activate(scenario, logger)
-            HttpStub::Server::Response::OK
-          else
-            HttpStub::Server::Response::NOT_FOUND
-          end
+        def find(request, logger)
+          @scenario_registry.find(URI.decode_www_form_component(request.parameters[:name]), logger)
+        end
+
+        def find_all
+          @scenario_registry.all.sort_by(&:name)
+        end
+
+        def activate(request, logger)
+          request.session.activate_scenario!(request.parameters[:name], logger)
+          HttpStub::Server::Response::OK
+        rescue HttpStub::Server::Scenario::NotFoundError
+          HttpStub::Server::Response::NOT_FOUND
         end
 
         def clear(logger)

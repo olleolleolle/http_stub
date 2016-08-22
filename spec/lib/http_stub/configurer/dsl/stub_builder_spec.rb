@@ -4,23 +4,39 @@ describe HttpStub::Configurer::DSL::StubBuilder do
 
   let(:builder) { HttpStub::Configurer::DSL::StubBuilder.new(default_builder) }
 
+  shared_context "triggers one scenario" do
+
+    let(:trigger_scenario) { "Some triggered scenario" }
+
+    before(:example) { builder.trigger(scenario: trigger_scenario) }
+
+  end
+
+  shared_context "triggers many scenarios" do
+
+    let(:trigger_scenarios) { (1..3).map { |i| "Some triggered scenario #{i}" } }
+
+    before(:example) { builder.trigger(scenarios: trigger_scenarios) }
+
+  end
+
   shared_context "triggers one stub" do
 
-    let(:trigger_stub)    { instance_double(HttpStub::Configurer::Request::Stub) }
-    let(:trigger_builder) { instance_double(HttpStub::Configurer::DSL::StubBuilder, build: trigger_stub) }
+    let(:trigger_stub)         { instance_double(HttpStub::Configurer::Request::Stub) }
+    let(:trigger_stub_builder) { instance_double(described_class, build: trigger_stub) }
 
-    before(:example) { builder.trigger(trigger_builder) }
+    before(:example) { builder.trigger(stub: trigger_stub_builder) }
 
   end
 
   shared_context "triggers many stubs" do
 
-    let(:trigger_stubs)    { (1..3).map { instance_double(HttpStub::Configurer::Request::Stub) } }
-    let(:trigger_builders) do
-      trigger_stubs.map { |stub| instance_double(HttpStub::Configurer::DSL::StubBuilder, build: stub) }
+    let(:trigger_stubs)         { (1..3).map { instance_double(HttpStub::Configurer::Request::Stub) } }
+    let(:trigger_stub_builders) do
+      trigger_stubs.map { |stub| instance_double(described_class, build: stub) }
     end
 
-    before(:example) { builder.trigger(trigger_builders) }
+    before(:example) { builder.trigger(stubs: trigger_stub_builders) }
 
   end
 
@@ -43,7 +59,7 @@ describe HttpStub::Configurer::DSL::StubBuilder do
 
     context "when a default builder is provided" do
 
-      let(:default_builder) { instance_double(HttpStub::Configurer::DSL::StubBuilder) }
+      let(:default_builder) { instance_double(described_class) }
 
       let(:builder) { HttpStub::Configurer::DSL::StubBuilderWithObservedMerge.new(default_builder) }
 
@@ -139,10 +155,68 @@ describe HttpStub::Configurer::DSL::StubBuilder do
 
   describe "#trigger" do
 
-    subject { builder.trigger(instance_double(HttpStub::Configurer::DSL::StubBuilder)) }
+    let(:args) { {} }
+
+    subject { builder.trigger(args) }
 
     it "returns the builder to support method chaining" do
       expect(subject).to eql(builder)
+    end
+
+    context "when scenarios are provided" do
+
+      let(:scenarios) { (1..3).map { |i| "Scenario name #{i}" } }
+
+      let(:args) { { scenarios: scenarios } }
+
+      it "adds the scenarios" do
+        subject
+
+        expect(builder.triggers).to include(scenarios: scenarios)
+      end
+
+    end
+
+    context "when a scenario is provided" do
+
+      let(:scenario) { "Some scenario name" }
+
+      let(:args) { { scenario: scenario } }
+
+      it "adds the scenario" do
+        subject
+
+        expect(builder.triggers).to include(scenarios: [ scenario ])
+      end
+
+    end
+
+    context "when stubs are provided" do
+
+      let(:stubs) { (1..3).map { instance_double(described_class) } }
+
+      let(:args) { { stubs: stubs } }
+
+      it "adds the stubs" do
+        subject
+
+        expect(builder.triggers).to include(stubs: stubs)
+      end
+
+    end
+
+    context "when a stub is provided" do
+
+      let(:stub) { instance_double(described_class) }
+
+      let(:args) { { stub: stub } }
+
+      it "adds the stub" do
+        subject
+
+        expect(builder.triggers).to include(stubs: [ stub ])
+      end
+
     end
 
   end
@@ -181,10 +255,11 @@ describe HttpStub::Configurer::DSL::StubBuilder do
 
     shared_context "a completely configured provided builder" do
 
-      let(:provided_triggers) { (1..3).map { instance_double(HttpStub::Configurer::DSL::StubBuilder) } }
+      let(:provided_trigger_scenarios)     { (1..3).map { |i| "Triggered scenario #{i}" } }
+      let(:provided_trigger_stub_builders) { (1..3).map { instance_double(described_class) } }
 
       let(:provided_builder) do
-        HttpStub::Configurer::DSL::StubBuilder.new.tap do |builder|
+        described_class.new.tap do |builder|
           builder.match_requests(uri: "/replacement_uri", method: :put,
                                  headers:    { request_header_key: "replacement request header value",
                                                other_request_header_key: "other request header value" },
@@ -195,7 +270,8 @@ describe HttpStub::Configurer::DSL::StubBuilder do
                                           other_response_header_key: "other response header value" },
                                body: "replacement body value",
                                delay_in_seconds: 3)
-          builder.trigger(provided_triggers)
+          builder.trigger(scenarios: provided_trigger_scenarios,
+                          stubs:     provided_trigger_stub_builders)
         end
       end
 
@@ -203,7 +279,8 @@ describe HttpStub::Configurer::DSL::StubBuilder do
 
     context "when the builder has been completely configured" do
 
-      let(:original_triggers) { (1..3).map { instance_double(HttpStub::Configurer::DSL::StubBuilder) } }
+      let(:original_trigger_scenarios)     { (1..3).map { |i| "Original trigger scenario #{i}" } }
+      let(:original_trigger_stub_builders) { (1..3).map { instance_double(described_class) } }
 
       before(:example) do
         builder.match_requests(uri: "/original_uri", method: :get,
@@ -213,7 +290,8 @@ describe HttpStub::Configurer::DSL::StubBuilder do
                              headers: { response_header_key: "original response header value" },
                              body: "original body",
                              delay_in_seconds: 2)
-        builder.trigger(original_triggers)
+        builder.trigger(scenarios: original_trigger_scenarios,
+                        stubs:     original_trigger_stub_builders)
       end
 
       context "and a builder that is completely configured is provided" do
@@ -272,17 +350,23 @@ describe HttpStub::Configurer::DSL::StubBuilder do
           expect(builder.response).to include(delay_in_seconds: 3)
         end
 
-        it "adds to the triggers" do
+        it "adds to the triggered scenarios" do
           subject
 
-          expect(builder.triggers).to eql(original_triggers + provided_triggers)
+          expect(builder.triggers).to include(scenarios: original_trigger_scenarios + provided_trigger_scenarios)
+        end
+
+        it "adds to the triggered stubs" do
+          subject
+
+          expect(builder.triggers).to include(stubs: original_trigger_stub_builders + provided_trigger_stub_builders)
         end
 
       end
 
       context "and a builder that is empty is provided" do
 
-        let(:provided_builder) { HttpStub::Configurer::DSL::StubBuilder.new }
+        let(:provided_builder) { described_class.new }
 
         it "preserves the uri" do
           subject
@@ -332,10 +416,16 @@ describe HttpStub::Configurer::DSL::StubBuilder do
           expect(builder.response).to include(delay_in_seconds: 2)
         end
 
-        it "preserves the triggers" do
+        it "preserves the triggered scenarios" do
           subject
 
-          expect(builder.triggers).to eql(original_triggers)
+          expect(builder.triggers).to include(scenarios: original_trigger_scenarios)
+        end
+
+        it "preserves the triggered stubs" do
+          subject
+
+          expect(builder.triggers).to include(stubs: original_trigger_stub_builders)
         end
 
       end
@@ -398,10 +488,16 @@ describe HttpStub::Configurer::DSL::StubBuilder do
         expect(builder.response).to include(delay_in_seconds: 3)
       end
 
-      it "assumes the provided triggers" do
+      it "assumes the provided triggered scenarios" do
         subject
 
-        expect(builder.triggers).to eql(provided_triggers)
+        expect(builder.triggers).to include(scenarios: provided_trigger_scenarios)
+      end
+
+      it "assumes the provided triggered stubs" do
+        subject
+
+        expect(builder.triggers).to include(stubs: provided_trigger_stub_builders)
       end
 
     end
@@ -411,7 +507,7 @@ describe HttpStub::Configurer::DSL::StubBuilder do
   describe "#build" do
 
     let(:fixture)  { HttpStub::StubFixture.new }
-    let(:triggers) { [] }
+    let(:triggers) { { scenarios: [], stubs: [] } }
     let(:stub)     { instance_double(HttpStub::Configurer::Request::Stub) }
 
     subject do
@@ -440,22 +536,44 @@ describe HttpStub::Configurer::DSL::StubBuilder do
 
       describe "creates a stub payload with triggers that" do
 
-        context "when a trigger is added" do
-          include_context "triggers one stub"
+        context "when a scenario trigger is added" do
+          include_context "triggers one scenario"
 
-          it "contain the provided trigger builder" do
-            expect_stub_to_be_created_with(triggers: [ trigger_builder ])
+          it "contains the provided trigger scenario name" do
+            expect_stub_to_be_created_with_triggers(scenario_names: [ trigger_scenario ])
 
             subject
           end
 
         end
 
-        context "when many triggers are added" do
+        context "when many scenario triggers are added" do
+          include_context "triggers many scenarios"
+
+          it "contains the provided trigger scenario names" do
+            expect_stub_to_be_created_with_triggers(scenario_names: trigger_scenarios)
+
+            subject
+          end
+
+        end
+
+        context "when a stub trigger is added" do
+          include_context "triggers one stub"
+
+          it "contains the provided trigger builder" do
+            expect_stub_to_be_created_with_triggers(stubs: [ trigger_stub ])
+
+            subject
+          end
+
+        end
+
+        context "when many stub triggers are added" do
           include_context "triggers many stubs"
 
-          it "contain the provided trigger builders" do
-            expect_stub_to_be_created_with(triggers: trigger_builders)
+          it "contains the provided trigger builders" do
+            expect_stub_to_be_created_with_triggers(stubs: trigger_stubs)
 
             subject
           end
@@ -485,12 +603,17 @@ describe HttpStub::Configurer::DSL::StubBuilder do
             delay_in_seconds: 8
           }
         end
-        let(:trigger_defaults) { (1..3).map { instance_double(HttpStub::Configurer::DSL::StubBuilder) } }
+        let(:trigger_scenario_defaults)      { (1..3).map { |i| "Default trigger scenario #{i}" } }
+        let(:trigger_stub_defaults)          { (1..3).map { instance_double(HttpStub::Configurer::Request::Stub) } }
+        let(:trigger_stub_builder_defaults)  do
+          trigger_stub_defaults.map { |stub| instance_double(described_class, build: stub) }
+        end
 
         let(:default_builder) do
-          instance_double(HttpStub::Configurer::DSL::StubBuilder, request: request_defaults,
-                                                                  response: response_defaults,
-                                                                  triggers: trigger_defaults)
+          instance_double(described_class, request:  request_defaults,
+                                           response: response_defaults,
+                                           triggers: { scenarios: trigger_scenario_defaults,
+                                                       stubs:     trigger_stub_builder_defaults })
         end
 
         describe "the built request payload" do
@@ -557,12 +680,24 @@ describe HttpStub::Configurer::DSL::StubBuilder do
 
         end
 
-        describe "the built response triggers" do
+        describe "the built triggers payload" do
 
-          let(:triggers) { (1..3).map { instance_double(HttpStub::Configurer::DSL::StubBuilder) } }
+          let(:trigger_scenarios)     { (1..3).map { |i| "Trigger scenario #{i}" } }
+          let(:trigger_stubs)         { (1..3).map { instance_double(HttpStub::Configurer::Request::Stub) } }
+          let(:trigger_stub_builders) do
+            trigger_stubs.map { |stub| instance_double(described_class, build: stub) }
+          end
 
-          it "combines any defaults with values values established in the stub" do
-            expect_stub_to_be_created_with(triggers: trigger_defaults + triggers)
+          let(:triggers) { { scenarios: trigger_scenarios, stubs: trigger_stub_builders } }
+
+          it "combines any scenario defaults with values established in the stub" do
+            expect_stub_to_be_created_with_triggers(scenario_names: trigger_scenario_defaults + trigger_scenarios)
+
+            subject
+          end
+
+          it "combines any stub defaults with values established in the stub" do
+            expect_stub_to_be_created_with_triggers(stubs: trigger_stub_defaults + trigger_stubs)
 
             subject
           end
@@ -579,6 +714,10 @@ describe HttpStub::Configurer::DSL::StubBuilder do
 
     def expect_stub_to_be_created_with(args)
       expect(HttpStub::Configurer::Request::Stub).to receive(:new).with(hash_including(args))
+    end
+
+    def expect_stub_to_be_created_with_triggers(args)
+      expect_stub_to_be_created_with(triggers: hash_including(args))
     end
 
   end

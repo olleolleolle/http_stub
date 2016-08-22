@@ -22,7 +22,7 @@ describe HttpStub::Server::Application::CrossOriginSupport do
   let(:app) { app_class.new! }
 
   before(:example) do
-    app_class.before { @http_stub_request = HttpStub::Server::Request.create(request) }
+    app_class.before { @http_stub_request = HttpStub::Server::RequestFixture.create(request) }
   end
 
   describe "when registered in an application" do
