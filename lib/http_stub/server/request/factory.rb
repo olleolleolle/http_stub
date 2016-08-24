@@ -4,12 +4,14 @@ module HttpStub
 
       class Factory
 
-        def initialize(scenario_registry)
-          @session = HttpStub::Server::Session.new(scenario_registry)
+        def initialize(scenario_registry, session_configuration)
+          @session_factory = HttpStub::Server::Session::Factory.new(scenario_registry, session_configuration)
         end
 
         def create(rack_request)
-          HttpStub::Server::Request::Request.new(rack_request, @session)
+          HttpStub::Server::Request::Request.new(rack_request).tap do |request|
+            request.session = @session_factory.create(request)
+          end
         end
 
       end

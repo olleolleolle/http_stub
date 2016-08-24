@@ -1,4 +1,4 @@
-describe HttpStub::Server::Session do
+describe HttpStub::Server::Session::Session do
 
   let(:scenario_registry)   { instance_double(HttpStub::Server::Registry) }
   let(:stub_registry)       { instance_double(HttpStub::Server::Stub::Registry) }

@@ -26,10 +26,7 @@ module HttpStub
 
       def run_application(args)
         HttpStub::Server::Application::Application.instance_eval do
-          set :environment, :test
-          set :port, args[:configurer] ? args[:configurer].stub_server.port : args[:port]
-          enable :cross_origin_support if args[:configurer] &&
-                                          args[:configurer].stub_server.enabled?(:cross_origin_support)
+          configure(args)
           run!
         end
       end

@@ -8,15 +8,26 @@ module HttpStub
 
         private_constant :SUPPORTED_REQUEST_TYPES
 
-        set :root, File.expand_path("../..", __FILE__)
-
         register Sinatra::Partial
+
+        set :root, File.expand_path("../..", __FILE__)
+        set :environment, :test
+        set :session_identifier, nil
 
         enable  :dump_errors, :logging, :partial_underscores
         disable :protection, :cross_origin_support
 
-        def self.any_request_type(path, opts={}, &block)
-          SUPPORTED_REQUEST_TYPES.each { |type| self.send(type, path, opts, &block) }
+        class << self
+
+          def configure(args)
+            configuration = HttpStub::Server::Application::Configuration.new(args)
+            configuration.settings.each { |name, value| set(name, value) }
+          end
+
+          def any_request_type(path, opts={}, &block)
+            SUPPORTED_REQUEST_TYPES.each { |type| self.send(type, path, opts, &block) }
+          end
+
         end
 
         private_class_method :any_request_type
@@ -27,7 +38,7 @@ module HttpStub
           @scenario_controller   = HttpStub::Server::Scenario::Controller.new(@scenario_registry)
           @stub_controller       = HttpStub::Server::Stub::Controller.new
           @stub_match_controller = HttpStub::Server::Stub::Match::Controller.new
-          @request_factory       = HttpStub::Server::Request::Factory.new(@scenario_registry)
+          @request_factory = HttpStub::Server::Request::Factory.new(@scenario_registry, settings.session_identifier)
         end
 
         before do

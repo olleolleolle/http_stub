@@ -2,7 +2,7 @@ describe HttpStub::Server::Scenario::Controller do
 
   let(:request_uri)        { "/some/request/path" }
   let(:request_parameters) { {} }
-  let(:session)            { instance_double(HttpStub::Server::Session) }
+  let(:session)            { instance_double(HttpStub::Server::Session::Session) }
   let(:request)            do
     instance_double(HttpStub::Server::Request::Request, uri:        request_uri,
                                                         parameters: request_parameters,

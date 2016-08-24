@@ -13,7 +13,7 @@ describe HttpStub::Server::Application::Application do
 
   let(:response_pipeline) { instance_double(HttpStub::Server::Application::ResponsePipeline, process: nil) }
 
-  let(:app) { HttpStub::Server::Application::Application.new! }
+  let(:app) { described_class.new! }
 
   before(:example) do
     allow(HttpStub::Server::Scenario::Controller).to receive(:new).and_return(scenario_controller)
@@ -21,6 +21,69 @@ describe HttpStub::Server::Application::Application do
     allow(HttpStub::Server::Stub::Match::Controller).to receive(:new).and_return(stub_match_controller)
     allow(HttpStub::Server::Request::Factory).to receive(:new).and_return(request_factory)
     allow(HttpStub::Server::Application::ResponsePipeline).to receive(:new).and_return(response_pipeline)
+  end
+
+  describe "::configure" do
+
+    let(:args)                { { some_argument_key: "some argument value" } }
+    let(:configured_settings) { { setting_1: "value 1", setting_2: "value 2", setting_3: "value 3" } }
+    let(:configuration)       do
+      instance_double(HttpStub::Server::Application::Configuration, settings: configured_settings)
+    end
+
+    subject { described_class.configure(args) }
+
+    before(:example) { allow(HttpStub::Server::Application::Configuration).to receive(:new).and_return(configuration) }
+
+    it "creates application configuration encapsulating the arguments" do
+      expect(HttpStub::Server::Application::Configuration).to receive(:new).with(args).and_return(configuration)
+
+      subject
+    end
+
+    it "establishes the configured settings on the application" do
+      subject
+
+      configured_settings.each { |name, value| expect(described_class.settings.send(name)).to eql(value) }
+    end
+
+  end
+
+  describe "session identifer" do
+
+    context "when configured" do
+
+      let(:session_identifier) { { header: :some_session_identifier } }
+
+      before(:example) do
+        @original_session_identifier = described_class.settings.session_identifier
+        described_class.set :session_identifier, session_identifier
+      end
+
+      after(:example) { described_class.set :session_identifier, @original_session_identifier }
+
+      it "creates a request factory with the configuration" do
+        expect(HttpStub::Server::Request::Factory).to receive(:new).with(anything, session_identifier)
+
+        issue_a_request
+      end
+
+    end
+
+    context "when not configured" do
+
+      it "creates a request factory with a nil configuration" do
+        expect(HttpStub::Server::Request::Factory).to receive(:new).with(anything, nil)
+
+        issue_a_request
+      end
+
+    end
+
+    def issue_a_request
+      get "/http_stub"
+    end
+
   end
 
   context "when the diagnostics landing page is retrieved" do

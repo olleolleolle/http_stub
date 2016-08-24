@@ -2,6 +2,7 @@
 
 New:
 * `stub.trigger` can activate Scenarios
+* Stub sessions via `stub_server.session_identifier`, sessions can pinned to a request header or parameter
 
 Breaking:
 * `stub.trigger` accepts a hash with optional `:scenarios`, `:scenario`, `:stubs` and `:stub` elements

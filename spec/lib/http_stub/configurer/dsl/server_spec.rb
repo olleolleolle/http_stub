@@ -26,6 +26,18 @@ describe HttpStub::Configurer::DSL::Server do
     expect(server).to be_a(HttpStub::Configurer::DSL::ScenarioActivator)
   end
 
+  describe "#session_identifier" do
+
+    let(:session_identifier) { { headers: :some_session_identifier } }
+
+    before(:example) { server.session_identifier = session_identifier }
+
+    it "returns any configured value" do
+      expect(server.session_identifier).to eql(session_identifier)
+    end
+
+  end
+
   describe "#base_uri" do
 
     subject { server.base_uri }

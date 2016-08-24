@@ -6,7 +6,7 @@ module HttpStub
         include HttpStub::Configurer::DSL::StubBuilderProducer
         include HttpStub::Configurer::DSL::ScenarioActivator
 
-        attr_accessor :host, :port
+        attr_accessor :host, :port, :session_identifier
 
         def initialize(server_facade)
           @server_facade        = server_facade

@@ -14,9 +14,8 @@ describe HttpStub::Server::Request::Request do
                                    params:         rack_parameters,
                                    body:           StringIO.new(rack_body))
   end
-  let(:session)            { instance_double(HttpStub::Server::Session) }
 
-  let(:server_request) { described_class.new(rack_request, session) }
+  let(:server_request) { described_class.new(rack_request) }
 
   describe "#base_uri" do
 
@@ -96,8 +95,24 @@ describe HttpStub::Server::Request::Request do
 
     subject { server_request.session }
 
-    it "is the provided session" do
-      expect(subject).to eql(session)
+    context "when it has been established" do
+
+      let(:session) { instance_double(HttpStub::Server::Session::Session) }
+
+      before(:example) { server_request.session = session }
+
+      it "returns the session" do
+        expect(subject).to eql(session)
+      end
+
+    end
+
+    context "when it has not been established" do
+
+      it "returns nil" do
+        expect(subject).to eql(nil)
+      end
+
     end
 
   end

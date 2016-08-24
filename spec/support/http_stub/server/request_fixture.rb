@@ -12,7 +12,7 @@ module HttpStub
         private
 
         def request_factory
-          @request_factory ||= HttpStub::Server::Request::Factory.new(HttpStub::Server::Registry.new("scenario"))
+          @request_factory ||= HttpStub::Server::Request::Factory.new(HttpStub::Server::Registry.new("scenario"), nil)
         end
 
       end

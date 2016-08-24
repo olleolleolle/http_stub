@@ -1,7 +1,7 @@
 describe HttpStub::Server::Stub::Controller do
 
   let(:request_parameters)  { {} }
-  let(:session)             { instance_double(HttpStub::Server::Session) }
+  let(:session)             { instance_double(HttpStub::Server::Session::Session) }
   let(:request)             do
     instance_double(HttpStub::Server::Request::Request, parameters: request_parameters, session: session)
   end
