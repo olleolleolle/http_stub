@@ -24,6 +24,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "rake", ">= 10.4"
 
   spec.add_dependency "sinatra",             "~> 1.4"
+  spec.add_dependency "sinatra-contrib",     "~> 1.4"
   spec.add_dependency "sinatra-partial",     "~> 1.0"
   spec.add_dependency "multipart-post",      "~> 2.0"
   spec.add_dependency "http_server_manager", "~> 0.4"

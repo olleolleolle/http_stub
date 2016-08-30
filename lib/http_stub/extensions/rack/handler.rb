@@ -1,6 +1,7 @@
 module HttpStub
   module Extensions
     module Rack
+
       module Handler
 
         def self.included(mod)

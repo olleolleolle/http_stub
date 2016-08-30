@@ -18,8 +18,7 @@ describe HttpStub::Server::Application::CrossOriginSupport do
   let(:response) { last_response }
 
   let(:app_class) { Class.new(Sinatra::Base) }
-
-  let(:app) { app_class.new! }
+  let(:app)       { app_class.new! }
 
   before(:example) do
     app_class.before { @http_stub_request = HttpStub::Server::RequestFixture.create(request) }

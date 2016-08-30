@@ -11,16 +11,20 @@ describe HttpStub::Server::Application::Application, "when the server is running
       expect(response.code).to eql(200)
     end
 
-    it "returns a response whose body links to the stubs list" do
-      expect(link_for("stubs")).to eql("/http_stub/stubs")
+    it "returns a response whose body links to the stubs list for the default session" do
+      expect(link_for("stubs")).to eql("/http_stub/stubs?http_stub_session_id=Default")
     end
 
-    it "returns a response whose body links to the scenarios list" do
-      expect(link_for("scenarios")).to eql("/http_stub/scenarios")
+    it "returns a response whose body links to the scenarios list in the context of the default session" do
+      expect(link_for("scenarios")).to eql("/http_stub/scenarios?http_stub_session_id=Default")
     end
 
-    it "returns a response whose body links to the matches list" do
-      expect(link_for("stub_matches")).to eql("/http_stub/stubs/matches")
+    it "returns a response whose body links to the matches list for the default session" do
+      expect(link_for("stub_matches")).to eql("/http_stub/stubs/matches?http_stub_session_id=Default")
+    end
+
+    it "returns a response whose body links to the misses list for the default session" do
+      expect(link_for("stub_misses")).to eql("/http_stub/stubs/misses?http_stub_session_id=Default")
     end
 
     def link_for(id)
@@ -229,17 +233,17 @@ describe HttpStub::Server::Application::Application, "when the server is running
         expect(scenario_names).to eql(expected_scenario_names)
       end
 
-      it "returns a response whose body contains links to activate each scenario" do
-        expected_activation_links = [ "/http_stub/scenarios/activate" ] * 6
+      it "returns a response whose body contains links to activate each scenario in the default session" do
+        expected_activation_links = [ "/http_stub/scenarios/activate?http_stub_session_id=Default" ] * 6
 
         activation_links = response_document.css("a.activate_scenario").map { |link| link["href"] }
 
         expect(activation_links).to eql(expected_activation_links)
       end
 
-      it "returns a response whose body contains links to the details of each scenario" do
+      it "returns a response whose body contains links to the details of each scenario for the default session" do
         expected_detail_links = %w{ Nested+scenario Scenario }.map do |scenario_name_prefix|
-          (1..3).map { |i| "/http_stub/scenarios?name=#{scenario_name_prefix}+#{i}" }
+          (1..3).map { |i| "/http_stub/scenarios?name=#{scenario_name_prefix}+#{i}&http_stub_session_id=Default" }
         end.flatten
 
         detail_links = response_document.css("a.view_scenario").map { |link| link["href"] }

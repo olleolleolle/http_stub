@@ -1,6 +1,6 @@
 describe HttpStub::Server::Request::Parameters do
 
-  let(:parameter_hash) { {} }
+  let(:parameter_hash) { { "some_parameter_name" => "some parameter value" } }
 
   let(:parameters) { described_class.new(parameter_hash) }
 
@@ -10,17 +10,14 @@ describe HttpStub::Server::Request::Parameters do
 
   describe "::create" do
 
-    let(:rack_params)  { { "some_parameter_name" => "some parameter value" } }
-    let(:rack_request) { instance_double(Rack::Request, params: rack_params) }
+    subject { described_class.create(parameter_hash) }
 
-    subject { described_class.create(rack_request) }
-
-    it "returns http stub request parameters" do
+    it "returns http_stub request parameters" do
       expect(subject).to be_an_instance_of(described_class)
     end
 
-    it "returns parameters containing the rack request parameters" do
-      expect(subject).to eql(rack_params)
+    it "contains the provided parameters" do
+      expect(subject).to eql(parameters)
     end
 
   end

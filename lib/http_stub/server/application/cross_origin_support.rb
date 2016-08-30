@@ -32,9 +32,11 @@ module HttpStub
         end
 
         def self.registered(application)
-          application.helpers HttpStub::Server::Application::CrossOriginSupport::Helpers
-          application.before { add_headers_if_necessary }
-          application.options("*") { handle_options_if_necessary }
+          application.instance_eval do
+            helpers HttpStub::Server::Application::CrossOriginSupport::Helpers
+            before { add_headers_if_necessary }
+            options("*") { handle_options_if_necessary }
+          end
         end
 
       end

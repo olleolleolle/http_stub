@@ -1,0 +1,8 @@
+%header
+  %h1 http_stub administration
+%section
+  %table{ class: :sessions }
+    - sessions.each do |session|
+      %tr
+        %td{ class: "header-rule" }
+          %a{ href: "/http_stub/sessions/#{session.id}", class: [:session, :link] }= session.id

@@ -45,6 +45,11 @@ Style/EmptyLinesAroundModuleBody:
   Enabled: false
 Style/IndentAssignment:
   Enabled: false
+Style/EmptyLinesAroundBlockBody:
+  Exclude:
+    - lib/http_stub/server/application/request_support.rb
+    - lib/http_stub/server/application/response_support.rb
+    - lib/http_stub/server/application/routes/*.rb
 
 # sufficient length for modern screens
 Metrics/LineLength:
@@ -64,7 +69,10 @@ Style/EmptyElse:
   EnforcedStyle: empty
 
 # rare situations where readability is preferred over metrics aspirations
+Metrics/MethodLength:
+  Exclude:
+    - lib/http_stub/server/application/routes/*.rb
 Metrics/AbcSize:
   Exclude:
+    - lib/http_stub/server/application/routes/*.rb
     - lib/http_stub/server/stub/response/base.rb
-    - lib/http_stub/server/stub/stub.rb

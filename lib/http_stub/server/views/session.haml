@@ -1,0 +1,10 @@
+%header
+  %h1 http_stub administration
+  %h2= "Session: #{session.id}"
+%a{ href: session_uri("/http_stub/scenarios"), id: :scenarios, class: :link } List Scenarios
+%br
+%a{ href: session_uri("/http_stub/stubs"), id: :stubs, class: :link } List Stubs
+%br
+%a{ href: session_uri("/http_stub/stubs/matches"), id: :stub_matches, class: :link } List Stub Matches
+%br
+%a{ href: session_uri("/http_stub/stubs/misses"), id: :stub_misses, class: :link } List Stub Misses

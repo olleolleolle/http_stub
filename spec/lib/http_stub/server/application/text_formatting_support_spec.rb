@@ -2,19 +2,19 @@ describe HttpStub::Server::Application::TextFormattingSupport do
 
   let(:text_formatting_support) { Class.new.extend(described_class) }
 
-  describe "::h" do
+  describe "#h" do
 
     let(:text) { "<tag>Some text</tag>" }
 
     subject { text_formatting_support.h(text) }
 
     it "should escape the provided HTML" do
-      expect(subject).to eq("&lt;tag&gt;Some text&lt;&#x2F;tag&gt;")
+      expect(subject).to eql("&lt;tag&gt;Some text&lt;&#x2F;tag&gt;")
     end
 
   end
 
-  describe "::pp" do
+  describe "#pp" do
 
     subject { text_formatting_support.pp(text) }
 

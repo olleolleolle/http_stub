@@ -1,7 +1,7 @@
 describe HttpStub::Extensions::Rack::Handler do
 
   it "patches Rack::Handler" do
-    expect(::Rack::Handler.included_modules).to include(HttpStub::Extensions::Rack::Handler)
+    expect(::Rack::Handler.included_modules).to include(described_class)
   end
 
   context "when mixed in to a module" do

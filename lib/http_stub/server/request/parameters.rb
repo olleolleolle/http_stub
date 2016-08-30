@@ -5,8 +5,8 @@ module HttpStub
       class Parameters < ::HashWithIndifferentAccess
         include HttpStub::Extensions::Core::Hash::Formatted
 
-        def self.create(rack_request)
-          self.new(rack_request.params)
+        class << self
+          alias_method :create, :new
         end
 
         def initialize(parameter_hash={})

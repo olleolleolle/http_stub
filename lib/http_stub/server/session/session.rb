@@ -4,11 +4,18 @@ module HttpStub
 
       class Session
 
-        def initialize(scenario_registry)
+        attr_reader :id
+
+        def initialize(id, scenario_registry)
+          @id                  = id
           @scenario_registry   = scenario_registry
           @stub_registry       = HttpStub::Server::Stub::Registry.new
           @stub_match_registry = HttpStub::Server::Registry.new("stub match")
           @stub_miss_registry  = HttpStub::Server::Registry.new("stub miss")
+        end
+
+        def matches?(id, _logger)
+          id == @id
         end
 
         def activate_scenario!(name, logger)

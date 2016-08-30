@@ -4,7 +4,7 @@ describe HttpStub::Server::Request::Request do
   let(:rack_path_info)      { "/rack/path/info" }
   let(:rack_request_method) { "some method" }
   let(:rack_env)            { { "some_env_name" => "some env value" } }
-  let(:rack_parameters)     { { "some_parameter_name" => "some parameter value" } }
+  let(:rack_parameters)     { { "rack_parameter_name" => "rack parameter value" } }
   let(:rack_body)           { "some request body" }
   let(:rack_request)        do
     instance_double(Rack::Request, base_url:       rack_base_url,
@@ -14,8 +14,9 @@ describe HttpStub::Server::Request::Request do
                                    params:         rack_parameters,
                                    body:           StringIO.new(rack_body))
   end
+  let(:sinatra_parameters)  { { "sinatra_parameter_name" => "sinatra parameter value" } }
 
-  let(:server_request) { described_class.new(rack_request) }
+  let(:server_request) { described_class.new(rack_request, sinatra_parameters) }
 
   describe "#base_uri" do
 
@@ -66,8 +67,8 @@ describe HttpStub::Server::Request::Request do
 
     subject { server_request.parameters }
 
-    it "creates http stub request parameters from the rack request" do
-      expect(HttpStub::Server::Request::Parameters).to receive(:create).with(rack_request)
+    it "creates http stub request parameters from the sinatra parameters" do
+      expect(HttpStub::Server::Request::Parameters).to receive(:create).with(sinatra_parameters)
 
       subject
     end

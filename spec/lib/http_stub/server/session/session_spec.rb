@@ -1,5 +1,6 @@
 describe HttpStub::Server::Session::Session do
 
+  let(:id)                  { "Some session id" }
   let(:scenario_registry)   { instance_double(HttpStub::Server::Registry) }
   let(:stub_registry)       { instance_double(HttpStub::Server::Stub::Registry) }
   let(:stub_match_registry) { instance_double(HttpStub::Server::Registry) }
@@ -7,12 +8,20 @@ describe HttpStub::Server::Session::Session do
 
   let(:logger) { instance_double(Logger) }
 
-  let(:session) { described_class.new(scenario_registry) }
+  let(:session) { described_class.new(id, scenario_registry) }
 
   before(:example) do
     allow(HttpStub::Server::Stub::Registry).to receive(:new).and_return(stub_registry)
     allow(HttpStub::Server::Registry).to receive(:new).with("stub match").and_return(stub_match_registry)
     allow(HttpStub::Server::Registry).to receive(:new).with("stub miss").and_return(stub_miss_registry)
+  end
+
+  describe "#id" do
+
+    it "returns the provided id" do
+      expect(session.id).to eql(id)
+    end
+
   end
 
   describe "activate_scenario!" do
