@@ -9,7 +9,7 @@ describe HttpStub::Extensions::Core::URI do
     let(:original_parameters) { {} }
     let(:arg_parameters)      { {} }
     let(:uri)                 do
-      uri = URI.parse("https://some_host:8888/some/path")
+      uri = URI.parse("https://some-host:8888/some/path")
       uri.query = "#{URI.encode_www_form(original_parameters)}"
       uri.to_s
     end
@@ -17,7 +17,7 @@ describe HttpStub::Extensions::Core::URI do
     subject { ::URI.add_parameters(uri, arg_parameters) }
 
     it "preserves the uri's host, port and path" do
-      expect(subject).to start_with("https://some_host:8888/some/path")
+      expect(subject).to start_with("https://some-host:8888/some/path")
     end
 
     context "when the uri has parameters" do
