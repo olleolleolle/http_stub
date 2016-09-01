@@ -3,7 +3,7 @@ describe "Stub matches last acceptance" do
 
   before(:example) { configurer.initialize! }
 
-  after(:example) { configurer.clear_stubs! }
+  after(:example) { stub_server.clear_stubs! }
 
   describe "GET /http_stub/stubs/matches/last" do
 

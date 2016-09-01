@@ -379,50 +379,9 @@ describe HttpStub::Configurer::DSL::Server do
 
   end
 
-  describe "#add_activator!" do
-
-    let(:scenario) { instance_double(HttpStub::Configurer::Request::Scenario) }
-    let(:stub_activator_builder) do
-      instance_double(HttpStub::Configurer::DSL::StubActivatorBuilder, build: scenario)
-    end
-
-    before(:example) { allow(server_facade).to receive(:define_scenario) }
-
-    let(:block) { lambda { |_activator| "some block" } }
-
-    before(:example) do
-      allow(HttpStub::Configurer::DSL::StubActivatorBuilder).to receive(:new).and_return(stub_activator_builder)
-    end
-
-    subject { server.add_activator!(&block) }
-
-    it "creates a stub activator builder containing the servers default stub builder" do
-      expect(HttpStub::Configurer::DSL::StubActivatorBuilder).to receive(:new).with(default_stub_builder)
-
-      subject
-    end
-
-    it "yields the created builder to the provided block" do
-      expect { |block| server.add_activator!(&block) }.to yield_with_args(stub_activator_builder)
-    end
-
-    it "builds a scenario request" do
-      expect(stub_activator_builder).to receive(:build).and_return(scenario)
-
-      subject
-    end
-
-    it "informs the server facade to submit the scenario request" do
-      expect(server_facade).to receive(:define_scenario).with(scenario)
-
-      subject
-    end
-
-  end
-
   describe "#activate!" do
 
-    let(:scenario_name) { "/some/scenario/name" }
+    let(:scenario_name) { "Some scenario name" }
 
     it "delegates to the server facade" do
       expect(server_facade).to receive(:activate).with(scenario_name)

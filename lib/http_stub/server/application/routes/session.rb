@@ -5,10 +5,10 @@ module HttpStub
 
         module Session
 
-          NAMESPACE           = "/http_stub/sessions".freeze
-          DEFAULT_SESSION_URI = "#{NAMESPACE}/#{HttpStub::Server::Session::DEFAULT_ID}".freeze
+          NAMESPACE_URI       = "/http_stub/sessions".freeze
+          DEFAULT_SESSION_URI = "#{NAMESPACE_URI}/#{HttpStub::Server::Session::DEFAULT_ID}".freeze
 
-          private_constant :NAMESPACE, :DEFAULT_SESSION_URI
+          private_constant :NAMESPACE_URI, :DEFAULT_SESSION_URI
 
           def initialize
             super()
@@ -19,10 +19,10 @@ module HttpStub
             application.instance_eval do
 
               get "/http_stub" do
-                redirect settings.session_identifier? ? NAMESPACE : DEFAULT_SESSION_URI
+                redirect settings.session_identifier? ? NAMESPACE_URI : DEFAULT_SESSION_URI
               end
 
-              namespace NAMESPACE do
+              namespace NAMESPACE_URI do
 
                 get do
                   haml :sessions, {}, sessions: @session_controller.find_all

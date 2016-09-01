@@ -11,7 +11,7 @@ describe "Scenario acceptance" do
 
       context "containing stubs" do
 
-        before(:example) { configurer.activate!("Scenario 1") }
+        before(:example) { stub_server.activate!("Scenario 1") }
 
         (1..3).each do |stub_number|
 
@@ -32,7 +32,7 @@ describe "Scenario acceptance" do
 
       context "containing triggered scenarios" do
 
-        before(:example) { configurer.activate!("Activates another scenario") }
+        before(:example) { stub_server.activate!("Activates another scenario") }
 
         (1..3).each do |stub_number|
 
@@ -71,7 +71,7 @@ describe "Scenario acceptance" do
 
       let(:configurer) { HttpStub::Examples::ConfigurerWithFileResponses.new }
 
-      before(:example) { configurer.activate!("Scenario with file") }
+      before(:example) { stub_server.activate!("Scenario with file") }
 
       context "and the stub request is made" do
 

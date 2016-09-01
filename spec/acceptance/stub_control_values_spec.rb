@@ -10,7 +10,10 @@ describe "Stub control value acceptance" do
     context "with a stub uri that is regular expression containing meta characters" do
 
       before(:example) do
-        configurer.stub_response!(/\/stub\/regexp\/\$key=value/, method: :get, response: { body: "Stub body" })
+        stub_server.add_stub! do |stub|
+          stub.match_requests(uri: /\/stub\/regexp\/\$key=value/, method: :get)
+          stub.respond_with(body: "Stub body")
+        end
       end
 
       context "and a request is made whose uri matches the regular expression" do
@@ -38,10 +41,10 @@ describe "Stub control value acceptance" do
     context "with headers whose values are regular expressions" do
 
       before(:example) do
-        configurer.stub_response!(
-          "/stub_with_headers", method: :get, headers: { key: /^match.*/ },
-          response: { status: 202, body: "Another stub body" }
-        )
+        stub_server.add_stub! do |stub|
+          stub.match_requests(uri: "/stub_with_headers", method: :get, headers: { key: /^match.*/ })
+          stub.respond_with(status: 202, body: "Another stub body")
+        end
       end
 
       context "and a request that matches is made" do
@@ -76,10 +79,10 @@ describe "Stub control value acceptance" do
       context "whose values are regular expressions" do
 
         before(:example) do
-          configurer.stub_response!(
-            "/stub_with_parameters", method: :get, parameters: { key: /^match.*/ },
-            response: { status: 202, body: "Another stub body" }
-          )
+          stub_server.add_stub! do |stub|
+            stub.match_requests(uri: "/stub_with_parameters", method: :get, parameters: { key: /^match.*/ })
+            stub.respond_with(status: 202, body: "Another stub body")
+          end
         end
 
         context "and a request that matches is made" do
@@ -110,10 +113,10 @@ describe "Stub control value acceptance" do
       context "whose values indicate the parameters must be omitted" do
 
         before(:example) do
-          configurer.stub_response!(
-            "/stub_with_omitted_parameters", method: :get, parameters: { key: :omitted },
-            response: { status: 202, body: "Omitted parameter stub body" }
-          )
+          stub_server.add_stub! do |stub|
+            stub.match_requests(uri: "/stub_with_omitted_parameters", method: :get, parameters: { key: :omitted })
+            stub.respond_with(status: 202, body: "Omitted parameter stub body")
+          end
         end
 
         context "and a request that matches is made" do
@@ -145,7 +148,7 @@ describe "Stub control value acceptance" do
     context "with a response delay" do
 
       before(:example) do
-        configurer.stub_response!("/some_stub_path", method: :get, response: { delay_in_seconds: 2 })
+        stub_server.add_stub! { match_requests(uri: "/some_stub_path", method: :get).respond_with(delay_in_seconds: 2) }
       end
 
       it "delays the response by the time provided" do

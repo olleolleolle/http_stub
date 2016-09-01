@@ -54,7 +54,7 @@ describe "Cross origin support acceptance" do
 
     context "and a scenario configuring OPTIONS request reponses is activated" do
 
-      before(:example) { configurer.activate!("Options scenario") }
+      before(:example) { stub_server.activate!("Options scenario") }
 
       context "and a matching pre-flight request is made" do
 
@@ -107,7 +107,7 @@ describe "Cross origin support acceptance" do
 
     context "and a scenario is activated" do
 
-      before(:example) { configurer.activate!("Scenario 1") }
+      before(:example) { stub_server.activate!("Scenario 1") }
 
       context "and a matching request is made" do
 

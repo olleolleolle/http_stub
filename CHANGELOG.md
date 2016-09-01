@@ -6,6 +6,10 @@ New:
 
 Breaking:
 * `stub.trigger` accepts a hash with optional `:scenarios`, `:scenario`, `:stubs` and `:stub` elements
+* Removed deprecated `Configurer` behaviour:
+** Replace `stub_activator` with `stub_server.add_scenario!`
+** Replace `clear_activators!` with `stub_server.clear_scenarios!`
+** Methods directly accessible from `Configurer` must now be performed via `stub_server`, e.g. `stub_server.recall_stubs!`
 
 Misc:
 * Migrated to Sinatra namespaces

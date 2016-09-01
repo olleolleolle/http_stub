@@ -5,7 +5,6 @@ module HttpStub
     def self.included(mod)
       mod.extend(HttpStub::Configurer::ClassMethods)
       mod.send(:include, HttpStub::Configurer::InstanceMethods)
-      mod.send(:include, HttpStub::Configurer::DSL::Deprecated)
     end
 
     module ClassMethods

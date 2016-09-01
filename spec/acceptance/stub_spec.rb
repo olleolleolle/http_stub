@@ -12,8 +12,9 @@ describe "Stub basics acceptance" do
       context "and it contains a response status" do
 
         before(:example) do
-          stub_server.add_stub! do
-            match_requests(uri: "/stub_with_status", method: :get).respond_with(status: 201, body: "Stub body")
+          stub_server.add_stub! do |stub|
+            stub.match_requests(uri: "/stub_with_status", method: :get)
+            stub.respond_with(status: 201, body: "Stub body")
           end
         end
 
@@ -33,7 +34,7 @@ describe "Stub basics acceptance" do
 
         context "and stubs are cleared" do
 
-          before(:example) { configurer.clear_stubs! }
+          before(:example) { stub_server.clear_stubs! }
 
           context "and a matching request is made" do
 
@@ -52,7 +53,10 @@ describe "Stub basics acceptance" do
       context "and it does not contain a response status" do
 
         before(:example) do
-          stub_server.add_stub! { match_requests(uri: "/stub_without_status", method: :get).respond_with(body: "Stub body") }
+          stub_server.add_stub! do |stub|
+            stub.match_requests(uri: "/stub_without_status", method: :get)
+            stub.respond_with(body: "Stub body")
+          end
         end
 
         context "and a matching request is made" do

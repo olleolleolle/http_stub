@@ -21,14 +21,15 @@ describe "Configurer initialization acceptance" do
       context "and the stub is overridden" do
 
         before(:example) do
-          configurer.stub_response!("/a_class_stub", method: :get, response: { body: "Other class stub body" })
+          stub_server.add_stub! do |stub|
+            stub.match_requests(uri: "/a_class_stub", method: :get)
+            stub.respond_with(body: "Other class stub body")
+          end
         end
 
         context "and the configurer is re-initialized" do
 
-          before(:example) do
-            configurer.class.initialize!
-          end
+          before(:example) { configurer.class.initialize! }
 
           it "re-establishes the class stub as having priority" do
             response = HTTParty.get("#{server_uri}/a_class_stub")
@@ -57,12 +58,15 @@ describe "Configurer initialization acceptance" do
       context "and another stub is registered" do
 
         before(:example) do
-          configurer.stub_response!("/another_stub", method: :get, response: { body: "Another stub body" })
+          stub_server.add_stub! do |stub|
+            stub.match_requests(uri: "/another_stub", method: :get)
+            stub.respond_with(body: "Another stub body")
+          end
         end
 
         context "and the servers remembered stubs are recalled" do
 
-          before(:example) { configurer.recall_stubs! }
+          before(:example) { stub_server.recall_stubs! }
 
           it "removes the stub registered post-initialization" do
             response = HTTParty.get("#{server_uri}/another_stub")
@@ -102,10 +106,10 @@ describe "Configurer initialization acceptance" do
 
     context "and the configurer is informed that the server has started" do
 
-      before(:example) { configurer.server_has_started! }
+      before(:example) { stub_server.has_started! }
 
       it "does not initialize the configurer" do
-        activation_lambda = lambda { configurer.activate!("an_activator") }
+        activation_lambda = lambda { stub_server.activate!("an_activator") }
 
         expect(activation_lambda).to raise_error(/error occurred activating 'an_activator'/i)
       end
@@ -113,7 +117,9 @@ describe "Configurer initialization acceptance" do
       context "and an attempt is made to register a stub" do
 
         before(:example) do
-          configurer.stub_response!("/some_stub_path", method: :get, response: { body: "Some stub body" })
+          stub_server.add_stub! do
+            match_requests(uri: "/some_stub_path", method: :get).respond_with(body: "Some stub body")
+          end
         end
 
         it "registers the stub" do
@@ -132,7 +138,7 @@ describe "Configurer initialization acceptance" do
       context "and an attempt is made to activate a stub" do
 
         it "raises an exception indicating an error occurred during activation" do
-          activation_lambda = lambda { configurer.activate!("an_activator") }
+          activation_lambda = lambda { stub_server.activate!("an_activator") }
 
           expect(activation_lambda).to raise_error(/error occurred activating 'an_activator'/i)
         end
