@@ -5,16 +5,18 @@ module HttpStub
 
       class << self
 
-        def create(request=HttpStub::Server::RequestFixture.create)
-          session_factory.create(request, HttpServerManager::Test::SilentLogger)
+        def create(id=SecureRandom.uuid)
+          HttpStub::Server::Session::Session.new(id, scenario_registry, HttpStub::Server::Session::Empty)
+        end
+
+        def memory
+          self.create(HttpStub::Server::Session::MEMORY_SESSION_ID)
         end
 
         private
 
-        def session_factory
-          @session_factory ||= HttpStub::Server::Session::Factory.new(
-            nil, HttpStub::Server::Registry.new("session"), HttpStub::Server::Registry.new("scenario")
-          )
+        def scenario_registry
+          @scenario_registry ||= HttpStub::Server::Registry.new("scenario")
         end
 
       end

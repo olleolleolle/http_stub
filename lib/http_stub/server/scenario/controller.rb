@@ -4,8 +4,8 @@ module HttpStub
 
       class Controller
 
-        def initialize(scenario_registry)
-          @scenario_registry = scenario_registry
+        def initialize(server_memory)
+          @scenario_registry = server_memory.scenarios
         end
 
         def register(request, logger)
@@ -23,7 +23,8 @@ module HttpStub
         end
 
         def activate(request, logger)
-          request.session.activate_scenario!(request.parameters[:name], logger)
+          scenario_names = request.parameters[:name] ? [request.parameters[:name] ] : request.parameters[:names]
+          scenario_names.each { |name| request.session.activate_scenario!(name, logger) }
           HttpStub::Server::Response::OK
         rescue HttpStub::Server::Scenario::NotFoundError
           HttpStub::Server::Response::NOT_FOUND

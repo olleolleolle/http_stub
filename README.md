@@ -46,6 +46,7 @@ In comparison ```http_stub```:
 Similiar in spirit, implemented in Java and comes with Java and Ruby clients.
 
 In comparison ```http_stub```:
+* Has session support to facilitate parallel test execution.
 * Has the concept of scenarios that allow on-the-fly changes to responses.  This aids automated testing, exploratory testing and demonstrations.
 * Supports a wider range of matching rules and can match requests against JSON schemas.
 * Supports references to request headers and parameters in responses.

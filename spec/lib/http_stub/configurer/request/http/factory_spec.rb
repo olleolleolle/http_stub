@@ -2,19 +2,53 @@ describe HttpStub::Configurer::Request::Http::Factory do
 
   describe "::multipart" do
 
-    let(:model)             { double("HttpStub::Configurer::Request::SomeModel") }
+    let(:model) { double("HttpStub::Configurer::Request::SomeModel") }
+    let(:path)  { "some/model/path" }
+
     let(:multipart_request) { instance_double(HttpStub::Configurer::Request::Http::Multipart) }
 
-    subject { HttpStub::Configurer::Request::Http::Factory.multipart(model) }
+    subject { described_class.multipart(path, model) }
 
     before(:example) do
       allow(HttpStub::Configurer::Request::Http::Multipart).to receive(:new).and_return(multipart_request)
     end
 
-    it "creates a multipart request with the provided model" do
-      expect(HttpStub::Configurer::Request::Http::Multipart).to receive(:new).with(model)
+    it "creates a multipart request with the provided path" do
+      expect(HttpStub::Configurer::Request::Http::Multipart).to receive(:new).with(hash_including(path: path))
 
       subject
+    end
+
+    it "creates a multipart request with the provided model" do
+      expect(HttpStub::Configurer::Request::Http::Multipart).to receive(:new).with(hash_including(model: model))
+
+      subject
+    end
+
+    context "when headers are provided" do
+
+      let(:headers) { (1..3).each_with_object({}) { |i, result| result["header#{i}"] = "value#{i}" } }
+
+      subject { described_class.multipart(path, model, headers) }
+
+      it "creates a multipart request with the provided headers" do
+        expect(HttpStub::Configurer::Request::Http::Multipart).to receive(:new).with(hash_including(headers: headers))
+
+        subject
+      end
+
+    end
+
+    context "when no headers are provided" do
+
+      subject { described_class.multipart(path, model) }
+
+      it "creates a multipart request with the empty headers" do
+        expect(HttpStub::Configurer::Request::Http::Multipart).to receive(:new).with(hash_including(headers: {}))
+
+        subject
+      end
+
     end
 
     it "returns the created request" do
@@ -25,45 +59,50 @@ describe HttpStub::Configurer::Request::Http::Factory do
 
   describe "::get" do
 
-    let(:path)          { "/some/get/path" }
-    let(:get_request)   { instance_double(Net::HTTP::Get) }
+    let(:path) { "/some/get/path" }
+
     let(:basic_request) { instance_double(HttpStub::Configurer::Request::Http::Basic) }
 
-    subject { HttpStub::Configurer::Request::Http::Factory.get(path) }
+    subject { described_class.get(path) }
 
-    before(:example) do
-      allow(Net::HTTP::Get).to receive(:new).and_return(get_request)
-      allow(HttpStub::Configurer::Request::Http::Basic).to receive(:new).and_return(basic_request)
-    end
+    before(:example) { allow(HttpStub::Configurer::Request::Http::Basic).to receive(:new).and_return(basic_request) }
 
-    context "when the path is absolute" do
-
-      let(:path) { "/some/absolute/get/path" }
-
-      it "creates a GET request with the provided path" do
-        expect(Net::HTTP::Get).to receive(:new).with(path)
-
-        subject
-      end
-
-    end
-
-    context "when the path is relative" do
-
-      let(:path) { "some/relative/get/path" }
-
-      it "creates a GET request with the path prefixed by '/'" do
-        expect(Net::HTTP::Get).to receive(:new).with("/#{path}")
-
-        subject
-      end
-
-    end
-
-    it "creates a basic request wrapping the GET request" do
-      expect(HttpStub::Configurer::Request::Http::Basic).to receive(:new).with(get_request)
+    it "creates a basic GET request" do
+      expect(HttpStub::Configurer::Request::Http::Basic).to receive(:new).with(hash_including(method: :get))
 
       subject
+    end
+
+    it "creates a basic request with the provided path" do
+      expect(HttpStub::Configurer::Request::Http::Basic).to receive(:new).with(hash_including(path: path))
+
+      subject
+    end
+
+    context "when headers are provided" do
+
+      let(:headers) { (1..3).each_with_object({}) { |i, result| result["header#{i}"] = "value#{i}" } }
+
+      subject { described_class.get(path, headers) }
+
+      it "creates a basic request with the provided headers" do
+        expect(HttpStub::Configurer::Request::Http::Basic).to receive(:new).with(hash_including(headers: headers))
+
+        subject
+      end
+
+    end
+
+    context "when no headers are provided" do
+
+      subject { described_class.get(path) }
+
+      it "creates a basic request with empty headers" do
+        expect(HttpStub::Configurer::Request::Http::Basic).to receive(:new).with(hash_including(headers: {}))
+
+        subject
+      end
+
     end
 
     it "returns the created basic request" do
@@ -74,31 +113,34 @@ describe HttpStub::Configurer::Request::Http::Factory do
 
   describe "::post" do
 
-    let(:path)          { "/some/post/path" }
-    let(:post_request)  { instance_double(Net::HTTP::Post).as_null_object }
+    let(:path) { "/some/post/path" }
+
     let(:basic_request) { instance_double(HttpStub::Configurer::Request::Http::Basic) }
 
-    subject { HttpStub::Configurer::Request::Http::Factory.post(path) }
+    subject { described_class.post(path) }
 
-    before(:example) do
-      allow(Net::HTTP::Post).to receive(:new).and_return(post_request)
-      allow(HttpStub::Configurer::Request::Http::Basic).to receive(:new).and_return(basic_request)
+    before(:example) { allow(HttpStub::Configurer::Request::Http::Basic).to receive(:new).and_return(basic_request) }
+
+    it "creates a basic POST request" do
+      expect(HttpStub::Configurer::Request::Http::Basic).to receive(:new).with(hash_including(method: :post))
+
+      subject
     end
 
-    it "creates a POST request with the provided path" do
-      expect(Net::HTTP::Post).to receive(:new).with(path)
+    it "creates a basic request with the provided path" do
+      expect(HttpStub::Configurer::Request::Http::Basic).to receive(:new).with(hash_including(path: path))
 
       subject
     end
 
     context "when parameters are provided" do
 
-      let(:parameters) { (1..3).each_with_object({}) { |i, result| result["key#{i}"] = "value#{i}" } }
+      let(:parameters) { (1..3).each_with_object({}) { |i, result| result["parameter#{i}"] = "value#{i}" } }
 
-      subject { HttpStub::Configurer::Request::Http::Factory.post(path, parameters) }
+      subject { described_class.post(path, parameters) }
 
-      it "establishes the provided parameters as the form data in the POST request" do
-        expect(post_request).to receive(:set_form_data).with(parameters)
+      it "creates a basic request with the provided parameters" do
+        expect(HttpStub::Configurer::Request::Http::Basic).to receive(:new).with(hash_including(parameters: parameters))
 
         subject
       end
@@ -107,20 +149,14 @@ describe HttpStub::Configurer::Request::Http::Factory do
 
     context "when no parameters are provided" do
 
-      subject { HttpStub::Configurer::Request::Http::Factory.post(path) }
+      subject { described_class.post(path) }
 
-      it "establishes empty form data in the POST request" do
-        expect(post_request).to receive(:set_form_data).with({})
+      it "creates a basic POST request with empty parameters" do
+        allow(HttpStub::Configurer::Request::Http::Basic).to receive(:new).with(hash_including(parameters: {}))
 
         subject
       end
 
-    end
-
-    it "creates a basic request wrapping the POST request" do
-      expect(HttpStub::Configurer::Request::Http::Basic).to receive(:new).with(post_request)
-
-      subject
     end
 
     it "returns the created basic request" do
@@ -131,27 +167,50 @@ describe HttpStub::Configurer::Request::Http::Factory do
 
   describe "::delete" do
 
-    let(:path)           { "/some/delete/path" }
-    let(:delete_request) { instance_double(Net::HTTP::Delete) }
-    let(:basic_request)  { instance_double(HttpStub::Configurer::Request::Http::Basic) }
+    let(:path) { "/some/delete/path" }
 
-    subject { HttpStub::Configurer::Request::Http::Factory.delete(path) }
+    let(:basic_request) { instance_double(HttpStub::Configurer::Request::Http::Basic) }
 
-    before(:example) do
-      allow(Net::HTTP::Delete).to receive(:new).and_return(delete_request)
-      allow(HttpStub::Configurer::Request::Http::Basic).to receive(:new).and_return(basic_request)
-    end
+    subject { described_class.delete(path) }
 
-    it "creates a DELETE request with the provided path" do
-      expect(Net::HTTP::Delete).to receive(:new).with(path)
+    before(:example) { allow(HttpStub::Configurer::Request::Http::Basic).to receive(:new).and_return(basic_request) }
+
+    it "creates a basic DELETE request" do
+      expect(HttpStub::Configurer::Request::Http::Basic).to receive(:new).with(hash_including(method: :delete))
 
       subject
     end
 
-    it "creates a basic request wrapping the DELETE request" do
-      expect(HttpStub::Configurer::Request::Http::Basic).to receive(:new).with(delete_request)
+    it "creates a basic request with the provided path" do
+      expect(HttpStub::Configurer::Request::Http::Basic).to receive(:new).with(hash_including(path: path))
 
       subject
+    end
+
+    context "when headers are provided" do
+
+      let(:headers) { (1..3).each_with_object({}) { |i, result| result["header#{i}"] = "value#{i}" } }
+
+      subject { described_class.delete(path, headers) }
+
+      it "creates a basic request with the provided headers" do
+        expect(HttpStub::Configurer::Request::Http::Basic).to receive(:new).with(hash_including(headers: headers))
+
+        subject
+      end
+
+    end
+
+    context "when no headers are provided" do
+
+      subject { described_class.delete(path) }
+
+      it "creates a basic request with empty headers" do
+        expect(HttpStub::Configurer::Request::Http::Basic).to receive(:new).with(hash_including(headers: {}))
+
+        subject
+      end
+
     end
 
     it "returns the created basic request" do

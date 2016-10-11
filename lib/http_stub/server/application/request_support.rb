@@ -8,14 +8,14 @@ module HttpStub
 
         private_constant :STUBBABLE_REQUEST_METHODS
 
+        attr_reader :http_stub_request
+
         def initialize
           super()
-          @request_factory = HttpStub::Server::Request::Factory.new(
-            settings.session_identifier, @session_registry, @scenario_registry
-          )
+          @request_factory = HttpStub::Server::Request::Factory.new(@session_configuration, @server_memory)
         end
 
-        def establish_request
+        def establish_http_stub_request
           @http_stub_request = @request_factory.create(request, params, logger)
         end
 
@@ -26,7 +26,7 @@ module HttpStub
               STUBBABLE_REQUEST_METHODS.each { |request_method| self.send(request_method, path, opts, &block) }
             end
 
-            before { establish_request }
+            before { establish_http_stub_request }
 
           end
         end

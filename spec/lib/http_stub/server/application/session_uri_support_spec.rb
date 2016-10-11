@@ -1,18 +1,29 @@
 describe HttpStub::Server::Application::SessionUriSupport do
 
-  let(:application)         { Class.new }
-  let(:session_uri_support) { application.extend(described_class) }
+  class HttpStub::Server::Application::SessionUriSupport::TestApplication
+    include HttpStub::Server::Application::SessionUriSupport
+
+    def initialize(request)
+      @request = request
+    end
+
+    def http_stub_request
+      @request
+    end
+
+  end
+
+  let(:session_id) { "some_session_id" }
+  let(:session)    { instance_double(HttpStub::Server::Session::Session, id: session_id) }
+  let(:request)    { instance_double(HttpStub::Server::Request::Request, session: session) }
+
+  let(:application) { HttpStub::Server::Application::SessionUriSupport::TestApplication.new(request) }
 
   describe "#session_uri" do
 
-    let(:uri)        { "http://some/uri" }
-    let(:session_id) { "some_session_id" }
-    let(:session)    { instance_double(HttpStub::Server::Session::Session, id: session_id) }
-    let(:request)    { instance_double(HttpStub::Server::Request::Request, session: session) }
+    let(:uri) { "http://some/uri" }
 
-    subject { session_uri_support.session_uri(uri) }
-
-    before(:example) { application.instance_variable_set(:@http_stub_request, request) }
+    subject { application.session_uri(uri) }
 
     context "when the uri contains parameters" do
 

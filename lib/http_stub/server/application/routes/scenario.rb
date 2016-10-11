@@ -7,7 +7,7 @@ module HttpStub
 
           def initialize
             super()
-            @scenario_controller = HttpStub::Server::Scenario::Controller.new(@scenario_registry)
+            @scenario_controller = HttpStub::Server::Scenario::Controller.new(@server_memory)
           end
 
           def self.included(application)
@@ -16,13 +16,13 @@ module HttpStub
               namespace "/http_stub/scenarios" do
 
                 post do
-                  response = @scenario_controller.register(@http_stub_request, logger)
+                  response = @scenario_controller.register(http_stub_request, logger)
                   @response_pipeline.process(response)
                 end
 
                 get do
-                  pass unless params[:name]
-                  haml :scenario, {}, scenario: @scenario_controller.find(@http_stub_request, logger)
+                  pass unless http_stub_request.parameters[:name]
+                  haml :scenario, {}, scenario: @scenario_controller.find(http_stub_request, logger)
                 end
 
                 get do
@@ -30,7 +30,7 @@ module HttpStub
                 end
 
                 post "/activate" do
-                  response = @scenario_controller.activate(@http_stub_request, logger)
+                  response = @scenario_controller.activate(http_stub_request, logger)
                   @response_pipeline.process(response)
                 end
 

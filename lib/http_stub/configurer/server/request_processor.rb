@@ -4,8 +4,8 @@ module HttpStub
 
       class RequestProcessor
 
-        def initialize(configurer)
-          @command_processor = HttpStub::Configurer::Server::CommandProcessor.new(configurer)
+        def initialize(configuration)
+          @command_processor = HttpStub::Configurer::Server::CommandProcessor.new(configuration)
           @buffered_command_processor = @active_processor =
             HttpStub::Configurer::Server::BufferedCommandProcessor.new(@command_processor)
         end

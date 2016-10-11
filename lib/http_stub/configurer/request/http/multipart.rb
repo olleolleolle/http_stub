@@ -5,19 +5,17 @@ module HttpStub
 
         class Multipart
 
-          def initialize(model)
-            @model = model
+          def initialize(args)
+            @model   = args[:model]
+            @path    = args[:path]
+            @headers = args[:headers] || {}
           end
 
           def to_http_request
-            Net::HTTP::Post::Multipart.new(path, parameters)
+            Net::HTTP::Post::Multipart.new("/http_stub/#{@path}", parameters, @headers.stringify_keys)
           end
 
           private
-
-          def path
-            "/http_stub/#{@model.class.name.demodulize.pluralize.underscore}"
-          end
 
           def parameters
             { payload: @model.payload.to_json }.tap do |parameters|

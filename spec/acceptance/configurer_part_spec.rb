@@ -3,9 +3,9 @@ describe "Configurer Part acceptance" do
 
   context "when a configurer contains a part" do
 
-    let(:configurer) { HttpStub::Examples::ConfigurerWithParts.new }
+    let(:configurer) { HttpStub::Examples::ConfigurerWithParts }
 
-    before(:example) { configurer.class.initialize! }
+    before(:example) { configurer.initialize! }
 
     context "that contains a configure stub method" do
 
@@ -17,7 +17,7 @@ describe "Configurer Part acceptance" do
 
     end
 
-    context "that contains a configure stubs methods" do
+    context "that contains a configure stubs method" do
 
       let(:response) { issue_request("registered_in_configure_stubs_method") }
 
@@ -27,7 +27,7 @@ describe "Configurer Part acceptance" do
 
     end
 
-    context "that contains a configure scenario methods" do
+    context "that contains a configure scenario method" do
 
       let(:response) { issue_request("registered_in_configure_scenario_method") }
 
@@ -37,7 +37,7 @@ describe "Configurer Part acceptance" do
 
     end
 
-    context "that contains a configure scenarios methods" do
+    context "that contains a configure scenarios method" do
 
       let(:response) { issue_request("registered_in_configure_scenarios_method") }
 

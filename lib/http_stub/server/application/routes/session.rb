@@ -5,32 +5,52 @@ module HttpStub
 
         module Session
 
-          NAMESPACE_URI       = "/http_stub/sessions".freeze
-          DEFAULT_SESSION_URI = "#{NAMESPACE_URI}/#{HttpStub::Server::Session::DEFAULT_ID}".freeze
+          DEFAULT_SESSION_URI =
+            "/http_stub/sessions?http_stub_session_id=#{HttpStub::Server::Session::TRANSACTIONAL_SESSION_ID}".freeze
 
-          private_constant :NAMESPACE_URI, :DEFAULT_SESSION_URI
+          private_constant :DEFAULT_SESSION_URI
 
           def initialize
             super()
-            @session_controller = HttpStub::Server::Session::Controller.new(@session_registry)
+            @session_controller = HttpStub::Server::Session::Controller.new(@session_configuration, @server_memory)
           end
 
           def self.included(application)
             application.instance_eval do
 
-              get "/http_stub" do
-                redirect settings.session_identifier? ? NAMESPACE_URI : DEFAULT_SESSION_URI
-              end
-
-              namespace NAMESPACE_URI do
+              namespace "/http_stub" do
 
                 get do
-                  haml :sessions, {}, sessions: @session_controller.find_all
+                  redirect settings.session_identifier? ? "/http_stub/sessions" : DEFAULT_SESSION_URI
                 end
 
-                get "/:id" do
-                  establish_request
-                  haml :session, {}, session: @session_controller.find(@http_stub_request, logger)
+                namespace "/sessions" do
+
+                  get do
+                    pass unless http_stub_request.session_id
+                    haml :session, {}, session: @session_controller.find(http_stub_request, logger)
+                  end
+
+                  get do
+                    haml :sessions, {}, sessions: @session_controller.find_all
+                  end
+
+                  post "/default" do
+                    @session_controller.mark_default(http_stub_request)
+                    halt 200, "OK"
+                  end
+
+                  delete do
+                    pass unless http_stub_request.session_id
+                    @session_controller.delete(http_stub_request, logger)
+                    halt 200, "OK"
+                  end
+
+                  delete do
+                    @session_controller.clear(logger)
+                    halt 200, "OK"
+                  end
+
                 end
 
               end

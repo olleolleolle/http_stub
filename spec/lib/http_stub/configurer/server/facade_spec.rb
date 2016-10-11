@@ -1,51 +1,70 @@
 describe HttpStub::Configurer::Server::Facade do
 
-  let(:configurer)        { double(HttpStub::Configurer) }
+  let(:configuration) { double(HttpStub::Configurer::Server::Configuration) }
+
   let(:request_processor) { instance_double(HttpStub::Configurer::Server::RequestProcessor) }
 
-  let(:facade) { HttpStub::Configurer::Server::Facade.new(configurer) }
+  let(:facade) { HttpStub::Configurer::Server::Facade.new(configuration) }
 
   before(:example) do
     allow(HttpStub::Configurer::Server::RequestProcessor).to receive(:new).and_return(request_processor)
   end
   
-  describe "constructor" do
+  it "creates a request processor with the provided configuration" do
+    expect(HttpStub::Configurer::Server::RequestProcessor).to receive(:new).with(configuration)
 
-    it "creates a request processor with the provided configurer" do
-      expect(HttpStub::Configurer::Server::RequestProcessor).to receive(:new).with(configurer)
-      
-      facade
-    end
-
+    facade
   end
 
-  describe "#stub_response" do
+  describe "#server_has_started" do
 
-    let(:model_description) { "some model description" }
-    let(:model)             { instance_double(HttpStub::Configurer::Request::Stub, to_s: model_description) }
-    let(:request)           { instance_double(HttpStub::Configurer::Request::Http::Multipart) }
+    subject { facade.server_has_started }
 
-    subject { facade.stub_response(model) }
-
-    before(:example) do
-      allow(request_processor).to receive(:submit)
-      allow(HttpStub::Configurer::Request::Http::Factory).to receive(:multipart).and_return(request)
-    end
-
-    it "creates a multipart request with the provided model" do
-      expect(HttpStub::Configurer::Request::Http::Factory).to receive(:multipart).with(model)
+    it "informs the request processor to disable buffering requests" do
+      expect(request_processor).to receive(:disable_buffering!)
 
       subject
     end
 
-    it "submits the request via the request processor" do
+  end
+
+  describe "#flush_requests" do
+
+    subject { facade.flush_requests }
+
+    it "informs the request processor to flush it's requests" do
+      expect(request_processor).to receive(:flush!)
+
+      subject
+    end
+
+  end
+
+  describe "#reset" do
+
+    let(:request) { instance_double(HttpStub::Configurer::Request::Http::Basic) }
+
+    subject { facade.reset }
+
+    before(:example) do
+      allow(HttpStub::Configurer::Request::Http::Factory).to receive(:delete).and_return(request)
+      allow(request_processor).to receive(:submit)
+    end
+
+    it "creates a DELETE request for the memory endpoint" do
+      expect(HttpStub::Configurer::Request::Http::Factory).to receive(:delete).with("memory").and_return(request)
+
+      subject
+    end
+
+    it "submits the HTTP Stub request via the request processor" do
       expect(request_processor).to receive(:submit).with(hash_including(request: request))
 
       subject
     end
 
-    it "describes the model via its string representation" do
-      expect(request_processor).to receive(:submit).with(hash_including(description: "stubbing '#{model_description}'"))
+    it "describes the request as resetting the server" do
+      expect(request_processor).to receive(:submit).with(hash_including(description: "resetting server"))
 
       subject
     end
@@ -54,19 +73,26 @@ describe HttpStub::Configurer::Server::Facade do
 
   describe "#define_scenario" do
 
-    let(:model_description) { "some model description" }
-    let(:model)             { instance_double(HttpStub::Configurer::Request::Scenario, to_s: model_description) }
-    let(:request)           { instance_double(HttpStub::Configurer::Request::Http::Multipart) }
+    let(:scenario_description) { "some scenario description" }
+    let(:scenario)             { instance_double(HttpStub::Configurer::Request::Scenario, to_s: scenario_description) }
 
-    subject { facade.define_scenario(model) }
+    let(:request) { instance_double(HttpStub::Configurer::Request::Http::Multipart) }
+
+    subject { facade.define_scenario(scenario) }
 
     before(:example) do
       allow(request_processor).to receive(:submit)
       allow(HttpStub::Configurer::Request::Http::Factory).to receive(:multipart).and_return(request)
     end
 
-    it "creates a multipart request with the provided model" do
-      expect(HttpStub::Configurer::Request::Http::Factory).to receive(:multipart).with(model)
+    it "creates a multipart request to the scenarios endpoint" do
+      expect(HttpStub::Configurer::Request::Http::Factory).to receive(:multipart).with("scenarios", anything)
+
+      subject
+    end
+
+    it "creates a multipart request with the provided scenario" do
+      expect(HttpStub::Configurer::Request::Http::Factory).to receive(:multipart).with(anything, scenario)
 
       subject
     end
@@ -77,151 +103,10 @@ describe HttpStub::Configurer::Server::Facade do
       subject
     end
 
-    it "describes the model via its string representation" do
+    it "describes the scenario via its string representation" do
       expect(request_processor).to(
-        receive(:submit).with(hash_including(description: "registering scenario '#{model_description}'"))
+        receive(:submit).with(hash_including(description: "registering scenario '#{scenario_description}'"))
       )
-
-      subject
-    end
-
-  end
-
-  describe "#activate" do
-
-    let(:scenario_name) { "some/scenario/name" }
-    let(:request)       { instance_double(HttpStub::Configurer::Request::Http::Basic) }
-
-    subject { facade.activate(scenario_name) }
-
-    before(:example) do
-      allow(HttpStub::Configurer::Request::Http::Factory).to receive(:post).and_return(request)
-      allow(request_processor).to receive(:submit)
-    end
-
-    it "creates an POST request to activate a scenario" do
-      expect(HttpStub::Configurer::Request::Http::Factory).to(
-        receive(:post).with("/http_stub/scenarios/activate", anything).and_return(request)
-      )
-
-      subject
-    end
-
-    it "creates a POST request with the scenario name as a parameter" do
-      expect(HttpStub::Configurer::Request::Http::Factory).to(
-        receive(:post).with(anything, hash_including(:name => scenario_name)).and_return(request)
-      )
-
-      subject
-    end
-
-    it "submits the request via the request processor" do
-      expect(request_processor).to receive(:submit).with(hash_including(request: request))
-
-      subject
-    end
-
-    it "describes the activation request using the provided scenario name" do
-      expect(request_processor).to receive(:submit).with(hash_including(description: "activating '#{scenario_name}'"))
-
-      subject
-    end
-
-  end
-
-  describe "#remember_stubs" do
-
-    let(:request) { instance_double(HttpStub::Configurer::Request::Http::Basic) }
-
-    subject { facade.remember_stubs }
-
-    before(:example) do
-      allow(HttpStub::Configurer::Request::Http::Factory).to receive(:post).and_return(request)
-      allow(request_processor).to receive(:submit)
-    end
-
-    it "creates a POST request for the /http_stub/stubs/memory endpoint" do
-      expect(HttpStub::Configurer::Request::Http::Factory).to(
-        receive(:post).with("/http_stub/stubs/memory").and_return(request)
-      )
-
-      subject
-    end
-
-    it "submits the request via the request processor" do
-      expect(request_processor).to receive(:submit).with(hash_including(request: request))
-
-      subject
-    end
-
-    it "describes the request as committing the servers stubs to memory" do
-      expect(request_processor).to receive(:submit).with(hash_including(description: "committing stubs to memory"))
-
-      subject
-    end
-
-  end
-
-  describe "#recall_stubs" do
-
-    let(:request) { instance_double(HttpStub::Configurer::Request::Http::Basic) }
-
-    subject { facade.recall_stubs }
-
-    before(:example) do
-      allow(HttpStub::Configurer::Request::Http::Factory).to receive(:get).and_return(request)
-      allow(request_processor).to receive(:submit)
-    end
-
-    it "creates a GET request for the /http_stub/stubs/memory endpoint" do
-      expect(HttpStub::Configurer::Request::Http::Factory).to(
-        receive(:get).with("/http_stub/stubs/memory").and_return(request)
-      )
-
-      subject
-    end
-
-    it "submits the request via the request processor" do
-      expect(request_processor).to receive(:submit).with(hash_including(request: request))
-
-      subject
-    end
-
-    it "describes the request as recalling the servers stubs in memory" do
-      expect(request_processor).to receive(:submit).with(hash_including(description: "recalling stubs in memory"))
-
-      subject
-    end
-
-  end
-
-  describe "#clear_stubs" do
-
-    let(:request) { instance_double(HttpStub::Configurer::Request::Http::Basic) }
-
-    subject { facade.clear_stubs }
-
-    before(:example) do
-      allow(HttpStub::Configurer::Request::Http::Factory).to receive(:delete).and_return(request)
-      allow(request_processor).to receive(:submit)
-    end
-
-    it "creates a DELETE request for the /http_stub/stubs endpoint" do
-      expect(HttpStub::Configurer::Request::Http::Factory).to(
-        receive(:delete).with("/http_stub/stubs").and_return(request)
-      )
-
-      subject
-    end
-
-    it "submits the request via the request processor" do
-      expect(request_processor).to receive(:submit).with(hash_including(request: request))
-
-      subject
-    end
-
-    it "describes the request as clearing the server stubs" do
-      expect(request_processor).to receive(:submit).with(hash_including(description: "clearing stubs"))
 
       subject
     end
@@ -239,10 +124,8 @@ describe HttpStub::Configurer::Server::Facade do
       allow(request_processor).to receive(:submit)
     end
 
-    it "creates a DELETE request for the /http_stub/scenarios endpoint" do
-      expect(HttpStub::Configurer::Request::Http::Factory).to(
-        receive(:delete).with("/http_stub/scenarios").and_return(request)
-      )
+    it "creates a DELETE request for the scenarios endpoint" do
+      expect(HttpStub::Configurer::Request::Http::Factory).to receive(:delete).with("scenarios").and_return(request)
 
       subject
     end
@@ -253,7 +136,7 @@ describe HttpStub::Configurer::Server::Facade do
       subject
     end
 
-    it "describes the request as clearing the server scenarios" do
+    it "describes the request as clearing the servers scenarios" do
       expect(request_processor).to receive(:submit).with(hash_including(description: "clearing scenarios"))
 
       subject
@@ -261,22 +144,62 @@ describe HttpStub::Configurer::Server::Facade do
 
   end
 
-  describe "#server_has_started" do
+  describe "#create_session_facade" do
 
-    it "informs the request processor to disable buffering requests" do
-      expect(request_processor).to receive(:disable_buffering!)
+    let(:session_id) { "some session id" }
 
-      facade.server_has_started
+    let(:session_facade) { instance_double(HttpStub::Configurer::Server::SessionFacade) }
+
+    subject { facade.create_session_facade(session_id) }
+
+    before(:example) { allow(HttpStub::Configurer::Server::SessionFacade).to receive(:new).and_return(session_facade) }
+
+    it "creates a session facade for the provided session" do
+      expect(HttpStub::Configurer::Server::SessionFacade).to receive(:new).with(session_id, anything)
+
+      subject
+
+    end
+
+    it "creates a session facade that processes requests the server facades request processor" do
+      expect(HttpStub::Configurer::Server::SessionFacade).to receive(:new).with(anything, request_processor)
+
+      subject
+    end
+
+    it "returns the created session facade" do
+      expect(subject).to eql(session_facade)
     end
 
   end
 
-  describe "#flush_requests" do
+  describe "#clear_sessions" do
 
-    it "informs the request processor to flush it's requests" do
-      expect(request_processor).to receive(:flush!)
+    let(:request) { instance_double(HttpStub::Configurer::Request::Http::Basic) }
 
-      facade.flush_requests
+    subject { facade.clear_sessions }
+
+    before(:example) do
+      allow(HttpStub::Configurer::Request::Http::Factory).to receive(:delete).and_return(request)
+      allow(request_processor).to receive(:submit)
+    end
+
+    it "creates a DELETE request for the sessions endpoint" do
+      expect(HttpStub::Configurer::Request::Http::Factory).to receive(:delete).with("sessions").and_return(request)
+
+      subject
+    end
+
+    it "submits the HTTP Stub request via the request processor" do
+      expect(request_processor).to receive(:submit).with(hash_including(request: request))
+
+      subject
+    end
+
+    it "describes the request as clearing the servers sessions" do
+      expect(request_processor).to receive(:submit).with(hash_including(description: "clearing sessions"))
+
+      subject
     end
 
   end

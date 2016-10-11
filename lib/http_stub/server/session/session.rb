@@ -6,10 +6,10 @@ module HttpStub
 
         attr_reader :id
 
-        def initialize(id, scenario_registry)
+        def initialize(id, scenario_registry, memory_session)
           @id                  = id
           @scenario_registry   = scenario_registry
-          @stub_registry       = HttpStub::Server::Stub::Registry.new
+          @stub_registry       = HttpStub::Server::Stub::Registry.new(memory_session)
           @stub_match_registry = HttpStub::Server::Registry.new("stub match")
           @stub_miss_registry  = HttpStub::Server::Registry.new("stub miss")
         end
@@ -63,16 +63,12 @@ module HttpStub
           @stub_miss_registry.all
         end
 
-        def remember
-          @stub_registry.remember
-        end
-
-        def recall
-          @stub_registry.recall
+        def reset(logger)
+          @stub_registry.reset(logger)
         end
 
         def clear(logger)
-          [ @stub_registry, @stub_match_registry, @stub_miss_registry ].each { |registry| registry.clear(logger) }
+          [ @stub_miss_registry, @stub_match_registry, @stub_registry ].each { |registry| registry.clear(logger) }
         end
 
       end

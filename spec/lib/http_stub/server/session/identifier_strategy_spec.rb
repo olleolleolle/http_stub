@@ -1,114 +1,120 @@
 describe HttpStub::Server::Session::IdentifierStrategy do
 
-  let(:configuration) { nil }
+  let(:identifier_configuration) { {} }
+  let(:session_configuration) do
+    instance_double(HttpStub::Server::Session::Configuration, identifier_configuration: identifier_configuration)
+  end
 
-  let(:identifier_strategy) { described_class.new(configuration) }
+  let(:identifier_strategy) { described_class.new(session_configuration) }
 
   describe "#identifier_for" do
 
     let(:request_headers)    { {} }
     let(:request_parameters) { {} }
-    let(:request)            do
-      instance_double(HttpStub::Server::Request::Request, headers: request_headers, parameters: request_parameters)
+    let(:sinatra_request)    do
+      instance_double(HttpStub::Server::Request::SinatraRequest, headers:    request_headers,
+                                                                 parameters: request_parameters)
     end
 
-    subject { identifier_strategy.identifier_for(request) }
+    subject { identifier_strategy.identifier_for(sinatra_request) }
 
-    context "when a custom configuration is provided" do
+    context "when the session identifier configuration has multiple entries" do
 
-      let(:configuration) { { header: :custom_session_header } }
-
-      context "and the request contains both an internal http_stub session id and a custom request id" do
-
-        let(:request_parameters) { { http_stub_session_id: "http_stub session value" } }
-        let(:request_headers)    { { custom_session_header: "custom session value" } }
-
-        it "returns the http_stub session id" do
-          expect(subject).to eql("http_stub session value")
-        end
-
+      let(:identifier_configuration) do
+        [
+          { header:    :first_session_header },
+          { parameter: :first_session_parameter },
+          { header:    :second_session_header },
+          { parameter: :second_session_parameter }
+        ]
       end
 
-      context "and the request does not contain an internal http_stub session id" do
+      context "and multiple session values are in the request" do
 
-        context "and a header identifier is configured" do
-
-          let(:configuration) { { header: :some_session_header } }
-
-          context "and the request has a value for the header" do
-
-            let(:header_value)    { "some session value" }
-            let(:request_headers) { { some_session_header: header_value, another_header: "some value" } }
-
-            it "returns the headers value" do
-              expect(subject).to eql(header_value)
-            end
-
-          end
-
-          context "and the request does not have a value for the header" do
-
-            let(:request_headers) { { another_header: "some value" } }
-
-            it "returns 'Default'" do
-              expect(subject).to eql("Default")
-            end
-
-          end
-
+        let(:request_headers)    do
+          { second_session_header: "second session header value", another_header: "another header value" }
         end
-
-        context "and a parameter identifier is configured" do
-
-          let(:configuration) { { parameter: :some_session_parameter } }
-
-          context "and the request has a value for the parameter" do
-
-            let(:parameter_value)    { "some session value" }
-            let(:request_parameters) { { some_session_parameter: parameter_value, another_parameter: "some value" } }
-
-            it "returns the parameters value" do
-              expect(subject).to eql(parameter_value)
-            end
-
-          end
-
-          context "and the request does not have a value for the parameter" do
-
-            let(:request_parmeters) { { another_parameter: "some value" } }
-
-            it "returns 'Default'" do
-              expect(subject).to eql("Default")
-            end
-
-          end
-
-        end
-
-      end
-
-    end
-
-    context "when no custom configuration is provided" do
-
-      let(:configuration) { nil }
-
-      context "and the request contains an internal http_stub session id" do
-
         let(:request_parameters) do
-          { http_stub_session_id: "http_stub session value", another_parameter: "some value" }
+          { first_session_parameter: "first session parameter value", another_parameter: "another parameter value" }
         end
 
-        it "returns the http_stub session id" do
-          expect(subject).to eql("http_stub session value")
+        it "returns the first value from the configuration in the request" do
+          expect(subject).to eql("first session parameter value")
         end
 
       end
 
-      context "and the request does not contain any session id" do
+      context "and one session value is in the request" do
 
-        it "return 'Default'" do
-          expect(subject).to eql("Default")
+        let(:request_headers)    { { a_header: "a header value" } }
+        let(:request_parameters) do
+          { second_session_parameter: "second session parameter value", another_parameter: "another parameter value" }
+        end
+
+        it "returns the value" do
+          expect(subject).to eql("second session parameter value")
+        end
+
+      end
+
+      context "and the session value is not in the request" do
+
+        it "returns nil" do
+          expect(subject).to eql(nil)
+        end
+
+      end
+
+    end
+
+    context "when the session identifier configuration has one entry" do
+
+      context "that is a header" do
+
+        let(:identifier_configuration) { [ { header: :session_header } ] }
+
+        context "and the session value is in the request" do
+
+          let(:request_headers) { { session_header: "session header value", another_header: "another header value" } }
+
+          it "returns the value" do
+            expect(subject).to eql("session header value")
+          end
+
+        end
+
+        context "and the session value is not in the request" do
+
+          it "returns nil" do
+            expect(subject).to eql(nil)
+          end
+
+        end
+
+      end
+
+      context "that is a parameter" do
+
+        let(:identifier_configuration) { [ { parameter: :session_parameter } ] }
+
+        context "and the session value is in the request" do
+
+          let(:request_parameters) do
+            { session_parameter: "session parameter value", another_parameter: "another parameter value" }
+          end
+
+          it "returns the value" do
+            expect(subject).to eql("session parameter value")
+          end
+
+        end
+
+        context "and the session value is not in the request" do
+
+          it "returns nil" do
+            expect(subject).to eql(nil)
+          end
+
         end
 
       end

@@ -1,37 +1,11 @@
-describe HttpStub::Server::Application::Application, "when the server is running" do
+describe HttpStub::Server::Application::Routes::Stub, "when the server is running" do
   include_context "server integration"
+
+  let(:transactional_session_id) { "http_stub_transactional" }
 
   let(:response_document) { Nokogiri::HTML(response.body) }
 
-  describe "GET /http_stub" do
-
-    let(:response) { HTTParty.get("#{server_uri}/http_stub") }
-
-    it "returns a 200 response code" do
-      expect(response.code).to eql(200)
-    end
-
-    it "returns a response whose body links to the stubs list for the default session" do
-      expect(link_for("stubs")).to eql("/http_stub/stubs?http_stub_session_id=Default")
-    end
-
-    it "returns a response whose body links to the scenarios list in the context of the default session" do
-      expect(link_for("scenarios")).to eql("/http_stub/scenarios?http_stub_session_id=Default")
-    end
-
-    it "returns a response whose body links to the matches list for the default session" do
-      expect(link_for("stub_matches")).to eql("/http_stub/stubs/matches?http_stub_session_id=Default")
-    end
-
-    it "returns a response whose body links to the misses list for the default session" do
-      expect(link_for("stub_misses")).to eql("/http_stub/stubs/misses?http_stub_session_id=Default")
-    end
-
-    def link_for(id)
-      response_document.at_css("a##{id}")["href"]
-    end
-
-  end
+  before(:example) { establish_default_session(transactional_session_id) }
 
   describe "POST /http_stub/stubs" do
 
@@ -43,6 +17,8 @@ describe HttpStub::Server::Application::Application, "when the server is running
           body: { uri: "/some/path", method: "get", response: { status: 200, body: "Some body" } }.to_json
         )
       end
+
+      after(:example) { reset_session }
 
       it "returns a 200 response code" do
         expect(response.code).to eql(200)
@@ -76,7 +52,7 @@ describe HttpStub::Server::Application::Application, "when the server is running
 
         before(:context) do
           (1..3).each do |i|
-            HTTParty.post("#{server_uri}/http_stub/scenarios/activate", :body => { :name => "Scenario #{i}" })
+            HTTParty.post("#{server_uri}/http_stub/scenarios/activate", :body => { name: "Scenario #{i}" })
           end
         end
 
@@ -223,6 +199,8 @@ describe HttpStub::Server::Application::Application, "when the server is running
 
       let(:response) { HTTParty.get("#{server_uri}/http_stub/scenarios") }
 
+      let(:transactional_session_parameter) { "http_stub_session_id=#{transactional_session_id}" }
+
       it "returns a response whose body contains the name of each scenario in alphabetical order" do
         expected_scenario_names = [ "Nested scenario", "Scenario" ].map do |scenario_name_prefix|
           (1..3).map { |i| "#{scenario_name_prefix} #{i}" }
@@ -233,8 +211,8 @@ describe HttpStub::Server::Application::Application, "when the server is running
         expect(scenario_names).to eql(expected_scenario_names)
       end
 
-      it "returns a response whose body contains links to activate each scenario in the default session" do
-        expected_activation_links = [ "/http_stub/scenarios/activate?http_stub_session_id=Default" ] * 6
+      it "returns a response whose body contains links to activate each scenario in the transactional session" do
+        expected_activation_links = [ "/http_stub/scenarios/activate?#{transactional_session_parameter}" ] * 6
 
         activation_links = response_document.css("a.activate_scenario").map { |link| link["href"] }
 
@@ -243,7 +221,7 @@ describe HttpStub::Server::Application::Application, "when the server is running
 
       it "returns a response whose body contains links to the details of each scenario for the default session" do
         expected_detail_links = %w{ Nested+scenario Scenario }.map do |scenario_name_prefix|
-          (1..3).map { |i| "/http_stub/scenarios?name=#{scenario_name_prefix}+#{i}&http_stub_session_id=Default" }
+          (1..3).map { |i| "/http_stub/scenarios?name=#{scenario_name_prefix}+#{i}&#{transactional_session_parameter}" }
         end.flatten
 
         detail_links = response_document.css("a.view_scenario").map { |link| link["href"] }

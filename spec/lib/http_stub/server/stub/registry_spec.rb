@@ -1,12 +1,20 @@
 describe HttpStub::Server::Stub::Registry do
 
+  let(:stubs_in_memory) { (1..3).map { instance_double(HttpStub::Server::Stub::Stub) } }
+  let(:memory_session)  { instance_double(HttpStub::Server::Session::Session, stubs: stubs_in_memory) }
+
   let(:underlying_stub_registry) { instance_double(HttpStub::Server::Registry) }
+  let(:logger)                   { instance_double(Logger) }
 
-  let(:logger) { instance_double(Logger) }
-
-  let(:stub_registry) { HttpStub::Server::Stub::Registry.new }
+  let(:stub_registry) { described_class.new(memory_session) }
 
   before(:example) { allow(HttpStub::Server::Registry).to receive(:new).and_return(underlying_stub_registry) }
+
+  it "uses an underlying simple registry that is initialised with the memory sessions stubs" do
+    expect(HttpStub::Server::Registry).to receive(:new).with("stub", stubs_in_memory)
+
+    stub_registry
+  end
 
   describe "#add" do
 
@@ -24,7 +32,7 @@ describe HttpStub::Server::Stub::Registry do
 
   describe "#concat" do
 
-    let(:stubs)  { (1..3).map { instance_double(HttpStub::Server::Stub::Stub) } }
+    let(:stubs) { (1..3).map { instance_double(HttpStub::Server::Stub::Stub) } }
 
     subject { stub_registry.concat(stubs, logger) }
 
@@ -86,6 +94,8 @@ describe HttpStub::Server::Stub::Registry do
 
     subject { stub_registry.all }
 
+    before(:example) { allow(underlying_stub_registry).to receive(:all).and_return(stubs) }
+
     it "delegates to an underlying simple registry" do
       expect(underlying_stub_registry).to receive(:all)
 
@@ -93,42 +103,27 @@ describe HttpStub::Server::Stub::Registry do
     end
 
     it "returns the result from the underlying registry" do
-      allow(underlying_stub_registry).to receive(:all).and_return(stubs)
-
       expect(subject).to eql(stubs)
     end
 
   end
 
-  describe "#recall" do
+  describe "#reset" do
 
-    subject { stub_registry.recall }
+    subject { stub_registry.reset(logger) }
 
-    context "when the state of the registry has been remembered" do
+    before(:example) { allow(underlying_stub_registry).to receive(:replace) }
 
-      let(:last_stub_remembered) { instance_double(HttpStub::Server::Stub::Stub) }
+    it "retrieves the stubs in the memory session" do
+      expect(memory_session).to receive(:stubs)
 
-      before(:example) do
-        allow(underlying_stub_registry).to receive(:last).and_return(last_stub_remembered)
-        stub_registry.remember
-      end
-
-      it "causes the underlying registry to rollback to the last stub added before the state was remembered" do
-        expect(underlying_stub_registry).to receive(:rollback_to).with(last_stub_remembered)
-
-        subject
-      end
-
+      subject
     end
 
-    context "when the state of the registry has not been remembered" do
+    it "replaces the stubs in the underlying registry with those in the memory session" do
+      expect(underlying_stub_registry).to receive(:replace).with(stubs_in_memory, logger)
 
-      it "does not rollback the underlying registry" do
-        expect(underlying_stub_registry).to_not receive(:rollback_to)
-
-        subject
-      end
-
+      subject
     end
 
   end

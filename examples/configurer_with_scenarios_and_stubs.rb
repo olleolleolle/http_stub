@@ -1,7 +1,7 @@
 module HttpStub
   module Examples
 
-    class ConfigurerWithComplexInitializer
+    class ConfigurerWithScenariosAndStubs
       include HttpStub::Configurer
 
       stub_server.add_scenario_with_one_stub!("Activated during initialization") do |stub|

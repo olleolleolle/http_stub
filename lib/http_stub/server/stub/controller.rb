@@ -19,19 +19,15 @@ module HttpStub
         end
 
         def find(request, logger)
-          request.session.find_stub(request.parameters[:id], logger)
+          request.session.find_stub(request.parameters[:stub_id], logger)
         end
 
         def find_all(request)
           request.session.stubs
         end
 
-        def remember_state(request)
-          request.session.remember
-        end
-
-        def recall_state(request)
-          request.session.recall
+        def reset(request, logger)
+          request.session.reset(logger)
         end
 
         def clear(request, logger)

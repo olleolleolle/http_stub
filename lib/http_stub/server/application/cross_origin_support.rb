@@ -22,11 +22,11 @@ module HttpStub
           private
 
           def determine_allowed_methods
-            @http_stub_request.headers["Access_Control_Request_Method"] || @http_stub_request.method.upcase
+            http_stub_request.headers["Access_Control_Request_Method"] || http_stub_request.method.upcase
           end
 
           def determine_allowed_headers
-            @http_stub_request.headers["Access_Control_Request_Headers"] || @http_stub_request.headers.keys.join(",")
+            http_stub_request.headers["Access_Control_Request_Headers"] || http_stub_request.headers.keys.join(",")
           end
 
         end

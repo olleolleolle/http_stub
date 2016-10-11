@@ -1,12 +1,49 @@
 describe HttpStub::Configurer::DSL::Server do
 
-  let(:server_facade)        { instance_double(HttpStub::Configurer::Server::Facade) }
-  let(:default_stub_builder) { instance_double(HttpStub::Configurer::DSL::StubBuilder) }
+  let(:configuration)         { instance_double(HttpStub::Configurer::Server::Configuration) }
+  let(:server_facade)         { instance_double(HttpStub::Configurer::Server::Facade) }
+  let(:default_stub_template) { instance_double(HttpStub::Configurer::DSL::StubBuilderTemplate) }
+  let(:memory_session)        { instance_double(HttpStub::Configurer::DSL::Session) }
+  let(:transactional_session) { instance_double(HttpStub::Configurer::DSL::Session) }
+  let(:session_factory)       do
+    instance_double(HttpStub::Configurer::DSL::SessionFactory, memory:        memory_session,
+                                                               transactional: transactional_session)
+  end
 
-  let(:server) { HttpStub::Configurer::DSL::Server.new(server_facade) }
+  let(:default_session) { memory_session }
+  let(:block_verifier)  { double("BlockVerifier") }
+
+  let(:server) { described_class.new }
 
   before(:example) do
-    allow(HttpStub::Configurer::DSL::StubBuilder).to receive(:new).with(no_args).and_return(default_stub_builder)
+    allow(HttpStub::Configurer::Server::Configuration).to receive(:new).and_return(configuration)
+    allow(HttpStub::Configurer::Server::Facade).to receive(:new).and_return(server_facade)
+    allow(HttpStub::Configurer::DSL::StubBuilderTemplate).to receive(:new).and_return(default_stub_template)
+    allow(HttpStub::Configurer::DSL::SessionFactory).to receive(:new).and_return(session_factory)
+  end
+
+  it "creates a server configuration" do
+    expect(HttpStub::Configurer::Server::Configuration).to receive(:new)
+
+    server
+  end
+
+  it "creates a facade to interact with the stub server based on the configuration" do
+    expect(HttpStub::Configurer::Server::Facade).to receive(:new).with(configuration)
+
+    server
+  end
+
+  it "creates a stub builder template to hold the default stub settings for the server" do
+    expect(HttpStub::Configurer::DSL::StubBuilderTemplate).to receive(:new).with(no_args)
+
+    server
+  end
+
+  it "creates a session factory that creates sessions interacting with the servers facade and stub template" do
+    expect(HttpStub::Configurer::DSL::SessionFactory).to receive(:new).with(server_facade, default_stub_template)
+
+    server
   end
 
   shared_context "a server with host and port configured" do
@@ -18,107 +55,128 @@ describe HttpStub::Configurer::DSL::Server do
 
   end
 
-  it "produces stub builders" do
-    expect(server).to be_a(HttpStub::Configurer::DSL::StubBuilderProducer)
+  describe "#host" do
+
+    let(:host) { "some_host" }
+
+    subject { server.host }
+
+    it "delegates to the servers configuration" do
+      allow(configuration).to receive(:host).and_return(host)
+
+      expect(subject).to eql(host)
+    end
+
   end
 
-  it "activates scenarios" do
-    expect(server).to be_a(HttpStub::Configurer::DSL::ScenarioActivator)
+  describe "#host=" do
+
+    let(:host) { "some_host" }
+
+    subject { server.host = host }
+
+    it "delegates to the servers configuration" do
+      allow(configuration).to receive(:host=).with(host)
+
+      subject
+    end
+
   end
 
-  describe "#session_identifier" do
+  describe "#port" do
 
-    let(:session_identifier) { { headers: :some_session_identifier } }
+    let(:port) { "8888" }
 
-    before(:example) { server.session_identifier = session_identifier }
+    subject { server.port }
 
-    it "returns any configured value" do
-      expect(server.session_identifier).to eql(session_identifier)
+    it "delegates to the servers configuration" do
+      allow(configuration).to receive(:port).and_return(port)
+
+      expect(subject).to eql(port)
+    end
+
+  end
+
+  describe "#port=" do
+
+    let(:port) { "8888" }
+
+    subject { server.port = port }
+
+    it "delegates to the servers configuration" do
+      allow(configuration).to receive(:port=).with(port)
+
+      subject
     end
 
   end
 
   describe "#base_uri" do
 
+    let(:base_uri) { "some_host:8888" }
+
     subject { server.base_uri }
 
-    include_context "a server with host and port configured"
+    it "delegates to the servers configuration" do
+      allow(configuration).to receive(:base_uri).and_return(base_uri)
 
-    it "returns a uri that combines any established host and port" do
-      expect(subject).to include("some_host:8888")
-    end
-
-    it "returns a uri accessed via http" do
-      expect(subject).to match(/^http:\/\//)
+      expect(subject).to eql(base_uri)
     end
 
   end
 
   describe "#external_base_uri" do
 
+    let(:external_base_uri) { "http://some/external/base/uri" }
+
     subject { server.external_base_uri }
 
-    include_context "a server with host and port configured"
+    it "delegates to the servers configuration" do
+      allow(configuration).to receive(:external_base_uri).and_return(external_base_uri)
 
-    context "when an external base URI environment variable is established" do
-
-      let(:external_base_uri) { "http://some/external/base/uri" }
-
-      before(:example) { ENV["STUB_EXTERNAL_BASE_URI"] = external_base_uri }
-      after(:example)  { ENV["STUB_EXTERNAL_BASE_URI"] = nil }
-
-      it "returns the environment variable" do
-        expect(subject).to eql(external_base_uri)
-      end
-
+      expect(subject).to eql(external_base_uri)
     end
 
-    context "when an external base URI environment variable is not established" do
+  end
 
-      it "returns the base URI" do
-        expect(subject).to eql(server.base_uri)
-      end
+  describe "#session_identifier" do
 
+    let(:session_identifier) { { headers: :some_session_identifier } }
+
+    subject { server.session_identifier }
+
+    it "delegates to the servers configuration" do
+      allow(configuration).to receive(:session_identifier).and_return(session_identifier)
+
+      expect(subject).to eql(session_identifier)
     end
 
-    it "returns a uri that combines any established host and port" do
-      expect(subject).to include("some_host:8888")
-    end
+  end
 
-    it "returns a uri accessed via http" do
-      expect(subject).to match(/^http:\/\//)
+  describe "#session_identifer=" do
+
+    let(:session_identifier) { { headers: :some_session_identifier } }
+
+    subject { server.session_identifier = session_identifier }
+
+    it "delegates to the servers configuration" do
+      expect(configuration).to receive(:session_identifier=).with(session_identifier)
+
+      subject
     end
 
   end
 
   describe "#enable" do
 
-    context "when a feature is provided" do
+    let(:features) { (1..3).map { |i| "feature_#{i}".to_sym } }
 
-      let(:feature) { :some_feature }
+    subject { server.enable(*features) }
 
-      subject { server.enable(feature) }
+    it "delegates to the sessions configuration" do
+      expect(configuration).to receive(:enable).with(*features)
 
-      it "enables the feature" do
-        subject
-
-        expect(server.enabled?(feature)).to be(true)
-      end
-
-    end
-
-    context "when features are provided" do
-
-      let(:features) { (1..3).map { |i| "feature_#{i}".to_sym } }
-
-      subject { server.enable(*features) }
-
-      it "enables the features" do
-        subject
-
-        features.each { |feature| expect(server.enabled?(feature)).to be(true) }
-      end
-
+      subject
     end
 
   end
@@ -129,22 +187,10 @@ describe HttpStub::Configurer::DSL::Server do
 
     subject { server.enabled?(feature) }
 
-    context "when a feature is enabled" do
+    it "delegates to the servers configuration" do
+      expect(configuration).to receive(:enabled?).and_return(true)
 
-      before(:example) { server.enable(feature) }
-
-      it "returns false" do
-        expect(subject).to be(true)
-      end
-
-    end
-
-    context "when a feature is not enabled" do
-
-      it "returns false" do
-        expect(subject).to be(false)
-      end
-
+      expect(subject).to be(true)
     end
 
   end
@@ -153,10 +199,12 @@ describe HttpStub::Configurer::DSL::Server do
 
     let(:args) { { request_rule_key: "request rule value" } }
 
-    it "establishes request matcher rules on the default stub builder" do
-      expect(default_stub_builder).to receive(:match_requests).with(args)
+    subject { server.request_defaults = args }
 
-      server.request_defaults = args
+    it "establishes request matching rules on the default stub template" do
+      expect(default_stub_template).to receive(:match_requests).with(args)
+
+      subject
     end
 
   end
@@ -165,82 +213,90 @@ describe HttpStub::Configurer::DSL::Server do
 
     let(:args) { { response_key: "response value" } }
 
-    it "establishes response values on the default stub builder" do
-      expect(default_stub_builder).to receive(:respond_with).with(args)
+    subject { server.response_defaults = args }
 
-      server.response_defaults = args
+    it "establishes response values on the default stub template" do
+      expect(default_stub_template).to receive(:respond_with).with(args)
+
+      subject
+    end
+
+  end
+
+  it "causes session operations to be performed against the memory session prior to initialization" do
+    expect(memory_session).to receive(:activate!)
+
+    server.activate!("some scenario name")
+  end
+
+  describe "#initialize!" do
+
+    subject { server.initialize! }
+
+    before(:example) do
+      allow(server_facade).to receive(:flush_requests)
+      allow(transactional_session).to receive(:mark_as_default!)
+    end
+
+    it "flushes requests held by the server facade" do
+      expect(server_facade).to receive(:flush_requests)
+
+      subject
+    end
+
+    it "marks the transactional session as the servers default" do
+      expect(transactional_session).to receive(:mark_as_default!)
+
+      subject
+    end
+
+    it "causes subsequent session operations to be performed against the transactional session" do
+      subject
+      expect(transactional_session).to receive(:activate!)
+
+      server.activate!("some scenario name")
     end
 
   end
 
   describe "#has_started!" do
 
+    subject { server.has_started! }
+
+    before(:example) do
+      allow(server_facade).to receive(:server_has_started)
+      allow(transactional_session).to receive(:mark_as_default!)
+    end
+
     it "informs the facade that the server has started" do
       expect(server_facade).to receive(:server_has_started)
 
-      server.has_started!
+      subject
+    end
+
+    it "marks the transactional session as the servers default" do
+      expect(transactional_session).to receive(:mark_as_default!)
+
+      subject
+    end
+
+    it "causes subsequent session operations to be performed against the transactional session" do
+      subject
+      expect(transactional_session).to receive(:activate!)
+
+      server.activate!("some scenario name")
     end
 
   end
 
-  describe "#add_stub!" do
+  describe "#reset!" do
 
-    let(:stub)         { instance_double(HttpStub::Configurer::Request::Stub) }
-    let(:stub_builder) { instance_double(HttpStub::Configurer::DSL::StubBuilder, build: stub) }
+    subject { server.reset! }
 
-    before(:example) { allow(server_facade).to receive(:stub_response) }
+    it "delegates to the server facade" do
+      expect(server_facade).to receive(:reset)
 
-    shared_examples_for "adding a stub request" do
-
-      it "builds the stub request" do
-        expect(stub_builder).to receive(:build).and_return(stub)
-
-        subject
-      end
-
-      it "informs the server facade of the stub request" do
-        expect(server_facade).to receive(:stub_response).with(stub)
-
-        subject
-      end
-
-    end
-
-    context "when a stub builder is provided" do
-
-      subject { server.add_stub!(stub_builder) }
-
-      it_behaves_like "adding a stub request"
-
-    end
-
-    context "when a stub builder is not provided" do
-
-      let(:block_verifier) { double("BlockVerifier") }
-      let(:block)          { lambda { block_verifier.verify } }
-
-      before(:example) do
-        allow(HttpStub::Configurer::DSL::StubBuilder).to receive(:new).and_return(stub_builder)
-        allow(stub_builder).to receive(:invoke)
-      end
-
-      subject { server.add_stub!(&block) }
-
-      it "creates a stub builder" do
-        expect(HttpStub::Configurer::DSL::StubBuilder).to receive(:new)
-
-        subject
-      end
-
-      it "requests the created builder invoke the provided block" do
-        expect(stub_builder).to receive(:invoke).and_yield
-        expect(block_verifier).to receive(:verify)
-
-        subject
-      end
-
-      it_behaves_like "adding a stub request"
-
+      subject
     end
 
   end
@@ -248,27 +304,26 @@ describe HttpStub::Configurer::DSL::Server do
   describe "#add_scenario!" do
 
     let(:scenario_name)    { "some/scenario/name" }
+    let(:block)            { lambda { |_scenario| "some block" } }
+
     let(:scenario)         { instance_double(HttpStub::Configurer::Request::Scenario) }
     let(:scenario_builder) { instance_double(HttpStub::Configurer::DSL::ScenarioBuilder, build: scenario) }
 
-    before(:example) { allow(server_facade).to receive(:define_scenario) }
-
-    let(:block) { lambda { |_scenario| "some block" } }
+    subject { server.add_scenario!(scenario_name, &block) }
 
     before(:example) do
       allow(HttpStub::Configurer::DSL::ScenarioBuilder).to receive(:new).and_return(scenario_builder)
+      allow(server_facade).to receive(:define_scenario)
     end
 
-    subject { server.add_scenario!(scenario_name, &block) }
-
-    it "creates a scenario builder containing the servers default stub builder" do
-      expect(HttpStub::Configurer::DSL::ScenarioBuilder).to receive(:new).with(default_stub_builder, anything)
+    it "creates a scenario builder containing the provided scenario name" do
+      expect(HttpStub::Configurer::DSL::ScenarioBuilder).to receive(:new).with(scenario_name, anything)
 
       subject
     end
 
-    it "creates a scenario builder containing the provided scenario name" do
-      expect(HttpStub::Configurer::DSL::ScenarioBuilder).to receive(:new).with(anything, scenario_name)
+    it "creates a scenario builder extending the servers default stub template" do
+      expect(HttpStub::Configurer::DSL::ScenarioBuilder).to receive(:new).with(anything, default_stub_template)
 
       subject
     end
@@ -293,9 +348,8 @@ describe HttpStub::Configurer::DSL::Server do
 
   describe "#add_scenario_with_one_stub!" do
 
-    let(:scenario_name)  { "Some scenario name" }
-    let(:block_verifier) { double("BlockVerifier") }
-    let(:block)          { lambda { block_verifier.verify } }
+    let(:scenario_name) { "Some scenario name" }
+    let(:block)         { lambda { block_verifier.verify } }
 
     let(:scenario_builder) { instance_double(HttpStub::Configurer::DSL::ScenarioBuilder, add_stub!: nil) }
     let(:stub_builder)     { instance_double(HttpStub::Configurer::DSL::StubBuilder, invoke: nil) }
@@ -330,8 +384,7 @@ describe HttpStub::Configurer::DSL::Server do
 
     context "when a block is provided" do
 
-      let(:block_verifier) { double("BlockVerifier") }
-      let(:block)          { lambda { block_verifier.verify } }
+      let(:block) { lambda { block_verifier.verify } }
 
       subject { server.add_scenario_with_one_stub!(scenario_name, &block) }
 
@@ -350,31 +403,58 @@ describe HttpStub::Configurer::DSL::Server do
 
   describe "#endpoint_template" do
 
-    let(:block_verifier)    { double("BlockVerifier") }
-    let(:block)             { lambda { block_verifier.verify } }
-    let(:endpoint_template) { instance_double(HttpStub::Configurer::DSL::EndpointTemplate, invoke: nil) }
+    let(:block)                    { lambda { block_verifier.verify } }
+    let(:server_endpoint_template) { instance_double(HttpStub::Configurer::DSL::ServerEndpointTemplate) }
 
     subject { server.endpoint_template(&block) }
 
     before(:example) do
-      allow(HttpStub::Configurer::DSL::EndpointTemplate).to receive(:new).and_return(endpoint_template)
+      allow(HttpStub::Configurer::DSL::ServerEndpointTemplate).to receive(:new).and_return(server_endpoint_template)
     end
 
-    it "requests the endpoint template invoke the provided block" do
-      expect(endpoint_template).to receive(:invoke).and_yield
+    it "creates an endpoint template for the server" do
+      expect(HttpStub::Configurer::DSL::ServerEndpointTemplate).to receive(:new).with(server, anything)
+
+      subject
+    end
+
+    it "creates an endpoint template using the curently default session" do
+      expect(HttpStub::Configurer::DSL::ServerEndpointTemplate).to receive(:new).with(anything, default_session)
+
+      subject
+    end
+
+    it "creates an endpoint template using any provided block to initialize the template" do
+      allow(HttpStub::Configurer::DSL::ServerEndpointTemplate).to receive(:new).and_yield
       expect(block_verifier).to receive(:verify)
 
       subject
     end
 
-    it "creates a template for the server" do
-      expect(HttpStub::Configurer::DSL::EndpointTemplate).to receive(:new).with(server).and_return(endpoint_template)
+    it "returns the created endpoint template" do
+      expect(subject).to eql(server_endpoint_template)
+    end
+
+  end
+
+  describe "#session" do
+
+    let(:session_id) { "some session id" }
+
+    let(:session) { instance_double(HttpStub::Configurer::DSL::Session) }
+
+    subject { server.session(session_id) }
+
+    before(:example) { allow(session_factory).to receive(:create).and_return(session) }
+
+    it "creates a DSL for interacting with a session for the provided ID via the session factory" do
+      expect(session_factory).to receive(:create).with(session_id)
 
       subject
     end
 
-    it "returns the created endpoint template" do
-      expect(subject).to eql(endpoint_template)
+    it "returns the created session" do
+      expect(subject).to eql(session)
     end
 
   end
@@ -383,50 +463,129 @@ describe HttpStub::Configurer::DSL::Server do
 
     let(:scenario_name) { "Some scenario name" }
 
-    it "delegates to the server facade" do
-      expect(server_facade).to receive(:activate).with(scenario_name)
+    subject { server.activate!(scenario_name) }
 
-      server.activate!(scenario_name)
+    it "delegates to the default session" do
+      expect(default_session).to receive(:activate!).with(scenario_name)
+
+      subject
     end
 
   end
 
-  describe "#remember_stubs" do
+  describe "#clear_sessions!" do
+
+    subject { server.clear_sessions! }
 
     it "delegates to the server facade" do
-      expect(server_facade).to receive(:remember_stubs)
+      expect(server_facade).to receive(:clear_sessions)
 
-      server.remember_stubs
+      subject
+    end
+
+  end
+
+  describe "#build_stub" do
+
+    let(:block) { lambda { block_verifier.verify } }
+
+    subject { server.build_stub(&block) }
+
+    it "delegates to the default session" do
+      expect(default_session).to receive(:build_stub)
+
+      subject
+    end
+
+    it "initializes the built stub using the provided block" do
+      allow(default_session).to receive(:build_stub).and_yield
+      expect(block_verifier).to receive(:verify)
+
+      subject
+    end
+
+    it "returns the built stub" do
+      built_stub = instance_double(HttpStub::Configurer::DSL::StubBuilder)
+      allow(default_session).to receive(:build_stub).and_return(built_stub)
+
+      expect(subject).to eql(built_stub)
+    end
+
+  end
+
+  describe "#add_stub!" do
+
+    context "when a stub builder is provided" do
+
+      let(:stub_builder) { instance_double(HttpStub::Configurer::DSL::StubBuilder) }
+
+      subject { server.add_stub!(stub_builder) }
+
+      it "delegates to the default session" do
+        expect(default_session).to receive(:add_stub!).with(stub_builder)
+
+        subject
+      end
+
+    end
+
+    context "when a block is provided" do
+
+      let(:block) { lambda { block_verifier.verify } }
+
+      subject { server.add_stub!(&block) }
+
+      it "delegates to the default session" do
+        expect(default_session).to receive(:add_stub!)
+
+        subject
+      end
+
+      it "supplies the provided block to the session" do
+        allow(default_session).to receive(:add_stub!).and_yield
+        expect(block_verifier).to receive(:verify)
+
+        subject
+      end
+
+    end
+
+  end
+
+  describe "#add_stubs!" do
+
+    let(:stub_builders) { (1..3).map { instance_double(HttpStub::Configurer::DSL::StubBuilder) } }
+
+    subject { server.add_stubs!(stub_builders) }
+
+    it "delegates to the default session" do
+      expect(default_session).to receive(:add_stubs!).with(stub_builders)
+
+      subject
     end
 
   end
 
   describe "#recall_stubs!" do
 
-    it "delegates to the server facade" do
-      expect(server_facade).to receive(:recall_stubs)
+    subject { server.recall_stubs! }
 
-      server.recall_stubs!
+    it "resets the default session" do
+      expect(default_session).to receive(:reset!)
+
+      subject
     end
 
   end
 
   describe "#clear_stubs!" do
 
-    it "delegates to the server facade" do
-      expect(server_facade).to receive(:clear_stubs)
+    subject { server.clear_stubs! }
 
-      server.clear_stubs!
-    end
+    it "delegates to the default session" do
+      expect(default_session).to receive(:clear!)
 
-  end
-
-  describe "#clear_scenarios!" do
-
-    it "delegates to the server facade" do
-      expect(server_facade).to receive(:clear_scenarios)
-
-      server.clear_scenarios!
+      subject
     end
 
   end

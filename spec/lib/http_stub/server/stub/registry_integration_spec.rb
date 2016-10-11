@@ -1,35 +1,59 @@
 describe HttpStub::Server::Stub::Registry, "integrating with real stubs" do
 
+  let(:memory_session) { HttpStub::Server::SessionFixture.memory }
+
   let(:logger) { instance_double(Logger, info: nil) }
 
-  let(:stub_registry) { HttpStub::Server::Stub::Registry.new }
+  let(:stub_registry) { HttpStub::Server::Stub::Registry.new(memory_session) }
 
-  describe "#recall" do
+  shared_context "a stub is added" do
 
-    subject { stub_registry.recall }
+    let(:added_stub) { create_stub(4) }
 
-    context "when stubs have been added" do
+    before(:example) { stub_registry.add(added_stub, logger) }
+
+  end
+
+  describe "#reset" do
+
+    subject { stub_registry.reset(logger) }
+
+    context "when stubs have been added to the servers memory" do
 
       let(:stubs) { (1..3).map { |i| create_stub(i) } }
 
-      before(:example) { stubs.each { |stub| stub_registry.add(stub, logger) } }
+      before(:example) { stubs.each { |stub| memory_session.add_stub(stub, logger) } }
 
-      context "and remembered" do
+      context "and a stub is subsequently added" do
 
-        before(:example) { stub_registry.remember }
+        include_context "a stub is added"
 
-        context "and a stub subsequently added" do
+        it "retains stubs added to the servers memory" do
+          subject
 
-          let(:stub_to_add) { create_stub(4) }
+          expect(stub_registry.all).to eql(stubs)
+        end
 
-          before(:example) { stub_registry.add(stub_to_add, logger) }
+        it "rejects stubs not added to the servers memory" do
+          subject
 
-          it "should restore all known stubs to the remembered state" do
-            subject
+          expect(stub_registry.all).not_to include(added_stub)
+        end
 
-            expect(stub_registry.all).not_to include(stub_to_add)
-          end
+      end
 
+    end
+
+    context "when no stubs have been added to the servers memory" do
+
+      context "and a stub is subsequently added" do
+
+        include_context "a stub is added"
+
+        it "clears the stubs" do
+          subject
+
+          expect(stub_registry.all).to eql([])
         end
 
       end

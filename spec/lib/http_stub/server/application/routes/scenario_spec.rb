@@ -7,18 +7,21 @@ describe HttpStub::Server::Application::Routes::Scenario do
 
   context "when a scenario registration request is received" do
 
+    let(:payload) do
+      {
+        uri: "/a_scenario_path",
+        stubs: [ { uri: "/a_path", method: "a method", response: { status: 200, body: "Foo" } } ],
+        triggered_scenario_names: [ "some/uri/to/activate" ]
+      }.to_json
+    end
     let(:registration_response) { instance_double(HttpStub::Server::Stub::Response::Base) }
 
-    before(:example) { allow(scenario_controller).to receive(:register).and_return(registration_response) }
-
-    subject do
-      post "/http_stub/scenarios",
-           {
-             uri: "/a_scenario_path",
-             stubs: [ { uri: "/a_path", method: "a method", response: { status: 200, body: "Foo" } } ],
-             triggered_scenario_names: [ "some/uri/to/activate" ]
-           }.to_json
+    before(:example) do
+      allow(request).to receive(:body).and_return(payload)
+      allow(scenario_controller).to receive(:register).and_return(registration_response)
     end
+
+    subject { post "/http_stub/scenarios" }
 
     it "registers the scenario via the scenario controller" do
       expect(scenario_controller).to receive(:register).and_return(registration_response)
@@ -37,9 +40,11 @@ describe HttpStub::Server::Application::Routes::Scenario do
   context "when a request to show a scenario is received" do
 
     let(:scenario_name)  { "Some scenario name" }
-    let(:found_scenario) { HttpStub::Server::Scenario::ScenarioFixture.create }
+    let(:found_scenario) { HttpStub::Server::ScenarioFixture.create }
 
-    subject { get "/http_stub/scenarios?#{URI.encode_www_form(:name => scenario_name)}" }
+    subject { get "/http_stub/scenarios" }
+
+    before(:example) { allow(request).to receive(:parameters).and_return(name: scenario_name) }
 
     it "retrieves the scenario via the scenario controller" do
       expect(scenario_controller).to receive(:find).with(request, anything).and_return(found_scenario)
@@ -51,7 +56,7 @@ describe HttpStub::Server::Application::Routes::Scenario do
 
   context "when a request to list the scenarios is received" do
 
-    let(:found_scenarios) { [ HttpStub::Server::Scenario::ScenarioFixture.create ] }
+    let(:found_scenarios) { [ HttpStub::Server::ScenarioFixture.create ] }
 
     subject { get "/http_stub/scenarios" }
 
@@ -63,14 +68,17 @@ describe HttpStub::Server::Application::Routes::Scenario do
 
   end
 
-  context "when a scenario activation request is received" do
+  context "when a request to active scenarios is received" do
 
-    let(:scenario_name)       { "Some scenario name" }
+    let(:scenario_names)      { (1..3).map { |i| "scenario name #{i}" } }
     let(:activation_response) { instance_double(HttpStub::Server::Stub::Response::Base) }
 
-    subject { post "/http_stub/scenarios/activate", name: scenario_name }
+    subject { post "/http_stub/scenarios/activate" }
 
-    before(:example) { allow(scenario_controller).to receive(:activate).and_return(activation_response) }
+    before(:example) do
+      allow(request).to receive(:parameters).and_return(names: scenario_names)
+      allow(scenario_controller).to receive(:activate).and_return(activation_response)
+    end
 
     it "activates the scenario via the scenario controller" do
       expect(scenario_controller).to receive(:activate).with(request, anything).and_return(activation_response)

@@ -3,6 +3,9 @@
 New:
 * `stub.trigger` can activate Scenarios
 * Stub sessions are enabled via `stub_server.session_identifier`, sessions can pinned to a request header or parameter
+* `stub_server.session(id)` allows stub and scenario interactions within an isolated session
+* `stub_server.reset!` returns the server to it's uninitialized original state
+* `GET /http_stub/memory` shows the memory session content
 
 Breaking:
 * `stub.trigger` accepts a hash with optional `:scenarios`, `:scenario`, `:stubs` and `:stub` elements
@@ -12,7 +15,13 @@ Breaking:
 ** Methods directly accessible from `Configurer` must now be performed via `stub_server`, e.g. `stub_server.recall_stubs!`
 
 Misc:
-* Migrated to Sinatra namespaces
+* Administration pages:
+  * `GET /http_stub` shows all sessions when sessions are enabled, show transaction session when sessions are disabled 
+* Refactor:
+  * Migrated to Sinatra namespaces
+  * Introduced concept of server `memory` holding all scenarios and sessions
+  * `memory` session holds the initial state of the server, all other sessions are derived from this
+  * In session-less mode, a `transactional` session is used internally by default
 
 ** 0.25.1 **
 

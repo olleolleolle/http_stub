@@ -3,15 +3,12 @@ describe HttpStub::Server::Application::RequestSupport do
   context "when included in an application" do
     include_context "rack application test"
 
-    class HttpStub::Server::Application::RequestSupportTestApplication < Sinatra::Base
-
+    class HttpStub::Server::Application::RequestSupport::TestApplication < Sinatra::Base
       include HttpStub::Server::Application::RequestSupport
 
-      set :session_identifier, { headers: :some_session_identifier }
-
-      def initialize(session_registry, scenario_registry)
-        @session_registry  = session_registry
-        @scenario_registry = scenario_registry
+      def initialize(session_configuration, server_memory)
+        @session_configuration = session_configuration
+        @server_memory         = server_memory
         super()
       end
 
@@ -19,57 +16,44 @@ describe HttpStub::Server::Application::RequestSupport do
         halt 200
       end
 
-      any_request_method "/any_request_method_test" do
-        halt 200
+    end
+
+    let(:session_configuration) { instance_double(HttpStub::Server::Session::Configuration) }
+    let(:server_memory)         { instance_double(HttpStub::Server::Memory::Memory) }
+    let(:request_factory)       { instance_double(HttpStub::Server::Request::Factory) }
+
+    let(:app_class) { HttpStub::Server::Application::RequestSupport::TestApplication }
+    let(:app)       { app_class.new!(session_configuration, server_memory) }
+
+    describe "constructor" do
+
+      subject { app }
+
+      it "creates a factory for creating http_stub using the servers session configuration" do
+        expect(HttpStub::Server::Request::Factory).to receive(:new).with(session_configuration, anything)
+
+        subject
+      end
+
+      it "creates a factory for creating http_stub requests based on the servers memory" do
+        expect(HttpStub::Server::Request::Factory).to receive(:new).with(anything, server_memory)
+
+        subject
       end
 
     end
 
-    let(:session_registry)  { instance_double(HttpStub::Server::Registry) }
-    let(:scenario_registry) { instance_double(HttpStub::Server::Registry) }
-    let(:request_factory)   { instance_double(HttpStub::Server::Request::Factory, create: nil) }
+    describe "when servicing a request" do
 
-    let(:app_class) { HttpStub::Server::Application::RequestSupportTestApplication }
-    let(:app)       { app_class.new!(session_registry, scenario_registry) }
+      subject { get "/request_support_test" }
 
-    before(:example) { allow(HttpStub::Server::Request::Factory).to receive(:new).and_return(request_factory) }
+      it "creates a http_stub request for rack requests issued" do
+        allow(HttpStub::Server::Request::Factory).to receive(:new).and_return(request_factory)
+        expect(request_factory).to receive(:create).with(a_kind_of(Rack::Request), anything, anything)
 
-    it "creates a factory for creating http_stub requests with the applications configured session identifier" do
-      expect(HttpStub::Server::Request::Factory).to(
-        receive(:new).with({ headers: :some_session_identifier }, anything, anything)
-      )
-
-      app
-    end
-
-    it "creates a factory for creating http_stub requests with the applications session and scenario registries" do
-      expect(HttpStub::Server::Request::Factory).to receive(:new).with(anything, session_registry, scenario_registry)
-
-      app
-    end
-
-    it "creates a http_stub request for rack requests issued" do
-      expect(request_factory).to receive(:create).with(a_kind_of(Rack::Request), anything, anything)
-
-      issue_a_request
-    end
-
-    describe "#any_request_method" do
-
-      [ :get, :post, :put, :patch, :delete, :options ].each do |request_method|
-
-        it "handles #{request_method} requests for the provided endpoint" do
-          self.send(request_method, "/any_request_method_test")
-
-          expect(response.status).to eql(200)
-        end
-
+        subject
       end
 
-    end
-
-    def issue_a_request
-      get "/test"
     end
 
   end

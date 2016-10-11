@@ -1,10 +1,11 @@
 describe HttpStub::Configurer::Server::RequestProcessor do
 
-  let(:configurer)        { double(HttpStub::Configurer) }
-  let(:command_processor) { instance_double(HttpStub::Configurer::Server::CommandProcessor) }
-  let(:buffered_command_processor)  { instance_double(HttpStub::Configurer::Server::BufferedCommandProcessor) }
+  let(:configuration) { double(HttpStub::Server::Application::Configuration) }
 
-  let(:request_processor)     { HttpStub::Configurer::Server::RequestProcessor.new(configurer) }
+  let(:command_processor)          { instance_double(HttpStub::Configurer::Server::CommandProcessor) }
+  let(:buffered_command_processor) { instance_double(HttpStub::Configurer::Server::BufferedCommandProcessor) }
+
+  let(:request_processor) { described_class.new(configuration) }
 
   before(:example) do
     allow(HttpStub::Configurer::Server::CommandProcessor).to receive(:new).and_return(command_processor)
@@ -15,8 +16,8 @@ describe HttpStub::Configurer::Server::RequestProcessor do
 
   describe "constructor" do
 
-    it "creates a command processor for the configurer" do
-      expect(HttpStub::Configurer::Server::CommandProcessor).to receive(:new).with(configurer)
+    it "creates a command processor based on the servers configuration" do
+      expect(HttpStub::Configurer::Server::CommandProcessor).to receive(:new).with(configuration)
 
       request_processor
     end

@@ -13,9 +13,12 @@ describe HttpStub::Configurer::Request::Http::Multipart do
 
   let(:payload)        { { key: "value" } }
   let(:response_files) { [] }
-  let(:model) { HttpStub::Configurer::Request::SomeModel.new(payload: payload, response_files: response_files) }
 
-  let(:multipart_request) { HttpStub::Configurer::Request::Http::Multipart.new(model) }
+  let(:path)  { "some/model/path" }
+  let(:model) { HttpStub::Configurer::Request::SomeModel.new(payload: payload, response_files: response_files) }
+  let(:args)  { { path: path , model: model } }
+
+  let(:multipart_request) { HttpStub::Configurer::Request::Http::Multipart.new(args) }
 
   describe "#to_http_request" do
 
@@ -34,14 +37,16 @@ describe HttpStub::Configurer::Request::Http::Multipart do
       expect(subject).to eql(http_multipart_request)
     end
 
-    it "creates a HTTP request with a path to the pluralized name for the model" do
-      expect(Net::HTTP::Post::Multipart).to receive(:new).with("/http_stub/some_models", anything)
+    it "creates a HTTP request with the provided path prefixed with http_stub scoping" do
+      expect(Net::HTTP::Post::Multipart).to receive(:new).with("/http_stub/some/model/path", anything, anything)
 
       subject
     end
 
     it "creates a HTTP request with a payload parameter containing the JSON representation of the payload" do
-      expect(Net::HTTP::Post::Multipart).to receive(:new).with(anything, hash_including(payload: payload.to_json))
+      expect(Net::HTTP::Post::Multipart).to(
+        receive(:new).with(anything, hash_including(payload: payload.to_json), anything)
+      )
 
       subject
     end
@@ -63,7 +68,9 @@ describe HttpStub::Configurer::Request::Http::Multipart do
           )
           result.tap { |hash| hash["response_file_#{response_file.id}"] = upload_file }
         end
-        expect(Net::HTTP::Post::Multipart).to receive(:new).with(anything, hash_including(expected_upload_parameters))
+        expect(Net::HTTP::Post::Multipart).to(
+          receive(:new).with(anything, hash_including(expected_upload_parameters), anything)
+        )
 
         subject
       end
@@ -73,7 +80,33 @@ describe HttpStub::Configurer::Request::Http::Multipart do
     context "when the payload contains no response files" do
 
       it "creates a HTTP request with no upload parameters" do
-        expect(Net::HTTP::Post::Multipart).to receive(:new).with(anything, payload: payload.to_json)
+        expect(Net::HTTP::Post::Multipart).to receive(:new).with(anything, { payload: payload.to_json }, anything)
+
+        subject
+      end
+
+    end
+
+    context "when headers are provided" do
+
+      let(:headers) { (1..3).each_with_object({}) { |i, result| result["header#{i}"] = "value#{i}" } }
+
+      let(:args) { { path: path, headers: headers, model: model } }
+
+      it "creates a HTTP request with the provided headers" do
+        expect(Net::HTTP::Post::Multipart).to receive(:new).with(anything, anything, headers)
+
+        subject
+      end
+
+    end
+
+    context "when no headers are provided" do
+
+      let(:args) { { path: path, model: model } }
+
+      it "creates a HTTP request with empty headers" do
+        expect(Net::HTTP::Post::Multipart).to receive(:new).with(anything, anything, {})
 
         subject
       end

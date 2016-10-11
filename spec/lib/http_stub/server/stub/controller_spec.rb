@@ -10,7 +10,7 @@ describe HttpStub::Server::Stub::Controller do
   let(:stub_uri)            { "/some/stub/uri" }
   let(:the_stub)            { instance_double(HttpStub::Server::Stub::Stub, uri: stub_uri) }
 
-  let(:controller) { HttpStub::Server::Stub::Controller.new }
+  let(:controller) { described_class.new }
 
   describe "#register" do
 
@@ -151,7 +151,7 @@ describe HttpStub::Server::Stub::Controller do
   describe "#find" do
 
     let(:id)                 { SecureRandom.uuid }
-    let(:request_parameters) { { id: id } }
+    let(:request_parameters) { { stub_id: id } }
 
     subject { controller.find(request, logger) }
 
@@ -189,24 +189,12 @@ describe HttpStub::Server::Stub::Controller do
 
   end
 
-  describe "#remember_state" do
+  describe "#reset" do
 
-    subject { controller.remember_state(request) }
+    subject { controller.reset(request, logger) }
 
-    it "delegates to the users session" do
-      expect(session).to receive(:remember)
-
-      subject
-    end
-
-  end
-
-  describe "#recall_state" do
-
-    subject { controller.recall_state(request) }
-
-    it "delegates to the users session" do
-      expect(session).to receive(:recall)
+    it "resets the users session" do
+      expect(session).to receive(:reset).with(logger)
 
       subject
     end

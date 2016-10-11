@@ -20,8 +20,8 @@ module HttpStub
         end
 
         def initialize
-          @session_registry  = HttpStub::Server::Registry.new("session")
-          @scenario_registry = HttpStub::Server::Registry.new("scenario")
+          @session_configuration = HttpStub::Server::Session::Configuration.new(settings.session_identifier)
+          @server_memory         = HttpStub::Server::Memory::Memory.new(@session_configuration)
           super()
         end
 
@@ -30,9 +30,10 @@ module HttpStub
 
         register HttpStub::Server::Application::CrossOriginSupport
 
+        include HttpStub::Server::Application::Routes::Memory
         include HttpStub::Server::Application::Routes::Resource
-        include HttpStub::Server::Application::Routes::Session
         include HttpStub::Server::Application::Routes::Scenario
+        include HttpStub::Server::Application::Routes::Session
         include HttpStub::Server::Application::Routes::Stub
 
         helpers HttpStub::Server::Application::SessionUriSupport

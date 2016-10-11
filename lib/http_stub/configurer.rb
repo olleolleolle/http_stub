@@ -10,13 +10,12 @@ module HttpStub
     module ClassMethods
 
       def stub_server
-        @stub_server ||= HttpStub::Configurer::DSL::Server.new(server_facade)
+        @stub_server ||= HttpStub::Configurer::DSL::Server.new
       end
 
       def initialize!
         on_initialize if self.respond_to?(:on_initialize) && !@initialized
-        server_facade.flush_requests
-        server_facade.remember_stubs
+        stub_server.initialize!
         @initialized = true
       end
 
@@ -26,12 +25,6 @@ module HttpStub
           self.define_singleton_method(name) { part }
           self.send(:define_method, name) { part }
         end
-      end
-
-      private
-
-      def server_facade
-        @server_facade ||= HttpStub::Configurer::Server::Facade.new(self)
       end
 
     end

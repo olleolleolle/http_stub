@@ -4,15 +4,16 @@ module HttpStub
 
       class Factory
 
-        def initialize(session_configuration, session_registry, scenario_registry)
-          @session_factory =
-            HttpStub::Server::Session::Factory.new(session_configuration, session_registry, scenario_registry)
+        def initialize(session_configuration, server_memory)
+          @server_memory               = server_memory
+          @session_identifier_strategy = HttpStub::Server::Session::IdentifierStrategy.new(session_configuration)
         end
 
         def create(rack_request, sinatra_parameters, logger)
-          HttpStub::Server::Request::Request.new(rack_request, sinatra_parameters).tap do |request|
-            request.session = @session_factory.create(request, logger)
-          end
+          sinatra_request = HttpStub::Server::Request::SinatraRequest.new(rack_request, sinatra_parameters)
+          session_id      = @session_identifier_strategy.identifier_for(sinatra_request)
+          session         = @server_memory.sessions.find_or_create(session_id, logger)
+          HttpStub::Server::Request::Request.new(sinatra_request, session_id, session)
         end
 
       end

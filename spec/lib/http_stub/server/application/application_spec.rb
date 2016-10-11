@@ -1,14 +1,6 @@
 describe HttpStub::Server::Application::Application do
   include_context "http_stub rack application test"
 
-  it "disables all standard HTTP security measures to allow stubs full control of responses" do
-    expect(app.settings.protection).to eql(false)
-  end
-
-  it "disables cross origin support by default" do
-    expect(app.settings.cross_origin_support).to eql(false)
-  end
-
   describe "::configure" do
 
     let(:args)                { { some_argument_key: "some argument value" } }
@@ -35,34 +27,70 @@ describe HttpStub::Server::Application::Application do
 
   end
 
-  describe "session identifer" do
+  it "disables all standard HTTP security measures to allow stubs full control of responses" do
+    expect(app.settings.protection).to eql(false)
+  end
 
-    context "when configured" do
+  it "disables cross origin support by default" do
+    expect(app.settings.cross_origin_support).to eql(false)
+  end
+
+  describe "the session configuration" do
+
+    let(:session_configuration) { instance_double(HttpStub::Server::Session::Configuration).as_null_object }
+
+    context "when a session identifier is set" do
 
       include_context "enabled session support"
 
-      it "creates a request factory with the configuration" do
-        expect(HttpStub::Server::Request::Factory).to receive(:new).with(session_identifier, anything, anything)
+      it "is created on startup with the session identifier"  do
+        expect(HttpStub::Server::Session::Configuration).to receive(:new).with(session_identifier)
 
-        issue_a_request
+        app
       end
 
     end
 
-    context "when not configured" do
+    context "when a session identifier is not configured" do
 
-      it "creates a request factory with a nil configuration" do
-        expect(HttpStub::Server::Request::Factory).to receive(:new).with(nil, anything, anything)
+      it "is created on startup with a nil session identifier"  do
+        expect(HttpStub::Server::Session::Configuration).to receive(:new).with(nil)
 
-        issue_a_request
+        app
       end
 
     end
 
-    def issue_a_request
-      get "/application.css"
+    it "is reused on all requests" do
+      expect(HttpStub::Server::Session::Configuration).to receive(:new).once
+
+      issue_a_request
+      issue_a_request
     end
 
+  end
+
+  describe "the memory" do
+
+    let(:server_memory) { instance_double(HttpStub::Server::Memory::Memory).as_null_object }
+
+    it "is created on startup" do
+      expect(HttpStub::Server::Memory::Memory).to receive(:new).and_return(server_memory)
+
+      app
+    end
+
+    it "is reused on all requests" do
+      expect(HttpStub::Server::Memory::Memory).to receive(:new).once.and_return(server_memory)
+
+      issue_a_request
+      issue_a_request
+    end
+
+  end
+
+  def issue_a_request
+    get "/application.css"
   end
 
 end

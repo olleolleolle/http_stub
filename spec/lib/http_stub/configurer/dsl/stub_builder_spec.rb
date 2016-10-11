@@ -46,9 +46,9 @@ describe HttpStub::Configurer::DSL::StubBuilder do
 
       attr_reader :merged_stub_builders
 
-      def initialize(default_builder)
+      def initialize(parent_builder=nil, &block)
         @merged_stub_builders = []
-        super(default_builder)
+        super(parent_builder, &block)
       end
 
       def merge!(stub_builder)
@@ -57,33 +57,55 @@ describe HttpStub::Configurer::DSL::StubBuilder do
 
     end
 
-    context "when a default builder is provided" do
+    context "when a parent builder is provided" do
 
-      let(:default_builder) { instance_double(described_class) }
+      let(:parent_builder) { instance_double(described_class) }
 
-      let(:builder) { HttpStub::Configurer::DSL::StubBuilderWithObservedMerge.new(default_builder) }
+      let(:builder) { HttpStub::Configurer::DSL::StubBuilderWithObservedMerge.new(parent_builder) }
 
-      it "merges the default builder" do
+      it "merges the parent builder" do
         builder
 
-        expect(builder.merged_stub_builders).to eql([ default_builder ])
+        expect(builder.merged_stub_builders).to eql([ parent_builder ])
+      end
+
+    end
+
+    context "when a block is provided" do
+
+      let(:block_verifier) { double("BlockVerifier", verify: nil) }
+      let(:block)          { lambda { |builder| block_verifier.verify(builder) } }
+
+      let(:builder) { HttpStub::Configurer::DSL::StubBuilderWithObservedMerge.new(&block) }
+
+      it "creates a builder that is yielded to the provided block" do
+        expect(block_verifier).to receive(:verify).with(a_kind_of(described_class))
+
+        builder
+      end
+
+      it "does not merge any parent builders" do
+        builder
+
+        expect(builder.merged_stub_builders).to eql([])
+      end
+
+    end
+
+    context "when neither a parent builder or block is provided" do
+
+      let(:builder) { HttpStub::Configurer::DSL::StubBuilderWithObservedMerge.new(nil) }
+
+      it "does not merge any parent builder" do
+        builder
+
+        expect(builder.merged_stub_builders).to eql([])
       end
 
     end
 
   end
 
-  context "when a default builder is not provided" do
-
-    let(:builder) { HttpStub::Configurer::DSL::StubBuilderWithObservedMerge.new(nil) }
-
-    it "does not merge a builder" do
-      builder
-
-      expect(builder.merged_stub_builders).to eql([])
-    end
-
-  end
 
   describe "#match_requests" do
 

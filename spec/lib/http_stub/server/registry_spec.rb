@@ -1,14 +1,62 @@
 describe HttpStub::Server::Registry do
 
-  let(:logger)  { instance_double(Logger, info: nil) }
+  let(:model_name) { "a_model" }
 
-  let(:registry) { HttpStub::Server::Registry.new("a_model") }
+  let(:logger) { instance_double(Logger, info: nil) }
+
+  let(:registry) { described_class.new(model_name) }
+
+  shared_context "multiple models" do
+
+    let(:models) { (1..3).map { |i| double("HttpStub::Server::Model#{i}", matches?: false) } }
+
+  end
 
   shared_context "register multiple models" do
-
-    let(:models) { (1..3).map { |i| double("HttpStub::Server::Model#{i}", :matches? => false) } }
+    include_context "multiple models"
 
     before(:example) { registry.concat(models, logger) }
+
+  end
+
+  shared_context "one model matches" do
+
+    let(:matching_model) { models[1] }
+
+    before(:example) { allow(matching_model).to receive(:matches?).and_return(true) }
+
+  end
+
+  shared_context "many models match" do
+
+    let(:matching_models) { [ models[0], models[2] ] }
+
+    before(:example) { matching_models.each { |model| allow(model).to receive(:matches?).and_return(true) } }
+
+  end
+
+  describe "constructor" do
+
+    context "when models are provided" do
+      include_context "multiple models"
+
+      subject { described_class.new(model_name, models) }
+
+      it "creates a registry with the models" do
+        expect(subject.all).to eql(models)
+      end
+
+    end
+
+    context "when models are not provided" do
+
+      subject { described_class.new(model_name) }
+
+      it "creates a registy with no models" do
+        expect(subject.all).to eql([])
+      end
+
+    end
 
   end
 
@@ -46,18 +94,69 @@ describe HttpStub::Server::Registry do
 
     subject { registry.concat(models, logger) }
 
+    it "adds the models" do
+      subject
+
+      expect_registry_to_contain(models)
+    end
+
     it "logs that the models have been registered" do
       model_string_representations.each do |string_representation|
-        expect(logger).to receive(:info).with(/#{string_representation}/)
+        expect(logger).to receive(:info).with(/Registered.+#{string_representation}/)
       end
 
       subject
     end
 
-    it "adds the models" do
-      subject
+  end
 
-      expect(registry.all).to eql(models.reverse)
+  describe "#replace" do
+
+    let(:model_string_representations) { (1..3).map { |i| "model string ##{i}" } }
+    let(:models) do
+      model_string_representations.map do |string_representation|
+        double("HttpStub::Server::Model", to_s: string_representation)
+      end
+    end
+
+    subject { registry.replace(models, logger) }
+
+    context "when no models had been added" do
+
+      it "establishes the models" do
+        subject
+
+        expect_registry_to_contain(models)
+      end
+
+    end
+
+    context "when models had been added" do
+
+      let(:original_models) { (1..3).map { double("HttpStub::Server::Model") } }
+
+      before(:example) { registry.concat(original_models, logger) }
+
+      it "replaces those models with the provided models" do
+        subject
+
+        expect_registry_to_contain(models)
+      end
+
+    end
+
+    it "logs that the models are being cleared" do
+      expect(logger).to receive(:info).with(/clearing a_model/i)
+
+      subject
+    end
+
+    it "logs that the models have been registered" do
+      model_string_representations.each do |string_representation|
+        expect(logger).to receive(:info).with(/Registered.+#{string_representation}/)
+      end
+
+      subject
     end
 
   end
@@ -78,10 +177,7 @@ describe HttpStub::Server::Registry do
       end
 
       describe "and one registered model matches the criteria" do
-
-        let(:matching_model) { models[1] }
-
-        before(:example) { allow(matching_model).to receive(:matches?).and_return(true) }
+        include_context "one model matches"
 
         it "returns the model" do
           expect(subject).to eql(matching_model)
@@ -100,11 +196,10 @@ describe HttpStub::Server::Registry do
       end
 
       describe "and multiple registered models satisfy the criteria" do
-
-        before(:example) { [0, 2].each { |i| allow(models[i]).to receive(:matches?).and_return(true) } }
+        include_context "many models match"
 
         it "supports model overrides by returning the last model registered" do
-          expect(subject).to eql(models[2])
+          expect(subject).to eql(matching_models.last)
         end
 
       end
@@ -127,7 +222,7 @@ describe HttpStub::Server::Registry do
 
     end
 
-    it "it should log model discovery diagnostics that includes the complete details of the criteria" do
+    it "logs model discovery diagnostics that include the complete details of the criteria" do
       expect(logger).to receive(:info).with(/Criteria inspect result/)
 
       subject
@@ -166,7 +261,7 @@ describe HttpStub::Server::Registry do
       include_context "register multiple models"
 
       it "returns the registered models in the order they were added" do
-        expect(registry.all).to eql(models.reverse)
+        expect_registry_to_contain(models)
       end
 
     end
@@ -174,56 +269,76 @@ describe HttpStub::Server::Registry do
     context "when no model has been registered" do
 
       it "returns an empty list" do
-        expect(registry.all).to eql([])
+        expect_registry_to_contain([])
       end
 
     end
 
   end
 
-  describe "#rollback_to" do
+  describe "#delete" do
 
-    subject { registry.rollback_to(model) }
+    let(:criteria) { double("Criteria", inspect: "Criteria inspect result") }
 
-    context "when models have been added" do
+    subject { registry.delete(criteria, logger) }
+
+    context "when multiple models have been registered" do
       include_context "register multiple models"
 
-      context "and the rollback is to one of those models" do
+      it "determines if the models satisfy the provided criteria" do
+        models.each { |model| expect(model).to receive(:matches?).with(criteria, logger).and_return(false) }
 
-        let(:model) { models[1] }
+        subject
+      end
 
-        it "the models remaining are those added up to and including the provided model" do
+      context "when the criteria matches a model" do
+        include_context "one model matches"
+
+        it "deletes the matched model from the registry" do
           subject
 
-          expect(registry.all).to eql(models[0, 2].reverse)
+          expect_registry_to_contain(models - [ matching_model ])
         end
 
       end
 
-      context "and the rollback is to a model that has not been added" do
+      context "when the criteria matches many models" do
+        include_context "many models match"
 
-        let(:model) { double("HttpStub::Server::Model") }
-
-        it "does not remove any models" do
+        it "deletes all matching models" do
           subject
 
-          expect(registry.all).to eql(models.reverse)
+          expect_registry_to_contain(models - matching_models)
+        end
+
+      end
+
+      context "when the criteria does not match any model" do
+
+        it "does not delete any models" do
+          subject
+
+          expect_registry_to_contain(models)
         end
 
       end
 
     end
 
-    context "when no models have been added" do
+    context "when no model has been registered" do
 
-      let(:model) { double("HttpStub::Server::Model") }
-
-      it "does not effect the known models" do
+      it "does not delete any models" do
         subject
 
-        expect(registry.all).to be_empty
+        expect_registry_to_contain([])
       end
 
+    end
+
+    it "logs model deletion diagnostics that include the complete details of the criteria" do
+      expect(logger).to receive(:info).with(/Criteria inspect result/)
+
+      subject
     end
 
   end
@@ -244,11 +359,15 @@ describe HttpStub::Server::Registry do
       it "releases all knowledge of the models" do
         subject
 
-        expect(registry.all).to be_empty
+        expect_registry_to_contain([])
       end
 
     end
 
+  end
+
+  def expect_registry_to_contain(models)
+    expect(registry.all).to eql(models.reverse)
   end
 
 end

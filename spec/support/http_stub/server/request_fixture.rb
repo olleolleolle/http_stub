@@ -12,8 +12,9 @@ module HttpStub
         private
 
         def request_factory
-          @request_factory ||= HttpStub::Server::Request::Factory.new(
-            nil, HttpStub::Server::Registry.new("session"), HttpStub::Server::Registry.new("scenario")
+          @session_configuration ||= HttpStub::Server::Session::Configuration.new(nil)
+          @request_factory       ||= HttpStub::Server::Request::Factory.new(
+            @session_configuration, HttpStub::Server::MemoryFixture.create(@session_configuration)
           )
         end
 

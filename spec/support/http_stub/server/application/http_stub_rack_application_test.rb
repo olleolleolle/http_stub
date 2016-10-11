@@ -30,4 +30,18 @@ shared_context "http_stub rack application test" do
 
   end
 
+  shared_context "request excludes a session identifier" do
+
+    before(:example) { allow(request).to receive(:session_id).and_return(nil) }
+
+  end
+
+  shared_context "request includes a session identifier" do
+
+    let(:session_id) { SecureRandom.uuid }
+
+    before(:example) { allow(request).to receive(:session_id).and_return(session_id) }
+
+  end
+
 end

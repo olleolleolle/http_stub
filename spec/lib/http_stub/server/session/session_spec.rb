@@ -1,14 +1,16 @@
 describe HttpStub::Server::Session::Session do
 
-  let(:id)                  { "Some session id" }
-  let(:scenario_registry)   { instance_double(HttpStub::Server::Registry) }
+  let(:id)                { "Some session id" }
+  let(:scenario_registry) { instance_double(HttpStub::Server::Registry) }
+  let(:memory_session)    { instance_double(HttpStub::Server::Session::Session) }
+
   let(:stub_registry)       { instance_double(HttpStub::Server::Stub::Registry) }
   let(:stub_match_registry) { instance_double(HttpStub::Server::Registry) }
   let(:stub_miss_registry)  { instance_double(HttpStub::Server::Registry) }
 
   let(:logger) { instance_double(Logger) }
 
-  let(:session) { described_class.new(id, scenario_registry) }
+  let(:session) { described_class.new(id, scenario_registry, memory_session) }
 
   before(:example) do
     allow(HttpStub::Server::Stub::Registry).to receive(:new).and_return(stub_registry)
@@ -16,10 +18,42 @@ describe HttpStub::Server::Session::Session do
     allow(HttpStub::Server::Registry).to receive(:new).with("stub miss").and_return(stub_miss_registry)
   end
 
+  it "uses a stub registry that is initialized with the provided memory session" do
+    expect(HttpStub::Server::Stub::Registry).to receive(:new).with(memory_session)
+
+    session
+  end
+
   describe "#id" do
 
     it "returns the provided id" do
       expect(session.id).to eql(id)
+    end
+
+  end
+
+  describe "#matches?" do
+
+    subject { session.matches?(provided_id, logger) }
+
+    context "when the provided id is equal to the session id" do
+
+      let(:provided_id) { id }
+
+      it "returns true" do
+        expect(subject).to be(true)
+      end
+
+    end
+
+    context "when the provided id is not equal to the session id" do
+
+      let(:provided_id) { "Another session id" }
+
+      it "returns false" do
+        expect(subject).to be(false)
+      end
+
     end
 
   end
@@ -51,7 +85,7 @@ describe HttpStub::Server::Session::Session do
       let(:scenario_stubs)         { (1..3).map { instance_double(HttpStub::Server::Stub::Stub) } }
       let(:scenario)               do
         instance_double(HttpStub::Server::Scenario::Scenario, triggered_scenarios: scenario_triggers,
-                                                              stubs:               scenario_stubs)
+                        stubs:               scenario_stubs)
       end
 
       before(:example) do
@@ -321,24 +355,12 @@ describe HttpStub::Server::Session::Session do
 
   end
 
-  describe "#remember" do
+  describe "#reset" do
 
-    subject { session.remember }
+    subject { session.reset(logger) }
 
-    it "remembers the current state of the stub registry" do
-      expect(stub_registry).to receive(:remember)
-
-      subject
-    end
-
-  end
-
-  describe "#recall" do
-
-    subject { session.recall }
-
-    it "recalls any last stored state in the stub registry" do
-      expect(stub_registry).to receive(:recall)
+    it "resets the stub registry" do
+      expect(stub_registry).to receive(:reset).with(logger)
 
       subject
     end
@@ -367,6 +389,20 @@ describe HttpStub::Server::Session::Session do
 
     it "clears the stub miss registry" do
       expect(stub_miss_registry).to receive(:clear).with(logger)
+
+      subject
+    end
+
+    it "clears stub misses before the stubs" do
+      expect(stub_miss_registry).to receive(:clear).ordered
+      expect(stub_registry).to receive(:clear).ordered
+
+      subject
+    end
+
+    it "clears stub matches before the stubs" do
+      expect(stub_match_registry).to receive(:clear).ordered
+      expect(stub_registry).to receive(:clear).ordered
 
       subject
     end

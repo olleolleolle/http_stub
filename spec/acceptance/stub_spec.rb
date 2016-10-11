@@ -1,9 +1,7 @@
 describe "Stub basics acceptance" do
   include_context "configurer integration"
 
-  let(:configurer) { HttpStub::Examples::ConfigurerWithTrivialStub.new }
-
-  before(:example) { configurer.class.initialize! }
+  before(:example) { configurer.initialize! }
 
   context "when a stub is submitted" do
 
@@ -237,7 +235,7 @@ describe "Stub basics acceptance" do
 
     context "that contains a response body that is a file" do
 
-      let(:configurer) { HttpStub::Examples::ConfigurerWithFileResponses.new }
+      let(:configurer) { HttpStub::Examples::ConfigurerWithFileResponses }
 
       context "and a request that matches is made" do
 

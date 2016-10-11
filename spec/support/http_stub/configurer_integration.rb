@@ -10,10 +10,7 @@ shared_context "configurer integration" do
     stub_server.port = server_port
   end
 
-  after(:example) do
-    stub_server.clear_stubs!
-    stub_server.clear_scenarios!
-  end
+  after(:example) { stub_server.reset! }
 
   def expect_response_to_contain_file(path)
     response_file = Tempfile.new(File.basename(path)).tap do |file|

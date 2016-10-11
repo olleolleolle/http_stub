@@ -3,18 +3,25 @@ module HttpStub
 
     class Registry
 
-      def initialize(model_name)
+      def initialize(model_name, models=[])
         @model_name = model_name
-        @models     = []
+        @models     = models
       end
 
       def add(model, logger)
         @models.unshift(model)
-        logger.info "Registered #{@model_name}: #{model}"
+        log_addition_of([ model ], logger)
       end
 
       def concat(models, logger)
-        models.each { |model| self.add(model, logger) }
+        @models.unshift(*models.reverse)
+        log_addition_of(models.reverse, logger)
+      end
+
+      def replace(models, logger)
+        log_pending_clear(logger)
+        @models.replace(models.reverse)
+        log_addition_of(models.reverse, logger)
       end
 
       def find(criteria, logger)
@@ -30,14 +37,24 @@ module HttpStub
         Array.new(@models)
       end
 
-      def rollback_to(model)
-        starting_index = @models.index(model)
-        @models = @models.slice(starting_index..-1) if starting_index
+      def delete(criteria, logger)
+        logger.info "Deleting #{@model_name} matching: #{criteria}"
+        @models.delete_if { |model| model.matches?(criteria, logger) }
       end
 
       def clear(logger)
-        logger.info "Clearing #{@model_name} registry"
+        log_pending_clear(logger)
         @models.clear
+      end
+
+      private
+
+      def log_pending_clear(logger)
+        logger.info "Clearing #{@model_name} registry"
+      end
+
+      def log_addition_of(models, logger)
+        models.each { |model| logger.info "Registered #{@model_name}: #{model}" }
       end
 
     end

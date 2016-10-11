@@ -3,47 +3,46 @@ module HttpStub
     module DSL
 
       class Server
-        include HttpStub::Configurer::DSL::StubBuilderProducer
-        include HttpStub::Configurer::DSL::ScenarioActivator
 
-        attr_accessor :host, :port, :session_identifier
+        delegate :host, :host=, :port, :port=, :base_uri, :external_base_uri, to: :@configuration
+        delegate :session_identifier, :session_identifier=,                   to: :@configuration
+        delegate :enable, :enabled?,                                          to: :@configuration
 
-        def initialize(server_facade)
-          @server_facade        = server_facade
-          @default_stub_builder = HttpStub::Configurer::DSL::StubBuilder.new
-          @enabled_features     = []
-        end
+        delegate :activate!, :build_stub, :add_stub!, :add_stubs!, to: :@default_session
 
-        def base_uri
-          "http://#{host}:#{port}"
-        end
-
-        def external_base_uri
-          ENV["STUB_EXTERNAL_BASE_URI"] || base_uri
-        end
-
-        def enable(*features)
-          @enabled_features = features
-        end
-
-        def enabled?(feature)
-          @enabled_features.include?(feature)
+        def initialize
+          @configuration         = HttpStub::Configurer::Server::Configuration.new
+          @server_facade         = HttpStub::Configurer::Server::Facade.new(@configuration)
+          @default_stub_template = HttpStub::Configurer::DSL::StubBuilderTemplate.new
+          @session_factory       = HttpStub::Configurer::DSL::SessionFactory.new(@server_facade, @default_stub_template)
+          @default_session       = @session_factory.memory
+          @enabled_features      = []
         end
 
         def request_defaults=(args)
-          @default_stub_builder.match_requests(args)
+          @default_stub_template.match_requests(args)
         end
 
         def response_defaults=(args)
-          @default_stub_builder.respond_with(args)
+          @default_stub_template.respond_with(args)
+        end
+
+        def initialize!
+          @server_facade.flush_requests
+          switch_to_transactional_session
         end
 
         def has_started!
           @server_facade.server_has_started
+          switch_to_transactional_session
+        end
+
+        def reset!
+          @server_facade.reset
         end
 
         def add_scenario!(name, &_block)
-          builder = HttpStub::Configurer::DSL::ScenarioBuilder.new(@default_stub_builder, name)
+          builder = HttpStub::Configurer::DSL::ScenarioBuilder.new(name, @default_stub_template)
           yield builder
           @server_facade.define_scenario(builder.build)
         end
@@ -55,34 +54,30 @@ module HttpStub
         end
 
         def endpoint_template(&block)
-          HttpStub::Configurer::DSL::EndpointTemplate.new(self).tap { |template| template.invoke(&block) }
+          HttpStub::Configurer::DSL::ServerEndpointTemplate.new(self, @default_session, &block)
         end
 
-        def add_stub!(builder=nil, &block)
-          resolved_builder = builder || self.build_stub(&block)
-          @server_facade.stub_response(resolved_builder.build)
+        def session(id)
+          @session_factory.create(id)
         end
 
-        def remember_stubs
-          @server_facade.remember_stubs
+        def clear_sessions!
+          @server_facade.clear_sessions
         end
 
         def recall_stubs!
-          @server_facade.recall_stubs
+          @default_session.reset!
         end
 
         def clear_stubs!
-          @server_facade.clear_stubs
-        end
-
-        def clear_scenarios!
-          @server_facade.clear_scenarios
+          @default_session.clear!
         end
 
         private
 
-        def activate_all!(scenario_names)
-          scenario_names.each { |scenario_name| @server_facade.activate(scenario_name) }
+        def switch_to_transactional_session
+          @session_factory.transactional.mark_as_default!
+          @default_session = @session_factory.transactional
         end
 
       end

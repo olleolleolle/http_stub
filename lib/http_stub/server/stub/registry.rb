@@ -6,18 +6,15 @@ module HttpStub
 
         delegate :add, :concat, :find, :all, :clear, to: :@stub_registry
 
-        def initialize
-          @stub_registry = HttpStub::Server::Registry.new("stub")
-        end
-
         alias_method :match, :find
 
-        def remember
-          @remembered_stub = @stub_registry.last
+        def initialize(memory_session)
+          @memory_session = memory_session
+          @stub_registry  = HttpStub::Server::Registry.new("stub", memory_session.stubs)
         end
 
-        def recall
-          @stub_registry.rollback_to(@remembered_stub) if @remembered_stub
+        def reset(logger)
+          @stub_registry.replace(@memory_session.stubs, logger)
         end
 
       end

@@ -6,11 +6,12 @@ module HttpStub
 
         attr_reader :request, :response, :triggers
 
-        def initialize(default_builder=nil)
+        def initialize(parent_builder=nil, &block)
           @request  = {}
           @response = {}
           @triggers = { scenarios: [], stubs: [] }
-          self.merge!(default_builder) if default_builder
+          self.merge!(parent_builder) if parent_builder
+          self.invoke(&block)         if block_given?
         end
 
         def match_requests(args)

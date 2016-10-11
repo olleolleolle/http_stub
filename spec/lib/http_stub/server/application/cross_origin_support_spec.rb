@@ -1,32 +1,36 @@
 describe HttpStub::Server::Application::CrossOriginSupport do
   include Rack::Test::Methods
 
-  let(:application_header_names) { (1..3).map { |i| "APPLICATION_HEADER_#{i}" } }
-  let(:application_headers)      do
-    application_header_names.each_with_object({}) { |name, result| result["HTTP_#{name}"] = "#{name} value" }
-  end
-
-  let(:access_control_request_method)       { "PATCH" }
-  let(:access_control_request_header_names) { (1..3).map { |i| "ACCESS_CONTROL_HEADER_#{i}" } }
-  let(:access_control_request_headers)      do
-    {
-      "ACCESS_CONTROL_REQUEST_METHOD"  => access_control_request_method,
-      "ACCESS_CONTROL_REQUEST_HEADERS" => access_control_request_header_names.join(",")
-    }
-  end
-
   let(:response) { last_response }
-
-  let(:app_class) { Class.new(Sinatra::Base) }
-  let(:app)       { app_class.new! }
-
-  before(:example) do
-    app_class.before { @http_stub_request = HttpStub::Server::RequestFixture.create(request) }
-  end
 
   describe "when registered in an application" do
 
-    before(:example) { app_class.register described_class }
+    class HttpStub::Server::Application::CrossOriginSupportTestApplication < Sinatra::Base
+
+      def http_stub_request
+        HttpStub::Server::RequestFixture.create(request)
+      end
+
+    end
+
+    let(:application_header_names) { (1..3).map { |i| "APPLICATION_HEADER_#{i}" } }
+    let(:application_headers)      do
+      application_header_names.each_with_object({}) { |name, result| result["HTTP_#{name}"] = "#{name} value" }
+    end
+
+    let(:access_control_request_method)       { "PATCH" }
+    let(:access_control_request_header_names) { (1..3).map { |i| "ACCESS_CONTROL_HEADER_#{i}" } }
+    let(:access_control_request_headers)      do
+      {
+        "ACCESS_CONTROL_REQUEST_METHOD"  => access_control_request_method,
+        "ACCESS_CONTROL_REQUEST_HEADERS" => access_control_request_header_names.join(",")
+      }
+    end
+
+    let(:app_class) { HttpStub::Server::Application::CrossOriginSupportTestApplication }
+    let(:app)       { app_class.new! }
+
+    before(:example) { app_class.register(described_class) }
 
     shared_examples_for "a request whose response contains access control headers" do
 
