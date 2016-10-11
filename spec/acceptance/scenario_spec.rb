@@ -1,11 +1,13 @@
 describe "Scenario acceptance" do
-  include_context "configurer integration"
 
   context "when a configurer that contains scenarios is initialized" do
+    include_context "configurer integration with server reset"
 
-    let(:configurer)  { HttpStub::Examples::ConfigurerWithTrivialScenarios.new }
+    def configurer
+      HttpStub::Examples::ConfigurerWithTrivialScenarios
+    end
 
-    before(:example) { configurer.class.initialize! }
+    before(:example) { configurer.initialize! }
 
     context "and a scenario is activated" do
 
@@ -69,7 +71,9 @@ describe "Scenario acceptance" do
 
     context "and the response contains a file" do
 
-      let(:configurer) { HttpStub::Examples::ConfigurerWithFileResponses.new }
+      def configurer
+        HttpStub::Examples::ConfigurerWithFileResponses
+      end
 
       before(:example) { stub_server.activate!("Scenario with file") }
 
@@ -79,7 +83,7 @@ describe "Scenario acceptance" do
 
         it "replays the stubbed response" do
           expect(response.code).to eql(200)
-          expect_response_to_contain_file(HttpStub::Examples::ConfigurerWithFileResponses::FILE_PATH)
+          expect(response).to contain_file(HttpStub::Examples::ConfigurerWithFileResponses::FILE_PATH)
         end
 
       end

@@ -359,8 +359,40 @@ describe HttpStub::Server::Session::Session do
 
     subject { session.reset(logger) }
 
-    it "resets the stub registry" do
+    before(:example) do
+      allow(stub_registry).to receive(:reset)
+      allow(stub_match_registry).to receive(:clear)
+      allow(stub_miss_registry).to receive(:clear)
+    end
+
+    it "resets the stub registry to revert it to its original state" do
       expect(stub_registry).to receive(:reset).with(logger)
+
+      subject
+    end
+
+    it "clears the stub miss registry to revert it to its original state" do
+      expect(stub_miss_registry).to receive(:clear).with(logger)
+
+      subject
+    end
+
+    it "clears the stub match registry to revert it to its original state" do
+      expect(stub_match_registry).to receive(:clear).with(logger)
+
+      subject
+    end
+
+    it "clears stub misses before the resetting stubs" do
+      expect(stub_miss_registry).to receive(:clear).ordered
+      expect(stub_registry).to receive(:reset).ordered
+
+      subject
+    end
+
+    it "clears stub matches before the resetting stubs" do
+      expect(stub_match_registry).to receive(:clear).ordered
+      expect(stub_registry).to receive(:reset).ordered
 
       subject
     end
@@ -381,14 +413,14 @@ describe HttpStub::Server::Session::Session do
       subject
     end
 
-    it "clears the stub match registry" do
-      expect(stub_match_registry).to receive(:clear).with(logger)
+    it "clears the stub miss registry" do
+      expect(stub_miss_registry).to receive(:clear).with(logger)
 
       subject
     end
 
-    it "clears the stub miss registry" do
-      expect(stub_miss_registry).to receive(:clear).with(logger)
+    it "clears the stub match registry" do
+      expect(stub_match_registry).to receive(:clear).with(logger)
 
       subject
     end

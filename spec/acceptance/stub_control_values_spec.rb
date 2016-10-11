@@ -1,9 +1,9 @@
 describe "Stub control value acceptance" do
-  include_context "configurer integration"
+  include_context "configurer integration with stubs recalled"
 
-  let(:configurer)  { HttpStub::Examples::ConfigurerWithTrivialStub.new }
-
-  before(:example) { configurer.class.initialize! }
+  def configurer
+    HttpStub::Examples::ConfigurerWithTrivialStub
+  end
 
   context "when a stub is submitted" do
 
@@ -148,7 +148,7 @@ describe "Stub control value acceptance" do
     context "with a response delay" do
 
       before(:example) do
-        stub_server.add_stub! { match_requests(uri: "/some_stub_path", method: :get).respond_with(delay_in_seconds: 2) }
+        stub_server.add_stub! { match_requests(uri: "/some_stub_path", method: :get).respond_with(delay_in_seconds: 1) }
       end
 
       it "delays the response by the time provided" do
@@ -156,7 +156,7 @@ describe "Stub control value acceptance" do
 
         response = HTTParty.get("#{server_uri}/some_stub_path")
 
-        expect(Time.now - start_time).to be >= 2.0
+        expect(Time.now - start_time).to be >= 1.0
       end
 
     end

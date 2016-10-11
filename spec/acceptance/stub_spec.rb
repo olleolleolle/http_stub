@@ -1,5 +1,5 @@
 describe "Stub basics acceptance" do
-  include_context "configurer integration"
+  include_context "configurer integration with server reset"
 
   before(:example) { configurer.initialize! }
 
@@ -235,7 +235,9 @@ describe "Stub basics acceptance" do
 
     context "that contains a response body that is a file" do
 
-      let(:configurer) { HttpStub::Examples::ConfigurerWithFileResponses }
+      def configurer
+        HttpStub::Examples::ConfigurerWithFileResponses
+      end
 
       context "and a request that matches is made" do
 
@@ -252,7 +254,7 @@ describe "Stub basics acceptance" do
           end
 
           it "responds with the configured file" do
-            expect_response_to_contain_file(HttpStub::Examples::ConfigurerWithFileResponses::FILE_PATH)
+            expect(response).to contain_file(HttpStub::Examples::ConfigurerWithFileResponses::FILE_PATH)
           end
 
           context "and a subsequent request is made that requests the file if it has been modified" do
@@ -291,7 +293,7 @@ describe "Stub basics acceptance" do
           end
 
           it "responds with the configured response" do
-            expect_response_to_contain_file(HttpStub::Examples::ConfigurerWithFileResponses::FILE_PATH)
+            expect(response).to contain_file(HttpStub::Examples::ConfigurerWithFileResponses::FILE_PATH)
           end
 
         end

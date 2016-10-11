@@ -1,11 +1,11 @@
 describe "Server memory acceptance" do
-  include_context "configurer integration"
 
   context "when a configurer with a stub is initialized" do
+    include_context "configurer integration with stubs recalled"
 
-    let(:configurer)  { HttpStub::Examples::ConfigurerWithTrivialStub }
-
-    before(:example) { configurer.initialize! }
+    def configurer
+      HttpStub::Examples::ConfigurerWithTrivialStub
+    end
 
     describe "GET /http_stub/memory" do
 

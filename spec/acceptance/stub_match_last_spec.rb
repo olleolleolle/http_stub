@@ -1,9 +1,5 @@
 describe "Stub matches last acceptance" do
-  include_context "configurer integration"
-
-  before(:example) { configurer.initialize! }
-
-  after(:example) { stub_server.clear_stubs! }
+  include_context "configurer integration with stubs recalled"
 
   describe "GET /http_stub/stubs/matches/last" do
 

@@ -5,15 +5,15 @@ describe "Cross origin support acceptance" do
   let(:cross_origin_page) { CrossOriginServer::IndexPage.new(browser) }
 
   context "when a stub server with cross origin support is initialized" do
-    include_context "configurer integration"
+    include_context "configurer integration with stubs recalled"
+
+    def configurer
+      HttpStub::Examples::ConfigurerWithCrossOriginSupport
+    end
 
     def server_name
       "cross_origin_stub"
     end
-
-    let(:configurer) { HttpStub::Examples::ConfigurerWithCrossOriginSupport.new }
-
-    before(:example) { configurer.class.initialize! }
 
     context "and a browser page rendered by a different server requests a scenario be activated" do
 
@@ -82,11 +82,11 @@ describe "Cross origin support acceptance" do
   end
 
   context "when a stub server without cross origin support is initialized" do
-    include_context "configurer integration"
+    include_context "configurer integration with stubs recalled"
 
-    let(:configurer) { HttpStub::Examples::ConfigurerWithTrivialScenarios.new }
-
-    before(:example) { configurer.class.initialize! }
+    def configurer
+      HttpStub::Examples::ConfigurerWithTrivialScenarios
+    end
 
     context "and a browser page rendered by a different server requests a scenario be activated" do
 

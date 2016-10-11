@@ -1,11 +1,11 @@
 describe "Configurer Part acceptance" do
-  include_context "configurer integration"
+  include_context "configurer integration with stubs recalled"
+
+  def configurer
+    HttpStub::Examples::ConfigurerWithParts
+  end
 
   context "when a configurer contains a part" do
-
-    let(:configurer) { HttpStub::Examples::ConfigurerWithParts }
-
-    before(:example) { configurer.initialize! }
 
     context "that contains a configure stub method" do
 

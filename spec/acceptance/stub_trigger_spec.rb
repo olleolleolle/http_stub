@@ -1,9 +1,9 @@
 describe "Stub trigger acceptance" do
-  include_context "configurer integration"
+  include_context "configurer integration with stubs recalled"
 
-  let(:configurer) { HttpStub::Examples::ConfigurerWithStubTriggers.new }
-
-  before(:example) { configurer.class.initialize! }
+  def configurer
+    HttpStub::Examples::ConfigurerWithStubTriggers
+  end
 
   context "when a stub is submitted that contains triggers" do
 
@@ -155,7 +155,7 @@ describe "Stub trigger acceptance" do
 
           it "replays the triggered response" do
             expect(response.code).to eql(200)
-            expect_response_to_contain_file(pdf_file_path)
+            expect(response).to contain_file(pdf_file_path)
           end
 
         end

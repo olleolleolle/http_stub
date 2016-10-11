@@ -64,6 +64,8 @@ module HttpStub
         end
 
         def reset(logger)
+          @stub_miss_registry.clear(logger)
+          @stub_match_registry.clear(logger)
           @stub_registry.reset(logger)
         end
 
