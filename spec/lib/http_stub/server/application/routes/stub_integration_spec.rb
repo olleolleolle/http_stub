@@ -38,19 +38,15 @@ describe HttpStub::Server::Application::Routes::Stub, "when the server is runnin
   end
 
   describe "and a configurer with multiple scenarios is initialized" do
+    include_context "configurer integration"
 
-    before(:context) do
-      configurer = HttpStub::Examples::ConfigurerWithExhaustiveScenarios
-      configurer.stub_server.host = server_host
-      configurer.stub_server.port = server_port
-      configurer.initialize!
-    end
+    let(:configurer_specification) { { class: HttpStub::Examples::ConfigurerWithExhaustiveScenarios } }
 
     describe "GET /http_stub/stubs" do
 
       describe "when multiple stubs are configured" do
 
-        before(:context) do
+        before(:example) do
           (1..3).each do |i|
             HTTParty.post("#{server_uri}/http_stub/scenarios/activate", :body => { name: "Scenario #{i}" })
           end

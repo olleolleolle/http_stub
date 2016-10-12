@@ -1,9 +1,7 @@
 describe "Configurer Part acceptance" do
-  include_context "configurer integration with stubs recalled"
+  include_context "configurer integration"
 
-  def configurer
-    HttpStub::Examples::ConfigurerWithParts
-  end
+  let(:configurer_specification) { { class: HttpStub::Examples::ConfigurerWithParts } }
 
   context "when a configurer contains a part" do
 

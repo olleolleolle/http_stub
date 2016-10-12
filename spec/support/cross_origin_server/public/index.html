@@ -4,7 +4,8 @@
 
   function activateScenario() {
     var request = new XMLHttpRequest();
-    request.open("POST", "http://localhost:8001/http_stub/scenarios/activate", false);
+    var stubPort = document.URL.match(/stubPort=(.+)$/)[1];
+    request.open("POST", "http://localhost:" + stubPort + "/http_stub/scenarios/activate", false);
     request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
     var result = "Failed";

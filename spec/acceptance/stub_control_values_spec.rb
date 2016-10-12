@@ -1,9 +1,7 @@
 describe "Stub control value acceptance" do
-  include_context "configurer integration with stubs recalled"
+  include_context "configurer integration"
 
-  def configurer
-    HttpStub::Examples::ConfigurerWithTrivialStub
-  end
+  let(:configurer_specification) { { class: HttpStub::Examples::ConfigurerWithTrivialStub } }
 
   context "when a stub is submitted" do
 

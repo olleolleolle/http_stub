@@ -1,19 +1,11 @@
 describe "Configurer initialization acceptance" do
-  include_context "configurer integration with server reset"
-
-  def configurer
-    HttpStub::Examples::ConfigurerWithTrivialStub
-  end
+  include_context "configurer integration"
 
   context "when a configurer is initialized" do
 
-    before(:example) { configurer.initialize! }
-
     context "that contains a stub" do
 
-      def configurer
-        HttpStub::Examples::ConfigurerWithTrivialStub
-      end
+      let(:configurer_specification) { { class: HttpStub::Examples::ConfigurerWithTrivialStub } }
 
       it "registers the stub" do
         response = HTTParty.get("#{server_uri}/a_class_stub")
@@ -80,9 +72,7 @@ describe "Configurer initialization acceptance" do
 
     context "and the configurer contains an initialize callback" do
 
-      def configurer
-        HttpStub::Examples::ConfigurerWithInitializeCallback
-      end
+      let(:configurer_specification) { { class: HttpStub::Examples::ConfigurerWithInitializeCallback } }
 
       it "executes the callback" do
         response = HTTParty.get("#{server_uri}/stubbed_on_initialize_path")
@@ -96,6 +86,8 @@ describe "Configurer initialization acceptance" do
   end
 
   context "when a configurer is uninitialized" do
+
+    let(:configurer_specification) { { class: HttpStub::Examples::ConfigurerWithTrivialStub, initialize: false } }
 
     context "and the configurer is informed that the server has started" do
 
@@ -138,8 +130,8 @@ describe "Configurer initialization acceptance" do
 
     context "and the configurer contains an initialize callback" do
 
-      def configurer
-        HttpStub::Examples::ConfigurerWithInitializeCallback
+      let(:configurer_specification) do
+        { class: HttpStub::Examples::ConfigurerWithInitializeCallback, initialize: false }
       end
 
       it "does not execute the callback" do

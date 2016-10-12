@@ -59,15 +59,15 @@ HttpStub::Server::Daemon.pid_dir = ::File.expand_path('../tmp/pids', __FILE__)
 
 HttpStub::Rake::ServerTasks.new(name: :example_server, port: 8001)
 
-cross_origin_configurer = HttpStub::Examples::ConfigurerWithCrossOriginSupport
-cross_origin_configurer.stub_server.host = "localhost"
-cross_origin_configurer.stub_server.port = 8001
-HttpStub::Rake::ServerDaemonTasks.new(name: :cross_origin_stub, configurer: cross_origin_configurer)
-
 example_configurer = HttpStub::Examples::ConfigurerWithExhaustiveScenarios
 example_configurer.stub_server.host = "localhost"
 example_configurer.stub_server.port = 8002
 HttpStub::Rake::ServerDaemonTasks.new(name: :example_server_daemon, configurer: example_configurer)
+
+cross_origin_configurer = HttpStub::Examples::ConfigurerWithCrossOriginSupport
+cross_origin_configurer.stub_server.host = "localhost"
+cross_origin_configurer.stub_server.port = 8003
+HttpStub::Rake::ServerDaemonTasks.new(name: :cross_origin_stub, configurer: cross_origin_configurer)
 
 task :default => %w{ clobber metrics coverage }
 

@@ -1,11 +1,9 @@
 describe "Session acceptance" do
 
   context "when a configurer that has a session identifier is initialized" do
-    include_context "configurer integration with stubs recalled"
+    include_context "configurer integration"
 
-    def configurer
-      HttpStub::Examples::ConfigurerWithSessions
-    end
+    let(:configurer_specification) { { class: HttpStub::Examples::ConfigurerWithSessions } }
 
     context "when a stub is added to a session" do
 

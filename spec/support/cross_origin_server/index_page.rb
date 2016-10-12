@@ -6,8 +6,8 @@ module CrossOriginServer
       @browser = browser
     end
 
-    def load_and_wait_until_available
-      @browser.navigate.to("http://localhost:8005/index.html")
+    def load_and_wait_until_available(stub_port)
+      @browser.navigate.to("http://localhost:8005/index.html?stubPort=#{stub_port}")
       ::Wait.until!(description: "cross origin test page has loaded") { @browser.find_element(id: "scenario_name") }
     end
 

@@ -1,9 +1,7 @@
 describe "Request references in response acceptance" do
-  include_context "configurer integration with stubs recalled"
+  include_context "configurer integration"
 
-  def configurer
-    HttpStub::Examples::ConfigurerWithRequestReferences
-  end
+  let(:configurer_specification) { { class: HttpStub::Examples::ConfigurerWithRequestReferences } }
 
   context "when a request is made matching a stub that references request attributes" do
 

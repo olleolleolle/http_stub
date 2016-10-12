@@ -1,11 +1,9 @@
 describe "Endpoint Template acceptance" do
 
   context "when a configurer contains an endpoint template" do
-    include_context "configurer integration with stubs recalled"
+    include_context "configurer integration"
 
-    def configurer
-      HttpStub::Examples::ConfigurerWithEndpointTemplate
-    end
+    let(:configurer_specification) { { class: HttpStub::Examples::ConfigurerWithEndpointTemplate } }
 
     it "does not register a stub when the template is defined" do
       response = issue_request("template_uri")

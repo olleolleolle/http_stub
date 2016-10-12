@@ -1,5 +1,5 @@
 describe "Stub miss list acceptance" do
-  include_context "configurer integration with stubs recalled"
+  include_context "configurer integration"
 
   describe "GET /http_stub/stubs/misses" do
 

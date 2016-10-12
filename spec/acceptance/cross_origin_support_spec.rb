@@ -5,20 +5,16 @@ describe "Cross origin support acceptance" do
   let(:cross_origin_page) { CrossOriginServer::IndexPage.new(browser) }
 
   context "when a stub server with cross origin support is initialized" do
-    include_context "configurer integration with stubs recalled"
+    include_context "configurer integration"
 
-    def configurer
-      HttpStub::Examples::ConfigurerWithCrossOriginSupport
-    end
-
-    def server_name
-      "cross_origin_stub"
+    let(:configurer_specification) do
+      { class: HttpStub::Examples::ConfigurerWithCrossOriginSupport, name: "cross_origin_stub", port: 8003 }
     end
 
     context "and a browser page rendered by a different server requests a scenario be activated" do
 
       before(:example) do
-        cross_origin_page.load_and_wait_until_available
+        cross_origin_page.load_and_wait_until_available(server_port)
         cross_origin_page.activate_scenario("Get scenario")
       end
 
@@ -82,16 +78,14 @@ describe "Cross origin support acceptance" do
   end
 
   context "when a stub server without cross origin support is initialized" do
-    include_context "configurer integration with stubs recalled"
+    include_context "configurer integration"
 
-    def configurer
-      HttpStub::Examples::ConfigurerWithTrivialScenarios
-    end
+    let(:configurer_specification) { { class: HttpStub::Examples::ConfigurerWithTrivialScenarios } }
 
     context "and a browser page rendered by a different server requests a scenario be activated" do
 
       before(:example) do
-        cross_origin_page.load_and_wait_until_available
+        cross_origin_page.load_and_wait_until_available(server_port)
         cross_origin_page.activate_scenario("Get scenario")
       end
 

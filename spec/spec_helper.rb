@@ -52,10 +52,12 @@ require_relative 'support/http_stub/empty_configurer'
 require_relative 'support/http_stub/server/driver'
 require_relative 'support/http_stub/server_integration'
 require_relative 'support/http_stub/configurer_integration'
-require_relative 'support/http_stub/configurer_integration_with_stubs_recalled'
-require_relative 'support/http_stub/configurer_integration_with_server_reset'
 require_relative 'support/http_stub/stub_registrator'
 require_relative 'support/html_helpers'
 require_relative 'support/http_stub/html_view_including_request_details'
 require_relative 'support/http_stub/html_view_excluding_request_details'
 require_relative 'support/browser_integration'
+
+RSpec.configure do |config|
+  config.after(:suite) { HttpStub::Server::Driver.all.each(&:stop) }
+end
