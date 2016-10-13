@@ -2,6 +2,7 @@ describe HttpStub::Rake::ServerTasks do
   include Rake::DSL
 
   shared_context "verification of generated tasks" do
+    include_context "surpressed output"
 
     before(:example) { HttpStub::Rake::ServerTasks.new(task_args) }
 
@@ -64,7 +65,7 @@ describe HttpStub::Rake::ServerTasks do
 
   context "when a port is provided" do
 
-    let(:port)      { 8003 }
+    let(:port)      { 8005 }
     let(:task_args) { { name: :test_server_with_port, port: port } }
 
     include_context "verification of generated tasks"

@@ -35,6 +35,7 @@ end
 
 require_relative 'support/include_in_json'
 require_relative 'support/contain_file'
+require_relative 'support/surpressed_output'
 require_relative 'support/rack/request_fixture'
 require_relative 'support/rack/rack_application_test'
 require_relative 'support/cross_origin_server/integration'

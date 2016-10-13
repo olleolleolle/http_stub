@@ -15,7 +15,7 @@ shared_context "cross origin server integration" do
   end
 
   def cross_origin_server_port
-    8005
+    8006
   end
 
   def cross_origin_server_uri
