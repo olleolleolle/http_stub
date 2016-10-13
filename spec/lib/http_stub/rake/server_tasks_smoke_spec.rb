@@ -12,7 +12,7 @@ describe HttpStub::Rake::ServerTasks do
       context "when invoked" do
 
         before(:example) do
-          Thread.new { task.invoke("--trace") }
+          Thread.new { task.invoke("--silent") }
           wait_until_server_has_started
         end
 

@@ -31,7 +31,7 @@ module HttpStub
 
       def start
         return if @pid
-        @pid = Process.spawn("rake #{@name}:start:foreground --trace")
+        @pid = Process.spawn("rake #{@name}:start:foreground", out: "/dev/null", err: "/dev/null")
         ::Wait.until!(description: "http stub server #{@name} started") do
           Net::HTTP.get_response(@host, "/", @port)
         end

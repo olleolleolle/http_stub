@@ -1,7 +1,8 @@
 shared_context "cross origin server integration" do
 
   before(:context) do
-    @cross_origin_server_pid = Process.spawn("ruby #{File.dirname(__FILE__)}/application.rb")
+    @cross_origin_server_pid = Process.spawn("ruby #{File.dirname(__FILE__)}/application.rb", out: "/dev/null",
+                                                                                              err: "/dev/null")
     ::Wait.until!(description: "cross origin server started") do
       Net::HTTP.get_response(cross_origin_server_host, "/", cross_origin_server_port)
     end
