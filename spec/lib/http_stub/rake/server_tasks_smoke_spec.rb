@@ -49,7 +49,7 @@ describe HttpStub::Rake::ServerTasks do
 
   context "when a configurer is provided" do
 
-    let(:port)       { 8004 }
+    let(:port)       { 8005 }
     let(:configurer) do
       Class.new.tap do |configurer|
         configurer.send(:include, HttpStub::Configurer)
@@ -65,7 +65,7 @@ describe HttpStub::Rake::ServerTasks do
 
   context "when a port is provided" do
 
-    let(:port)      { 8005 }
+    let(:port)      { 8006 }
     let(:task_args) { { name: :test_server_with_port, port: port } }
 
     include_context "verification of generated tasks"

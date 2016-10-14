@@ -1,0 +1,26 @@
+:javascript
+  function postLink(link_selector, successText) {
+    $(window).load(function() {
+      $(link_selector).on("click", function(event) {
+        event.preventDefault();
+        var link = $(event.target)
+        var originalLinkText = link.text();
+        link.prop("disabled", true);
+        $.post(
+          link.attr("href"), link.data(), null, "html"
+        ).done(
+          function() {
+            link.html(successText).css("color", "green");
+            setTimeout(function() { link.html(originalLinkText).css("color", "inherit"); }, 3000);
+          }
+        ).fail(
+          function() {
+            link.html("Failed").css("color", "red");
+            setTimeout(function() { link.html(originalLinkText).css("color", "inherit"); }, 3000);
+          }
+        ).always(
+          function() { link.prop("disabled", false); }
+        );
+      });
+    });
+  }

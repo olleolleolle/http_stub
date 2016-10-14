@@ -8,7 +8,7 @@ describe "Cross origin support acceptance" do
     include_context "configurer integration"
 
     let(:configurer_specification) do
-      { class: HttpStub::Examples::ConfigurerWithCrossOriginSupport, name: "cross_origin_stub", port: 8003 }
+      { class: HttpStub::Examples::ConfigurerWithCrossOriginSupport, name: :cross_origin_stub, port: 8004 }
     end
 
     context "and a browser page rendered by a different server requests a scenario be activated" do

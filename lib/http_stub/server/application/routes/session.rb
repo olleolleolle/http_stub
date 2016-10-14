@@ -5,11 +5,6 @@ module HttpStub
 
         module Session
 
-          DEFAULT_SESSION_URI =
-            "/http_stub/sessions?http_stub_session_id=#{HttpStub::Server::Session::TRANSACTIONAL_SESSION_ID}".freeze
-
-          private_constant :DEFAULT_SESSION_URI
-
           def initialize
             super()
             @session_controller = HttpStub::Server::Session::Controller.new(@session_configuration, @server_memory)
@@ -21,10 +16,14 @@ module HttpStub
               namespace "/http_stub" do
 
                 get do
-                  redirect settings.session_identifier? ? "/http_stub/sessions" : DEFAULT_SESSION_URI
+                  redirect settings.session_identifier? ? "/http_stub/sessions" : "/http_stub/sessions/transactional"
                 end
 
                 namespace "/sessions" do
+
+                  get "/transactional" do
+                    haml :transactional_session, {}, session: @session_controller.find_transactional(logger)
+                  end
 
                   get do
                     pass unless http_stub_request.session_id

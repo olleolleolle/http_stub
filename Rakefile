@@ -7,6 +7,7 @@ require 'rspec/core/rake_task'
 
 require_relative 'lib/http_stub/rake/task_generators'
 require_relative 'examples/configurer_with_exhaustive_scenarios'
+require_relative 'examples/configurer_with_sessions'
 require_relative 'examples/configurer_with_cross_origin_support'
 
 directory "pkg"
@@ -64,9 +65,14 @@ example_configurer.stub_server.host = "localhost"
 example_configurer.stub_server.port = 8002
 HttpStub::Rake::ServerDaemonTasks.new(name: :example_server_daemon, configurer: example_configurer)
 
+session_based_configurer = HttpStub::Examples::ConfigurerWithSessions
+session_based_configurer.stub_server.host = "localhost"
+session_based_configurer.stub_server.port = 8003
+HttpStub::Rake::ServerDaemonTasks.new(name: :session_based_stub, configurer: session_based_configurer)
+
 cross_origin_configurer = HttpStub::Examples::ConfigurerWithCrossOriginSupport
 cross_origin_configurer.stub_server.host = "localhost"
-cross_origin_configurer.stub_server.port = 8003
+cross_origin_configurer.stub_server.port = 8004
 HttpStub::Rake::ServerDaemonTasks.new(name: :cross_origin_stub, configurer: cross_origin_configurer)
 
 task :default => %w{ clobber metrics coverage }

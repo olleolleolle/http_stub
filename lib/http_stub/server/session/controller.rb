@@ -13,6 +13,10 @@ module HttpStub
           @server_memory.sessions.find(request.session_id, logger)
         end
 
+        def find_transactional(logger)
+          @server_memory.sessions.find(HttpStub::Server::Session::TRANSACTIONAL_SESSION_ID, logger)
+        end
+
         def find_all
           @server_memory.sessions.all
         end

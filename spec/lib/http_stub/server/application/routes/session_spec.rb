@@ -42,9 +42,7 @@ describe HttpStub::Server::Application::Routes::Session do
       it "redirects to the transactional session page" do
         subject
 
-        expect(response.location).to(
-          end_with("/http_stub/sessions?http_stub_session_id=#{HttpStub::Server::Session::TRANSACTIONAL_SESSION_ID}")
-        )
+        expect(response.location).to end_with("/http_stub/sessions/transactional")
       end
 
     end
@@ -88,6 +86,28 @@ describe HttpStub::Server::Application::Routes::Session do
 
     it "retrieves the session identified in the request via the stub controller" do
       expect(session_controller).to receive(:find).with(request, anything).and_return(found_session)
+
+      subject
+    end
+
+    it "responds with a 200 status code" do
+      subject
+
+      expect(response.status).to eql(200)
+    end
+
+  end
+
+  describe "when a request to show the transactional session is received" do
+
+    let(:transactional_session) { HttpStub::Server::SessionFixture.create }
+
+    subject { get "/http_stub/sessions/transactional" }
+
+    before(:example) { allow(session_controller).to receive(:find_transactional).and_return(transactional_session) }
+
+    it "retrieves the transactional session via the stub controller" do
+      expect(session_controller).to receive(:find_transactional).with(anything).and_return(transactional_session)
 
       subject
     end

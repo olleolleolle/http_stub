@@ -29,6 +29,25 @@ describe HttpStub::Server::Session::Controller do
 
   end
 
+  describe "#find_transactional" do
+
+    subject { controller.find_transactional(logger) }
+
+    it "finds a session in the servers session registry with the transactional session id" do
+      expect(session_registry).to receive(:find).with(HttpStub::Server::Session::TRANSACTIONAL_SESSION_ID, logger)
+
+      subject
+    end
+
+    it "returns any found session" do
+      transactional_session = instance_double(HttpStub::Server::Session::Session)
+      allow(session_registry).to receive(:find).and_return(transactional_session)
+
+      expect(subject).to eql(transactional_session)
+    end
+
+  end
+
   describe "#find_all" do
 
     subject { controller.find_all }
