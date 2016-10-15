@@ -1,5 +1,6 @@
 AllCops:
   Exclude:
+    - http_stub.gemspec
     - Rakefile
     - spec/**/*
     - vendor/**/*
@@ -71,6 +72,10 @@ Style/EmptyElse:
 # rare situations where readability is preferred over metrics aspirations
 Metrics/MethodLength:
   Exclude:
+    - lib/http_stub/server/application/routes/*.rb
+Metrics/BlockLength:
+  Exclude:
+    - examples/*.rb
     - lib/http_stub/server/application/routes/*.rb
 Metrics/AbcSize:
   Exclude:
