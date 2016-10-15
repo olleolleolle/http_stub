@@ -10,8 +10,10 @@ New:
 Breaking:
 * `stub.trigger` accepts a hash with optional `:scenarios`, `:scenario`, `:stubs` and `:stub` elements
 * Removed deprecated `Configurer` behaviour:
+** Replace `server_has_started!` with `stub_server.has_started!`
 ** Replace `stub_activator` with `stub_server.add_scenario!`
 ** Replace `clear_activators!` with `stub_server.clear_scenarios!`
+** Replace `stub_response!` with `stub_server.add_stub!`
 ** Methods directly accessible from `Configurer` must now be performed via `stub_server`, e.g. `stub_server.recall_stubs!`
 
 Misc:
