@@ -67,18 +67,6 @@ describe HttpStub::Server::Session::Controller do
 
   end
 
-  describe "#mark_default" do
-
-    subject { controller.mark_default(request) }
-
-    it "establishes the default session identifier in the servers session configuration" do
-      expect(session_configuration).to receive(:default_identifier=).with(session_id)
-
-      subject
-    end
-
-  end
-
   describe "#delete" do
 
     subject { controller.delete(request, logger) }

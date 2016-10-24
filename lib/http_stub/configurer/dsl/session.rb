@@ -15,10 +15,6 @@ module HttpStub
           @default_stub_template = default_stub_template
         end
 
-        def mark_as_default!
-          @session_facade.mark_as_default
-        end
-
         def endpoint_template(&block)
           HttpStub::Configurer::DSL::SessionEndpointTemplate.new(self, @default_stub_template, &block)
         end

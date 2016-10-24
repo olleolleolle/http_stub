@@ -233,19 +233,10 @@ describe HttpStub::Configurer::DSL::Server do
 
     subject { server.initialize! }
 
-    before(:example) do
-      allow(server_facade).to receive(:flush_requests)
-      allow(transactional_session).to receive(:mark_as_default!)
-    end
+    before(:example) { allow(server_facade).to receive(:initialize_server) }
 
-    it "flushes requests held by the server facade" do
-      expect(server_facade).to receive(:flush_requests)
-
-      subject
-    end
-
-    it "marks the transactional session as the servers default" do
-      expect(transactional_session).to receive(:mark_as_default!)
+    it "initializes the server via the facade" do
+      expect(server_facade).to receive(:initialize_server)
 
       subject
     end
@@ -263,19 +254,10 @@ describe HttpStub::Configurer::DSL::Server do
 
     subject { server.has_started! }
 
-    before(:example) do
-      allow(server_facade).to receive(:server_has_started)
-      allow(transactional_session).to receive(:mark_as_default!)
-    end
+    before(:example) { allow(server_facade).to receive(:server_has_started) }
 
     it "informs the facade that the server has started" do
       expect(server_facade).to receive(:server_has_started)
-
-      subject
-    end
-
-    it "marks the transactional session as the servers default" do
-      expect(transactional_session).to receive(:mark_as_default!)
 
       subject
     end

@@ -28,13 +28,13 @@ module HttpStub
         end
 
         def initialize!
-          @server_facade.flush_requests
-          switch_to_transactional_session
+          @server_facade.initialize_server
+          @default_session = @session_factory.transactional
         end
 
         def has_started!
           @server_facade.server_has_started
-          switch_to_transactional_session
+          @default_session = @session_factory.transactional
         end
 
         def reset!
@@ -71,13 +71,6 @@ module HttpStub
 
         def clear_stubs!
           @default_session.clear!
-        end
-
-        private
-
-        def switch_to_transactional_session
-          @session_factory.transactional.mark_as_default!
-          @default_session = @session_factory.transactional
         end
 
       end

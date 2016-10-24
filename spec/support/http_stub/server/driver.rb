@@ -7,7 +7,7 @@ module HttpStub
 
       private_constant :DRIVERS
 
-      attr_reader :default_session_id, :host, :port, :uri
+      attr_reader :session_id, :host, :port, :uri
 
       class << self
 
@@ -37,13 +37,12 @@ module HttpStub
         end
       end
 
-      def default_session_id=(session_id)
-        @default_session_id = session_id
-        HTTParty.post("#{@uri}/http_stub/sessions/default", body: { http_stub_session_id: session_id })
+      def session_id=(session_id)
+        @session_id = session_id
       end
 
       def reset_session
-        HTTParty.post("#{@uri}/http_stub/stubs/reset", body: { http_stub_session_id: @default_session_id })
+        HTTParty.post("#{@uri}/http_stub/stubs/reset", body: { http_stub_session_id: @session_id })
       end
 
       def stop

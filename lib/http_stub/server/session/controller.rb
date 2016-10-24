@@ -21,10 +21,6 @@ module HttpStub
           @server_memory.sessions.all
         end
 
-        def mark_default(request)
-          @session_configuration.default_identifier = request.session_id
-        end
-
         def delete(request, logger)
           @server_memory.sessions.delete(request.session_id, logger)
         end

@@ -8,6 +8,14 @@ describe "Stub miss list acceptance" do
 
     before(:example) { configure_stub_registrator }
 
+    context "when no miss has been registered" do
+
+      it "returns a response with an empty request list" do
+        expect(response.body).to_not include("Request")
+      end
+
+    end
+
     context "when a request has been made that does not match a stub" do
 
       before(:example) { stub_registrator.issue_matching_request }
@@ -31,7 +39,6 @@ describe "Stub miss list acceptance" do
     context "when a request has been made configuring a stub" do
 
       before(:example) { stub_registrator.register_stub }
-
 
       include_context "HTML view excluding request details"
 

@@ -14,13 +14,6 @@ module HttpStub
           @session_description = "session '#{session_id}'"
         end
 
-        def mark_as_default
-          @request_processor.submit(
-            request:     REQUEST_FACTORY.post("sessions/default", http_stub_session_id: @session_id),
-            description: "marking #{@session_description} as the default"
-          )
-        end
-
         def stub_response(stub)
           @request_processor.submit(
             request:     REQUEST_FACTORY.multipart("stubs", stub, http_stub_session_id: @session_id),

@@ -105,13 +105,23 @@ describe "Configurer initialization acceptance" do
           end
         end
 
-        it "registers the stub" do
-          response = HTTParty.get("#{server_uri}/some_stub_path")
+        it "registers the stub in the servers transactional session" do
+          response = HTTParty.get("#{server_uri}/some_stub_path", request_session_id_header("http_stub_transactional"))
 
           expect(response.code).to eql(200)
           expect(response.body).to eql("Some stub body")
         end
 
+        it "does not register the stub in the servers memory session" do
+          response = HTTParty.get("#{server_uri}/some_stub_path", request_session_id_header("http_stub_memory"))
+
+          expect(response.code).to eql(404)
+        end
+
+      end
+
+      def request_session_id_header(session_id)
+        { headers: { "http_stub_session_id" => session_id } }
       end
 
     end

@@ -5,57 +5,6 @@ describe HttpStub::Configurer::Server::SessionFacade do
 
   let(:session_facade) { described_class.new(session_id, request_processor) }
 
-  describe "#mark_as_default" do
-
-    let(:request) { instance_double(HttpStub::Configurer::Request::Http::Basic) }
-
-    subject { session_facade.mark_as_default }
-
-    before(:example) do
-      allow(HttpStub::Configurer::Request::Http::Factory).to receive(:post).and_return(request)
-      allow(request_processor).to receive(:submit)
-    end
-
-    it "creates an POST request to mark the session as the default" do
-      expect(HttpStub::Configurer::Request::Http::Factory).to(
-        receive(:post).with("sessions/default", anything).and_return(request)
-      )
-
-      subject
-    end
-
-    it "creates a POST request with the session id as a parameter" do
-      expect(HttpStub::Configurer::Request::Http::Factory).to(
-        receive(:post).with(anything, http_stub_session_id: session_id).and_return(request)
-      )
-
-      subject
-    end
-
-    it "submits the request via the request processor" do
-      expect(request_processor).to receive(:submit).with(hash_including(request: request))
-
-      subject
-    end
-
-    it "describes the request as marking the session" do
-      expect(request_processor).to(
-        receive(:submit).with(hash_including(description: a_string_including("marking")))
-      )
-
-      subject
-    end
-
-    it "describes the request as scoped within the session" do
-      expect(request_processor).to(
-        receive(:submit).with(hash_including(description: a_string_including("session '#{session_id}'")))
-      )
-
-      subject
-    end
-
-  end
-
   describe "#stub_response" do
 
     let(:the_stub_description) { "some stub description" }

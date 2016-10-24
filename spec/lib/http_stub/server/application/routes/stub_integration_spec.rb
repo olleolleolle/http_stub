@@ -1,11 +1,9 @@
-describe HttpStub::Server::Application::Routes::Stub, "when the server is running" do
+describe HttpStub::Server::Application::Routes::Stub, "when an initialized server is running" do
   include_context "server integration"
-
-  let(:transactional_session_id) { "http_stub_transactional" }
 
   let(:response_document) { Nokogiri::HTML(response.body) }
 
-  before(:example) { establish_default_session(transactional_session_id) }
+  before(:example) { initialize_server }
 
   describe "POST /http_stub/stubs" do
 

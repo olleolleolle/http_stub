@@ -17,18 +17,6 @@ describe HttpStub::Configurer::DSL::Session do
     session
   end
 
-  describe "#mark_as_default!" do
-
-    subject { session.mark_as_default! }
-
-    it "marks the session as the servers default via the session facade" do
-      expect(session_facade).to receive(:mark_as_default)
-
-      subject
-    end
-
-  end
-
   describe "#endpoint_template" do
 
     let(:block)                    { lambda { block_verifier.verify } }

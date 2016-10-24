@@ -51,6 +51,9 @@ Style/EmptyLinesAroundBlockBody:
     - lib/http_stub/server/application/request_support.rb
     - lib/http_stub/server/application/response_support.rb
     - lib/http_stub/server/application/routes/*.rb
+Performance/RedundantMerge:
+  Exclude:
+    - lib/http_stub/server/daemon.rb
 
 # sufficient length for modern screens
 Metrics/LineLength:

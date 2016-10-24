@@ -1,3 +1,11 @@
+** 0.26.1 **
+
+New:
+* `GET /http_stub/status` indicates the status of the server
+ 
+Fix:
+* Stub match lists are empty on start-up
+
 ** 0.26.0 **
 
 New:

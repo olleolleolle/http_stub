@@ -16,24 +16,52 @@ describe HttpStub::Configurer::Server::Facade do
     facade
   end
 
-  describe "#server_has_started" do
+  describe "#initialize_server" do
 
-    subject { facade.server_has_started }
+    let(:request) { instance_double(HttpStub::Configurer::Request::Http::Basic) }
 
-    it "informs the request processor to disable buffering requests" do
-      expect(request_processor).to receive(:disable_buffering!)
+    subject { facade.initialize_server }
+
+    before(:example) do
+      allow(request_processor).to receive(:flush!)
+      allow(HttpStub::Configurer::Request::Http::Factory).to receive(:post).and_return(request)
+      allow(request_processor).to receive(:submit)
+    end
+
+    it "causes the request processor to flush its requests" do
+      expect(request_processor).to receive(:flush!)
+
+      subject
+    end
+
+    it "creates a POST request for the initialized status endpoint" do
+      expect(HttpStub::Configurer::Request::Http::Factory).to(
+        receive(:post).with("status/initialized").and_return(request)
+      )
+
+      subject
+    end
+
+    it "submits the HTTP Stub request via the request processor" do
+      expect(request_processor).to receive(:submit).with(hash_including(request: request))
+
+      subject
+    end
+
+    it "describes the request as marking the server as initialized" do
+      expect(request_processor).to receive(:submit).with(hash_including(description: "marking server as initialized"))
 
       subject
     end
 
   end
 
-  describe "#flush_requests" do
+  describe "#server_has_started" do
 
-    subject { facade.flush_requests }
+    subject { facade.server_has_started }
 
-    it "informs the request processor to flush it's requests" do
-      expect(request_processor).to receive(:flush!)
+    it "informs the request processor to disable buffering requests" do
+      expect(request_processor).to receive(:disable_buffering!)
 
       subject
     end

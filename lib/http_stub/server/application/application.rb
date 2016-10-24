@@ -30,8 +30,9 @@ module HttpStub
 
         register HttpStub::Server::Application::CrossOriginSupport
 
-        include HttpStub::Server::Application::Routes::Memory
         include HttpStub::Server::Application::Routes::Resource
+        include HttpStub::Server::Application::Routes::Status
+        include HttpStub::Server::Application::Routes::Memory
         include HttpStub::Server::Application::Routes::Scenario
         include HttpStub::Server::Application::Routes::Session
         include HttpStub::Server::Application::Routes::Stub

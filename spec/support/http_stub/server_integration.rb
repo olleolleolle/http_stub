@@ -10,12 +10,17 @@ shared_context "server integration" do
 
   before(:example) { server_driver.start }
 
-  def default_session_id
-    server_driver.default_session_id
+  def initialize_server
+    HTTParty.post("#{server_uri}/http_stub/status/initialized")
+    server_driver.session_id = transactional_session_id
   end
 
-  def establish_default_session(session_id)
-    server_driver.default_session_id = session_id
+  def transactional_session_id
+    "http_stub_transactional"
+  end
+
+  def session_id
+    server_driver.session_id
   end
 
   def reset_session

@@ -120,27 +120,6 @@ describe HttpStub::Server::Application::Routes::Session do
 
   end
 
-  describe "when a request to mark a session as the default is received" do
-    include_context "request includes a session identifier"
-
-    subject { post "/http_stub/sessions/default" }
-
-    before(:example) { allow(session_controller).to receive(:mark_default) }
-
-    it "retrieves the session identified in the request via the stub controller" do
-      expect(session_controller).to receive(:mark_default).with(request)
-
-      subject
-    end
-
-    it "responds with a 200 status code" do
-      subject
-
-      expect(response.status).to eql(200)
-    end
-
-  end
-
   describe "when a request to delete a session is received" do
     include_context "request includes a session identifier"
 

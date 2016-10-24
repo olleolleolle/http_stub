@@ -60,6 +60,26 @@ describe HttpStub::Server::Memory::Memory do
     memory
   end
 
+  describe "#status" do
+
+    subject { memory.status }
+
+    it "defaults to 'Started'" do
+      expect(subject).to eql("Started")
+    end
+
+    context "when the memory has been initialized" do
+
+      before(:example) { memory.initialized! }
+
+      it "reflects the memory is 'Initialized'" do
+        expect(subject).to eql("Initialized")
+      end
+
+    end
+
+  end
+
   describe "#scenarios" do
 
     subject { memory.scenarios }
@@ -115,6 +135,18 @@ describe HttpStub::Server::Memory::Memory do
       expect(session_registry).to receive(:clear).with(logger)
 
       subject
+    end
+
+    context "when the memory had been initialized" do
+
+      before(:example) { memory.initialized! }
+
+      it "resets the servers status to the default value" do
+        subject
+
+        expect(memory.status).to eql("Started")
+      end
+
     end
 
   end

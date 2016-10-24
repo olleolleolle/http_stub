@@ -10,12 +10,16 @@ module HttpStub
           @request_processor = HttpStub::Configurer::Server::RequestProcessor.new(configuration)
         end
 
-        def server_has_started
-          @request_processor.disable_buffering!
+        def initialize_server
+          @request_processor.flush!
+          @request_processor.submit(
+            request:     HttpStub::Configurer::Request::Http::Factory.post("status/initialized"),
+            description: "marking server as initialized"
+          )
         end
 
-        def flush_requests
-          @request_processor.flush!
+        def server_has_started
+          @request_processor.disable_buffering!
         end
 
         def reset

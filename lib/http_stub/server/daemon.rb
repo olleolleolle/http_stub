@@ -16,9 +16,9 @@ module HttpStub
       end
 
       def initialize(args)
-        @configurer = args[:configurer]
-        default_args = { host: "localhost" }
-        default_args = { host: @configurer.stub_server.host, port: @configurer.stub_server.port } if @configurer
+        @configurer  = args[:configurer]
+        default_args = { host: "localhost", ping_uri: "/http_stub/status" }
+        default_args.merge!(host: @configurer.stub_server.host, port: @configurer.stub_server.port) if @configurer
         super(default_args.merge(args))
       end
 

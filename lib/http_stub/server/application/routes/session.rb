@@ -34,11 +34,6 @@ module HttpStub
                     haml :sessions, {}, sessions: @session_controller.find_all
                   end
 
-                  post "/default" do
-                    @session_controller.mark_default(http_stub_request)
-                    halt 200, "OK"
-                  end
-
                   delete do
                     pass unless http_stub_request.session_id
                     @session_controller.delete(http_stub_request, logger)
