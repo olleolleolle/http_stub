@@ -7,8 +7,8 @@ Gem::Specification.new do |spec|
   spec.version           = HttpStub::VERSION
   spec.platform          = Gem::Platform::RUBY
   spec.authors           = %w{ dueckes rvanbert rypac andykingking campezzi }
-  spec.summary           = "A HTTP Server replaying configured stub responses"
-  spec.description       = "fakeweb for a HTTP server, informing it to stub / fake responses"
+  spec.summary           = "A service virtualization tool that encourages contract based testing"
+  spec.description       = "A service virtualization tool that encourages contract based tests in API consumers and producers"
   spec.email             = "matthew.ueckerman@myob.com"
   spec.homepage          = "http://github.com/MYOB-Technology/http_stub"
   spec.rubyforge_project = "http_stub"
