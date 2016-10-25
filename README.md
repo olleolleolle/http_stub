@@ -1,7 +1,13 @@
 http_stub
 =========
 
-```fakeweb``` for a HTTP server, informing it to 'fake', or, in the test double vernacular - 'stub' - responses.
+```http_stub``` is a [service virtualization](https://en.wikipedia.org/wiki/Service_virtualization) tool.<br/>
+It provides a HTTP server that is configurable on-the-fly to [stub](https://en.wikipedia.org/wiki/Test_stub) responses
+to matched requests.
+
+```http_stub``` has been primarily designed to aid API **consumer** testing:
+* By providing tools to simulate a producer API and change its responses on-the-fly
+* By aiming to provide tools that validate the simulation is true to the producer
 
 Status
 ------
@@ -15,10 +21,10 @@ Status
 Motivation
 ----------
 
-Need to simulate a HTTP service with which your application integrates?  Enter ```http_stub```.
+Need to simulate a HTTP API with which your application integrates?  Enter ```http_stub```.
 
 ```http_stub``` is similar in motivation to the ```fakeweb``` gem, although ```http_stub``` provides a separately 
-running HTTP process whose responses can be faked / stubbed.
+running HTTP process whose responses can be stubbed.
 
 Alternatives and Comparisons
 ----------------------------
@@ -145,8 +151,10 @@ The scenario list allows activation of scenarios on the fly:
 More Information
 ----------------
 
-```http_stub``` can match requests against a variety of criteria, including JSON schemas, and can respond with arbitrary
-content including files and the matching requests headers and parameters.
+```http_stub``` can [match requests](https://github.com/MYOB-Technology/http_stub/wiki/Stub-Request-Matching) against a
+variety of criteria, including JSON schemas, and can
+[respond](https://github.com/MYOB-Technology/http_stub/wiki/Stub-Responses) with arbitrary content including files and
+request headers and parameters.
 
 See the [wiki](https://github.com/MYOB-Technology/http_stub/wiki) for more usage details and examples.
 
