@@ -46,15 +46,15 @@ In comparison ```http_stub```:
 Similiar in spirit, implemented in Java and comes with Java and Ruby clients.
 
 In comparison ```http_stub```:
-* Has session support to facilitate parallel test execution.
-* Has the concept of scenarios that allow on-the-fly changes to responses.  This aids automated testing, exploratory testing and demonstrations.
-* Supports a wider range of matching rules and can match requests against JSON schemas.
+* Has [session support](https://github.com/MYOB-Technology/http_stub/wiki/Stub%20Sessions) to facilitate parallel test execution.
+* Has the concept of [scenarios](https://github.com/MYOB-Technology/http_stub/wiki/Scenarios) that allow on-the-fly changes to responses.  This aids automated testing, exploratory testing and demonstrations.
+* Supports a wider range of [matching rules](https://github.com/MYOB-Technology/http_stub/wiki/Stub-Request-Matching) and can match requests against JSON schemas.
 * Supports references to request headers and parameters in responses.
 * Supports multi-part file responses.
 * Allows cross-origin request support to be enabled easily.
 * Allows a match to trigger the registration of other ```stubs``` to simulate state changes in the provider.
-* Has diagnostic pages to interrogate the state of the stub, trace requests to responses, and activate scenarios on-the-fly.
-* Has an elegant Ruby DSL that aids in keeping requests and responses DRY.
+* Has [diagnostic pages](https://github.com/MYOB-Technology/http_stub/wiki/Diagnostic-Pages) to interrogate the state of the stub, trace requests to responses, and activate scenarios on-the-fly.
+* Has an elegant [Ruby DSL](https://github.com/MYOB-Technology/http_stub/wiki/The-Configurer-DSL) that aids in keeping requests and responses DRY.
 
 ### [HTTParrot](https://github.com/abrandoned/httparrot), [Rack Stubs](https://github.com/featurist/rack-stubs), [mock_server](https://github.com/unixcharles/mock_server)
 These are similar in spirit, implemented in Ruby, but have limited functionality and have been discontinued.
