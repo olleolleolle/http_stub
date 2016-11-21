@@ -1,3 +1,8 @@
+** 0.26.2 **
+
+Fix:
+* Accommodates numeric stub response header values
+
 ** 0.26.1 **
 
 New:

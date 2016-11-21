@@ -7,11 +7,13 @@ module HttpStub
         module Helpers
 
           def add_headers_if_necessary
-            response.headers.merge!(
-              "Access-Control-Allow-Origin"  => "*",
-              "Access-Control-Allow-Methods" => determine_allowed_methods,
-              "Access-Control-Allow-Headers" => determine_allowed_headers
-            ) if settings.cross_origin_support?
+            if settings.cross_origin_support?
+              response.headers.merge!(
+                "Access-Control-Allow-Origin"  => "*",
+                "Access-Control-Allow-Methods" => determine_allowed_methods,
+                "Access-Control-Allow-Headers" => determine_allowed_headers
+              )
+            end
           end
 
           def handle_options_if_necessary

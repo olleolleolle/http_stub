@@ -46,6 +46,8 @@ Style/EmptyLinesAroundModuleBody:
   Enabled: false
 Style/IndentAssignment:
   Enabled: false
+Style/GuardClause:
+  Enabled: false
 Style/EmptyLinesAroundBlockBody:
   Exclude:
     - lib/http_stub/server/application/request_support.rb

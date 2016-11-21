@@ -1,11 +1,7 @@
 require 'bundler'
 Bundler.require(:development)
 
-CodeClimate::TestReporter.start
-
 SimpleCov.start do
-  coverage_dir "tmp/coverage"
-
   add_filter "/spec/"
   add_filter "/vendor/"
 
@@ -57,8 +53,12 @@ require_relative 'support/http_stub/stub_registrator'
 require_relative 'support/html_helpers'
 require_relative 'support/http_stub/html_view_including_request_details'
 require_relative 'support/http_stub/html_view_excluding_request_details'
+require_relative 'support/http_stub/selenium/browser'
 require_relative 'support/browser_integration'
 
 RSpec.configure do |config|
-  config.after(:suite) { HttpStub::Server::Driver.all.each(&:stop) }
+  config.after(:suite) do
+    HttpStub::Server::Driver.all.each(&:stop)
+    HttpStub::Selenium::Browser.stop
+  end
 end

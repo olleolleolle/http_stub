@@ -36,6 +36,22 @@ describe HttpStub::Server::Stub::Response::Attribute::Headers do
       expect(subject).to eql(interpolated_headers)
     end
 
+    context "when a header value is a number" do
+
+      let(:stub_headers) { (1..3).each_with_object({}) { |i, result| result["key#{i}"] = i } }
+
+      it "does not interpolate any values" do
+        expect(HttpStub::Server::Stub::Response::Attribute::Interpolator).to_not receive(:interpolate)
+
+        subject
+      end
+
+      it "returns a hash containing the values unchanged" do
+        expect(subject).to eql(stub_headers)
+      end
+
+    end
+
   end
 
   describe "#to_s" do

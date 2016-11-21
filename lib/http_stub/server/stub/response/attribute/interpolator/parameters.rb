@@ -11,8 +11,8 @@ module HttpStub
 
               private_constant :CONTROL_VALUE_REGEXP
 
-              def self.interpolate(stub_parameters, request)
-                stub_parameters.scan(CONTROL_VALUE_REGEXP).flatten.reduce(stub_parameters) do |result, parameter_name|
+              def self.interpolate(value, request)
+                value.scan(CONTROL_VALUE_REGEXP).flatten.reduce(value) do |result, parameter_name|
                   result.gsub("control:request.parameters[#{parameter_name}]", request.parameters[parameter_name] || "")
                 end
               end

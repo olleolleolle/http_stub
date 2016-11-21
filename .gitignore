@@ -4,7 +4,6 @@
 .sass-cache
 *.log
 coverage
-log
 pkg
 projectFilesBackup
 tmp

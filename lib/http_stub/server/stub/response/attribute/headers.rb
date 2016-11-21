@@ -13,8 +13,14 @@ module HttpStub
 
             def with_values_from(request)
               self.each_with_object({}) do |(name, value), result|
-                result[name] = HttpStub::Server::Stub::Response::Attribute::Interpolator.interpolate(value, request)
+                result[name] = value.is_a?(String) ? interpolate(value, request) : value
               end
+            end
+
+            private
+
+            def interpolate(value, request)
+              HttpStub::Server::Stub::Response::Attribute::Interpolator.interpolate(value, request)
             end
 
           end

@@ -33,14 +33,14 @@ Gem::Specification.new do |spec|
   spec.add_dependency "haml",                "~> 4.0"
   spec.add_dependency "sass",                "~> 3.4"
 
-  spec.add_development_dependency "rubocop",                   "~> 0.44"
+  spec.add_development_dependency "rubocop",                   "~> 0.45"
   spec.add_development_dependency "rspec",                     "~> 3.5"
   spec.add_development_dependency "nokogiri",                  "~> 1.6"
   spec.add_development_dependency "httparty",                  "~> 0.14"
   spec.add_development_dependency "rack-test",                 "~> 0.6"
   spec.add_development_dependency "wait_until",                "~> 0.3"
-  spec.add_development_dependency "selenium-webdriver",        "~> 2.53"
+  spec.add_development_dependency "selenium-webdriver",        "~> 3.0"
   spec.add_development_dependency "simplecov",                 "~> 0.12"
-  spec.add_development_dependency "codeclimate-test-reporter", "~> 0.6"
+  spec.add_development_dependency "codeclimate-test-reporter", "~> 1.0"
   spec.add_development_dependency "travis-lint",               "~> 2.0"
 end

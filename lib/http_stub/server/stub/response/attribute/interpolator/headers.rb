@@ -11,8 +11,8 @@ module HttpStub
 
               private_constant :CONTROL_VALUE_REGEXP
 
-              def self.interpolate(stub_headers, request)
-                stub_headers.scan(CONTROL_VALUE_REGEXP).flatten.reduce(stub_headers) do |result, header_name|
+              def self.interpolate(value, request)
+                value.scan(CONTROL_VALUE_REGEXP).flatten.reduce(value) do |result, header_name|
                   result.gsub("control:request.headers[#{header_name}]", request.headers[header_name] || "")
                 end
               end
