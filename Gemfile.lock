@@ -129,7 +129,6 @@ DEPENDENCIES
   httparty (~> 0.14)
   nokogiri (~> 1.7)
   rack-test (~> 0.6)
-  rake (~> 12.0)
   rspec (~> 3.5)
   rubocop (~> 0.47)
   selenium-webdriver (~> 3.0)
