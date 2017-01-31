@@ -16,7 +16,11 @@ wget https://github.com/mozilla/geckodriver/releases/download/v${VERSION}/geckod
 echo ">>> Installing..."
 tar -xvzf geckodriver-v${VERSION}-${OS_NAME}.tar.gz
 chmod +x geckodriver
-mv geckodriver /usr/local/bin
+if [ "$TRAVIS" = "true" ]; then
+ sudo mv geckodriver /usr/local/bin
+else
+  mv geckodriver /usr/local/bin
+fi
 
 echo ">>> Cleaning up..."
 rm geckodriver-v${VERSION}-${OS_NAME}.tar.gz
