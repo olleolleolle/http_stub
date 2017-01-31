@@ -33,6 +33,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "haml",                "~> 4.0"
   spec.add_dependency "sass",                "~> 3.4"
 
+  spec.add_development_dependency "rake",                      "~> 12.0"
   spec.add_development_dependency "rubocop",                   "~> 0.47"
   spec.add_development_dependency "rspec",                     "~> 3.5"
   spec.add_development_dependency "nokogiri",                  "~> 1.7"
