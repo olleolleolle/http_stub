@@ -81,6 +81,8 @@ cross_origin_configurer.stub_server.host = "localhost"
 cross_origin_configurer.stub_server.port = 8004
 HttpStub::Rake::ServerDaemonTasks.new(name: :cross_origin_stub, configurer: cross_origin_configurer)
 
-task :default => %w{ clobber metrics coverage }
+task pre_commit: %w{ clobber metrics coverage:show validate }
 
-task :pre_commit => %w{ clobber metrics coverage:show validate }
+task default: :pre_commit
+
+task commit: %w{ clobber metrics provision coverage }
