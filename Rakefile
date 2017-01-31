@@ -22,6 +22,11 @@ end
 desc "Source code metrics analysis"
 RuboCop::RakeTask.new(:metrics) { |task| task.fail_on_error = true }
 
+desc "Provisions specification dependencies"
+task :provision do
+  sh "provisioning/install_geckodriver.sh"
+end
+
 desc "Exercises specifications"
 ::RSpec::Core::RakeTask.new(:spec)
 
