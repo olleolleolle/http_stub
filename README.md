@@ -174,5 +174,5 @@ In your Gemfile include:
 Requirements
 ------------
 
-* Ruby >= 2.0
+* Ruby >= 2.1
 * A Rack server
