@@ -4,7 +4,7 @@ describe HttpStub::Extensions::Rack::Handler do
     expect(::Rack::Handler.included_modules).to include(described_class)
   end
 
-  context "when mixed in to a module" do
+  context "when prepended to a module" do
 
     module HttpStub::TestableRackHandler
 
@@ -20,7 +20,7 @@ describe HttpStub::Extensions::Rack::Handler do
 
     end
 
-    HttpStub::TestableRackHandler.send(:include, HttpStub::Extensions::Rack::Handler)
+    HttpStub::TestableRackHandler.send(:prepend, HttpStub::Extensions::Rack::Handler)
 
     describe "the modules ::get" do
 

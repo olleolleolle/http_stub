@@ -174,5 +174,5 @@ In your Gemfile include:
 Requirements
 ------------
 
-* Ruby >= 2.1
+* Ruby >= 2.2.2 (see the [CHANGELOG](https://github.com/MYOB-Technology/http_stub/blob/master/CHANGELOG.md) for older versions supporting prior Rubies)
 * A Rack server

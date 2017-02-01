@@ -1,3 +1,11 @@
+** 0.27.0 **
+
+Breaking:
+* Supported Ruby versions now >= 2.2.2 (as per Rails)
+
+Misc:
+* Upgraded to activesupport 5.0 and json 2.0 
+
 ** 0.26.2 **
 
 Fix:

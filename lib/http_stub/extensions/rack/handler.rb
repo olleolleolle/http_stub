@@ -4,18 +4,14 @@ module HttpStub
 
       module Handler
 
-        def self.included(mod)
-          mod.extend(ClassMethods)
+        def self.prepended(mod)
+          mod.singleton_class.prepend(ClassMethods)
         end
 
         module ClassMethods
 
-          def self.extended(mod)
-            mod.singleton_class.alias_method_chain :get, :run_check
-          end
-
-          def get_with_run_check(server)
-            handler = get_without_run_check(server)
+          def get(server)
+            handler = super
             raise NameError, "#{server} Rack handler is invalid" unless handler.respond_to?(:run)
             handler
           end
@@ -28,4 +24,4 @@ module HttpStub
   end
 end
 
-::Rack::Handler.send(:include, ::HttpStub::Extensions::Rack::Handler)
+::Rack::Handler.prepend(::HttpStub::Extensions::Rack::Handler)

@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
 
   spec.require_path = "lib"
 
-  spec.required_ruby_version = ">= 2.0"
+  spec.required_ruby_version = ">= 2.2.2"
 
   spec.add_runtime_dependency "rake", ">= 10.4"
 
@@ -29,7 +29,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "multipart-post",      "~> 2.0"
   spec.add_dependency "http_server_manager", "~> 0.5"
   spec.add_dependency "json-schema",         "~> 2.7"
-  spec.add_dependency "activesupport",       "~> 4.2"
+  spec.add_dependency "activesupport",       "~> 5.0"
   spec.add_dependency "haml",                "~> 4.0"
   spec.add_dependency "sass",                "~> 3.4"
 
