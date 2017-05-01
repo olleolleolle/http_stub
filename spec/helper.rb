@@ -2,6 +2,8 @@ require 'bundler'
 Bundler.require(:development)
 
 SimpleCov.start do
+  coverage_dir "tmp/coverage"
+
   add_filter "/spec/"
   add_filter "/vendor/"
 

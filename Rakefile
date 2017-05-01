@@ -14,7 +14,7 @@ directory "pkg"
 
 desc "Removed generated artefacts"
 task :clobber do
-  %w{ coverage pkg tmp }.each { |dir| rm_rf dir }
+  %w{ pkg tmp }.each { |dir| rm_rf dir }
   rm Dir.glob("**/coverage.data"), force: true
   puts "Clobbered"
 end
@@ -46,8 +46,9 @@ namespace :coverage do
   task :show do
     begin
       Rake::Task["coverage:generate"].invoke
-    ensure
+    rescue Exception => exc
       `open tmp/coverage/index.html`
+      raise exc
     end
   end
 

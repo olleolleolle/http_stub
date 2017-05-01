@@ -2,7 +2,7 @@
 
 set -e
 
-VERSION="0.13.0"
+VERSION="0.16.1"
 
 OS_NAME="linux64"
 if [[ $(uname) == "Darwin" ]]; then

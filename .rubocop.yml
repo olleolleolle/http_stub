@@ -4,7 +4,7 @@ AllCops:
     - Rakefile
     - spec/**/*
     - vendor/**/*
-  TargetRubyVersion: 2.0
+  TargetRubyVersion: 2.2
 
 # double quotes preferred, except in require
 Style/StringLiterals:
@@ -64,6 +64,7 @@ Metrics/LineLength:
 # {} distinguishes delimiters from method calls
 Style/PercentLiteralDelimiters:
   PreferredDelimiters:
+    '%i': '{}'
     '%w': '{}'
 
 # self-documentation preferred

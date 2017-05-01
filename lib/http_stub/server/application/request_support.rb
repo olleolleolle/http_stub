@@ -4,7 +4,7 @@ module HttpStub
 
       module RequestSupport
 
-        STUBBABLE_REQUEST_METHODS = [ :get, :post, :put, :patch, :delete, :options ].freeze
+        STUBBABLE_REQUEST_METHODS = %i{ get post put patch delete options }.freeze
 
         private_constant :STUBBABLE_REQUEST_METHODS
 
