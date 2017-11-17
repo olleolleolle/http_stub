@@ -10,10 +10,7 @@ shared_context "server integration" do
   let(:server_uri)    { server_driver.uri }
   let(:client)        { server_driver.client }
 
-  before(:example) do
-    configurator.stub_server.port = server_port
-    server_driver.start
-  end
+  before(:example) { server_driver.start }
 
   after(:example) { client.reset! }
 

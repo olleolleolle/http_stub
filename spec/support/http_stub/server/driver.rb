@@ -25,17 +25,20 @@ module HttpStub
 
       def initialize(configurator)
         @configurator = configurator
-        @host     = "localhost"
-        @port     = HttpStub::Port.free_port
-        @uri      = "http://#{@host}:#{@port}"
-        @client   = HttpStub::Client.create(@uri)
+        @host         = "localhost"
       end
 
       def start
-        return if @pid
-        @pid = Process.spawn("rake launch_stub configurator=#{@configurator.name} port=#{@port}")
-        ::Wait.until!(description: "http stub server for #{@configurator.name} started") do
-          Net::HTTP.get_response(@host, "/http_stub/status", @port)
+        return if @port
+        ::Wait.until!(description: "server on an available port started") do
+          @port = HttpStub::Port.free_port
+          @pid = Process.spawn("rake launch_server configurator=#{@configurator.name} port=#{@port}", out: DEV_NULL,
+                                                                                                      err: DEV_NULL)
+          ::Wait.until!(description: "http stub server for #{@configurator.name} started", timeout_in_seconds: 3) do
+            Net::HTTP.get_response(@host, "/http_stub/status", @port)
+            @uri    = "http://#{@host}:#{@port}"
+            @client = HttpStub::Client.create(@uri)
+          end
         end
       end
 
