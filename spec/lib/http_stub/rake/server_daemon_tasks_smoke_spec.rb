@@ -1,27 +1,32 @@
 describe HttpStub::Rake::ServerDaemonTasks do
+  include_context "surpressed output"
   include Rake::DSL
 
-  before(:context) { HttpStub::Rake::ServerDaemonTasks.new(name: :example_server_daemon, port: 8002) }
+  before(:context) do
+    @server_name_in_rakefile = :example_server_daemon
+    @port_in_rakefile        = 8001
+    HttpStub::Rake::ServerDaemonTasks.new(
+      name:         @server_name_in_rakefile,
+      configurator: HttpStub::ConfiguratorFixture.create(port: @port_in_rakefile)
+    )
+  end
 
   describe "start task" do
 
     context "when invoked" do
 
-      before(:context) { @exit_flag = Rake::Task["example_server_daemon:start"].invoke("--trace") }
+      before(:context) { @exit_flag = system "rake #{@server_name_in_rakefile}:start > /dev/null" }
 
-      after(:context) { Rake::Task["example_server_daemon:stop"].invoke("--trace") }
+      after(:context) { system "rake #{@server_name_in_rakefile}:stop > /dev/null" }
 
       it "exits with a status code of 0" do
-        expect(@exit_flag).to be_truthy
+        expect(@exit_flag).to be(true)
       end
 
       it "starts a stub server that responds to stub requests" do
-        request = Net::HTTP::Post.new("/http_stub/stubs")
-        request.body = { response: { status: 302, body: "Some Body" } }.to_json
+        response = HTTParty.get("http://localhost:#{@port_in_rakefile}/http_stub/stubs")
 
-        response = Net::HTTP.new("localhost", 8002).start { |http| http.request(request) }
-
-        expect(response.code).to eql("200")
+        expect(response.code).to eql(200)
       end
 
     end

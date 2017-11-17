@@ -6,12 +6,17 @@ module HttpStub
 
         attr_reader :name, :links, :stubs, :triggered_scenarios
 
-        def initialize(args)
-          @args                = args
-          @name                = args["name"]
-          @links               = HttpStub::Server::Scenario::Links.new(@name)
-          @stubs               = create_stubs(args["stubs"])
-          @triggered_scenarios = create_triggers(args["triggered_scenario_names"])
+        def initialize(hash)
+          @args                     = hash
+          @name                     = hash[:name]
+          @links                    = HttpStub::Server::Scenario::Links.new(@name)
+          @initially_activated_flag = hash[:activated]
+          @stubs                    = create_stubs(hash[:stubs])
+          @triggered_scenarios      = create_triggers(hash[:triggered_scenario_names])
+        end
+
+        def initially_activated?
+          !!@initially_activated_flag
         end
 
         def matches?(name, _logger)
@@ -24,8 +29,8 @@ module HttpStub
 
         private
 
-        def create_stubs(stubs_args)
-          stubs_args.map { |stub_args| HttpStub::Server::Stub.create(stub_args) }
+        def create_stubs(stub_hashes)
+          stub_hashes.map { |hash| HttpStub::Server::Stub.create(hash) }
         end
 
         def create_triggers(scenario_names)

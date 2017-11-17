@@ -4,29 +4,23 @@ module HttpStub
 
       class Registry
 
-        delegate :find, :all, :delete, to: :@session_registry
+        delegate :find, :all, :delete, :clear, to: :@session_registry
 
-        def initialize(session_configuration, scenario_registry, memory_session)
-          @session_configuration = session_configuration
-          @scenario_registry     = scenario_registry
-          @memory_session        = memory_session
-          @session_registry      = HttpStub::Server::Registry.new("session", [ memory_session ])
+        def initialize(scenario_registry, initial_stubs)
+          @scenario_registry = scenario_registry
+          @initial_stubs     = initial_stubs
+          @session_registry  = HttpStub::Server::Registry.new("session")
         end
 
         def find_or_create(session_id, logger)
-          effective_session_id = session_id || @session_configuration.default_identifier
+          effective_session_id = session_id || HttpStub::Server::Session::TRANSACTIONAL_SESSION_ID
           @session_registry.find(effective_session_id, logger) || create(effective_session_id, logger)
-        end
-
-        def clear(logger)
-          @memory_session.clear(logger)
-          @session_registry.replace([ @memory_session ], logger)
         end
 
         private
 
         def create(session_id, logger)
-          HttpStub::Server::Session::Session.new(session_id, @scenario_registry, @memory_session).tap do |session|
+          HttpStub::Server::Session::Session.new(session_id, @scenario_registry, @initial_stubs).tap do |session|
             @session_registry.add(session, logger)
           end
         end

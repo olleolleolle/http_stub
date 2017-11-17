@@ -1,20 +1,20 @@
 describe HttpStub::Server::Stub::Match::Rule::Method do
 
-  let(:stub_method) { "put" }
+  let(:stub_method) { :put }
 
   let(:the_method) { described_class.new(stub_method) }
 
   describe "#matches?" do
 
     let(:request_method) { "get" }
-    let(:request)        { instance_double(HttpStub::Server::Request::Request, method: request_method) }
+    let(:request)        { HttpStub::Server::RequestFixture.create(method: request_method) }
     let(:logger)         { instance_double(Logger) }
 
     subject { the_method.matches?(request, logger) }
 
-    context "when the request method is identical to the stub method" do
+    context "when the stub method is identical to the request method" do
 
-      let(:request_method) { stub_method }
+      let(:stub_method) { request_method }
 
       it "returns true" do
         expect(subject).to be(true)
@@ -22,9 +22,29 @@ describe HttpStub::Server::Stub::Match::Rule::Method do
 
     end
 
-    context "when the stub method and request method are the the same value but have different casing" do
+    context "when the stub and request methods are the same value but have different casing" do
 
       let(:stub_method) { "GET" }
+
+      it "returns true" do
+        expect(subject).to be(true)
+      end
+
+    end
+
+    context "when the stub and request methods are the same value but the stub method is symbolised" do
+
+      let(:stub_method) { :get }
+
+      it "returns true" do
+        expect(subject).to be(true)
+      end
+
+    end
+
+    context "when the stub and request methods are the same but the stub method is symbolised with different casing" do
+
+      let(:stub_method) { :GET }
 
       it "returns true" do
         expect(subject).to be(true)
@@ -75,10 +95,24 @@ describe HttpStub::Server::Stub::Match::Rule::Method do
 
     context "when the stub method is not nil" do
 
-      let(:stub_method) { "present" }
+      context "and is a string" do
 
-      it "returns the stub method" do
-        expect(subject).to eql(stub_method)
+        let(:stub_method) { "present" }
+
+        it "returns the capitalised stub method" do
+          expect(subject).to eql("PRESENT")
+        end
+
+      end
+
+      context "and is a symbol" do
+
+        let(:stub_method) { :present }
+
+        it "returns the method as a capitalised string" do
+          expect(subject).to eql("PRESENT")
+        end
+
       end
 
     end

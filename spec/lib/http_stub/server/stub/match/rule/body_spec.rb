@@ -31,14 +31,14 @@ describe HttpStub::Server::Stub::Match::Rule::Body do
         let(:raw_schema)  { { "type" => "json", "definition" => json_schema } }
 
         it "creates a JSON request body with the schema" do
-          expect(HttpStub::Server::Stub::Match::Rule::JsonBody).to receive(:new).with(json_schema)
+          expect(HttpStub::Server::Stub::Match::Rule::JsonSchemaBody).to receive(:new).with(json_schema)
 
           subject
         end
 
         it "returns the created request body" do
-          json_body = instance_double(HttpStub::Server::Stub::Match::Rule::JsonBody)
-          allow(HttpStub::Server::Stub::Match::Rule::JsonBody).to receive(:new).and_return(json_body)
+          json_body = instance_double(HttpStub::Server::Stub::Match::Rule::JsonSchemaBody)
+          allow(HttpStub::Server::Stub::Match::Rule::JsonSchemaBody).to receive(:new).and_return(json_body)
 
           expect(subject).to eql(json_body)
         end

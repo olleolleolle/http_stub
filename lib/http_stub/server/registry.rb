@@ -3,9 +3,11 @@ module HttpStub
 
     class Registry
 
+      delegate :find_all, to: :@models
+
       def initialize(model_name, models=[])
         @model_name = model_name
-        @models     = models
+        @models     = models.reverse
       end
 
       def add(model, logger)

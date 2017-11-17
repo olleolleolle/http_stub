@@ -16,22 +16,12 @@ module HttpStub
 
               namespace "/http_stub/stubs" do
 
-                post do
-                  response = @stub_controller.register(http_stub_request, logger)
-                  @response_pipeline.process(response)
-                end
-
                 get do
                   haml :stubs, {}, stubs: @stub_controller.find_all(http_stub_request)
                 end
 
                 post "/reset" do
                   @stub_controller.reset(http_stub_request, logger)
-                  halt 200, "OK"
-                end
-
-                delete do
-                  @stub_controller.clear(http_stub_request, logger)
                   halt 200, "OK"
                 end
 
@@ -43,7 +33,7 @@ module HttpStub
 
                   get "/last" do
                     response = @stub_match_controller.last_match(http_stub_request, logger)
-                    @response_pipeline.process(response)
+                    response.serve_on(self)
                   end
 
                 end
@@ -61,7 +51,7 @@ module HttpStub
 
               any_request_method "*" do
                 response = @stub_controller.match(http_stub_request, logger)
-                @response_pipeline.process(response)
+                response.serve_on(self)
               end
 
             end

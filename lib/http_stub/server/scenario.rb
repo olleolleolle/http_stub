@@ -3,8 +3,8 @@ module HttpStub
 
     module Scenario
 
-      def self.create(args)
-        HttpStub::Server::Scenario::Scenario.new(args)
+      def self.create(hash)
+        HttpStub::Server::Scenario::Scenario.new(hash)
       end
 
     end

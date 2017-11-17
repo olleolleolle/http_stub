@@ -7,51 +7,51 @@ $color_font: black
 $color_peach: #FFF6EF
 
 body
-  :background $color_background
-  :font-family "Helvetica Neue", Helvetica, Arial, sans-serif
-  :display flex
-  :flex-direction column
-  :align-items center
+  background: $color_background
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif
+  display: flex
+  flex-direction: column
+  align-items: center
 
 header
-  :padding-left 1rem
-  :text-align center
+  padding-left: 1rem
+  text-align: center
 
 section
-  :display flex
-  :align-items center
-  :flex-direction column
-  :max-width 800px
-  :border-radius 10px
-  :background white
-  :padding 1rem
+  display: flex
+  align-items: center
+  flex-direction: column
+  max-width: 1000px
+  border-radius: 10px
+  background: white
+  padding: 1rem
 
 table
-  :padding 1rem
-  :border-collapse collapse
+  padding: 1rem
+  border-collapse: collapse
   tr
-    :background $color_content_bg
+    background: $color_content_bg
     td
-      :padding 1rem
-      :max-width 600px
+      padding: 1rem
+      max-width: 800px
       &.name
-        :font-weight bold
+        font-weight: bold
       &.title
-        :font-weight bold
+        font-weight: bold
 
 .header-rule
-  :border-bottom 1px solid $color_border
+  border-bottom: 1px solid $color_border
 
 a.link
-  :border 1px solid $color_dark_border
-  :border-radius 3px
-  :padding 0.5rem
-  :text-decoration none
-  :color $color_font
+  border: 1px solid $color_dark_border
+  border-radius: 3px
+  padding: 0.5rem
+  text-decoration: none
+  color: $color_font
   &:hover
-    :background $color_highlight
+    background: $color_highlight
 
 pre
-  :white-space pre-wrap !important
-  :word-wrap break-word !important
-  :max-width 600px
+  white-space: pre-wrap !important
+  word-wrap: break-word !important
+  max-width: 800px

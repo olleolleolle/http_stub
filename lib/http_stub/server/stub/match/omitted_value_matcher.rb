@@ -5,7 +5,7 @@ module HttpStub
 
         class OmittedValueMatcher
 
-          OMITTED_CONTROL_VALUE = "control:omitted".freeze
+          OMITTED_CONTROL_VALUE = :omitted
 
           private_constant :OMITTED_CONTROL_VALUE
 

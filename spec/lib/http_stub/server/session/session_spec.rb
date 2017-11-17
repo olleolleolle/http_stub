@@ -1,8 +1,8 @@
 describe HttpStub::Server::Session::Session do
 
-  let(:id)                { "Some session id" }
-  let(:scenario_registry) { instance_double(HttpStub::Server::Registry) }
-  let(:memory_session)    { instance_double(HttpStub::Server::Session::Session) }
+  let(:id)                { "some session id" }
+  let(:scenario_registry) { instance_double(HttpStub::Server::Scenario::Registry) }
+  let(:initial_stubs)     { (1..3).map { HttpStub::Server::StubFixture.create } }
 
   let(:stub_registry)       { instance_double(HttpStub::Server::Stub::Registry) }
   let(:stub_match_registry) { instance_double(HttpStub::Server::Registry) }
@@ -10,7 +10,7 @@ describe HttpStub::Server::Session::Session do
 
   let(:logger) { instance_double(Logger) }
 
-  let(:session) { described_class.new(id, scenario_registry, memory_session) }
+  let(:session) { described_class.new(id, scenario_registry, initial_stubs) }
 
   before(:example) do
     allow(HttpStub::Server::Stub::Registry).to receive(:new).and_return(stub_registry)
@@ -18,8 +18,8 @@ describe HttpStub::Server::Session::Session do
     allow(HttpStub::Server::Registry).to receive(:new).with("stub miss").and_return(stub_miss_registry)
   end
 
-  it "uses a stub registry that is initialized with the provided memory session" do
-    expect(HttpStub::Server::Stub::Registry).to receive(:new).with(memory_session)
+  it "uses a stub registry that is initialized with the provided initial stubs" do
+    expect(HttpStub::Server::Stub::Registry).to receive(:new).with(initial_stubs)
 
     session
   end
@@ -75,38 +75,22 @@ describe HttpStub::Server::Session::Session do
 
     context "when the scenario is found" do
 
-      let(:scenario_trigger_names) { (1..3).map { |i| "scenario trigger #{i}" } }
-      let(:scenario_triggers)      do
-        scenario_trigger_names.map { |name| instance_double(HttpStub::Server::Scenario::Trigger, name: name) }
-      end
-      let(:triggered_scenarios)    do
-        (1..3).map { instance_double(HttpStub::Server::Scenario::Scenario, triggered_scenarios: [], stubs: []) }
-      end
-      let(:scenario_stubs)         { (1..3).map { instance_double(HttpStub::Server::Stub::Stub) } }
-      let(:scenario)               do
-        instance_double(HttpStub::Server::Scenario::Scenario, triggered_scenarios: scenario_triggers,
-                        stubs:               scenario_stubs)
-      end
+      let(:stubs_activated) { (1..3).map { HttpStub::Server::StubFixture.create } }
+      let(:scenario)        { instance_double(HttpStub::Server::Scenario::Scenario) }
 
       before(:example) do
-        scenario_trigger_names.zip(triggered_scenarios).each do |scenario_trigger_name, triggered_scenario|
-          allow(scenario_registry).to(
-            receive(:find).with(scenario_trigger_name, anything).and_return(triggered_scenario)
-          )
-        end
+        allow(scenario_registry).to receive(:stubs_activated_by).and_return(stubs_activated)
         allow(stub_registry).to receive(:concat)
       end
 
-      it "triggers activation of the scenario triggers of the scenario" do
-        scenario_trigger_names.zip(triggered_scenarios).each do |scenario_trigger_name, triggered_scenario|
-          expect(scenario_registry).to receive(:find).with(scenario_trigger_name, logger).and_return(triggered_scenario)
-        end
+      it "discovers the stubs activated by the scenario" do
+        expect(scenario_registry).to receive(:stubs_activated_by).with(scenario, logger)
 
         subject
       end
 
-      it "adds the scenarios stubs to the stub registry" do
-        expect(stub_registry).to receive(:concat).with(scenario_stubs, logger)
+      it "adds the stubs activated to the stub registry" do
+        expect(stub_registry).to receive(:concat).with(stubs_activated, logger)
 
         subject
       end
@@ -393,48 +377,6 @@ describe HttpStub::Server::Session::Session do
     it "clears stub matches before the resetting stubs" do
       expect(stub_match_registry).to receive(:clear).ordered
       expect(stub_registry).to receive(:reset).ordered
-
-      subject
-    end
-
-  end
-
-  describe "#clear" do
-
-    subject { session.clear(logger) }
-
-    before(:example) do
-      [ stub_registry, stub_match_registry, stub_miss_registry ].each { |registry| allow(registry).to receive(:clear) }
-    end
-
-    it "clears the stub registry" do
-      expect(stub_registry).to receive(:clear).with(logger)
-
-      subject
-    end
-
-    it "clears the stub miss registry" do
-      expect(stub_miss_registry).to receive(:clear).with(logger)
-
-      subject
-    end
-
-    it "clears the stub match registry" do
-      expect(stub_match_registry).to receive(:clear).with(logger)
-
-      subject
-    end
-
-    it "clears stub misses before the stubs" do
-      expect(stub_miss_registry).to receive(:clear).ordered
-      expect(stub_registry).to receive(:clear).ordered
-
-      subject
-    end
-
-    it "clears stub matches before the stubs" do
-      expect(stub_match_registry).to receive(:clear).ordered
-      expect(stub_registry).to receive(:clear).ordered
 
       subject
     end

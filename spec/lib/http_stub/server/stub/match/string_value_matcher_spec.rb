@@ -1,81 +1,28 @@
 describe HttpStub::Server::Stub::Match::StringValueMatcher do
 
-  let(:stub_value) { "some stub value" }
-
   describe "::match?" do
 
+    let(:stub_value)   { :some_stub_value }
     let(:actual_value) { "some actual value" }
 
     subject { described_class.match?(stub_value, actual_value) }
 
-    shared_examples_for "a StringValueMatcher that matches an expected stub value" do
+    it "determines if actual value matches by omission" do
+      expect(HttpStub::Server::Stub::Match::OmittedValueMatcher).to receive(:match?).with(stub_value, actual_value)
 
-      it "determines if actual value should be omitted" do
-        expect(HttpStub::Server::Stub::Match::OmittedValueMatcher).to(
-          receive(:match?).with(expected_stub_match_value, actual_value)
-        )
-
-        subject
-      end
-
-      it "determines if the actual value matches a regular expression" do
-        expect(HttpStub::Server::Stub::Match::RegexpValueMatcher).to(
-          receive(:match?).with(expected_stub_match_value, actual_value)
-        )
-
-        subject
-      end
-
-      it "determines if the actual value exactly matches the stub value" do
-        expect(HttpStub::Server::Stub::Match::ExactValueMatcher).to(
-          receive(:match?).with(expected_stub_match_value, actual_value)
-        )
-
-        subject
-      end
-
-      it "determines if actual value should be omitted" do
-        expect(HttpStub::Server::Stub::Match::OmittedValueMatcher).to(
-          receive(:match?).with(expected_stub_match_value, actual_value)
-        )
-
-        subject
-      end
-
-      it "determines if the actual value matches a regular expression" do
-        expect(HttpStub::Server::Stub::Match::RegexpValueMatcher).to(
-          receive(:match?).with(expected_stub_match_value, actual_value)
-        )
-
-        subject
-      end
-
-      it "determines if the actual value exactly matches the stub value" do
-        expect(HttpStub::Server::Stub::Match::ExactValueMatcher).to(
-          receive(:match?).with(expected_stub_match_value, actual_value)
-        )
-
-        subject
-      end
-
+      subject
     end
 
-    context "when the provided stub value is a string" do
+    it "determines if the actual value matches the stub value using a regular expression" do
+      expect(HttpStub::Server::Stub::Match::RegexpValueMatcher).to receive(:match?).with(stub_value, actual_value)
 
-      let(:stub_value)                { "some stub value" }
-      let(:expected_stub_match_value) { "some stub value" }
-
-      it_behaves_like "a StringValueMatcher that matches an expected stub value"
-
+      subject
     end
 
-    context "when the provided stub value is not a string" do
+    it "determines if the actual value exactly matches the stub value" do
+      expect(HttpStub::Server::Stub::Match::ExactValueMatcher).to receive(:match?).with(stub_value, actual_value)
 
-      let(:stub_value)                { 88 }
-      let(:expected_stub_match_value) { "88" }
-
-      it_behaves_like "a StringValueMatcher that matches an expected stub value"
-
+      subject
     end
 
     context "when an omitted match occurs" do

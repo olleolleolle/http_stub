@@ -12,7 +12,7 @@ module HttpStub
 
         def initialize
           super()
-          @request_factory = HttpStub::Server::Request::Factory.new(@session_configuration, @server_memory)
+          @request_factory = HttpStub::Server::Request::Factory.new(settings.session_identifier, @server_memory)
         end
 
         def establish_http_stub_request

@@ -1,9 +1,9 @@
 describe "Server defaults acceptance" do
 
-  context "when a configurer defines server defaults" do
-    include_context "configurer integration"
+  context "when a server configured with defaults is started" do
+    include_context "server integration"
 
-    let(:configurer_specification) { { class: HttpStub::Examples::ConfigurerWithServerDefaults } }
+    let(:configurator) { HttpStub::Examples::ConfiguratorWithServerDefaults }
 
     it "matches requests that match the request default rules" do
       response = issue_matching_request("has_defaults")

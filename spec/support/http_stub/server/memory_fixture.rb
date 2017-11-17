@@ -5,8 +5,8 @@ module HttpStub
 
       class << self
 
-        def create(session_configuration=HttpStub::Server::Session::Configuration.new(nil))
-          HttpStub::Server::Memory::Memory.new(session_configuration)
+        def create(configurator_state=HttpStub::Configurator::State.new)
+          HttpStub::Server::Memory::Memory.new(configurator_state)
         end
 
       end

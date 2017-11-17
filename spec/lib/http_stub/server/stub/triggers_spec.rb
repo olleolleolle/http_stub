@@ -2,7 +2,7 @@ describe HttpStub::Server::Stub::Triggers do
 
   let(:scenario_names) { (1..3).map { |i| "Scenario trigger #{i}" } }
   let(:stub_payloads)  { (1..3).map { |i| "Stub trigger payload #{i}" } }
-  let(:args)           { { "scenario_names" => scenario_names, "stubs" => stub_payloads } }
+  let(:args)           { { scenario_names: scenario_names, stubs: stub_payloads } }
 
   let(:stubs) { (1..stub_payloads.length).map { instance_double(HttpStub::Server::Stub::Stub) } }
 
@@ -30,10 +30,24 @@ describe HttpStub::Server::Stub::Triggers do
 
     context "when scenario names are provided" do
 
-      let(:args) { { "scenario_names" => scenario_names } }
+      context "as a symbolised arg" do
 
-      it "establishes the scenario names" do
-        expect(subject.scenario_names).to eql(scenario_names)
+        let(:args) { { scenario_names: scenario_names } }
+
+        it "establishes the scenario names" do
+          expect(subject.scenario_names).to eql(scenario_names)
+        end
+
+      end
+
+      context "as a string arg" do
+
+        let(:args) { { "scenario_names" => scenario_names } }
+
+        it "establishes the scenario names" do
+          expect(subject.scenario_names).to eql(scenario_names)
+        end
+
       end
 
     end
@@ -50,17 +64,38 @@ describe HttpStub::Server::Stub::Triggers do
 
     context "when stubs are provided" do
 
-      let(:args) { { "stubs" => stub_payloads } }
+      context "as a symbolised arg" do
 
-      it "creates a stub for each provided stub payload" do
-        stub_payloads.each { |payload| expect(HttpStub::Server::Stub).to receive(:create).with(payload) }
+        let(:args) { { stubs: stub_payloads } }
 
-        subject
+        it "creates a stub for each provided stub payload" do
+          stub_payloads.each { |payload| expect(HttpStub::Server::Stub).to receive(:create).with(payload) }
+
+          subject
+        end
+
+        it "estalishes the created stubs" do
+          expect(subject.stubs).to eql(stubs)
+        end
+
       end
 
-      it "estalishes the created stubs" do
-        expect(subject.stubs).to eql(stubs)
+      context "as a string arg" do
+
+        let(:args) { { "stubs" => stub_payloads } }
+
+        it "creates a stub for each provided stub payload" do
+          stub_payloads.each { |payload| expect(HttpStub::Server::Stub).to receive(:create).with(payload) }
+
+          subject
+        end
+
+        it "estalishes the created stubs" do
+          expect(subject.stubs).to eql(stubs)
+        end
+
       end
+
 
     end
 
@@ -117,10 +152,10 @@ describe HttpStub::Server::Stub::Triggers do
 
     context "when scenario names and stubs are provided" do
 
-      let(:args) { { "scenario_names" => scenario_names, "stubs" => stubs } }
+      let(:args) { { scenario_names: scenario_names, stubs: stubs } }
 
       it "returns a string representation of the arguments provided to the triggers" do
-        expect(subject).to eql(args.to_s)
+        expect(subject).to eql({ "scenario_names" => scenario_names, "stubs" => stubs }.to_s)
       end
 
     end

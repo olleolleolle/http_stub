@@ -1,27 +1,27 @@
 describe HttpStub::Server::Stub::Match::Rules do
 
-  let(:header_payload) do
+  let(:method_arg) { :get }
+  let(:headers_arg) do
     {
-        "match_rule_header1" => "match_rule_header_value1",
-        "match_rule_header2" => "match_rule_header_value2",
-        "match_rule_header3" => "match_rule_header_value3"
+      match_rule_header1: "match_rule_header_value1",
+      match_rule_header2: "match_rule_header_value2",
+      match_rule_header3: "match_rule_header_value3"
     }
   end
-  let(:parameter_payload) do
+  let(:parameters_arg) do
     {
-        "match_rule_parameter1" => "match_rule_parameter_value1",
-        "match_rule_parameter2" => "match_rule_parameter_value2",
-        "match_rule_parameter3" => "match_rule_parameter_value3"
+      match_rule_parameter1: "match_rule_parameter_value1",
+      match_rule_parameter2: "match_rule_parameter_value2",
+      match_rule_parameter3: "match_rule_parameter_value3"
     }
   end
-  let(:method_payload) { "get" }
-  let(:match_rules_payload) do
+  let(:match_rules_args) do
     {
-      "uri" =>        "/a_path",
-      "method" =>     method_payload,
-      "headers" =>    header_payload,
-      "parameters" => parameter_payload,
-      "body" =>       { "schema" => { "json" => "stub schema definition" } }
+      uri:            "/a_path",
+      method:         method_arg,
+      headers:        headers_arg,
+      parameters:     parameters_arg,
+      body:           { schema: { json: "stub schema definition" } }
     }
   end
   let(:uri_rule)        { instance_double(HttpStub::Server::Stub::Match::Rule::Uri, matches?: true) }
@@ -30,7 +30,7 @@ describe HttpStub::Server::Stub::Match::Rules do
   let(:parameters_rule) { instance_double(HttpStub::Server::Stub::Match::Rule::Parameters, matches?: true) }
   let(:body_rule)       { double("HttpStub::Server::Stub::SomeRequestBody", matches?: true) }
 
-  let(:match_rules) { HttpStub::Server::Stub::Match::Rules.new(match_rules_payload) }
+  let(:match_rules) { described_class.new(match_rules_args) }
 
   before(:example) do
     allow(HttpStub::Server::Stub::Match::Rule::Uri).to receive(:new).and_return(uri_rule)
@@ -68,8 +68,8 @@ describe HttpStub::Server::Stub::Match::Rules do
 
   describe "#matches?" do
 
-    let(:request_method) { method_payload }
-    let(:request)        { instance_double(HttpStub::Server::Request::Request, method: method_payload) }
+    let(:request_method) { method_arg }
+    let(:request)        { instance_double(HttpStub::Server::Request::Request, method: method_arg) }
     let(:logger)         { instance_double(Logger) }
 
     subject { match_rules.matches?(request, logger) }

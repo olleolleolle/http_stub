@@ -1,7 +1,7 @@
 describe HttpStub::Server::Scenario::Controller do
 
   let(:scenario_registry) { instance_double(HttpStub::Server::Registry) }
-  let(:server_memory)     { instance_double(HttpStub::Server::Memory::Memory, scenarios: scenario_registry) }
+  let(:server_memory)     { instance_double(HttpStub::Server::Memory::Memory, scenario_registry: scenario_registry) }
 
   let(:request_uri)        { "/some/request/path" }
   let(:request_parameters) { {} }
@@ -12,46 +12,11 @@ describe HttpStub::Server::Scenario::Controller do
                                                         session:    session)
   end
   let(:logger)             { instance_double(Logger) }
-  let(:payload)            { HttpStub::ScenarioFixture.new.server_payload }
   let(:stubs)              { (1..3).map { instance_double(HttpStub::Server::Stub::Stub) } }
   let(:scenario)           { instance_double(HttpStub::Server::Scenario::Scenario, stubs: stubs) }
   let(:activator)          { instance_double(HttpStub::Server::Scenario::Activator).as_null_object }
 
   let(:controller) { described_class.new(server_memory) }
-
-  describe "#register" do
-
-    subject { controller.register(request, logger) }
-
-    before(:example) do
-      allow(HttpStub::Server::Scenario::Parser).to receive(:parse).and_return(payload)
-      allow(HttpStub::Server::Scenario).to receive(:create).and_return(scenario)
-      allow(scenario_registry).to receive(:add)
-    end
-
-    it "parses the payload from the request" do
-      expect(HttpStub::Server::Scenario::Parser).to receive(:parse).with(request).and_return(payload)
-
-      subject
-    end
-
-    it "creates a scenario with the parsed payload" do
-      expect(HttpStub::Server::Scenario).to receive(:create).with(payload).and_return(scenario)
-
-      subject
-    end
-
-    it "adds the created scenario to the servers scenario registry with the provided logger" do
-      expect(scenario_registry).to receive(:add).with(scenario, logger)
-
-      subject
-    end
-
-    it "returns an ok response" do
-      expect(subject).to eql(HttpStub::Server::Response::OK)
-    end
-
-  end
 
   describe "#find" do
 
@@ -82,7 +47,7 @@ describe HttpStub::Server::Scenario::Controller do
 
   describe "#find_all" do
 
-    let(:scenarios) { (1..3).map { |i| HttpStub::Server::ScenarioFixture.create("#{4 - i}") } }
+    let(:scenarios) { (1..3).map { |i| HttpStub::Server::ScenarioFixture.create(name: "#{4 - i}") } }
 
     subject { controller.find_all }
 
@@ -123,8 +88,12 @@ describe HttpStub::Server::Scenario::Controller do
           )
         end
 
-        it "returns a not found response" do
-          expect(subject).to eql(HttpStub::Server::Response::NOT_FOUND)
+        it "returns a response indicating the request was invalid" do
+          expect(subject.status).to eql(400)
+        end
+
+        it "returns a response whose body includes the scenario name" do
+          expect(subject.body.to_s).to include(scenario_name)
         end
 
       end
@@ -156,8 +125,12 @@ describe HttpStub::Server::Scenario::Controller do
           )
         end
 
-        it "returns a not found response" do
-          expect(subject).to eql(HttpStub::Server::Response::NOT_FOUND)
+        it "returns a response indicating the request was invalid" do
+          expect(subject.status).to eql(400)
+        end
+
+        it "returns a response whose body includes the name of the not found scenario" do
+          expect(subject.body.to_s).to include(scenario_name_not_found)
         end
 
       end
@@ -174,18 +147,6 @@ describe HttpStub::Server::Scenario::Controller do
         expect(subject).to eql(HttpStub::Server::Response::OK)
       end
 
-    end
-
-  end
-
-  describe "#clear" do
-
-    subject { controller.clear(logger) }
-
-    it "clears the servers scenario registry" do
-      expect(scenario_registry).to receive(:clear).with(logger)
-
-      subject
     end
 
   end

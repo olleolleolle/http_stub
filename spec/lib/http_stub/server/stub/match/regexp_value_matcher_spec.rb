@@ -2,16 +2,18 @@ describe HttpStub::Server::Stub::Match::RegexpValueMatcher do
 
   describe "::match?" do
 
-    context "when the stub value is a string prefixed with 'regexp:'" do
+    subject { described_class.match?(stub_value, actual_value) }
 
-      let(:stub_value) { "regexp:^a[0-9]*\\$z$" }
+    context "when the stub value is a regular expression" do
+
+      let(:stub_value) { /^a[0-9]*\$z$/ }
 
       context "and the actual value matches the regular expression" do
 
         let(:actual_value) { "a789$z" }
 
         it "returns true" do
-          expect(perform_match).to be_truthy
+          expect(subject).to be(true)
         end
 
       end
@@ -21,26 +23,33 @@ describe HttpStub::Server::Stub::Match::RegexpValueMatcher do
         let(:actual_value) { "a789" }
 
         it "returns false" do
-          expect(perform_match).to be_falsey
+          expect(subject).to be(false)
         end
 
       end
 
     end
 
-    context "when the provided value is not a string prefixed with 'regexp'" do
+    context "when the stub value is a string" do
 
-      let(:stub_value) { "does not start with regexp:" }
-      let(:actual_value) { "some actual value" }
+      let(:stub_value)   { "some string" }
+      let(:actual_value) { stub_value }
 
       it "returns false" do
-        expect(perform_match).to be_falsey
+        expect(subject).to be(false)
       end
 
     end
-    
-    def perform_match
-      HttpStub::Server::Stub::Match::RegexpValueMatcher.match?(stub_value, actual_value)
+
+    context "when the stub value is a symbol" do
+
+      let(:stub_value)   { :some_symbol }
+      let(:actual_value) { stub_value }
+
+      it "returns false" do
+        expect(subject).to be(false)
+      end
+
     end
 
   end

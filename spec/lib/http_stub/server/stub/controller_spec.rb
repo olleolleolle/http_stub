@@ -1,65 +1,19 @@
 describe HttpStub::Server::Stub::Controller do
 
-  let(:request_parameters)  { {} }
-  let(:session)             { instance_double(HttpStub::Server::Session::Session) }
-  let(:request)             do
-    instance_double(HttpStub::Server::Request::Request, parameters: request_parameters, session: session)
-  end
-  let(:logger)              { instance_double(Logger) }
-  let(:payload)             { HttpStub::StubFixture.new.server_payload }
-  let(:stub_uri)            { "/some/stub/uri" }
-  let(:the_stub)            { instance_double(HttpStub::Server::Stub::Stub, uri: stub_uri) }
+  let(:request_parameters) { {} }
+  let(:request)            { HttpStub::Server::RequestFixture.create(parameters: request_parameters) }
+  let(:session)            { request.session }
+  let(:logger)             { instance_double(Logger) }
+  let(:stub_uri)           { "/some/stub/uri" }
+  let(:the_stub)           { instance_double(HttpStub::Server::Stub::Stub, uri: stub_uri) }
 
   let(:controller) { described_class.new }
-
-  describe "#register" do
-
-    subject { controller.register(request, logger) }
-
-    before(:example) do
-      allow(HttpStub::Server::Stub::Parser).to receive(:parse).and_return(payload)
-      allow(HttpStub::Server::Stub).to receive(:create).and_return(the_stub)
-      allow(session).to receive(:add_stub)
-    end
-
-    it "parses the payload from the request" do
-      expect(HttpStub::Server::Stub::Parser).to receive(:parse).with(request).and_return(payload)
-
-      subject
-    end
-
-    it "creates a stub with the parsed payload" do
-      expect(HttpStub::Server::Stub).to receive(:create).with(payload).and_return(the_stub)
-
-      subject
-    end
-
-    it "adds the stub to the users session" do
-      expect(session).to receive(:add_stub).with(the_stub, logger)
-
-      subject
-    end
-
-    it "creates an ok response with a location header containing the stubs uri" do
-      expect(HttpStub::Server::Response).to receive(:ok).with("headers" => { "location" => stub_uri })
-
-      subject
-    end
-
-    it "returns the ok response" do
-      response = double("HttpStub::Server::Response")
-      allow(HttpStub::Server::Response).to receive(:ok).and_return(response)
-
-      expect(subject).to eql(response)
-    end
-
-  end
 
   describe "#match" do
 
     let(:matched_stub) { nil }
 
-    let(:calculated_stub_response) { instance_double(HttpStub::Server::Stub::Response::Base) }
+    let(:calculated_stub_response) { HttpStub::Server::Stub::ResponseFixture.create }
 
     subject { controller.match(request, logger) }
 
@@ -195,18 +149,6 @@ describe HttpStub::Server::Stub::Controller do
 
     it "resets the users session" do
       expect(session).to receive(:reset).with(logger)
-
-      subject
-    end
-
-  end
-
-  describe "#clear" do
-
-    subject { controller.clear(request, logger) }
-
-    it "clears the users session" do
-      expect(session).to receive(:clear).with(logger)
 
       subject
     end

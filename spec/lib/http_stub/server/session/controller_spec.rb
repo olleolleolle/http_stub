@@ -1,14 +1,13 @@
 describe HttpStub::Server::Session::Controller do
 
-  let(:session_configuration) { instance_double(HttpStub::Server::Session::Configuration) }
-  let(:session_registry)      { instance_double(HttpStub::Server::Session::Registry) }
-  let(:server_memory)         { instance_double(HttpStub::Server::Memory::Memory, sessions: session_registry) }
+  let(:session_registry) { instance_double(HttpStub::Server::Session::Registry) }
+  let(:server_memory)    { instance_double(HttpStub::Server::Memory::Memory, session_registry: session_registry) }
 
   let(:session_id) { "some session id" }
-  let(:request)    { instance_double(HttpStub::Server::Request::Request, session_id: session_id) }
+  let(:request)    { HttpStub::Server::RequestFixture.create(session_id: session_id) }
   let(:logger)     { instance_double(Logger) }
 
-  let(:controller) { described_class.new(session_configuration, server_memory) }
+  let(:controller) { described_class.new(server_memory) }
 
   describe "#find" do
 

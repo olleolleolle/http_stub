@@ -12,15 +12,15 @@ describe HttpStub::Server::Scenario::Scenario do
     (1..number_of_triggered_scenario_names).map { instance_double(HttpStub::Server::Scenario::Trigger) }
   end
 
-  let(:args) do
-    HttpStub::ScenarioFixture.new.
+  let(:scenario_hash) do
+    HttpStub::Configurator::ScenarioBuilder.new.
       with_name!(name).
       with_stubs!(number_of_stubs).
       with_triggered_scenario_names!(triggered_scenario_names).
-      server_payload
+      build_hash
   end
 
-  let(:scenario) { described_class.new(args) }
+  let(:scenario) { described_class.new(scenario_hash) }
 
   describe "#constructor" do
 
@@ -31,7 +31,7 @@ describe HttpStub::Server::Scenario::Scenario do
       let(:number_of_stubs) { 3 }
 
       it "creates an underlying stub for each stub payload provided" do
-        args["stubs"].each { |stub_args| expect(HttpStub::Server::Stub).to receive(:create).with(stub_args) }
+        scenario_hash[:stubs].each { |stub_args| expect(HttpStub::Server::Stub).to receive(:create).with(stub_args) }
 
         subject
       end
@@ -43,7 +43,7 @@ describe HttpStub::Server::Scenario::Scenario do
       let(:number_of_stubs) { 1 }
 
       it "creates an underlying stub for the stub payload provided" do
-        expect(HttpStub::Server::Stub).to receive(:create).with(args["stubs"].first)
+        expect(HttpStub::Server::Stub).to receive(:create).with(scenario_hash[:stubs].first)
 
         subject
       end
@@ -159,10 +159,8 @@ describe HttpStub::Server::Scenario::Scenario do
 
   describe "#to_s" do
 
-    it "returns the string representation of the activation arguments" do
-      expect(args).to receive(:to_s).and_return("scenario string representation")
-
-      expect(scenario.to_s).to eql("scenario string representation")
+    it "returns the string representation of the provided hash" do
+      expect(scenario.to_s).to eql(scenario_hash.to_s)
     end
 
   end

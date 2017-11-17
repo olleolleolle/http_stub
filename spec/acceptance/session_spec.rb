@@ -1,16 +1,14 @@
 describe "Session acceptance" do
+  include_context "server integration"
 
-  context "when a configurer that has a session support enabled is initialized" do
-    include_context "configurer integration"
+  context "when a server configured with session support is started" do
 
-    let(:configurer_specification) do
-      { class: HttpStub::Examples::ConfigurerWithSessions, name: :session_based_stub, port: 8003 }
-    end
+    let(:configurator) { HttpStub::Examples::ConfiguratorWithSessions }
 
-    context "when a stub is added to a session" do
+    context "and a stub is actviated in a session" do
 
       let(:stub_session_id) { "some_session" }
-      let(:stub_session)    { stub_server.session(stub_session_id) }
+      let(:stub_session)    { client.session(stub_session_id) }
 
       let(:match_response) { HTTParty.get("#{server_uri}/matching_path", request_session_id_header) }
 
@@ -79,7 +77,7 @@ describe "Session acceptance" do
     context "when many sessions have been created" do
 
       let(:session_ids) { (1..3).map { |i| "session#{i}"} }
-      let(:sessions)    { session_ids.map { |session_id| stub_server.session(session_id) } }
+      let(:sessions)    { session_ids.map { |session_id| client.session(session_id) } }
 
       before(:example) { sessions.each { |session| session.activate!("Some Scenario") } }
 
@@ -101,10 +99,9 @@ describe "Session acceptance" do
 
   end
 
-  context "when a configurer that has a session support disabled is initialized" do
-    include_context "configurer integration"
+  context "when a server configured without session support is started" do
 
-    let(:configurer_specification) { { class: HttpStub::EmptyConfigurer } }
+    let(:configurator) { HttpStub::Examples::ConfiguratorWithTrivialStubs }
 
     describe "the administration landing page" do
 

@@ -43,13 +43,13 @@ describe HttpStub::Server::Stub::Match::Controller do
       before(:example) { allow(session).to receive(:last_match).and_return(match) }
 
       it "creates an ok response containing the JSON representation of the match" do
-        expect(HttpStub::Server::Response).to receive(:ok).with("body" => match_json)
+        expect(HttpStub::Server::Response).to receive(:ok).with(body: match_json)
 
         subject
       end
 
       it "returns the response" do
-        response = instance_double(HttpStub::Server::Stub::Response::Text)
+        response = HttpStub::Server::Stub::ResponseFixture.create
         allow(HttpStub::Server::Response).to receive(:ok).and_return(response)
 
         expect(subject).to eql(response)

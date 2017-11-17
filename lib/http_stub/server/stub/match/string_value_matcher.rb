@@ -12,8 +12,7 @@ module HttpStub
           private_constant :MATCHERS
 
           def self.match?(stub_value, actual_value)
-            stub_match_value = stub_value ? stub_value.to_s : stub_value
-            !!MATCHERS.find { |matcher| matcher.match?(stub_match_value, actual_value) }
+            !!MATCHERS.find { |matcher| matcher.match?(stub_value, actual_value) }
           end
 
         end

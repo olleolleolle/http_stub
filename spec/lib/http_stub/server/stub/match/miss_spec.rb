@@ -1,8 +1,8 @@
 describe HttpStub::Server::Stub::Match::Miss do
 
-  let(:request)  { instance_double(HttpStub::Server::Request::Request) }
+  let(:request) { HttpStub::Server::RequestFixture.create }
 
-  let(:miss) { HttpStub::Server::Stub::Match::Miss.new(request) }
+  let(:miss) { described_class.new(request) }
 
   describe "#request" do
 

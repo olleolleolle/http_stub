@@ -7,7 +7,7 @@ module HttpStub
 
           def initialize
             super()
-            @session_controller = HttpStub::Server::Session::Controller.new(@session_configuration, @server_memory)
+            @session_controller = HttpStub::Server::Session::Controller.new(@server_memory)
           end
 
           def self.included(application)

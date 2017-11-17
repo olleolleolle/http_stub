@@ -3,10 +3,11 @@ module HttpStub
 
     module Stub
 
-      def self.create(args)
-        HttpStub::Server::Stub::Stub.new(args)
+      def self.create(hash)
+        HttpStub::Server::Stub::Stub.new(hash)
       end
 
     end
+
   end
 end

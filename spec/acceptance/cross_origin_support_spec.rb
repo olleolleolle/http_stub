@@ -4,12 +4,10 @@ describe "Cross origin support acceptance" do
 
   let(:cross_origin_page) { CrossOriginServer::IndexPage.new(browser) }
 
-  context "when a stub server with cross origin support is initialized" do
-    include_context "configurer integration"
+  context "when a stub server with cross origin support is started" do
+    include_context "server integration"
 
-    let(:configurer_specification) do
-      { class: HttpStub::Examples::ConfigurerWithCrossOriginSupport, name: :cross_origin_stub, port: 8004 }
-    end
+    let(:configurator) { HttpStub::Examples::ConfiguratorWithCrossOriginSupport }
 
     context "and a browser page rendered by a different server requests a scenario be activated" do
 
@@ -48,9 +46,9 @@ describe "Cross origin support acceptance" do
 
     end
 
-    context "and a scenario configuring OPTIONS request reponses is activated" do
+    context "and a scenario composing OPTIONS request reponses is activated" do
 
-      before(:example) { stub_server.activate!("Options scenario") }
+      before(:example) { client.activate!("Options scenario") }
 
       context "and a matching pre-flight request is made" do
 
@@ -77,10 +75,10 @@ describe "Cross origin support acceptance" do
 
   end
 
-  context "when a stub server without cross origin support is initialized" do
-    include_context "configurer integration"
+  context "when a stub server without cross origin support is started" do
+    include_context "server integration"
 
-    let(:configurer_specification) { { class: HttpStub::Examples::ConfigurerWithTrivialScenarios } }
+    let(:configurator) { HttpStub::Examples::ConfiguratorWithTrivialScenarios }
 
     context "and a browser page rendered by a different server requests a scenario be activated" do
 
@@ -101,7 +99,7 @@ describe "Cross origin support acceptance" do
 
     context "and a scenario is activated" do
 
-      before(:example) { stub_server.activate!("Scenario 1") }
+      before(:example) { client.activate!("Scenario 1") }
 
       context "and a matching request is made" do
 

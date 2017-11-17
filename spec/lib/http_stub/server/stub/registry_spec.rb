@@ -1,17 +1,16 @@
 describe HttpStub::Server::Stub::Registry do
 
-  let(:stubs_in_memory) { (1..3).map { instance_double(HttpStub::Server::Stub::Stub) } }
-  let(:memory_session)  { instance_double(HttpStub::Server::Session::Session, stubs: stubs_in_memory) }
+  let(:initial_stubs) { (1..3).map { HttpStub::Server::StubFixture.create } }
 
   let(:underlying_stub_registry) { instance_double(HttpStub::Server::Registry) }
   let(:logger)                   { instance_double(Logger) }
 
-  let(:stub_registry) { described_class.new(memory_session) }
+  let(:stub_registry) { described_class.new(initial_stubs) }
 
   before(:example) { allow(HttpStub::Server::Registry).to receive(:new).and_return(underlying_stub_registry) }
 
-  it "uses an underlying simple registry that is initialised with the memory sessions stubs" do
-    expect(HttpStub::Server::Registry).to receive(:new).with("stub", stubs_in_memory)
+  it "uses an underlying simple registry that is initialised with the initial stubs" do
+    expect(HttpStub::Server::Registry).to receive(:new).with("stub", initial_stubs)
 
     stub_registry
   end
@@ -114,14 +113,8 @@ describe HttpStub::Server::Stub::Registry do
 
     before(:example) { allow(underlying_stub_registry).to receive(:replace) }
 
-    it "retrieves the stubs in the memory session" do
-      expect(memory_session).to receive(:stubs)
-
-      subject
-    end
-
-    it "replaces the stubs in the underlying registry with those in the memory session" do
-      expect(underlying_stub_registry).to receive(:replace).with(stubs_in_memory, logger)
+    it "replaces the stubs in the underlying registry with those initially provided" do
+      expect(underlying_stub_registry).to receive(:replace).with(initial_stubs, logger)
 
       subject
     end

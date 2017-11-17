@@ -7,14 +7,13 @@ shared_context "http_stub rack application test" do
   let(:request)         { HttpStub::Server::RequestFixture.create }
   let(:request_factory) { instance_double(HttpStub::Server::Request::Factory, create: request) }
 
-  let(:response_pipeline) { instance_double(HttpStub::Server::Application::ResponsePipeline, process: nil) }
+  let(:configurator) { Class.new { include HttpStub::Configurator } }
 
   let(:app_class) { HttpStub::Server::Application::Application }
-  let(:app)       { app_class.new! }
 
   before(:example) do
+    app_class.configure(configurator)
     allow(HttpStub::Server::Request::Factory).to receive(:new).and_return(request_factory)
-    allow(HttpStub::Server::Application::ResponsePipeline).to receive(:new).and_return(response_pipeline)
   end
 
   shared_context "enabled session support" do

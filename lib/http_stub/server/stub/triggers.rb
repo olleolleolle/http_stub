@@ -4,15 +4,26 @@ module HttpStub
 
       class Triggers
 
-        attr_reader :scenario_names
-        attr_reader :stubs
+        DEFAULT_ARGS = { scenario_names: [], stubs: [] }.with_indifferent_access.freeze
+
+        private_constant :DEFAULT_ARGS
+
+        attr_reader :scenario_names, :stubs
 
         def initialize(args={})
-          resolved_args = { "scenario_names" => [], "stubs" => [] }.merge(args || {})
-          @scenario_names = resolved_args["scenario_names"]
-          @stubs          = resolved_args["stubs"].map { |stub_args| HttpStub::Server::Stub.create(stub_args) }
+          resolved_args   = DEFAULT_ARGS.merge(args || {})
+          @scenario_names = resolved_args[:scenario_names]
+          @stubs          = create_stubs(resolved_args[:stubs])
           @description    = resolved_args.to_s
         end
+
+        private
+
+        def create_stubs(stub_hashes)
+          stub_hashes.map { |hash| HttpStub::Server::Stub.create(hash) }
+        end
+
+        public
 
         EMPTY = HttpStub::Server::Stub::Triggers.new.freeze
 

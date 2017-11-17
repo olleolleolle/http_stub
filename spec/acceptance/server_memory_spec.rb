@@ -1,16 +1,24 @@
 describe "Server memory acceptance" do
+  include_context "server integration"
 
-  context "when a configurer with a stub is initialized" do
-    include_context "configurer integration"
+  let(:configurator) { HttpStub::Examples::ConfiguratorWithScenariosAndStubs }
 
-    let(:configurer_specification) { { class: HttpStub::Examples::ConfigurerWithTrivialStub } }
+  context "when a server configured with scenarios and stubs is started" do
 
     describe "GET /http_stub/memory" do
 
       let(:response) { HTTParty.get("#{server_uri}/http_stub/memory") }
 
-      it "lists the stubs registered during initialization" do
-        expect(response.body).to include("Class stub body")
+      it "lists scenarios activated initially" do
+        expect(response.body).to include("Activated initially body")
+      end
+
+      it "does not list scenario's that are not activated initially" do
+        expect(response.body).to_not include("Not activated initially body")
+      end
+
+      it "lists stubs" do
+        expect(response.body).to include("Stub body")
       end
 
     end

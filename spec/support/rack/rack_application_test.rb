@@ -4,6 +4,6 @@ shared_context "rack application test" do
   let(:response)      { last_response }
   let(:response_body) { response.body.to_s }
 
-  let(:app)       { app_class.new! }
+  let(:app)           { app_class.new! }
 
 end

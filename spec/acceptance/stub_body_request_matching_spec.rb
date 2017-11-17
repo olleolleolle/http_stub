@@ -1,13 +1,13 @@
 describe "Scenario acceptance" do
 
-  context "when a configurer that contains a stub matching a request body" do
-    include_context "configurer integration"
+  context "when a server is started that is configured with a stub matching a request body" do
+    include_context "server integration"
 
-    let(:configurer_specification) { { class: HttpStub::Examples::ConfigurerWithStubRequestBody } }
+    let(:configurator) { HttpStub::Examples::ConfiguratorWithStubRequestBody }
 
     context "against an exact match" do
 
-      before(:example) { stub_server.activate!("Match body exactly") }
+      before(:example) { client.activate!("Match body exactly") }
 
       context "and a request is made with a request body" do
 
@@ -15,7 +15,7 @@ describe "Scenario acceptance" do
 
           let(:response) { issue_request(body: "Exactly matches") }
 
-          it "responds with the configured response" do
+          it "responds with the composed response" do
             expect(response.code).to eql(204)
           end
 
@@ -51,7 +51,7 @@ describe "Scenario acceptance" do
 
     context "against a regular expression" do
 
-      before(:example) { stub_server.activate!("Match body regex") }
+      before(:example) { client.activate!("Match body regex") }
 
       context "and a request is made with a request body" do
 
@@ -59,7 +59,7 @@ describe "Scenario acceptance" do
 
           let(:response) { issue_request(body: "matches with additional content") }
 
-          it "responds with the configured response" do
+          it "responds with the composed response" do
             expect(response.code).to eql(204)
           end
 
@@ -95,7 +95,7 @@ describe "Scenario acceptance" do
 
     context "against a JSON schema" do
 
-      before(:example) { stub_server.activate!("Match body JSON schema") }
+      before(:example) { client.activate!("Match body JSON schema") }
 
       context "and a request is made with a request body" do
 
@@ -107,7 +107,7 @@ describe "Scenario acceptance" do
                                   float_property:   77.7 }.to_json)
           end
 
-          it "responds with the configured response" do
+          it "responds with the composed response" do
             expect(response.code).to eql(204)
           end
 

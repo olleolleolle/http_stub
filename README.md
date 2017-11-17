@@ -60,7 +60,7 @@ In comparison ```http_stub```:
 * Allows cross-origin request support to be enabled easily.
 * Allows a match to trigger the registration of other ```stubs``` to simulate state changes in the provider.
 * Has [diagnostic pages](https://github.com/MYOB-Technology/http_stub/wiki/Diagnostic-Pages) to interrogate the state of the stub, trace requests to responses, and activate scenarios on-the-fly.
-* Has an elegant [Ruby DSL](https://github.com/MYOB-Technology/http_stub/wiki/The-Configurer-DSL) that aids in keeping requests and responses DRY.
+* Has an elegant [Ruby DSL](https://github.com/MYOB-Technology/http_stub/wiki/The-Configurator-DSL) that aids in keeping requests and responses DRY.
 
 ### [HTTParrot](https://github.com/abrandoned/httparrot), [Rack Stubs](https://github.com/featurist/rack-stubs), [mock_server](https://github.com/unixcharles/mock_server)
 These are similar in spirit, implemented in Ruby, but have limited functionality and have been discontinued.
@@ -71,21 +71,21 @@ Design
 ```http_stub``` is composed of two parts:
 * A HTTP server (Sinatra) that replays known responses when an incoming request matches defined criteria.  The server 
   is run in a dedicated - external - process to the system under test to better simulate the real architecture. 
-* A Ruby DSL used to configure the server known as a ```Configurer```
+* A Ruby DSL used to configure the server known as a ```Configurator```
 
 Usage
 -----
 
 ## Step 1: Define The Server Configuration ##
 
-To simulate a response from an authentication service, let's stub the service and respond to it's login endpoint by
+To simulate a response from an authentication service, let's stub the service and respond to its login endpoint by
 either granting or denying access:
 
 ```ruby
 module AuthenticationService
 
-  class Configurer
-    include HttpStub::Configurer
+  class Configurator
+    include HttpStub::Configurator
 
     login_template = stub_server.endpoint_template { match_requests(uri: "/login", method: :post) }
 
@@ -103,11 +103,10 @@ Define tasks to manage the servers lifecycle:
 ```ruby
   require 'http_stub/rake/task_generators'
 
-  configurer = AuthenticationService::Configurer
-  configurer.stub_server.host = "localhost"
-  configurer.stub_server.port = 8000
+  configurator = AuthenticationService::Configurator
+  configurator.stub_server.port = 8000
 
-  HttpStub::Rake::ServerDaemonTasks.new(name: :authentication_service, configurer: configurer)
+  HttpStub::Rake::ServerDaemonTasks.new(name: :authentication_service, configurator: configurator)
 ```
 
 Then start the server:
@@ -115,23 +114,25 @@ Then start the server:
 ```
 some_host:some_path some_user$ rake authentication_service:start
 authentication_service started on localhost:8000
-authentication_service initialized
 ```
+
+Congratulations, your server is now running on `localhost:8000`!
 
 ## Step 3: Activate Scenarios On-The-Fly ##
 
-Now we can activate the scenarios as needed.
+Now we can activate scenarios as needed.
 
 ### Activating Scenarios Via Code ###
 
-Within automated tests, you'll often need to activate a scenario:
+Within automated tests you'll often need to activate a scenario:
 
 ```ruby
-  before(:context) { AuthenticationServiceConfigurer.stub_server.has_started! }
+
+  let(:stub_client) { HttpStub::Client.new("http://localhost:8000") }
 
   context "when access is granted" do
 
-    before(:example) { AuthenticationServiceConfigurer.stub_server.activate!("Grant access") }
+    before(:example) { stub_client.activate!("Grant access") }
 
     ...
 
@@ -144,7 +145,7 @@ The server has an admin UI accessible on ```http://localhost:8000/http_stub```:
 
 ![http://localhost:8000/http_stub/](examples/resources/admin_ui_homepage.png "Admin UI Homepage")
 
-The scenario list allows activation of scenarios on the fly:
+It allows scenarios to be listed and activated on-the-fly:
 
 ![http://localhost:8000/http_stub/scenarios/](examples/resources/admin_ui_scenarios.png "Admin UI Scenarios")
 
@@ -154,7 +155,7 @@ More Information
 ```http_stub``` can [match requests](https://github.com/MYOB-Technology/http_stub/wiki/Stub-Request-Matching) against a
 variety of criteria, including JSON schemas, and can
 [respond](https://github.com/MYOB-Technology/http_stub/wiki/Stub-Responses) with arbitrary content including files and
-request headers and parameters.
+values interpolated from the matching request.
 
 See the [wiki](https://github.com/MYOB-Technology/http_stub/wiki) for more usage details and examples.
 

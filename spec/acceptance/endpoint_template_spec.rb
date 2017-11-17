@@ -1,9 +1,9 @@
-describe "Endpoint Template acceptance" do
+describe "Endpoint template acceptance" do
 
-  context "when a configurer contains an endpoint template" do
-    include_context "configurer integration"
+  context "when a server configured with an endpoint template is started" do
+    include_context "server integration"
 
-    let(:configurer_specification) { { class: HttpStub::Examples::ConfigurerWithEndpointTemplate } }
+    let(:configurator) { HttpStub::Examples::ConfiguratorWithEndpointTemplate }
 
     it "does not register a stub when the template is defined" do
       response = issue_request("template_uri")
@@ -20,7 +20,7 @@ describe "Endpoint Template acceptance" do
 
     context "and a templated scenario is activated" do
 
-      before(:example) { stub_server.activate!(scenario_name) }
+      before(:example) { client.activate!(scenario_name) }
 
       context "that customises the request matching rules" do
 

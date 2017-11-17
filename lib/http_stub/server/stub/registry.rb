@@ -8,13 +8,13 @@ module HttpStub
 
         alias_method :match, :find
 
-        def initialize(memory_session)
-          @memory_session = memory_session
-          @stub_registry  = HttpStub::Server::Registry.new("stub", memory_session.stubs)
+        def initialize(initial_stubs)
+          @initial_stubs = initial_stubs
+          @stub_registry = HttpStub::Server::Registry.new("stub", initial_stubs)
         end
 
         def reset(logger)
-          @stub_registry.replace(@memory_session.stubs, logger)
+          @stub_registry.replace(@initial_stubs, logger)
         end
 
       end

@@ -1,6 +1,6 @@
 describe HttpStub::Server::Scenario do
 
-  let(:args) { HttpStub::ScenarioFixture.new.server_payload }
+  let(:args) { HttpStub::Configurator::ScenarioBuilder.new.build_hash }
 
   describe "::create" do
 

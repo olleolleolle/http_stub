@@ -13,26 +13,25 @@ Style/StringLiteralsInInterpolation:
   EnforcedStyle: double_quotes
 
 # appropriate hash formatting varies wildly
-Style/MultilineMethodCallBraceLayout:
+Layout/MultilineMethodCallBraceLayout:
   Enabled: false
-Style/AlignHash:
+Layout/AlignHash:
   Enabled: false
 
 # tolerate names that are not predicates
-Style/PredicateName:
-  NameWhitelist:
-    - has_started!
+Naming/PredicateName:
+  NameWhitelist: []
 
 # aids readability
 Style/RedundantSelf:
   Enabled: false
-Style/ExtraSpacing:
+Layout/ExtraSpacing:
   Enabled: false
-Style/SpaceInsideBrackets:
+Layout/SpaceInsideBrackets:
   Enabled: false
-Style/SpaceInsidePercentLiteralDelimiters:
+Layout/SpaceInsidePercentLiteralDelimiters:
   Enabled: false
-Style/SpaceAroundEqualsInParameterDefault:
+Layout/SpaceAroundEqualsInParameterDefault:
   Enabled: false
 Style/SingleLineBlockParams:
   Enabled: false
@@ -40,15 +39,15 @@ Style/DoubleNegation:
   Enabled: false
 Style/Alias:
   Enabled: false
-Style/EmptyLinesAroundClassBody:
+Layout/EmptyLinesAroundClassBody:
   Enabled: false
-Style/EmptyLinesAroundModuleBody:
+Layout/EmptyLinesAroundModuleBody:
   Enabled: false
-Style/IndentAssignment:
+Layout/IndentAssignment:
   Enabled: false
 Style/GuardClause:
   Enabled: false
-Style/EmptyLinesAroundBlockBody:
+Layout/EmptyLinesAroundBlockBody:
   Exclude:
     - lib/http_stub/server/application/request_support.rb
     - lib/http_stub/server/application/response_support.rb

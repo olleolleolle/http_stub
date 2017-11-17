@@ -8,7 +8,12 @@
   %tr
     %td.title Body:
     %td
-      %pre= partial "#{response.type}_response".to_sym, locals: { response: response }
+      %pre= partial "#{response.body.short_class_name}_response".to_sym, locals: { body: response.body }
   %tr
     %td.title Delay:
     %td= h(response.delay_in_seconds)
+  %tr
+    %td.title Blocks:
+    %td
+      - response.blocks.each do |block|
+        %pre= h(block.source)

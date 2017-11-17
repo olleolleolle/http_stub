@@ -4,9 +4,9 @@ describe HttpStub::Extensions::Core::Hash do
 
     subject { hash.underscore_keys }
 
-    describe "when the hash contains keys which are strings" do
+    context "when the hash contains keys which are strings" do
 
-      describe "and keys contain underscores and hyphens" do
+      context "and keys contain underscores and hyphens" do
 
         let(:hash) do
           { "has_underscore" => 1, "has-hypen" => 2, "has_underscore_and-hypen" => 3 }
@@ -20,7 +20,7 @@ describe HttpStub::Extensions::Core::Hash do
 
     end
 
-    describe "when the hash contains keys which are not strings" do
+    context "when the hash contains keys which are not strings" do
 
       let(:hash) do
         { 1 => 2, :symbol => 3, nil => 4 }

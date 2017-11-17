@@ -4,12 +4,6 @@ module HttpStub
 
       class Controller
 
-        def register(request, logger)
-          stub = HttpStub::Server::Stub.create(HttpStub::Server::Stub::Parser.parse(request))
-          request.session.add_stub(stub, logger)
-          HttpStub::Server::Response.ok("headers" => { "location" => stub.uri })
-        end
-
         def match(request, logger)
           stub = request.session.match(request, logger)
           response = stub ? stub.response_for(request) : HttpStub::Server::Response::NOT_FOUND
@@ -28,10 +22,6 @@ module HttpStub
 
         def reset(request, logger)
           request.session.reset(logger)
-        end
-
-        def clear(request, logger)
-          request.session.clear(logger)
         end
 
       end

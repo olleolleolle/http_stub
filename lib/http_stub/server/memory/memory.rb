@@ -4,34 +4,13 @@ module HttpStub
 
       class Memory
 
-        DEFAULT_STATUS     = "Started".freeze
-        INITIALIZED_STATUS = "Initialized".freeze
+        attr_reader :scenario_registry, :stubs, :session_registry
 
-        SESSION_ID = HttpStub::Server::Session::MEMORY_SESSION_ID
-
-        private_constant :DEFAULT_STATUS, :INITIALIZED_STATUS, :SESSION_ID
-
-        attr_reader :status, :scenarios, :sessions
-
-        def initialize(session_configuration)
-          @status    = DEFAULT_STATUS
-          @scenarios = HttpStub::Server::Registry.new("scenario")
-          @session   = HttpStub::Server::Session::Session.new(SESSION_ID, @scenarios, HttpStub::Server::Session::Empty)
-          @sessions  = HttpStub::Server::Session::Registry.new(session_configuration, @scenarios, @session)
-        end
-
-        def initialized!
-          @status = INITIALIZED_STATUS
-        end
-
-        def stubs
-          @session.stubs
-        end
-
-        def reset(logger)
-          @scenarios.clear(logger)
-          @sessions.clear(logger)
-          @status = DEFAULT_STATUS
+        def initialize(configurator_state)
+          initial_state = HttpStub::Server::Memory::InitialState.new(configurator_state)
+          @scenario_registry = HttpStub::Server::Scenario::Registry.new(initial_state.load_scenarios)
+          @stubs             = initial_state.load_stubs(@scenario_registry)
+          @session_registry  = HttpStub::Server::Session::Registry.new(@scenario_registry, @stubs)
         end
 
       end

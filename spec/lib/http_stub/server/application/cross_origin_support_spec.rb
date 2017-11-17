@@ -1,14 +1,12 @@
 describe HttpStub::Server::Application::CrossOriginSupport do
-  include Rack::Test::Methods
-
-  let(:response) { last_response }
+  include_context "rack application test"
 
   describe "when registered in an application" do
 
     class HttpStub::Server::Application::CrossOriginSupportTestApplication < Sinatra::Base
 
       def http_stub_request
-        HttpStub::Server::RequestFixture.create(request)
+        HttpStub::Server::RequestFixture.create(rack_request: request)
       end
 
     end
@@ -28,7 +26,6 @@ describe HttpStub::Server::Application::CrossOriginSupport do
     end
 
     let(:app_class) { HttpStub::Server::Application::CrossOriginSupportTestApplication }
-    let(:app)       { app_class.new! }
 
     before(:example) { app_class.register(described_class) }
 

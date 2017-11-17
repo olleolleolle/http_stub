@@ -5,15 +5,16 @@ module HttpStub
 
       DRIVERS = {}
 
-      private_constant :DRIVERS
+      DEV_NULL = "/dev/null".freeze
 
-      attr_reader :session_id, :host, :port, :uri
+      private_constant :DRIVERS, :DEV_NULL
+
+      attr_reader :session_id, :host, :port, :uri, :client
 
       class << self
 
-        def find_or_create(specification)
-          resolved_specification = { name: "example_server", port: 8001 }.merge(specification)
-          DRIVERS[resolved_specification] ||= self.new(resolved_specification)
+        def find_or_create(configurator)
+          DRIVERS[configurator] ||= self.new(configurator)
         end
 
         def all
@@ -22,18 +23,19 @@ module HttpStub
 
       end
 
-      def initialize(specification)
-        @name = specification[:name]
-        @host = "localhost"
-        @port = specification[:port]
-        @uri  = "http://#{@host}:#{@port}"
+      def initialize(configurator)
+        @configurator = configurator
+        @host     = "localhost"
+        @port     = HttpStub::Port.free_port
+        @uri      = "http://#{@host}:#{@port}"
+        @client   = HttpStub::Client.create(@uri)
       end
 
       def start
         return if @pid
-        @pid = Process.spawn("rake #{@name}:start:foreground", out: "/dev/null", err: "/dev/null")
-        ::Wait.until!(description: "http stub server #{@name} started") do
-          Net::HTTP.get_response(@host, "/", @port)
+        @pid = Process.spawn("rake launch_stub configurator=#{@configurator.name} port=#{@port}")
+        ::Wait.until!(description: "http stub server for #{@configurator.name} started") do
+          Net::HTTP.get_response(@host, "/http_stub/status", @port)
         end
       end
 
@@ -42,7 +44,7 @@ module HttpStub
       end
 
       def reset_session
-        HTTParty.post("#{@uri}/http_stub/stubs/reset", body: { http_stub_session_id: @session_id })
+        @client.session(@session_id).reset!
       end
 
       def stop

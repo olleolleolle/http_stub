@@ -1,3 +1,19 @@
+** 0.28.0.beta1 **
+
+New:
+* `stub.respond_with(&block)` dynamically invokes the block on each match
+* `HttpStub::Client` provides a DSL over the servers HTTP API to enable scenarios and manipulate sessions
+
+Breaking:
+* `HttpStub::Configurer` renamed to `HttpStub::Configurator`
+* A scenario is immediately activated via `scenario.activate!`, a scenario activates other scenarios via `scenario.activate_scenarios!`
+* Scenario's and Stubs are no longer configurable over HTTP, they are loaded in-process on the server
+  * `HttpStub::Configurator` no longer requires initialization, `#self.on_initialize` is no longer supported
+  * `server:configure` rake task has been removed
+  * `stub_server.has_started!` has been removed
+  * Scenario's can no longer be cleared
+* `stub_server` no longer supports `host=`, running host defaults to `localhost`
+
 ** 0.27.0 **
 
 Breaking:

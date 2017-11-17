@@ -6,10 +6,10 @@ module HttpStub
 
         attr_reader :id
 
-        def initialize(id, scenario_registry, memory_session)
+        def initialize(id, scenario_registry, initial_stubs)
           @id                  = id
           @scenario_registry   = scenario_registry
-          @stub_registry       = HttpStub::Server::Stub::Registry.new(memory_session)
+          @stub_registry       = HttpStub::Server::Stub::Registry.new(initial_stubs)
           @stub_match_registry = HttpStub::Server::Registry.new("stub match")
           @stub_miss_registry  = HttpStub::Server::Registry.new("stub miss")
         end
@@ -21,8 +21,8 @@ module HttpStub
         def activate_scenario!(name, logger)
           found_scenario = @scenario_registry.find(name, logger)
           raise HttpStub::Server::Scenario::NotFoundError, name unless found_scenario
-          @stub_registry.concat(found_scenario.stubs, logger)
-          found_scenario.triggered_scenarios.each { |scenario| activate_scenario!(scenario.name, logger) }
+          activated_stubs = @scenario_registry.stubs_activated_by(found_scenario, logger)
+          @stub_registry.concat(activated_stubs, logger)
         end
 
         def add_stub(stub, logger)
@@ -67,10 +67,6 @@ module HttpStub
           @stub_miss_registry.clear(logger)
           @stub_match_registry.clear(logger)
           @stub_registry.reset(logger)
-        end
-
-        def clear(logger)
-          [ @stub_miss_registry, @stub_match_registry, @stub_registry ].each { |registry| registry.clear(logger) }
         end
 
       end

@@ -14,19 +14,23 @@ module HttpStub
         enable  :dump_errors, :logging, :partial_underscores
         disable :protection, :cross_origin_support
 
-        def self.configure(args)
-          configuration = HttpStub::Server::Application::Configuration.new(args)
-          configuration.settings.each { |name, value| set(name, value) }
+        class << self
+
+          attr_reader :configurator_state
+
+          def configure(configurator)
+            @configurator_state = configurator.state
+            @configurator_state.application_settings.each { |name, value| set(name, value) }
+          end
+
         end
 
         def initialize
-          @session_configuration = HttpStub::Server::Session::Configuration.new(settings.session_identifier)
-          @server_memory         = HttpStub::Server::Memory::Memory.new(@session_configuration)
+          @server_memory = HttpStub::Server::Memory::Memory.new(self.class.configurator_state)
           super()
         end
 
         include HttpStub::Server::Application::RequestSupport
-        include HttpStub::Server::Application::ResponseSupport
 
         register HttpStub::Server::Application::CrossOriginSupport
 

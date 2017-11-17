@@ -1,10 +1,10 @@
 describe HttpStub::Server::Stub::Match::Match do
 
-  let(:request)  { instance_double(HttpStub::Server::Request::Request) }
-  let(:response) { instance_double(HttpStub::Server::Stub::Response::Base) }
-  let(:stub)     { instance_double(HttpStub::Server::Stub::Stub) }
+  let(:request)  { HttpStub::Server::RequestFixture.create }
+  let(:response) { HttpStub::Server::Stub::ResponseFixture.create }
+  let(:stub)     { HttpStub::Server::StubFixture.create }
 
-  let(:match) { HttpStub::Server::Stub::Match::Match.new(request, response, stub) }
+  let(:match) { described_class.new(request, response, stub) }
 
   describe "#request" do
 

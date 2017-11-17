@@ -1,68 +1,53 @@
 describe "Stub control value acceptance" do
-  include_context "configurer integration"
+  include_context "server integration"
 
-  let(:configurer_specification) { { class: HttpStub::Examples::ConfigurerWithTrivialStub } }
+  let(:configurator) { HttpStub::Examples::ConfiguratorWithStubControlValues }
 
-  context "when a stub is submitted" do
+  context "when a stub match uri has regular expression containing meta characters" do
 
-    context "with a stub uri that is regular expression containing meta characters" do
+    context "and a request is made whose uri matches the regular expression" do
 
-      before(:example) do
-        stub_server.add_stub! do |stub|
-          stub.match_requests(uri: /\/stub\/regexp\/\$key=value/, method: :get)
-          stub.respond_with(body: "Stub body")
-        end
-      end
+      let(:response) { HTTParty.get("#{server_uri}/match/stub/regexp/$key=value") }
 
-      context "and a request is made whose uri matches the regular expression" do
-
-        let(:response) { HTTParty.get("#{server_uri}/match/stub/regexp/$key=value") }
-
-        it "replays the stubbed body" do
-          expect(response.body).to eql("Stub body")
-        end
-
-      end
-
-      context "and a request is made whose uri does not match the regular expression" do
-
-        let(:response) { HTTParty.get("#{server_uri}/stub/no_match/regexp") }
-
-        it "responds with a 404 status code" do
-          expect(response.code).to eql(404)
-        end
-
+      it "replays the stubbed body" do
+        expect(response.body).to eql("Regular expression uri stub body")
       end
 
     end
 
-    context "with headers whose values are regular expressions" do
+    context "and a request is made whose uri does not match the regular expression" do
 
-      before(:example) do
-        stub_server.add_stub! do |stub|
-          stub.match_requests(uri: "/stub_with_headers", method: :get, headers: { key: /^match.*/ })
-          stub.respond_with(status: 202, body: "Another stub body")
-        end
+      let(:response) { HTTParty.get("#{server_uri}/stub/no_match/regexp") }
+
+      it "responds with a 404 status code" do
+        expect(response.code).to eql(404)
+      end
+
+    end
+
+  end
+
+  context "when stub match headers" do
+
+    context "have regular expression values" do
+
+      let(:response) do
+        HTTParty.get("#{server_uri}/stub_with_regular_expression_headers", headers: { "key" => header_value })
       end
 
       context "and a request that matches is made" do
 
-        let(:response) do
-          HTTParty.get("#{server_uri}/stub_with_headers", headers: { "key" => "matching_value" })
-        end
+        let(:header_value) { "matching_value" }
 
         it "replays the stubbed response" do
-          expect(response.code).to eql(202)
-          expect(response.body).to eql("Another stub body")
+          expect(response.body).to eql("Regular expression headers stub body")
         end
 
       end
 
       context "and a request that does not match is made" do
 
-        let(:response) do
-          HTTParty.get("#{server_uri}/stub_with_headers", headers: { "key" => "does_not_match_value" })
-        end
+        let(:header_value) { "does_not_match_value" }
 
         it "responds with a 404 status code" do
           expect(response.code).to eql(404)
@@ -72,91 +57,98 @@ describe "Stub control value acceptance" do
 
     end
 
-    context "with parameters" do
+    context "have values indicating they must be omitted" do
 
-      context "whose values are regular expressions" do
+      context "and a request that matches is made" do
 
-        before(:example) do
-          stub_server.add_stub! do |stub|
-            stub.match_requests(uri: "/stub_with_parameters", method: :get, parameters: { key: /^match.*/ })
-            stub.respond_with(status: 202, body: "Another stub body")
-          end
-        end
+        let(:response) { HTTParty.get("#{server_uri}/stub_with_omitted_headers") }
 
-        context "and a request that matches is made" do
-
-          let(:parameters) { { "key" => "matching_value" } }
-          let(:response)   { HTTParty.get("#{server_uri}/stub_with_parameters", query: parameters) }
-
-          it "replays the stubbed response" do
-            expect(response.code).to eql(202)
-            expect(response.body).to eql("Another stub body")
-          end
-
-        end
-
-        context "and a request that does not match is made" do
-
-          let(:parameters) { { "key" => "does_not_match_value" } }
-          let(:response)   { HTTParty.get("#{server_uri}/stub_with_parameters", query: parameters) }
-
-          it "responds with a 404 status code" do
-            expect(response.code).to eql(404)
-          end
-
+        it "replays the stubbed response" do
+          expect(response.body).to eql("Omitted headers stub body")
         end
 
       end
 
-      context "whose values indicate the parameters must be omitted" do
+      context "and a request that does not match is made" do
 
-        before(:example) do
-          stub_server.add_stub! do |stub|
-            stub.match_requests(uri: "/stub_with_omitted_parameters", method: :get, parameters: { key: :omitted })
-            stub.respond_with(status: 202, body: "Omitted parameter stub body")
-          end
-        end
+        let(:headers)  { { "key" => "must_be_omitted" } }
+        let(:response) { HTTParty.get("#{server_uri}/stub_with_omitted_headers", headers: headers) }
 
-        context "and a request that matches is made" do
-
-          let(:response) { HTTParty.get("#{server_uri}/stub_with_omitted_parameters") }
-
-          it "replays the stubbed response" do
-            expect(response.code).to eql(202)
-            expect(response.body).to eql("Omitted parameter stub body")
-          end
-
-        end
-
-        context "and a request that does not match is made" do
-
-          let(:parameters) { { "key" => "must_be_omitted" } }
-          let(:response)   { HTTParty.get("#{server_uri}/stub_with_omitted_parameters", query: parameters) }
-
-          it "responds with a 404 status code" do
-            expect(response.code).to eql(404)
-          end
-
+        it "responds with a 404 status code" do
+          expect(response.code).to eql(404)
         end
 
       end
 
     end
 
-    context "with a response delay" do
+  end
 
-      before(:example) do
-        stub_server.add_stub! { match_requests(uri: "/some_stub_path", method: :get).respond_with(delay_in_seconds: 1) }
+  context "when stub match parameters" do
+
+    context "have regular expression values" do
+
+      let(:response) do
+        HTTParty.get("#{server_uri}/stub_with_regular_expression_parameters", query: { "key" => parameter_value })
       end
 
-      it "delays the response by the time provided" do
-        start_time = Time.now
+      context "and a request that matches is made" do
 
-        response = HTTParty.get("#{server_uri}/some_stub_path")
+        let(:parameter_value) { "matching_value" }
 
-        expect(Time.now - start_time).to be >= 1.0
+        it "replays the stubbed response" do
+          expect(response.body).to eql("Regular expression parameters stub body")
+        end
+
       end
 
+      context "and a request that does not match is made" do
+
+        let(:parameter_value) { "does_not_match_value" }
+
+        it "responds with a 404 status code" do
+          expect(response.code).to eql(404)
+        end
+
+      end
+
+    end
+
+    context "have values indicating they must be omitted" do
+
+      context "and a request that matches is made" do
+
+        let(:response) { HTTParty.get("#{server_uri}/stub_with_omitted_parameters") }
+
+        it "replays the stubbed response" do
+          expect(response.body).to eql("Omitted parameters stub body")
+        end
+
+      end
+
+      context "and a request that does not match is made" do
+
+        let(:parameters) { { "key" => "must_be_omitted" } }
+        let(:response)   { HTTParty.get("#{server_uri}/stub_with_omitted_parameters", query: parameters) }
+
+        it "responds with a 404 status code" do
+          expect(response.code).to eql(404)
+        end
+
+      end
+
+    end
+
+  end
+
+  context "when stub has a response delay" do
+
+    it "delays the response by the time provided" do
+      start_time = Time.now
+
+      HTTParty.get("#{server_uri}/stub_with_response_delay")
+
+      expect(Time.now - start_time).to be >= 1.0
     end
 
   end

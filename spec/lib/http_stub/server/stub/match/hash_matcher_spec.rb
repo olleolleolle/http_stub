@@ -11,7 +11,7 @@ describe HttpStub::Server::Stub::Match::HashMatcher do
     let(:actual_hash) { {} }
 
     subject { described_class.match?(stub_hash, actual_hash) }
-    
+
     context "when the stub hash contains multiple entries" do
 
       it "returns the result of evaluating a match for each stub value" do
@@ -114,9 +114,9 @@ describe HttpStub::Server::Stub::Match::HashMatcher do
         end
 
       end
-      
+
     end
-    
+
   end
-  
+
 end

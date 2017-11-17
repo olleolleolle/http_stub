@@ -42,8 +42,10 @@ describe HttpStub::Server::Registry do
 
       subject { described_class.new(model_name, models) }
 
-      it "creates a registry with the models" do
-        expect(subject.all).to eql(models)
+      it "creates a registry with the models in reverse order as the registry operates akin to a stack" do
+        registry = subject
+
+        expect(registry.all).to eql(models.reverse)
       end
 
     end
@@ -226,6 +228,59 @@ describe HttpStub::Server::Registry do
       expect(logger).to receive(:info).with(/Criteria inspect result/)
 
       subject
+    end
+
+  end
+
+  describe "#find_all" do
+
+    subject { registry.find_all(&condition) }
+
+    context "when multiple models have been registered" do
+      include_context "register multiple models"
+
+      let(:condition) { lambda { |model| matching_models.include?(model) } }
+
+      context "when many models match the condition" do
+
+        let(:matching_models) { [ models.first, models.last ] }
+
+        it "returns the models preserving stack order" do
+          expect(subject).to eql(matching_models.reverse)
+        end
+
+      end
+
+      context "when one model matches the condition" do
+
+        let(:matching_models) { [ models[1] ] }
+
+        it "returns an array containing the model" do
+          expect(subject).to eql(matching_models)
+        end
+
+      end
+
+      context "when no model matches the condition" do
+
+        let(:matching_models) { [] }
+
+        it "returns an empty array" do
+          expect(subject).to eql([])
+        end
+
+      end
+
+    end
+
+    context "when no models have been registered" do
+
+      let(:condition) { lambda { |_| true } }
+
+      it "returns an empty array" do
+        expect(subject).to eql([])
+      end
+
     end
 
   end

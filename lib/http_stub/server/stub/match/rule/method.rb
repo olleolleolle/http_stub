@@ -7,7 +7,7 @@ module HttpStub
           class Method
 
             def initialize(method)
-              @method = method
+              @method = method.try(:to_s).try(:upcase)
             end
 
             def matches?(request, _logger)

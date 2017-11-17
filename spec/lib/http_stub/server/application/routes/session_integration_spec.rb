@@ -1,4 +1,4 @@
-describe HttpStub::Server::Application::Routes::Session, "when an initialized server is running" do
+describe HttpStub::Server::Application::Routes::Session, "when a server is running" do
   include_context "server integration"
 
   let(:response_document) { Nokogiri::HTML(response.body) }

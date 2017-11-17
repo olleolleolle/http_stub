@@ -1,44 +1,13 @@
-describe HttpStub::Server::Application::Routes::Stub, "when an initialized server is running" do
+describe HttpStub::Server::Application::Routes::Stub, "when a server is running" do
   include_context "server integration"
 
   let(:response_document) { Nokogiri::HTML(response.body) }
 
   before(:example) { initialize_server }
 
-  describe "POST /http_stub/stubs" do
+  describe "and a configurator with multiple scenarios is initialized" do
 
-    context "when provided with the minimum data required" do
-
-      let(:response) do
-        HTTParty.post(
-          "#{server_uri}/http_stub/stubs",
-          body: { uri: "/some/path", method: "get", response: { status: 200, body: "Some body" } }.to_json
-        )
-      end
-
-      after(:example) { reset_session }
-
-      it "returns a 200 response code" do
-        expect(response.code).to eql(200)
-      end
-
-      it "registers a stub returning the provided response for a matching request" do
-        response
-
-        stubbed_response = HTTParty.get("#{server_uri}/some/path")
-
-        expect(stubbed_response.code).to eql(200)
-        expect(stubbed_response.body).to eql("Some body")
-      end
-
-    end
-
-  end
-
-  describe "and a configurer with multiple scenarios is initialized" do
-    include_context "configurer integration"
-
-    let(:configurer_specification) { { class: HttpStub::Examples::ConfigurerWithExhaustiveScenarios } }
+    let(:configurator) { HttpStub::Examples::ConfiguratorWithExhaustiveScenarios }
 
     describe "GET /http_stub/stubs" do
 

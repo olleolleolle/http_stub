@@ -4,8 +4,15 @@ module HttpStub
 
       class IdentifierStrategy
 
-        def initialize(session_configuration)
-          @identifier_configuration = session_configuration.identifier_configuration
+        DEFAULT_CONFIGURATION = [
+          { parameter: HttpStub::Server::Session::ID_ATTRIBUTE_NAME },
+          { header:    HttpStub::Server::Session::ID_ATTRIBUTE_NAME }
+        ].freeze
+
+        private_constant :DEFAULT_CONFIGURATION
+
+        def initialize(identifier_setting)
+          @identifier_configuration = DEFAULT_CONFIGURATION + (identifier_setting ? [ identifier_setting ] : [])
         end
 
         def identifier_for(sinatra_request)

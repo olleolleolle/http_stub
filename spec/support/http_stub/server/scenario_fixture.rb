@@ -3,8 +3,20 @@ module HttpStub
 
     class ScenarioFixture
 
-      def self.create(name="empty")
-        HttpStub::Server::Scenario::Scenario.new("name" => name, "stubs" => [], "triggered_scenario_names" => [])
+      class << self
+
+        def with_stubs(args={})
+          self.create(args.merge(stubs: HttpStub::Configurator::StubFixture.create_hashes))
+        end
+
+        def create(args={})
+          HttpStub::Server::Scenario::Scenario.new(HttpStub::Configurator::ScenarioFixture.create_hash(args))
+        end
+
+        def many
+          (1..3).map { self.create }
+        end
+
       end
 
     end

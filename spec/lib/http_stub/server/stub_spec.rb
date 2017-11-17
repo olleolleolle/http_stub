@@ -1,6 +1,6 @@
 describe HttpStub::Server::Stub do
 
-  let(:args) { HttpStub::StubFixture.new.server_payload }
+  let(:args) { HttpStub::Configurator::StubFixture.create_hash }
 
   describe "::create" do
 

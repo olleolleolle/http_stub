@@ -2,6 +2,14 @@ describe HttpStub::Server::Stub::Empty do
 
   let(:empty_stub) { HttpStub::Server::Stub::Empty::INSTANCE }
 
+  describe "#stub_id" do
+
+    it "is an empty string" do
+      expect(empty_stub.stub_id).to eql("")
+    end
+
+  end
+
   describe "#uri" do
 
     it "is an empty string" do

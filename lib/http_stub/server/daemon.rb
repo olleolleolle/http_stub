@@ -16,17 +16,8 @@ module HttpStub
       end
 
       def initialize(args)
-        @configurer  = args[:configurer]
-        default_args = { host: "localhost", ping_uri: "/http_stub/status" }
-        default_args.merge!(host: @configurer.stub_server.host, port: @configurer.stub_server.port) if @configurer
+        default_args = { host: "localhost", port: args[:configurator].state.port, ping_uri: "/http_stub/status" }
         super(default_args.merge(args))
-      end
-
-      def start!
-        super
-        return unless @configurer
-        @configurer.initialize!
-        logger.info "#{@name} initialized"
       end
 
       def start_command

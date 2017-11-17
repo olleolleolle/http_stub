@@ -1,19 +1,21 @@
 describe HttpStub::Server::Request::Factory do
 
-  let(:session_configuration) { instance_double(HttpStub::Server::Session::Configuration) }
-  let(:session_registry)      { instance_double(HttpStub::Server::Session::Registry) }
-  let(:server_memory)         { instance_double(HttpStub::Server::Memory::Memory, sessions: session_registry) }
+  let(:session_identifier_setting) { nil }
+  let(:session_registry)           { instance_double(HttpStub::Server::Session::Registry) }
+  let(:server_memory)              do
+    instance_double(HttpStub::Server::Memory::Memory, session_registry: session_registry)
+  end
 
   let(:session_identifier_strategy) { instance_double(HttpStub::Server::Session::IdentifierStrategy) }
 
-  let(:factory) { described_class.new(session_configuration, server_memory) }
+  let(:factory) { described_class.new(session_identifier_setting, server_memory) }
 
   before(:example) do
     allow(HttpStub::Server::Session::IdentifierStrategy).to receive(:new).and_return(session_identifier_strategy)
   end
 
-  it "creates a session identifier strategy based on the session configuration" do
-    expect(HttpStub::Server::Session::IdentifierStrategy).to receive(:new).with(session_configuration)
+  it "creates a session identifier strategy based on the session identifier setting" do
+    expect(HttpStub::Server::Session::IdentifierStrategy).to receive(:new).with(session_identifier_setting)
 
     factory
   end

@@ -1,41 +1,37 @@
 describe HttpStub::Server::Stub::Stub do
 
-  let(:base_uri)        { "http://base.uri:8888" }
   let(:stub_id)         { SecureRandom.uuid }
   let(:trigger_payload) do
     {
-      "base_uri" =>   base_uri,
-      "uri" =>        "/a_triggered_path",
-      "method" =>     "post",
-      "headers" =>    { "triggered_header" => "triggered_header_value" },
-      "parameters" => { "triggered_parameter" => "triggered_parameter_value" },
-      "body" =>       { "schema" => { "json" => "trigger schema definition" } },
-      "response" => {
-        "status" => 203,
-        "body" =>   "Triggered body"
+      uri:        "/a_triggered_path",
+      method:     "post",
+      headers:    { trigger_header: "triggered_header_value" },
+      parameters: { trigger_parameter: "triggered_parameter_value" },
+      body:       { schema: { type: "json", definition: "trigger schema definition" } },
+      response:   {
+        status: 203,
+        body:   "triggered body"
       }
     }
   end
-  let(:stub_payload) do
+  let(:stub_payload)    do
     {
-      "id" =>         stub_id,
-      "base_uri" =>   base_uri,
-      "uri" =>        "/a_path",
-      "method" =>     "get",
-      "headers" =>    { "header" => "header value" },
-      "parameters" => { "parameter" => "parameter value" },
-      "body" =>       { "schema" => { "json" => "stub schema definition" } },
-      "response" => {
-        "status" => 201,
-        "body" =>   "Some body"
+      id:         stub_id,
+      uri:        "/a_path",
+      method:     :get,
+      headers:    { header: "header value" },
+      parameters: { parameter: "parameter value" },
+      body:       { schema: { type: :json, definition: "stub schema definition" } },
+      response:   {
+        status: 201,
+        body:   "some body"
       },
-      "triggers" => [ trigger_payload ]
+      triggers:   [ trigger_payload ]
     }
   end
-  let(:match_rules)        { instance_double(HttpStub::Server::Stub::Match::Rules, matches?: true) }
-  let(:response_types)     { [ HttpStub::Server::Stub::Response::Text, HttpStub::Server::Stub::Response::File ] }
-  let(:response)           { instance_double(response_types.sample) }
-  let(:triggers)           { instance_double(HttpStub::Server::Stub::Triggers) }
+  let(:match_rules)     { instance_double(HttpStub::Server::Stub::Match::Rules, matches?: true) }
+  let(:response)        { HttpStub::Server::Stub::ResponseFixture.create }
+  let(:triggers)        { instance_double(HttpStub::Server::Stub::Triggers) }
 
   let(:the_stub) { HttpStub::Server::Stub::Stub.new(stub_payload) }
 
@@ -121,10 +117,20 @@ describe HttpStub::Server::Stub::Stub do
     end
 
     it "returns the response with replaced values" do
-      response_with_replaced_values = instance_double(response_types.sample)
+      response_with_replaced_values = HttpStub::Server::Stub::ResponseFixture.create
       allow(response).to receive(:with_values_from).and_return(response_with_replaced_values)
 
       expect(subject).to eql(response_with_replaced_values)
+    end
+
+  end
+
+  describe "#stub_id" do
+
+    subject { the_stub.stub_id }
+
+    it "returns the provided id" do
+      expect(subject).to eql(stub_id)
     end
 
   end
@@ -133,20 +139,8 @@ describe HttpStub::Server::Stub::Stub do
 
     subject { the_stub.uri }
 
-    context "when an id is provided in the payload" do
-
-      it "returns a absolute uri on the server  that includes the id" do
-        expect(subject).to eql("#{base_uri}/http_stub/stubs/#{stub_id}")
-      end
-
-    end
-
-    context "when an id is not provided in the payload" do
-
-      it "returns an absolute uri on the server that includes a generated id" do
-        expect(subject).to match(%r{#{base_uri}/http_stub/stubs/[a-zA-Z0-9-]+$})
-      end
-
+    it "returns a relative uri to the stub that includes the id" do
+      expect(subject).to eql("/http_stub/stubs/#{stub_id}")
     end
 
   end

@@ -5,9 +5,10 @@ describe HttpStub::Server::Application::RequestSupport, "when integrated into a 
 
     class HttpStub::Server::Application::RequestSupport::IntegrationTestApplication < Sinatra::Base
 
+      set :session_identifier, nil
+
       def initialize
-        @session_configuration = HttpStub::Server::Session::Configuration.new(nil)
-        @server_memory         = HttpStub::Server::Memory::Memory.new(@session_configuration)
+        @server_memory = HttpStub::Server::MemoryFixture.create
         super()
       end
 
@@ -32,13 +33,12 @@ describe HttpStub::Server::Application::RequestSupport, "when integrated into a 
       end
 
       def logger
-        HttpServerManager::Test::SilentLogger
+        HttpStub::Server::SilentLogger
       end
 
     end
 
     let(:app_class) { HttpStub::Server::Application::RequestSupport::IntegrationTestApplication }
-    let(:app)       { app_class.new! }
 
     describe "#http_stub_request" do
 

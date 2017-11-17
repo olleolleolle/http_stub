@@ -1,152 +1,64 @@
 describe HttpStub::Server::Memory::Memory do
 
-  let(:session_configuration) { instance_double(HttpStub::Server::Session::Configuration) }
+  let(:loaded_scenarios) { HttpStub::Server::ScenarioFixture.many }
+  let(:loaded_stubs)     { HttpStub::Server::StubFixture.many }
 
-  let(:memory_session)    { instance_double(HttpStub::Server::Session::Session) }
-  let(:scenario_registry) { instance_double(HttpStub::Server::Registry) }
-  let(:session_registry)  { instance_double(HttpStub::Server::Session::Registry) }
+  let(:configurator_state) { HttpStub::Configurator::State.new }
 
-  let(:memory) { described_class.new(session_configuration) }
-
-  before(:example) do
-    allow(HttpStub::Server::Session::Session).to receive(:new).and_return(memory_session)
-    allow(HttpStub::Server::Registry).to receive(:new).and_return(scenario_registry)
-    allow(HttpStub::Server::Session::Registry).to receive(:new).and_return(session_registry)
+  let(:initial_state) do
+    instance_double(HttpStub::Server::Memory::InitialState, load_scenarios: loaded_scenarios, load_stubs: loaded_stubs)
   end
 
-  it "creates a simple scenario registry" do
-    expect(HttpStub::Server::Registry).to receive(:new).with("scenario")
+  let(:memory) { described_class.new(configurator_state) }
 
-    memory
-  end
+  before(:example) { expect(HttpStub::Server::Memory::InitialState).to receive(:new).and_return(initial_state) }
 
-  it "creates a memory session" do
-    expect(HttpStub::Server::Session::Session).to(
-      receive(:new).with(HttpStub::Server::Session::MEMORY_SESSION_ID, anything, anything)
-    )
+  describe "#scenario_registry" do
 
-    memory
-  end
+    subject { memory.scenario_registry }
 
-  it "creates a memory session containing the scenario registry" do
-    expect(HttpStub::Server::Session::Session).to receive(:new).with(anything, scenario_registry, anything)
-
-    memory
-  end
-
-  it "creates a memory session containing an empty memory session" do
-    expect(HttpStub::Server::Session::Session).to(
-      receive(:new).with(anything, anything, HttpStub::Server::Session::Empty)
-    )
-
-    memory
-  end
-
-  it "creates a session registry containing the session configuration" do
-    expect(HttpStub::Server::Session::Registry).to receive(:new).with(session_configuration, anything, anything)
-
-    memory
-  end
-
-  it "creates a session registry containing the scenario registry" do
-    expect(HttpStub::Server::Session::Registry).to receive(:new).with(anything, scenario_registry, anything)
-
-    memory
-  end
-
-  it "creates a session registry initalised with the memory session" do
-    expect(HttpStub::Server::Session::Registry).to receive(:new).with(anything, anything, memory_session)
-
-    memory
-  end
-
-  describe "#status" do
-
-    subject { memory.status }
-
-    it "defaults to 'Started'" do
-      expect(subject).to eql("Started")
+    it "returns a scenario registry" do
+      expect(subject).to be_an_instance_of(HttpStub::Server::Scenario::Registry)
     end
 
-    context "when the memory has been initialized" do
-
-      before(:example) { memory.initialized! }
-
-      it "reflects the memory is 'Initialized'" do
-        expect(subject).to eql("Initialized")
-      end
-
-    end
-
-  end
-
-  describe "#scenarios" do
-
-    subject { memory.scenarios }
-
-    it "returns the servers scenario registry" do
-      expect(subject).to eql(scenario_registry)
-    end
-
-  end
-
-  describe "#sessions" do
-
-    subject { memory.sessions }
-
-    it "returns the servers session registry" do
-      expect(subject).to eql(session_registry)
+    it "contains the loaded scenarios" do
+      expect(subject.all.map(&:name)).to contain_exactly(*loaded_scenarios.map(&:name))
     end
 
   end
 
   describe "#stubs" do
 
-    let(:stubs) { (1..3).map { instance_double(HttpStub::Server::Stub::Stub) } }
-
     subject { memory.stubs }
 
-    before(:example) { allow(memory_session).to receive(:stubs).and_return(stubs) }
-
-    it "returns the stubs within the memory session" do
-      expect(subject).to eql(stubs)
+    it "contains the loaded stubs" do
+      expect(subject).to eql(loaded_stubs)
     end
 
   end
 
-  describe "#reset" do
+  describe "#session_registry" do
 
-    let(:logger) { instance_double(Logger) }
+    let(:logger) { HttpStub::Server::SilentLogger }
 
-    subject { memory.reset(logger) }
+    subject { memory.session_registry }
 
-    before(:example) do
-      allow(scenario_registry).to receive(:clear)
-      allow(session_registry).to receive(:clear)
+    it "returns a session registry" do
+      expect(subject).to be_an_instance_of(HttpStub::Server::Session::Registry)
     end
 
-    it "clears the servers scenarios" do
-      expect(scenario_registry).to receive(:clear).with(logger)
-
-      subject
-    end
-
-    it "clears the servers sessions" do
-      expect(session_registry).to receive(:clear).with(logger)
-
-      subject
-    end
-
-    context "when the memory had been initialized" do
-
-      before(:example) { memory.initialized! }
-
-      it "resets the servers status to the default value" do
-        subject
-
-        expect(memory.status).to eql("Started")
+    it "contains the loaded scenarios" do
+      loaded_scenarios.each do |scenario|
+        expect { obtain_session.activate_scenario!(scenario.name, logger) }.to_not raise_error
       end
+    end
 
+    it "contains the loaded stubs" do
+      expect(obtain_session.stubs.map(&:stub_id)).to contain_exactly(*loaded_stubs.map(&:stub_id))
+    end
+
+    def obtain_session
+      subject.find_or_create("some id", logger)
     end
 
   end

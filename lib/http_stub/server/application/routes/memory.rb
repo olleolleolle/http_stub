@@ -7,7 +7,7 @@ module HttpStub
 
           def initialize
             super()
-            @memory_controller = HttpStub::Server::Memory::Controller.new(@session_configuration, @server_memory)
+            @memory_controller = HttpStub::Server::Memory::Controller.new(@server_memory)
           end
 
           def self.included(application)
@@ -17,11 +17,6 @@ module HttpStub
 
                 get do
                   haml :stubs, {}, stubs: @memory_controller.find_stubs
-                end
-
-                delete do
-                  @memory_controller.reset(logger)
-                  halt 200, "OK"
                 end
 
               end

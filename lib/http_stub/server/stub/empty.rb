@@ -7,6 +7,7 @@ module HttpStub
         private
 
         def initialize
+          @stub_id     = ""
           @uri         = ""
           @match_rules = HttpStub::Server::Stub::Match::Rules::EMPTY
           @response    = HttpStub::Server::Response::EMPTY
@@ -15,7 +16,7 @@ module HttpStub
 
         public
 
-        attr_reader :uri, :match_rules, :response, :triggers
+        attr_reader :stub_id, :uri, :match_rules, :response, :triggers
 
         def matches?(_criteria, _logger)
           false

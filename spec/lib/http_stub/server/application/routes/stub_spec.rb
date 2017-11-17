@@ -9,34 +9,6 @@ describe HttpStub::Server::Application::Routes::Stub do
     allow(HttpStub::Server::Stub::Match::Controller).to receive(:new).and_return(stub_match_controller)
   end
 
-  describe "when a stub registration request within a session is received" do
-    include_context "request includes a session identifier"
-
-    let(:payload) { { uri: "/a_path", method: "a method", response: { status: 200, body: "Foo" } }.to_json }
-
-    let(:registration_response) { instance_double(HttpStub::Server::Stub::Response::Base) }
-
-    subject { post "/http_stub/stubs" }
-
-    before(:example) do
-      allow(request).to receive(:body).and_return(payload)
-      allow(stub_controller).to receive(:register).and_return(registration_response)
-    end
-
-    it "registers the stub via the stub controller" do
-      expect(stub_controller).to receive(:register).and_return(registration_response)
-
-      subject
-    end
-
-    it "processes the stub controllers response via the response pipeline" do
-      expect(response_pipeline).to receive(:process).with(registration_response)
-
-      subject
-    end
-
-  end
-
   describe "when a request to list the stubs in a session is received" do
     include_context "request includes a session identifier"
 
@@ -98,27 +70,6 @@ describe HttpStub::Server::Application::Routes::Stub do
 
   end
 
-  describe "when a request to clear the stubs in a session is received" do
-    include_context "request includes a session identifier"
-
-    subject { delete "/http_stub/stubs" }
-
-    before(:example) { allow(stub_controller).to receive(:clear) }
-
-    it "clears the stubs for the current user via the stub controller" do
-      expect(stub_controller).to receive(:clear).with(request, anything)
-
-      subject
-    end
-
-    it "responds with a 200 status code" do
-      subject
-
-      expect(response.status).to eql(200)
-    end
-
-  end
-
   describe "when a request to list the stub matches in a session is received" do
     include_context "request includes a session identifier"
 
@@ -139,7 +90,7 @@ describe HttpStub::Server::Application::Routes::Stub do
 
     let(:uri)                 { "/some/matched/uri" }
     let(:method)              { "some http method" }
-    let(:last_match_response) { instance_double(HttpStub::Server::Stub::Response::Base) }
+    let(:last_match_response) { HttpStub::Server::Stub::ResponseFixture.create }
 
     subject { get "/http_stub/stubs/matches/last" }
 
@@ -154,8 +105,8 @@ describe HttpStub::Server::Application::Routes::Stub do
       subject
     end
 
-    it "processes the match result controllers response via the response pipeline" do
-      expect(response_pipeline).to receive(:process).with(last_match_response)
+    it "serves the match result controllers response" do
+      expect(last_match_response).to receive(:serve_on).with(an_instance_of(app_class))
 
       subject
     end
@@ -179,7 +130,7 @@ describe HttpStub::Server::Application::Routes::Stub do
 
   describe "when any other request is received" do
 
-    let(:stub_response) { instance_double(HttpStub::Server::Stub::Response::Base) }
+    let(:stub_response) { HttpStub::Server::Stub::ResponseFixture.create }
 
     subject { get "/some_path" }
 
@@ -191,8 +142,8 @@ describe HttpStub::Server::Application::Routes::Stub do
       subject
     end
 
-    it "processes the response via the response pipeline" do
-      expect(response_pipeline).to receive(:process).with(stub_response)
+    it "serves the response" do
+      expect(stub_response).to receive(:serve_on).with(an_instance_of(app_class))
 
       subject
     end

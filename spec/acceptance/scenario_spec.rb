@@ -1,15 +1,15 @@
 describe "Scenario acceptance" do
 
-  context "when a configurer that contains scenarios is initialized" do
-    include_context "configurer integration"
+  context "when a server configured with scenario's is started" do
+    include_context "server integration"
 
-    let(:configurer_specification) { { class: HttpStub::Examples::ConfigurerWithTrivialScenarios } }
+    let(:configurator) { HttpStub::Examples::ConfiguratorWithTrivialScenarios }
 
     context "and a scenario is activated" do
 
       context "containing stubs" do
 
-        before(:example) { stub_server.activate!("Scenario 1") }
+        before(:example) { client.activate!("Scenario 1") }
 
         (1..3).each do |stub_number|
 
@@ -30,7 +30,7 @@ describe "Scenario acceptance" do
 
       context "containing triggered scenarios" do
 
-        before(:example) { stub_server.activate!("Activates another scenario") }
+        before(:example) { client.activate!("Activates another scenario") }
 
         (1..3).each do |stub_number|
 
@@ -67,9 +67,9 @@ describe "Scenario acceptance" do
 
     context "and the response contains a file" do
 
-      let(:configurer_specification) { { class: HttpStub::Examples::ConfigurerWithFileResponses } }
+      let(:configurator) { HttpStub::Examples::ConfiguratorWithFileResponses }
 
-      before(:example) { stub_server.activate!("Scenario with file") }
+      before(:example) { client.activate!("Scenario with file") }
 
       context "and the stub request is made" do
 
@@ -77,7 +77,7 @@ describe "Scenario acceptance" do
 
         it "replays the stubbed response" do
           expect(response.code).to eql(200)
-          expect(response).to contain_file(HttpStub::Examples::ConfigurerWithFileResponses::FILE_PATH)
+          expect(response).to contain_file(HttpStub::Examples::ConfiguratorWithFileResponses::FILE_PATH)
         end
 
       end

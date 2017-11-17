@@ -2,46 +2,37 @@ describe HttpStub::Server::Stub::Response do
 
   describe "::create" do
 
-    let(:response_args) { { "body" => body } }
-
-    subject { HttpStub::Server::Stub::Response.create(response_args) }
-
-    context "when the body contains text" do
-
-      let(:body) { "some text" }
-
-      it "creates a text response" do
-        expect(HttpStub::Server::Stub::Response::Text).to receive(:new).with(response_args)
-
-        subject
-      end
-
-      it "returns the created response" do
-        response = instance_double(HttpStub::Server::Stub::Response::Text)
-        allow(HttpStub::Server::Stub::Response::Text).to receive(:new).and_return(response)
-
-        expect(subject).to eql(response)
-      end
-
+    let(:status)           { 201 }
+    let(:headers)          { HttpStub::HeadersFixture.many }
+    let(:body)             { "some text" }
+    let(:delay_in_seconds) { 8 }
+    let(:blocks)           { HttpStub::Server::Stub::Response::BlocksFixture.many }
+    let(:args)             do
+      { status: 201, headers: headers, body: body, delay_in_seconds: delay_in_seconds, blocks: blocks }
     end
 
-    context "when the body contains a file" do
+    let(:primitive_response) { JSON.parse(subject.to_json).symbolize_keys }
 
-      let(:body) { { "file" => { "path" => "a/file.path", "name" => "a_file.name" } } }
+    subject { HttpStub::Server::Stub::Response.create(args) }
 
-      it "creates a file response" do
-        expect(HttpStub::Server::Stub::Response::File).to receive(:new).with(response_args)
+    it "creates a response with the provided status" do
+      expect(primitive_response).to include(status: status)
+    end
 
-        subject
-      end
+    it "creates a response with the provided headers" do
+      expect(primitive_response).to include(headers: headers)
+    end
 
-      it "returns the created response" do
-        response = instance_double(HttpStub::Server::Stub::Response::File)
-        allow(HttpStub::Server::Stub::Response::File).to receive(:new).and_return(response)
+    it "creates a response with the provided body" do
+      expect(primitive_response).to include(body: body)
+    end
 
-        expect(subject).to eql(response)
-      end
+    it "creates a response with the provided delay in seconds" do
+      expect(primitive_response).to include(delay_in_seconds: delay_in_seconds)
+    end
 
+    it "creates a response with the provided blocks" do
+      expect(primitive_response[:blocks]).to eql(blocks.map(&:source))
     end
 
   end
