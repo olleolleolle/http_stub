@@ -18,7 +18,7 @@ module HttpStub
     end
 
     def issue_non_matching_request
-      issue_request(headers: { some_header: "does not match" })
+      issue_request(headers: { "some_header" => "does not match" })
     end
 
     private

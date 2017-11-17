@@ -8,7 +8,7 @@ module HttpStub
 
       def initialize(stub_server=nil)
         @stub_server = stub_server
-        @match_rules = defaults_match_rules
+        @match_rules = default_match_rules
         @response    = default_response
       end
 
@@ -61,7 +61,7 @@ module HttpStub
 
       private
 
-      def defaults_match_rules
+      def default_match_rules
         headers = (1..3).each_with_object({}) { |i, hash| hash["request_header_#{i}"] = "request header value #{i}" }
         { uri: "/some/stub", method: "get", headers: headers, parameters: {}, body: "" }
       end
