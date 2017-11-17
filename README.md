@@ -5,8 +5,8 @@ http_stub
 It provides a HTTP server that is configurable on-the-fly to [stub](https://en.wikipedia.org/wiki/Test_stub) responses
 to matched requests.
 
-```http_stub``` has been primarily designed to aid API **consumer** testing:
-* By providing tools to simulate a producer API and change its responses on-the-fly
+```http_stub``` has been primarily designed to aid automated and exploratory testing for API **consumers**:
+* By providing tools to simulate a producer API and change its responses on-the-fly 
 * By aiming to provide tools that validate the simulation is true to the producer
 
 Status
@@ -17,53 +17,6 @@ Status
 [![Code Climate](https://codeclimate.com/github/MYOB-Technology/http_stub/badges/gpa.svg)](https://codeclimate.com/github/MYOB-Technology/http_stub)
 [![Test Coverage](https://codeclimate.com/github/MYOB-Technology/http_stub/badges/coverage.svg)](https://codeclimate.com/github/MYOB-Technology/http_stub/coverage)
 [![Dependency Status](https://gemnasium.com/MYOB-Technology/http_stub.png)](https://gemnasium.com/MYOB-Technology/http_stub)
-
-Motivation
-----------
-
-Need to simulate a HTTP API with which your application integrates?  Enter ```http_stub```.
-
-```http_stub``` is similar in motivation to the ```fakeweb``` gem, although ```http_stub``` provides a separately 
-running HTTP process whose responses can be stubbed.
-
-Alternatives and Comparisons
-----------------------------
-
-### [Pact](https://github.com/realestate-com-au/pact)
-Facilitates consumer driven contracts by allowing consumers to define a contract that is shared with and verified by producers.
-
-In comparison ```http_stub```:
-* Supports on-the-fly changes to responses to aid exploratory testing and demonstrations.
-* Supports specification based contracts in addition to example based contracts.  Incoming requests can be matched through the use of clauses such as regular expressions and JSON schema definitions.
-* See comparison with ```http-stub-server``` for more highlights.
-
-```http_stub``` can be used for Consumer & Producer contract verification.
-For more information, see the dedicated [Slide Deck](https://docs.google.com/presentation/d/18iikw5rXuHNt7TxmAuiak9kFXR3wmObMMB1jlqrrwbQ/edit?usp=sharing) & [Wiki Page](https://github.com/MYOB-Technology/http_stub/wiki/Contract-Based-Testing-Recommendations).
-
-### [VCR](https://github.com/vcr/vcr)
-Records requests and responses onto 'cassettes'.  Replays responses in-process by mocking HTTP libraries in use.
-
-In comparison ```http_stub```:
-* Relies on an external HTTP server and does not effect HTTP libraries in use.
-* Facilitates TDD/BDD style testing by not relying on real integrations being recorded and pre-existing.
-* Can make it easier to write and alter requests and responses by not having to alter or re-record cassettes / recordings.
-
-### [http-stub-server](https://github.com/Sensis/http-stub-server)
-Similiar in spirit, implemented in Java and comes with Java and Ruby clients.
-
-In comparison ```http_stub```:
-* Has [session support](https://github.com/MYOB-Technology/http_stub/wiki/Stub%20Sessions) to facilitate parallel test execution.
-* Has the concept of [scenarios](https://github.com/MYOB-Technology/http_stub/wiki/Scenarios) that allow on-the-fly changes to responses.  This aids automated testing, exploratory testing and demonstrations.
-* Supports a wider range of [matching rules](https://github.com/MYOB-Technology/http_stub/wiki/Stub-Request-Matching) and can match requests against JSON schemas.
-* Supports references to request headers and parameters in responses.
-* Supports multi-part file responses.
-* Allows cross-origin request support to be enabled easily.
-* Allows a match to trigger the registration of other ```stubs``` to simulate state changes in the provider.
-* Has [diagnostic pages](https://github.com/MYOB-Technology/http_stub/wiki/Diagnostic-Pages) to interrogate the state of the stub, trace requests to responses, and activate scenarios on-the-fly.
-* Has an elegant [Ruby DSL](https://github.com/MYOB-Technology/http_stub/wiki/The-Configurator-DSL) that aids in keeping requests and responses DRY.
-
-### [HTTParrot](https://github.com/abrandoned/httparrot), [Rack Stubs](https://github.com/featurist/rack-stubs), [mock_server](https://github.com/unixcharles/mock_server)
-These are similar in spirit, implemented in Ruby, but have limited functionality and have been discontinued.
 
 Design
 ------
@@ -171,6 +124,45 @@ In your Gemfile include:
 ```ruby
     gem 'http_stub'
 ```
+
+Alternatives and Comparisons
+----------------------------
+
+### [Pact](https://github.com/realestate-com-au/pact)
+Facilitates consumer driven contracts by allowing consumers to define a contract that is shared with and verified by producers.
+
+In comparison ```http_stub```:
+* Supports on-the-fly changes to responses to aid exploratory testing and demonstrations.
+* Supports specification based contracts in addition to example based contracts.  Incoming requests can be matched through the use of clauses such as regular expressions and JSON schema definitions.
+* See comparison with ```http-stub-server``` for more highlights.
+
+```http_stub``` can be used for Consumer & Producer based contract verification.
+For more information, see the dedicated [Slide Deck](https://docs.google.com/presentation/d/18iikw5rXuHNt7TxmAuiak9kFXR3wmObMMB1jlqrrwbQ/edit?usp=sharing) & [Wiki Page](https://github.com/MYOB-Technology/http_stub/wiki/Contract-Based-Testing-Recommendations).
+
+### [VCR](https://github.com/vcr/vcr)
+Records requests and responses onto 'cassettes'.  Replays responses in-process by mocking HTTP libraries in use.
+
+In comparison ```http_stub```:
+* Relies on an external HTTP server and does not effect HTTP libraries in use.
+* Facilitates test-first practice by not relying on real integrations being recorded and pre-existing.
+* Can make it easier to write and alter requests and responses by not having to alter or re-record cassettes / recordings.
+
+### [http-stub-server](https://github.com/Sensis/http-stub-server)
+Similar in spirit, implemented in Java and comes with Java and Ruby clients.
+
+In comparison ```http_stub```:
+* Has [session support](https://github.com/MYOB-Technology/http_stub/wiki/Stub%20Sessions) to facilitate parallel test execution.
+* Has the concept of [scenarios](https://github.com/MYOB-Technology/http_stub/wiki/Scenarios) that allow on-the-fly changes to responses.  This aids automated testing, exploratory testing and demonstrations.
+* Supports a wider range of [matching rules](https://github.com/MYOB-Technology/http_stub/wiki/Stub-Request-Matching) and can match requests against JSON schemas.
+* Supports references to request headers and parameters in responses.
+* Supports multi-part file responses.
+* Allows cross-origin request support to be enabled easily.
+* Allows a match to trigger the registration of other ```stubs``` to simulate state changes in the provider.
+* Has [diagnostic pages](https://github.com/MYOB-Technology/http_stub/wiki/Diagnostic-Pages) to interrogate the state of the stub, trace requests to responses, and activate scenarios on-the-fly.
+* Has an elegant [Ruby DSL](https://github.com/MYOB-Technology/http_stub/wiki/The-Configurator-DSL) that aids in keeping requests and responses DRY.
+
+### [HTTParrot](https://github.com/abrandoned/httparrot), [Rack Stubs](https://github.com/featurist/rack-stubs), [mock_server](https://github.com/unixcharles/mock_server)
+These are similar in spirit, implemented in Ruby, but have limited functionality and have been discontinued.
 
 Requirements
 ------------
