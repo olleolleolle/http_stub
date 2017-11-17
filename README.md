@@ -125,6 +125,12 @@ In your Gemfile include:
     gem 'http_stub'
 ```
 
+Requirements
+------------
+
+* Ruby >= 2.2.2 (see the [CHANGELOG](https://github.com/MYOB-Technology/http_stub/blob/master/CHANGELOG.md) for older versions supporting prior Rubies)
+* A Rack server
+
 Alternatives and Comparisons
 ----------------------------
 
@@ -163,9 +169,3 @@ In comparison ```http_stub```:
 
 ### [HTTParrot](https://github.com/abrandoned/httparrot), [Rack Stubs](https://github.com/featurist/rack-stubs), [mock_server](https://github.com/unixcharles/mock_server)
 These are similar in spirit, implemented in Ruby, but have limited functionality and have been discontinued.
-
-Requirements
-------------
-
-* Ruby >= 2.2.2 (see the [CHANGELOG](https://github.com/MYOB-Technology/http_stub/blob/master/CHANGELOG.md) for older versions supporting prior Rubies)
-* A Rack server
