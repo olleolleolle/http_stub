@@ -40,7 +40,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rack-test",                 "~> 0.7"
   spec.add_development_dependency "wait_until",                "~> 0.3"
   spec.add_development_dependency "selenium-webdriver",        "~> 3.7"
-  spec.add_development_dependency "simplecov",                 "~> 0.15"
+  spec.add_development_dependency "simplecov",                 "~> 0.13.0"
   spec.add_development_dependency "codeclimate-test-reporter", "~> 1.0"
   spec.add_development_dependency "travis-lint",               "~> 2.0"
 end
