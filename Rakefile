@@ -48,7 +48,7 @@ namespace :coverage do
   task :generate do
     ENV["coverage"] = "enabled"
     Rake::Task[:spec].invoke
-    sh "bundle exec codeclimate-test-reporter" if ENV["CODECLIMATE_REPO_TOKEN"]
+    sh "bundle exec codeclimate-test-reporter tmp/coverage/.resultset.json" if ENV["CODECLIMATE_REPO_TOKEN"]
   end
 
   desc "Shows specification coverage results in browser"
