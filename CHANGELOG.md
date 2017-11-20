@@ -1,12 +1,20 @@
 ** 0.28.0.beta1 **
 
+This release removes the ability to define Scenario's and Stubs on-the-fly over HTTP.
+These can now solely be defined via the DSL.<br/>
+This change intends to encourage the production of _verifiable contracts_.
+
+This release also brings the ability to respond dynamically to a matching request by providing a response block.
+The blocks can interpolate any part of the request into the response.<br/>
+
 New:
 * `stub.respond_with(&block)` dynamically invokes the block on each match
-* `HttpStub::Client` provides a DSL over the servers HTTP API to enable scenarios and manipulate sessions
+* `HttpStub::Client` provides a DSL over the servers HTTP API to enable Scenario's and manipulate sessions
 
 Breaking:
 * `HttpStub::Configurer` renamed to `HttpStub::Configurator`
-* A scenario is immediately activated via `scenario.activate!`, a scenario activates other scenarios via `scenario.activate_scenarios!`
+* A scenario is immediately activated via `scenario.activate!`
+  * A scenario activates other scenarios via `scenario.activate_scenarios!`
 * Scenario's and Stubs are no longer configurable over HTTP, they are loaded in-process on the server
   * `HttpStub::Configurator` no longer requires initialization, `#self.on_initialize` is no longer supported
   * `server:configure` rake task has been removed
