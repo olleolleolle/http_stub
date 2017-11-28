@@ -10,6 +10,8 @@ describe "Session acceptance" do
       let(:stub_session_id) { "some_session" }
       let(:stub_session)    { client.session(stub_session_id) }
 
+      let(:request_session_id_header) { { headers: { "http_stub_session_id" => request_session_id } } }
+
       let(:match_response) { HTTParty.get("#{server_uri}/matching_path", request_session_id_header) }
 
       before(:example) { stub_session.activate!("Some Scenario") }
@@ -66,10 +68,6 @@ describe "Session acceptance" do
 
         end
 
-      end
-
-      def request_session_id_header
-        { headers: { "http_stub_session_id" => request_session_id } }
       end
 
     end

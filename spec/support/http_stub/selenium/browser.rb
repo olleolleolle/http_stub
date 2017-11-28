@@ -9,7 +9,7 @@ module HttpStub
           @instance ||= ::Selenium::WebDriver.for(:firefox)
         end
 
-        def stop
+        def stop!
           @instance.try(:quit)
         end
 

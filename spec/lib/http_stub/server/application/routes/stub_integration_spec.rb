@@ -3,9 +3,7 @@ describe HttpStub::Server::Application::Routes::Stub, "when a server is running"
 
   let(:response_document) { Nokogiri::HTML(response.body) }
 
-  before(:example) { initialize_server }
-
-  describe "and a configurator with multiple scenarios is initialized" do
+  describe "that has multiple scenarios configured" do
 
     let(:configurator) { HttpStub::Examples::ConfiguratorWithExhaustiveScenarios }
 

@@ -80,7 +80,7 @@ require_relative 'support/browser_integration'
 
 RSpec.configure do |config|
   config.after(:suite) do
-    HttpStub::Server::Driver.all.each(&:stop)
-    HttpStub::Selenium::Browser.stop
+    HttpStub::Server::Driver.all.each(&:stop!)
+    HttpStub::Selenium::Browser.stop!
   end
 end

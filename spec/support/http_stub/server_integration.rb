@@ -10,24 +10,12 @@ shared_context "server integration" do
   let(:server_uri)    { server_driver.uri }
   let(:client)        { server_driver.client }
 
-  before(:example) { server_driver.start }
+  before(:example) { server_driver.start! }
 
   after(:example) { client.reset! }
 
-  def initialize_server
-    server_driver.session_id = transactional_session_id
-  end
-
   def transactional_session_id
     "http_stub_transactional"
-  end
-
-  def session_id
-    server_driver.session_id
-  end
-
-  def reset_session
-    server_driver.reset_session
   end
 
 end

@@ -28,8 +28,8 @@ module HttpStub
         @host         = "localhost"
       end
 
-      def start
-        return if @port
+      def start!
+        return if started?
         ::Wait.until!(description: "server on an available port started") do
           @port = HttpStub::Port.free_port
           @pid = Process.spawn("rake launch_server configurator=#{@configurator.name} port=#{@port}", out: DEV_NULL,
@@ -42,16 +42,14 @@ module HttpStub
         end
       end
 
-      def session_id=(session_id)
-        @session_id = session_id
+      def stop!
+        Process.kill(9, @pid) if started?
       end
 
-      def reset_session
-        @client.session(@session_id).reset!
-      end
+      private
 
-      def stop
-        Process.kill(9, @pid)
+      def started?
+        !!@client
       end
 
     end
