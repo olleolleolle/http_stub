@@ -52,14 +52,14 @@ GEM
     minitest (5.10.3)
     multi_json (1.12.2)
     multi_xml (0.6.0)
-    nokogiri (1.8.1)
+    nokogiri (1.8.3)
       mini_portile2 (~> 2.3.0)
     parallel (1.12.0)
     parser (2.4.0.2)
       ast (~> 2.3)
     powerpack (0.1.1)
     public_suffix (3.0.1)
-    rack (1.6.8)
+    rack (1.6.10)
     rack-protection (1.5.5)
       rack
     rack-test (0.7.0)
@@ -148,4 +148,4 @@ DEPENDENCIES
   wait_until (~> 0.3)
 
 BUNDLED WITH
-   1.16.0
+   1.16.2
