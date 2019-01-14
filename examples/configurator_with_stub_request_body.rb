@@ -18,14 +18,14 @@ module HttpStub
         stub.match_requests(
           uri:    "/match_body_json_schema",
           method: :post,
-          body:   stub.schema(:json, type: :object,
-                                     properties: {
-                                       string_property:  { type: :string },
-                                       integer_property: { type: :integer, minimum: 0 },
-                                       float_property:   { type: :number }
-                                     },
-                                     required: [ :float_property ]
-                             )
+          body:   stub.schema(:json,
+                              type:       :object,
+                              properties: {
+                                string_property:  { type: :string },
+                                integer_property: { type: :integer, minimum: 0 },
+                                float_property:   { type: :number }
+                              },
+                              required:   [ :float_property ])
         )
         stub.respond_with(status: 204)
       end

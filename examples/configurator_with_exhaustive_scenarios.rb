@@ -4,7 +4,7 @@ module HttpStub
     class ConfiguratorWithExhaustiveScenarios
       include HttpStub::Configurator
 
-      FILE_PATH = ::File.expand_path("../resources/some.pdf", __FILE__).freeze
+      FILE_PATH = ::File.expand_path("resources/some.pdf", __dir__).freeze
 
       [ { "key" => "JSON body" }.to_json,
         "<html><body>HTML body</body></html>",

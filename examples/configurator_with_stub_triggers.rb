@@ -4,7 +4,7 @@ module HttpStub
     class ConfiguratorWithStubTriggers
       include HttpStub::Configurator
 
-      RESOURCES_DIR = ::File.expand_path("../resources", __FILE__).freeze
+      RESOURCES_DIR = ::File.expand_path("resources", __dir__).freeze
 
       private_constant :RESOURCES_DIR
 

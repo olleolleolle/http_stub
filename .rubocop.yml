@@ -21,13 +21,16 @@ Layout/AlignHash:
 # tolerate names that are not predicates
 Naming/PredicateName:
   NameWhitelist: []
+# tolerate memoized instance variable names slightly deviating
+Naming/MemoizedInstanceVariableName:
+  Enabled: false
 
 # aids readability
 Style/RedundantSelf:
   Enabled: false
 Layout/ExtraSpacing:
   Enabled: false
-Layout/SpaceInsideBrackets:
+Layout/SpaceInsideArrayLiteralBrackets:
   Enabled: false
 Layout/SpaceInsidePercentLiteralDelimiters:
   Enabled: false
@@ -46,6 +49,8 @@ Layout/EmptyLinesAroundModuleBody:
 Layout/IndentAssignment:
   Enabled: false
 Style/GuardClause:
+  Enabled: false
+Layout/EmptyLineAfterGuardClause:
   Enabled: false
 Layout/EmptyLinesAroundBlockBody:
   Exclude:

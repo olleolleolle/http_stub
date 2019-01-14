@@ -71,6 +71,18 @@ describe HttpStub::Configurator::Stub::Stub do
         expect(composed_stub.merged_stubs).to eql([ parent_stub ])
       end
 
+      it "creates a stub with different response blocks" do
+        parent_stub = described_class.new
+        child_stub  = described_class.new(parent_stub)
+        another_child_stub = described_class.new(parent_stub)
+
+        expect(response_blocks_of(child_stub)).to_not equal(response_blocks_of(another_child_stub))
+      end
+
+      def response_blocks_of(stub)
+        stub.to_hash[:response][:blocks]
+      end
+
     end
 
     context "when a block is provided" do
@@ -160,11 +172,11 @@ describe HttpStub::Configurator::Stub::Stub do
 
     context "when a hash is provided" do
 
-      let(:response_hash) { { status: 201 } }
+      let(:response_hash) { { json: { some_key: "some value" } } }
 
       subject { composed_stub.respond_with(response_hash) }
 
-      it "includes the proivded hash in the stub payloads response" do
+      it "includes the provided hash in the stub payloads response" do
         subject
 
         expect(composed_stub_response_payload).to include(response_hash)
@@ -172,6 +184,29 @@ describe HttpStub::Configurator::Stub::Stub do
 
       it "returns the stub to support method chaining" do
         expect(subject).to eql(composed_stub)
+      end
+
+      it "does not reflect subsequent changes made to the provided hash" do
+        subject
+
+        response_hash[:json][:some_key] = "another value"
+        expect(composed_stub.to_hash[:response]).to include(json: { some_key: "some value" })
+      end
+
+      context "that is frozen" do
+
+        let(:response_hash) { { status: 201 }.freeze }
+
+        it "includes the provided hash in the stub payloads response" do
+          subject
+
+          expect(composed_stub_response_payload).to include(response_hash)
+        end
+
+        it "returns the stub to support method chaining" do
+          expect(subject).to eql(composed_stub)
+        end
+
       end
 
     end
@@ -573,6 +608,7 @@ describe HttpStub::Configurator::Stub::Stub do
       before(:example) do
         composed_stub.match_requests(fixture.match_rules)
         composed_stub.respond_with(fixture.response)
+        composed_stub.trigger(fixture.triggers)
       end
 
       it "returns a string identifying the stub" do
@@ -608,9 +644,10 @@ describe HttpStub::Configurator::Stub::Stub do
         before(:example) do
           other_composed_stub.match_requests(fixture.match_rules)
           other_composed_stub.respond_with(fixture.response)
+          other_composed_stub.trigger(fixture.triggers)
         end
 
-        context "who has the same data" do
+        context "which has the same data" do
 
           it "returns the same value" do
             expect(subject).to eql(other_composed_stub.id)
@@ -618,14 +655,50 @@ describe HttpStub::Configurator::Stub::Stub do
 
         end
 
-        context "who has different data" do
+        context "which has different request matching rules" do
 
-          before(:example) { other_composed_stub.trigger(fixture.triggers) }
+          before(:example) { other_composed_stub.match_requests(uri: "some_other_uri") }
 
           it "returns a different value" do
             expect(subject).to_not eql(other_composed_stub.id)
           end
 
+        end
+
+        context "which has different response blocks" do
+
+          let(:other_response_block) { lambda { { status: 404 } } }
+
+          before(:example) { other_composed_stub.respond_with(&other_response_block) }
+
+          it "returns a different value" do
+            expect(subject).to_not eql(other_composed_stub.id)
+          end
+
+        end
+
+        context "which has different triggered stubs" do
+
+          let(:triggered_stub) { described_class.new(parent_stub) }
+
+          before(:example) { other_composed_stub.trigger(stub: triggered_stub) }
+
+          it "returns a different value" do
+            expect(subject).to_not eql(other_composed_stub.id)
+          end
+
+        end
+
+      end
+
+      context "that is frozen" do
+
+        before(:example) do
+          composed_stub.match_requests({ status: 201 }.freeze)
+        end
+
+        it "returns a string identifying the stub" do
+          expect(composed_stub.id).to be_a(String)
         end
 
       end
@@ -648,8 +721,8 @@ describe HttpStub::Configurator::Stub::Stub do
     let(:triggers) { { scenarios: [], stubs: [] } }
 
     subject do
-      composed_stub.match_requests(fixture.match_rules.to_hash)
-      composed_stub.respond_with(fixture.response.to_hash)
+      composed_stub.match_requests(fixture.match_rules)
+      composed_stub.respond_with(fixture.response)
       composed_stub.trigger(triggers)
 
       composed_stub.to_hash
@@ -662,11 +735,11 @@ describe HttpStub::Configurator::Stub::Stub do
     context "when provided with request match and response data" do
 
       it "creates a hash with match rules that include the uri and the match options" do
-        expect(subject[:match_rules]).to eql(fixture.match_rules.to_hash)
+        expect(subject[:match_rules]).to eql(fixture.match_rules)
       end
 
       it "creates a hash with response arguments" do
-        expect(subject[:response]).to eql(fixture.response.to_hash)
+        expect(subject[:response]).to eql(fixture.response)
       end
 
       context "and the response data contains blocks" do
@@ -674,7 +747,7 @@ describe HttpStub::Configurator::Stub::Stub do
         before(:example) { fixture.with_response_block! }
 
         it "creates a hash with response arguments that include the blocks" do
-          expect(subject[:response]).to include(blocks: fixture.response.blocks)
+          expect(subject[:response]).to include(blocks: fixture.response[:blocks])
         end
 
       end

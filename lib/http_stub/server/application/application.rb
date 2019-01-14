@@ -7,7 +7,7 @@ module HttpStub
         register Sinatra::Namespace
         register Sinatra::Partial
 
-        set :root, File.expand_path("../..", __FILE__)
+        set :root, File.expand_path("..", __dir__)
         set :environment, :test
         set :session_identifier, nil
 

@@ -10,11 +10,11 @@ require_relative 'lib/http_stub/rake/task_generators'
 require_relative 'lib/http_stub/configurator'
 
 require_relative 'examples/stub_builder'
-Dir[File.expand_path('../examples/**/*.rb', __FILE__)].each { |file| require file }
+Dir[File.expand_path('examples/**/*.rb', __dir__)].each { |file| require file }
 
 directory "pkg"
 
-desc "Removed generated artefacts"
+desc "Removes generated artifacts"
 task :clobber do
   %w{ pkg tmp }.each { |dir| rm_rf dir }
   rm Dir.glob("**/coverage.data"), force: true
@@ -65,14 +65,14 @@ end
 
 task :validate do
   print " Travis CI Validation ".center(80, "*") + "\n"
-  result = `travis-lint #{::File.expand_path('../.travis.yml', __FILE__)}`
+  result = `travis-lint #{::File.expand_path('.travis.yml', __dir__)}`
   puts result
   print "*" * 80 + "\n"
   raise "Travis CI validation failed" unless $?.success?
 end
 
-HttpStub::Server::Daemon.log_dir = ::File.expand_path('../tmp/log', __FILE__)
-HttpStub::Server::Daemon.pid_dir = ::File.expand_path('../tmp/pids', __FILE__)
+HttpStub::Server::Daemon.log_dir = ::File.expand_path('tmp/log', __dir__)
+HttpStub::Server::Daemon.pid_dir = ::File.expand_path('tmp/pids', __dir__)
 
 example_configurator = HttpStub::Examples::ConfiguratorWithExhaustiveScenarios
 example_configurator.stub_server.port = 8001

@@ -1,3 +1,11 @@
+** 0.28.0.beta2 **
+
+Fix:
+* Accommodates stub responses that are frozen
+
+Misc:
+* Upgraded dependencies, migrated to Sinatra 2.0 
+
 ** 0.28.0.beta1 **
 
 This release removes the ability to define Scenario's and Stubs on-the-fly over HTTP.

@@ -4,7 +4,7 @@ module HttpStub
     class ConfiguratorWithFileResponses
       include HttpStub::Configurator
 
-      FILE_PATH = ::File.expand_path("../resources/example.pdf", __FILE__).freeze
+      FILE_PATH = ::File.expand_path("resources/example.pdf", __dir__).freeze
 
       stub_server.add_stub! do
         match_requests(uri: "/stub_response_with_file", method: :get)

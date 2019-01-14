@@ -23,4 +23,5 @@ module CrossOriginServer
     end
 
   end
+
 end

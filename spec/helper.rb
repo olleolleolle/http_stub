@@ -20,17 +20,17 @@ require_relative '../lib/http_stub/client'
 require_relative '../lib/http_stub/rake/task_generators'
 
 require_relative '../examples/stub_builder'
-Dir[File.expand_path('../../examples/**/*.rb', __FILE__)].each { |file| require file }
+Dir[::File.expand_path('../examples/**/*.rb', __dir__)].each { |file| require file }
 
-HttpStub::Server::Daemon.log_dir = ::File.expand_path('../../tmp/log', __FILE__)
-HttpStub::Server::Daemon.pid_dir = ::File.expand_path('../../tmp/pids', __FILE__)
+HttpStub::Server::Daemon.log_dir = ::File.expand_path('../tmp/log', __dir__)
+HttpStub::Server::Daemon.pid_dir = ::File.expand_path('../tmp/pids', __dir__)
 
 HttpServerManager.logger = HttpServerManager::Test::SilentLogger
 
 module HttpStub
 
   module Examples
-    RESOURCES_DIR = ::File.expand_path('../../examples/resources', __FILE__)
+    RESOURCES_DIR = ::File.expand_path('../examples/resources', __dir__)
   end
 
 end

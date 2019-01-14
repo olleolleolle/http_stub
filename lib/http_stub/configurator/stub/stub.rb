@@ -23,18 +23,17 @@ module HttpStub
         end
 
         def respond_with(args={}, &block)
-          remaining_args = args.clone
-          response_args  = @hash[:response]
-          response_args[:blocks].concat(remaining_args.delete(:blocks) || [])
-          response_args[:blocks] << block if block_given?
-          self.tap { response_args.deep_merge!(remaining_args) }
+          remaining_args = args.with_indifferent_access
+          response_opts  = @hash[:response]
+          response_opts[:blocks].concat([ remaining_args.delete(:blocks), block ].flatten.compact)
+          self.tap { response_opts.deep_merge!(remaining_args) }
         end
 
         def trigger(args)
           resolved_args = to_triggers(args)
-          triggers_args = @hash[:triggers]
-          triggers_args[:scenario_names].concat(resolved_args[:scenario_names])
-          triggers_args[:stubs].concat(resolved_args[:stubs])
+          triggers_opts = @hash[:triggers]
+          triggers_opts[:scenario_names].concat(resolved_args[:scenario_names])
+          triggers_opts[:stubs].concat(resolved_args[:stubs])
           self
         end
 
