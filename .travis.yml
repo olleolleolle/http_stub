@@ -1,15 +1,15 @@
+dist: xenial
 language: ruby
 rvm:
-  - 2.2.10
   - 2.3.8
   - 2.4.6
   - 2.5.5
   - 2.6.3
+services:
+  - xvfb
 addons:
   firefox: 67.0.3
 before_install:
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
   - gem update --system
   - gem --version
   - gem install bundler rake
