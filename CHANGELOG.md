@@ -1,3 +1,11 @@
+** 0.28.0.beta3 **
+
+Breaking:
+* Dropped Ruby 2.2 support (encouraged by Bundler)
+
+Misc:
+* Upgraded dependencies 
+
 ** 0.28.0.beta2 **
 
 Fix:

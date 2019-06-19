@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
 
   spec.require_path = "lib"
 
-  spec.required_ruby_version = ">= 2.2.2"
+  spec.required_ruby_version = ">= 2.3"
 
   spec.add_runtime_dependency "rake", ">= 12.3"
 
@@ -30,16 +30,16 @@ Gem::Specification.new do |spec|
   spec.add_dependency "json-schema",         "~> 2.8"
   spec.add_dependency "activesupport",       "~> 5.2"
   spec.add_dependency "method_source",       "~> 0.9"
-  spec.add_dependency "haml",                "~> 5.0"
+  spec.add_dependency "haml",                "~> 5.1"
   spec.add_dependency "sass",                "~> 3.7"
 
-  spec.add_development_dependency "rubocop",                   "~> 0.62"
+  spec.add_development_dependency "rubocop",                   "~> 0.71"
   spec.add_development_dependency "rspec",                     "~> 3.8"
   spec.add_development_dependency "nokogiri",                  "~> 1.10"
-  spec.add_development_dependency "httparty",                  "~> 0.16"
-  spec.add_development_dependency "rack-test",                 "~> 0.8"
+  spec.add_development_dependency "httparty",                  "~> 0.17"
+  spec.add_development_dependency "rack-test",                 "~> 1.1"
   spec.add_development_dependency "wait_until",                "~> 0.3"
-  spec.add_development_dependency "selenium-webdriver",        "~> 3.141"
+  spec.add_development_dependency "selenium-webdriver",        "~> 3.142"
   spec.add_development_dependency "simplecov",                 "~> 0.13.0"
   spec.add_development_dependency "codeclimate-test-reporter", "~> 1.0"
   spec.add_development_dependency "travis-lint",               "~> 2.0"
