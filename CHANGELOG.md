@@ -1,18 +1,13 @@
-** 0.28.0.beta3 **
+** 0.28.0.beta2 **
 
 Breaking:
-* Dropped Ruby 2.2 support (encouraged by Bundler)
-
-Misc:
-* Upgraded dependencies 
-
-** 0.28.0.beta2 **
+* Dropped <= Ruby 2.2 support (official language supported has ended)
 
 Fix:
 * Accommodates stub responses that are frozen
 
 Misc:
-* Upgraded dependencies, migrated to Sinatra 2.0 
+* Upgraded dependencies, locked to Sinatra 2.0.4 as 2.0.5 includes patches to Hash that break behaviors
 
 ** 0.28.0.beta1 **
 

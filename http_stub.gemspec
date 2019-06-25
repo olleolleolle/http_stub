@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 $LOAD_PATH.push ::File.expand_path("lib", __dir__)
 require "http_stub/version"
 
@@ -23,7 +22,7 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency "rake", ">= 12.3"
 
-  spec.add_dependency "sinatra",             "~> 2.0"
+  spec.add_dependency "sinatra",             "= 2.0.4"
   spec.add_dependency "sinatra-contrib",     "~> 2.0"
   spec.add_dependency "sinatra-partial",     "~> 1.0"
   spec.add_dependency "http_server_manager", "~> 0.5"

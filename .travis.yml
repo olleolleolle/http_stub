@@ -8,7 +8,7 @@ rvm:
 services:
   - xvfb
 addons:
-  firefox: 67.0.3
+  firefox: 67.0.4
 before_install:
   - gem update --system
   - gem --version

@@ -14,8 +14,6 @@ Status
 
 [![Build Status](https://travis-ci.org/MYOB-Technology/http_stub.png)](https://travis-ci.org/MYOB-Technology/http_stub)
 [![Gem Version](https://badge.fury.io/rb/http_stub.png)](http://badge.fury.io/rb/http_stub)
-[![Code Climate](https://codeclimate.com/github/MYOB-Technology/http_stub/badges/gpa.svg)](https://codeclimate.com/github/MYOB-Technology/http_stub)
-[![Test Coverage](https://codeclimate.com/github/MYOB-Technology/http_stub/badges/coverage.svg)](https://codeclimate.com/github/MYOB-Technology/http_stub/coverage)
 
 Design
 ------
@@ -127,7 +125,7 @@ In your Gemfile include:
 Requirements
 ------------
 
-* Ruby >= 2.2.2 (see the [CHANGELOG](https://github.com/MYOB-Technology/http_stub/blob/master/CHANGELOG.md) for older versions supporting prior Rubies)
+* Ruby >= 2.3 (see the [CHANGELOG](https://github.com/MYOB-Technology/http_stub/blob/master/CHANGELOG.md) for older versions supporting prior Rubies)
 * A Rack server
 
 Alternatives and Comparisons
