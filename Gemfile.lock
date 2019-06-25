@@ -27,11 +27,9 @@ GEM
     backports (3.15.0)
     childprocess (1.0.1)
       rake (< 13.0)
-    codeclimate-test-reporter (1.0.9)
-      simplecov (<= 0.13)
     concurrent-ruby (1.1.5)
     diff-lcs (1.3)
-    docile (1.1.5)
+    docile (1.3.2)
     ffi (1.11.1)
     haml (5.1.1)
       temple (>= 0.8.0)
@@ -104,8 +102,8 @@ GEM
     selenium-webdriver (3.142.3)
       childprocess (>= 0.5, < 2.0)
       rubyzip (~> 1.2, >= 1.2.2)
-    simplecov (0.13.0)
-      docile (~> 1.1.0)
+    simplecov (0.16.1)
+      docile (~> 1.1)
       json (>= 1.8, < 3)
       simplecov-html (~> 0.10.0)
     simplecov-html (0.10.2)
@@ -142,7 +140,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  codeclimate-test-reporter (~> 1.0)
   http_stub!
   httparty (~> 0.17)
   nokogiri (~> 1.10)
@@ -150,7 +147,7 @@ DEPENDENCIES
   rspec (~> 3.8)
   rubocop (~> 0.71)
   selenium-webdriver (~> 3.142)
-  simplecov (~> 0.13.0)
+  simplecov (~> 0.16)
   travis-lint (~> 2.0)
   wait_until (~> 0.3)
 
