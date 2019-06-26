@@ -29,7 +29,7 @@ task :provision do
   sh "provisioning/install_geckodriver.sh"
 end
 
-desc "Launches a server for test purposes"
+desc "Launches a stub server provided a configurator and port"
 task :launch_server do
   configurator = ENV["configurator"].constantize
   configurator.stub_server.port = ENV["port"].to_i
