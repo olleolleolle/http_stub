@@ -32,7 +32,7 @@ module HttpStub
         return if started?
         ::Wait.until!(description: "server on an available port started") do
           @port = HttpStub::Port.free_port
-          @pid = Process.spawn("rake launch_server configurator=#{@configurator.name} port=#{@port} 2>&1")
+          @pid = Process.spawn("rake launch_server configurator=#{@configurator.name} port=#{@port}")
           ::Wait.until!(description: "http stub server for #{@configurator.name} started", timeout_in_seconds: 5) do
             Net::HTTP.get_response(@host, "/http_stub/status", @port)
             @uri    = "http://#{@host}:#{@port}"
