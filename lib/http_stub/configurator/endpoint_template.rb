@@ -11,7 +11,7 @@ module HttpStub
       end
 
       def add_scenario!(name, response_overrides={}, &block)
-        @server.add_scenario_with_one_stub!(name, self.build_stub(response_overrides, &block))
+        @server.add_scenario_with_one_stub!(name, self.build_stub(response_overrides), &block)
       end
 
       def add_stub!(response_overrides={}, &block)

@@ -73,7 +73,7 @@ end
 HttpStub::Server::Daemon.log_dir = ::File.expand_path('tmp/log', __dir__)
 HttpStub::Server::Daemon.pid_dir = ::File.expand_path('tmp/pids', __dir__)
 
-example_configurator = HttpStub::Examples::ConfiguratorWithExhaustiveScenarios
+example_configurator = HttpStub::Examples::ConfiguratorWithEndpointTemplate
 example_configurator.stub_server.port = 8001
 HttpStub::Rake::ServerTasks.new(name: :example_server, configurator: example_configurator)
 HttpStub::Rake::ServerDaemonTasks.new(name: :example_server_daemon, configurator: example_configurator)

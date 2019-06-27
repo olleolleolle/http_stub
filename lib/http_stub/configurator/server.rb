@@ -34,7 +34,9 @@ module HttpStub
 
       def add_scenario_with_one_stub!(name, stub=nil, &block)
         add_scenario!(name) do |scenario|
-          scenario.add_stub!(stub) { |added_stub| added_stub.invoke(block.arity == 2 ? scenario : nil, &block) }
+          built_stub = stub || scenario.build_stub
+          built_stub.invoke(block.arity == 2 ? scenario : nil, &block) if block_given?
+          scenario.add_stub!(built_stub)
         end
       end
 

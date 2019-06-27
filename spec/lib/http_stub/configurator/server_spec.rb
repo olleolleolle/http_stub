@@ -211,11 +211,20 @@ describe HttpStub::Configurator::Server do
 
       subject { server.add_scenario_with_one_stub!(scenario_name, &block) }
 
-      before(:example) { allow(scenario).to receive(:add_stub!).and_yield(the_stub) }
+      before(:example) do
+        allow(scenario).to receive(:build_stub).and_return(the_stub)
+        allow(scenario).to receive(:add_stub!)
+      end
 
-      it "adds an empty stub to the scenario" do
-        expect(scenario).to receive(:add_stub!).with(nil)
+      it "builds a stub from the scenario" do
+        expect(scenario).to receive(:build_stub).with(no_args)
         
+        subject
+      end
+
+      it "adds the built stub to the scenario" do
+        expect(scenario).to receive(:add_stub!).with(the_stub)
+
         subject
       end
 
@@ -233,6 +242,46 @@ describe HttpStub::Configurator::Server do
       end
 
       context "that accepts the stub and scenario as arguments" do
+
+        let(:block) { lambda { |_stub, _scenario| block_verifier.verify } }
+
+        it "invokes the stub and supplies the scenario" do
+          expect(the_stub).to receive(:invoke).with(scenario).and_yield(the_stub, scenario)
+          expect(block_verifier).to receive(:verify)
+
+          subject
+        end
+
+      end
+
+    end
+
+    context "when a stub and block is provided" do
+
+      subject { server.add_scenario_with_one_stub!(scenario_name, the_stub, &block) }
+
+      before(:example) { allow(scenario).to receive(:add_stub!) }
+
+      it "adds the stub to the scenario" do
+        expect(scenario).to receive(:add_stub!).with(the_stub)
+
+        subject
+      end
+
+      context "and the block accepts the stub as an argument" do
+
+        let(:block) { lambda { |_stub| block_verifier.verify } }
+
+        it "invokes the stub with no additional argument" do
+          expect(the_stub).to receive(:invoke).with(nil).and_yield(the_stub)
+          expect(block_verifier).to receive(:verify)
+
+          subject
+        end
+
+      end
+
+      context "and the block accepts the stub and scenario as arguments" do
 
         let(:block) { lambda { |_stub, _scenario| block_verifier.verify } }
 

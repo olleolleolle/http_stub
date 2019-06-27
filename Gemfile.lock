@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    http_stub (0.28.0.beta2)
+    http_stub (0.28.0.beta3)
       activesupport (~> 5.2)
       haml (~> 5.1)
       http_server_manager (~> 0.5)
@@ -145,7 +145,7 @@ DEPENDENCIES
   nokogiri (~> 1.10)
   rack-test (~> 1.1)
   rspec (~> 3.8)
-  rubocop (~> 0.71)
+  rubocop (~> 0.72)
   selenium-webdriver (~> 3.142)
   simplecov (~> 0.16)
   travis-lint (~> 2.0)

@@ -130,15 +130,15 @@ describe HttpStub::Configurator::EndpointTemplate do
       allow(server).to receive(:add_scenario_with_one_stub!)
     end
 
-    it "builds a stub using any provided response overrides and block" do
-      expect(endpoint_stub_template).to receive(:build_stub).with(response_overrides).and_yield
-      expect(block_verifier).to receive(:verify)
+    it "builds a stub using any provided response overrides" do
+      expect(endpoint_stub_template).to receive(:build_stub).with(response_overrides)
 
       subject
     end
 
-    it "adds a one stub scenario to the server with the provided name and built stub" do
-      expect(server).to receive(:add_scenario_with_one_stub!).with(name, built_stub)
+    it "adds a one stub scenario to the server with the provided name, built stub and block" do
+      expect(server).to receive(:add_scenario_with_one_stub!).with(name, built_stub).and_yield
+      expect(block_verifier).to receive(:verify)
 
       subject
     end

@@ -18,6 +18,13 @@ describe "Endpoint template acceptance" do
       expect(response.body).to eql("custom stub body")
     end
 
+    it "registers any stubs for templated scenarios initially activated" do
+      response = issue_request("scenario_initially_activated")
+
+      expect(response.code).to eql(202)
+      expect(response.body).to eql("scenario initially activated body")
+    end
+
     context "and a templated scenario is activated" do
 
       before(:example) { client.activate!(scenario_name) }
