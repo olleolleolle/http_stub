@@ -1,4 +1,4 @@
-** 0.28.0.beta3 **
+** 0.28.0 **
 
 New:
 * `end_point_template.add_scenario!` accepts a block with stub and optionally the scenario as arguments, mimicking `server.add_scenario_with_one_stub!` 
