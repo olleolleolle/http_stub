@@ -14,9 +14,13 @@ module HttpStub
 
       template.add_scenario!("Custom response", status: 202, body: "custom scenario body")
 
-      template.add_scenario!("Custom scenario initially activated") do |stub, scenario|
-        stub.match_requests(uri: "/scenario_initially_activated")
-        stub.respond_with(status: 202, body: "scenario initially activated body")
+      template.add_scenario!("Initially activated via method chaining") do
+        match_requests(uri: "/scenario_activated_via_chaining").respond_with(body: "scenario activated via chaining")
+      end.activate!
+
+      template.add_scenario!("Initially activated via a block") do |stub, scenario|
+        stub.match_requests(uri: "/scenario_activated_via_a_block")
+        stub.respond_with(body: "scenario activated via a block")
         scenario.activate!
       end
 

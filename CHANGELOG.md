@@ -1,3 +1,8 @@
+** 0.28.1 **
+
+New:
+* `server.add_scenario!`, `server.add_scenario_with_one_stub!`, `end_point_template.add_scenario!` return the scenario to support method chaining 
+
 ** 0.28.0 **
 
 New:

@@ -30,6 +30,7 @@ module HttpStub
         scenario = HttpStub::Configurator::Scenario.new(name, @server_stub_template)
         yield scenario
         @state.add_scenario(scenario)
+        scenario
       end
 
       def add_scenario_with_one_stub!(name, stub=nil, &block)

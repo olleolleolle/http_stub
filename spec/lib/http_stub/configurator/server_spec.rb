@@ -141,8 +141,8 @@ describe HttpStub::Configurator::Server do
 
   describe "#add_scenario!" do
 
-    let(:scenario_name)    { "some/scenario/name" }
-    let(:block)            { lambda { |_scenario| "some block" } }
+    let(:scenario_name) { "some/scenario/name" }
+    let(:block)         { lambda { |_scenario| "some block" } }
 
     let(:scenario) { instance_double(HttpStub::Configurator::Scenario) }
 
@@ -175,6 +175,10 @@ describe HttpStub::Configurator::Server do
       subject
     end
 
+    it "returns the created scenario to support method chaining" do
+      expect(subject).to eql(scenario)
+    end
+
   end
 
   describe "#add_scenario_with_one_stub!" do
@@ -187,12 +191,16 @@ describe HttpStub::Configurator::Server do
 
     subject { server.add_scenario_with_one_stub!(scenario_name, the_stub) }
 
-    before(:each) { allow(server).to receive(:add_scenario!).and_yield(scenario) }
+    before(:each) { allow(server).to receive(:add_scenario!).and_yield(scenario).and_return(scenario) }
 
     it "adds a scenario with the provided name" do
       expect(server).to receive(:add_scenario!).with(scenario_name)
 
       subject
+    end
+
+    it "returns the added scenario to support method chaining" do
+      expect(subject).to eql(scenario)
     end
 
     context "when a stub is provided" do

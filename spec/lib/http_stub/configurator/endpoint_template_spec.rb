@@ -121,13 +121,14 @@ describe HttpStub::Configurator::EndpointTemplate do
     let(:block_verifier)     { double("BlockVerifier") }
     let(:block)              { lambda { block_verifier.verify } }
 
-    let(:built_stub) { instance_double(HttpStub::Configurator::Stub::Stub) }
+    let(:built_scenario) { instance_double(HttpStub::Configurator::Scenario) }
+    let(:built_stub)     { instance_double(HttpStub::Configurator::Stub::Stub) }
 
     subject { server_endpoint_template.add_scenario!(name, response_overrides, &block) }
 
     before(:example) do
       allow(endpoint_stub_template).to receive(:build_stub).and_return(built_stub)
-      allow(server).to receive(:add_scenario_with_one_stub!)
+      allow(server).to receive(:add_scenario_with_one_stub!).and_return(built_scenario)
     end
 
     it "builds a stub using any provided response overrides" do
@@ -141,6 +142,10 @@ describe HttpStub::Configurator::EndpointTemplate do
       expect(block_verifier).to receive(:verify)
 
       subject
+    end
+
+    it "returns the stub added to the server" do
+      expect(subject).to eql(built_scenario)
     end
 
   end

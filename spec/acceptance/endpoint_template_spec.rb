@@ -18,11 +18,16 @@ describe "Endpoint template acceptance" do
       expect(response.body).to eql("custom stub body")
     end
 
-    it "registers any stubs for templated scenarios initially activated" do
-      response = issue_request("scenario_initially_activated")
+    it "registers any stubs for templated scenarios initially activated via method chaining" do
+      response = issue_request("scenario_activated_via_chaining")
 
-      expect(response.code).to eql(202)
-      expect(response.body).to eql("scenario initially activated body")
+      expect(response.body).to eql("scenario activated via chaining")
+    end
+
+    it "registers any stubs for templated scenarios initially activated via a blocks" do
+      response = issue_request("scenario_activated_via_a_block")
+
+      expect(response.body).to eql("scenario activated via a block")
     end
 
     context "and a templated scenario is activated" do
