@@ -10,7 +10,6 @@ Gem::Specification.new do |spec|
   spec.description       = "A service virtualization tool that encourages contract based tests in API consumers and producers"
   spec.email             = "matthew.ueckerman@myob.com"
   spec.homepage          = "http://github.com/MYOB-Technology/http_stub"
-  spec.rubyforge_project = "http_stub"
   spec.license           = "MIT"
 
   spec.files      = Dir.glob("./lib/**/*")
